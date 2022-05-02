@@ -102,3 +102,9 @@ dist
 
 # TernJS port file
 .tern-port
+
+# Parcel
+.parcel-cache
+
+# OSX
+.DS_Store

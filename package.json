@@ -1,0 +1,40 @@
+{
+  "name": "use-rapier",
+  "version": "0.0.1",
+  "source": "src/index.ts",
+  "main": "dist/main.js",
+  "module": "dist/module.js",
+  "types": "dist/types.d.ts",
+  "files": [
+    "dist"
+  ],
+  "devDependencies": {
+    "@parcel/packager-ts": "2.5.0",
+    "@parcel/transformer-typescript-types": "2.5.0",
+    "@react-three/drei": "^9.5.3",
+    "@react-three/fiber": "^8.0.12",
+    "@types/react-dom": "^18.0.2",
+    "@types/three": "^0.139.0",
+    "buffer": "^6.0.3",
+    "concurrently": "^7.1.0",
+    "parcel": "^2.5.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "three": "^0.139.2",
+    "typescript": ">=3.0.0"
+  },
+  "peerDependencies": {
+    "@react-three/fiber": "^8.0.12",
+    "react": "^18.0.0",
+    "three": "^0.139.2"
+  },
+  "dependencies": {
+    "@dimforge/rapier3d-compat": "^0.8.0-alpha.2",
+    "use-asset": "^1.0.4"
+  },
+  "scripts": {
+    "clean": "rm -rf dist",
+    "build": "yarn clean; parcel build",
+    "dev": "concurrently 'yarn clean; parcel watch .' 'parcel serve demos/index.html --port 1111'"
+  }
+}
