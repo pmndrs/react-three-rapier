@@ -1,4 +1,4 @@
-// import { RigidBodyType } from "@dimforge/rapier3d-compat";
+import React from "react";
 import { RigidBodyTypeString, Vector3Array } from "./types";
 
 export const vectorArrayToObject = (arr: Vector3Array) => {

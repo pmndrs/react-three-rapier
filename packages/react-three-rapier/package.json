@@ -1,0 +1,30 @@
+{
+  "name": "use-rapier",
+  "version": "0.0.1",
+  "source": "src/index.ts",
+  "main": "dist/use-rapier.cjs.js",
+  "module": "dist/use-rapier.esm.js",
+  "types": "dist/types.d.ts",
+  "files": [
+    "dist"
+  ],
+  "devDependencies": {
+    "@react-three/drei": "^9.5.3",
+    "@react-three/fiber": "^8.0.12",
+    "@types/react-dom": "^18.0.2",
+    "@types/three": "^0.139.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "three": "^0.139.2",
+    "typescript": ">=3.0.0"
+  },
+  "peerDependencies": {
+    "@react-three/fiber": "^8.0.12",
+    "react": "^18.0.0",
+    "three": "^0.139.2"
+  },
+  "dependencies": {
+    "@dimforge/rapier3d-compat": "^0.8.0-alpha.2",
+    "use-asset": "^1.0.4"
+  }
+}

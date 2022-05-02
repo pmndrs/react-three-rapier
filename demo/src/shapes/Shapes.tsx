@@ -2,7 +2,7 @@ import React from "react";
 import { Dispatch, FC, memo, ReactNode, useEffect, useState } from "react";
 
 import { Box, Html, Plane, Sphere, useGLTF } from "@react-three/drei";
-import { useBall, useConvexHull, useCuboid, useCylinder } from "../../src";
+import { useBall, useConvexHull, useCuboid, useCylinder } from "use-rapier";
 import Plinko from "./Plinko";
 import { Mesh } from "three";
 

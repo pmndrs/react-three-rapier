@@ -5,7 +5,7 @@ import {
   CylinderCollider,
   RigidBody,
   useSphericalJoint,
-} from "../../src";
+} from "use-rapier";
 import { useRef } from "react";
 
 const Rod = (props) => {
