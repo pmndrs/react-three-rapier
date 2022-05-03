@@ -1,3 +1,5 @@
+import React from "react";
+
 import { Box, Shadow } from "@react-three/drei";
 import { createRef, forwardRef, ReactNode, useEffect, useRef } from "react";
 import {
@@ -6,7 +8,7 @@ import {
   useCuboid,
   useSphericalJoint,
   Vector3Array,
-} from "../../src";
+} from "@react-three/rapier";
 import { useImperativeHandle } from "react";
 
 const ShadowBox = forwardRef((_, ref) => (

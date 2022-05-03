@@ -1,7 +1,8 @@
+import React from "react";
 import { Box, Environment, OrbitControls, Plane } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { ReactNode, Suspense, useState } from "react";
-import { RapierWorld, useCuboid } from "../src";
+import { RapierWorld, useCuboid } from "@react-three/rapier";
 import Joints from "./joints/Joints";
 import Shapes from "./shapes/Shapes";
 import { ComponentsExample } from "./components/Components";
@@ -62,10 +63,6 @@ export const App = () => {
             {demo === "joints" && <Joints setUI={setUI} />}
             {demo === "components" && <ComponentsExample setUI={setUI} />}
             {demo === "cradle" && <CradleExample setUI={setUI} />}
-            {/* 
-            <RB>
-              <Box />
-            </RB> */}
 
             <Floor />
           </RapierWorld>

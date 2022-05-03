@@ -1,4 +1,4 @@
-import { createContext, FC, ReactNode, useMemo, useRef } from "react";
+import React, { createContext, FC, ReactNode, useMemo, useRef } from "react";
 import { useAsset } from "use-asset";
 import type Rapier from "@dimforge/rapier3d-compat";
 import { useFrame } from "@react-three/fiber";

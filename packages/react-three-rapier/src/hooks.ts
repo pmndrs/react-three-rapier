@@ -1,3 +1,4 @@
+import React, { MutableRefObject } from "react";
 import {
   RefObject,
   useContext,
@@ -178,51 +179,51 @@ export const useRigidBody = <O extends Object3D>(
 export const useRigidBodyWithCollider = <A, O extends Object3D = Object3D>(
   rigidBodyOptions?: UseRigidBodyOptions,
   colliderOptions?: UseColliderOptions<A>
-): [ref: RefObject<Object3D>, rigidBody: RigidBody, collider: Collider] => {
+): [ref: RefObject<O>, rigidBody: RigidBody, collider: Collider] => {
   const [ref, rigidBody] = useRigidBody<O>(rigidBodyOptions);
   const [collider] = useCollider<A>(rigidBody, colliderOptions);
 
   return [ref, rigidBody, collider];
 };
 
-export const useCuboid = (
+export const useCuboid = <T extends Object3D>(
   rigidBodyOptions: UseBodyOptions = {},
   colliderOptions: UseColliderOptions<CuboidArgs> = {}
 ) => {
-  return useRigidBodyWithCollider<CuboidArgs>(rigidBodyOptions, {
+  return useRigidBodyWithCollider<CuboidArgs, T>(rigidBodyOptions, {
     shape: "cuboid",
     args: colliderOptions.args ?? [0.5, 0.5, 0.5],
     ...colliderOptions,
   });
 };
 
-export const useBall = (
+export const useBall = <T extends Object3D>(
   rigidBodyOptions: UseBodyOptions = {},
   colliderOptions: UseColliderOptions<BallArgs> = {}
 ) => {
-  return useRigidBodyWithCollider<BallArgs>(rigidBodyOptions, {
+  return useRigidBodyWithCollider<BallArgs, T>(rigidBodyOptions, {
     shape: "ball",
     args: colliderOptions.args ?? [0.5],
     ...colliderOptions,
   });
 };
 
-export const useCapsule = (
+export const useCapsule = <T extends Object3D>(
   rigidBodyOptions: UseBodyOptions = {},
   colliderOptions: UseColliderOptions<CapsuleArgs> = {}
 ) => {
-  return useRigidBodyWithCollider<CapsuleArgs>(rigidBodyOptions, {
+  return useRigidBodyWithCollider<CapsuleArgs, T>(rigidBodyOptions, {
     shape: "capsule",
     args: colliderOptions.args ?? [0.5, 0.5],
     ...colliderOptions,
   });
 };
 
-export const useHeightfield = (
+export const useHeightfield = <T extends Object3D>(
   rigidBodyOptions: UseBodyOptions = {},
   colliderOptions: UseColliderOptions<HeightfieldArgs> = {}
 ) => {
-  return useRigidBodyWithCollider<HeightfieldArgs>(rigidBodyOptions, {
+  return useRigidBodyWithCollider<HeightfieldArgs, T>(rigidBodyOptions, {
     shape: "heightfield",
     ...colliderOptions,
   });
@@ -234,22 +235,22 @@ export const useHeightfield = (
  * See https://rapier.rs/docs/user_guides/javascript/rigid_bodies#mass-properties
  * for available properties.
  */
-export const useTrimesh = (
+export const useTrimesh = <T extends Object3D>(
   rigidBodyOptions: UseBodyOptions = {},
   colliderOptions: UseColliderOptions<TrimeshArgs> = {}
 ) => {
-  return useRigidBodyWithCollider<TrimeshArgs>(rigidBodyOptions, {
+  return useRigidBodyWithCollider<TrimeshArgs, T>(rigidBodyOptions, {
     shape: "trimesh",
     ...colliderOptions,
   });
 };
 
-useTrimesh.fromMesh = (
+useTrimesh.fromMesh = <T extends Object3D>(
   mesh: Mesh,
   rigidBodyOptions: UseBodyOptions = {},
   colliderOptions: UseColliderOptions<TrimeshArgs> = {}
 ) => {
-  return useTrimesh(rigidBodyOptions, {
+  return useTrimesh<T>(rigidBodyOptions, {
     args: [
       mesh.geometry.attributes.position.array,
       mesh.geometry?.index?.array || [],
@@ -258,92 +259,92 @@ useTrimesh.fromMesh = (
   });
 };
 
-export const usePolyline = (
+export const usePolyline = <T extends Object3D>(
   rigidBodyOptions: UseBodyOptions = {},
   colliderOptions: UseColliderOptions<PolylineArgs> = {}
 ) => {
-  return useRigidBodyWithCollider<PolylineArgs>(rigidBodyOptions, {
+  return useRigidBodyWithCollider<PolylineArgs, T>(rigidBodyOptions, {
     shape: "polyline",
     ...colliderOptions,
   });
 };
 
-export const useRoundCuboid = (
+export const useRoundCuboid = <T extends Object3D>(
   rigidBodyOptions: UseBodyOptions = {},
   colliderOptions: UseColliderOptions<RoundCuboidArgs> = {}
 ) => {
-  return useRigidBodyWithCollider<RoundCuboidArgs>(rigidBodyOptions, {
+  return useRigidBodyWithCollider<RoundCuboidArgs, T>(rigidBodyOptions, {
     shape: "roundCuboid",
     ...colliderOptions,
   });
 };
 
-export const useCylinder = (
+export const useCylinder = <T extends Object3D>(
   rigidBodyOptions: UseBodyOptions = {},
   colliderOptions: UseColliderOptions<CylinderArgs> = {}
 ) => {
-  return useRigidBodyWithCollider<CylinderArgs>(rigidBodyOptions, {
+  return useRigidBodyWithCollider<CylinderArgs, T>(rigidBodyOptions, {
     shape: "cylinder",
     ...colliderOptions,
   });
 };
 
-export const useRoundCylinder = (
+export const useRoundCylinder = <T extends Object3D>(
   rigidBodyOptions: UseBodyOptions = {},
   colliderOptions: UseColliderOptions<RoundCylinderArgs> = {}
 ) => {
-  return useRigidBodyWithCollider<RoundCylinderArgs>(rigidBodyOptions, {
+  return useRigidBodyWithCollider<RoundCylinderArgs, T>(rigidBodyOptions, {
     shape: "roundCylinder",
     ...colliderOptions,
   });
 };
 
-export const useCone = (
+export const useCone = <T extends Object3D>(
   rigidBodyOptions: UseBodyOptions = {},
   colliderOptions: UseColliderOptions<ConeArgs> = {}
 ) => {
-  return useRigidBodyWithCollider<ConeArgs>(rigidBodyOptions, {
+  return useRigidBodyWithCollider<ConeArgs, T>(rigidBodyOptions, {
     shape: "cone",
     ...colliderOptions,
   });
 };
 
-export const useRoundCone = (
+export const useRoundCone = <T extends Object3D>(
   rigidBodyOptions: UseBodyOptions = {},
   colliderOptions: UseColliderOptions<RoundCone> = {}
 ) => {
-  return useRigidBodyWithCollider<RoundCone>(rigidBodyOptions, {
+  return useRigidBodyWithCollider<RoundCone, T>(rigidBodyOptions, {
     shape: "roundCone",
     ...colliderOptions,
   });
 };
 
-export const useConvexHull = (
+export const useConvexHull = <T extends Object3D>(
   rigidBodyOptions: UseBodyOptions = {},
   colliderOptions: UseColliderOptions<ConvexHullArgs> = {}
 ) => {
-  return useRigidBodyWithCollider<ConvexHullArgs>(rigidBodyOptions, {
+  return useRigidBodyWithCollider<ConvexHullArgs, T>(rigidBodyOptions, {
     shape: "convexHull",
     ...colliderOptions,
   });
 };
 
-useConvexHull.fromMesh = (
+useConvexHull.fromMesh = <T extends Object3D>(
   mesh: Mesh,
   rigidBodyOptions: UseBodyOptions = {},
   colliderOptions: Omit<UseColliderOptions<ConvexHullArgs>, "colliderArgs"> = {}
 ) => {
-  return useConvexHull(rigidBodyOptions, {
+  return useConvexHull<T>(rigidBodyOptions, {
     args: [mesh?.geometry?.attributes?.position?.array || []],
     ...colliderOptions,
   });
 };
 
-export const useRoundConvexHull = (
+export const useRoundConvexHull = <T extends Object3D>(
   rigidBodyOptions: UseBodyOptions = {},
   colliderOptions: UseColliderOptions<RoundConvexHullArgs> = {}
 ) => {
-  return useRigidBodyWithCollider<RoundConvexHullArgs>(rigidBodyOptions, {
+  return useRigidBodyWithCollider<RoundConvexHullArgs, T>(rigidBodyOptions, {
     shape: "roundConvexHull",
     ...colliderOptions,
   });

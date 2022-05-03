@@ -1,3 +1,4 @@
+import React from "react";
 import type Rapier from "@dimforge/rapier3d-compat";
 
 import {
@@ -6,9 +7,6 @@ import {
   RigidBodyType,
 } from "@dimforge/rapier3d-compat";
 import { RefObject } from "react";
-import { Object3D } from "three";
-
-// export { ,RigidBodyType };
 
 export interface UseRigidBodyAPI {
   rigidBody: Rapier.RigidBody;

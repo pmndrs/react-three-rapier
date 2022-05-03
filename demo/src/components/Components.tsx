@@ -6,7 +6,7 @@ import {
   CuboidCollider,
   RigidBody,
   TrimeshCollider,
-} from "../../src";
+} from "@react-three/rapier";
 import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import type { RigidBody as RB } from "@dimforge/rapier3d-compat";

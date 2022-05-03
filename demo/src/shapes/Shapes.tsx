@@ -2,7 +2,12 @@ import React from "react";
 import { Dispatch, FC, memo, ReactNode, useEffect, useState } from "react";
 
 import { Box, Html, Plane, Sphere, useGLTF } from "@react-three/drei";
-import { useBall, useConvexHull, useCuboid, useCylinder } from "../../src";
+import {
+  useBall,
+  useConvexHull,
+  useCuboid,
+  useCylinder,
+} from "@react-three/rapier";
 import Plinko from "./Plinko";
 import { Mesh } from "three";
 
@@ -62,7 +67,7 @@ const RigidBox = memo(() => {
 
 const RigidCylinder = memo(() => {
   const color = useRandomColor();
-  const [cylinder, api] = useCylinder(
+  const [cylinder, api] = useCylinder<Mesh>(
     {
       position: [-4 + Math.random() * 8, 10, 0],
     },
@@ -100,9 +105,9 @@ const RigidBall = memo(() => {
 useGLTF.preload(new URL("objects.glb", import.meta.url).toString());
 
 const HullPear = () => {
-  const { nodes } = useGLTF(
+  const { nodes } = (useGLTF(
     new URL("objects.glb", import.meta.url).toString()
-  ) as unknown as {
+  ) as unknown) as {
     nodes: {
       pear: Mesh;
     };
@@ -115,7 +120,7 @@ const HullPear = () => {
     return g;
   });
 
-  const [pear] = useConvexHull(
+  const [pear] = useConvexHull<Mesh>(
     {
       position: [-4 + Math.random() * 8, 10, 0],
     },
@@ -136,9 +141,9 @@ const HullPear = () => {
 };
 
 const MeshBoat = () => {
-  const { nodes } = useGLTF(
+  const { nodes } = (useGLTF(
     new URL("objects.glb", import.meta.url).toString()
-  ) as unknown as {
+  ) as unknown) as {
     nodes: {
       boat: Mesh;
     };
@@ -151,7 +156,7 @@ const MeshBoat = () => {
     return g;
   });
 
-  const [boat] = useConvexHull(
+  const [boat] = useConvexHull<Mesh>(
     {
       position: [-4 + Math.random() * 8, 10, 0],
     },
@@ -171,7 +176,7 @@ const MeshBoat = () => {
   );
 };
 
-const itemMap = {
+const itemMap: Record<string, FC> = {
   box: RigidBox,
   cylinder: RigidCylinder,
   ball: RigidBall,
