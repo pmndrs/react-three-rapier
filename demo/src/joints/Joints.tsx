@@ -8,7 +8,7 @@ import {
   useCuboid,
   useSphericalJoint,
   Vector3Array,
-} from "use-rapier";
+} from "@react-three/rapier";
 import { useImperativeHandle } from "react";
 
 const ShadowBox = forwardRef((_, ref) => (

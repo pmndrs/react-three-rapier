@@ -2,7 +2,7 @@ import React from "react";
 import { Box, Environment, OrbitControls, Plane } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { ReactNode, Suspense, useState } from "react";
-import { RapierWorld, useCuboid } from "use-rapier";
+import { RapierWorld, useCuboid } from "@react-three/rapier";
 import Joints from "./joints/Joints";
 import Shapes from "./shapes/Shapes";
 import { ComponentsExample } from "./components/Components";

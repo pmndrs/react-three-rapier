@@ -1,8 +1,8 @@
 <h1 align="center">use-rapier 🗡</h1>
 
-⚠️ Under heavy development. All APIs are subject to change.
+<p align="center">⚠️ Under heavy development. All APIs are subject to change. ⚠️</p>
 
-## Syntax
+## Alpha Usage
 
 Hooks:
 
@@ -12,18 +12,16 @@ import { useCuboid } from "use-rapier";
 
 const RigidBox = () => {
   // Generates a RigidBody and attaches a BoxCollider to it, returns a ref
-  const [box, rigidBody] = useCuboid(
+  const [box, rigidBody, collider] = useCuboid(
     { position: [1, 1, 1] },
-    {
-      args: [0.5, 0.5, 0.5],
-    }
+    { args: [0.5, 0.5, 0.5] }
   );
 
   return <Box ref={box} />;
 };
 ```
 
-Or, using components:
+Or, using components:  
 This is equivalent to the above 👆
 
 ```tsx
@@ -31,17 +29,13 @@ import { Box } from "@react-three/drei";
 
 const RigidBox = () => {
   return (
-    <RigidBox position={[1, 1, 1]}>
+    <RigidBody position={[1, 1, 1]}>
       <Box />
       <CuboidCollider args={[0.5, 0.5, 0.5]} />
-    </RigidBox>
+    </RigidBody>
   );
 };
 ```
-
-## Dev notes
-
-Currently built with Parcel (https://parceljs.org/).
 
 ## Roadmap
 

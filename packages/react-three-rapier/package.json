@@ -1,9 +1,9 @@
 {
-  "name": "use-rapier",
-  "version": "0.0.1",
+  "name": "@react-three/rapier",
+  "version": "0.1.0-alpha.1",
   "source": "src/index.ts",
-  "main": "dist/use-rapier.cjs.js",
-  "module": "dist/use-rapier.esm.js",
+  "main": "dist/react-three-rapier.cjs.js",
+  "module": "dist/react-three-rapier.esm.js",
   "types": "dist/types.d.ts",
   "files": [
     "dist"
