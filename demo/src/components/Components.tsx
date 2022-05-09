@@ -22,15 +22,27 @@ const Map = () => {
   nodes.map.receiveShadow = true;
 
   return (
-    <RigidBody position={[0, -10, 0]}>
-      <primitive object={nodes.map} />;
-      <TrimeshCollider
-        args={[
-          nodes.map.geometry.attributes.position.array,
-          nodes.map.geometry.index.array,
-        ]}
-      />
-    </RigidBody>
+    <group position={[0, -3, 0]}>
+      <RigidBody position={[3, 0, 0]}>
+        <primitive object={nodes.map} />;
+        <TrimeshCollider
+          args={[
+            nodes.map.geometry.attributes.position.array,
+            nodes.map.geometry.index.array,
+          ]}
+        />
+      </RigidBody>
+
+      <RigidBody position={[10, 0, 0]}>
+        <primitive object={nodes.map.clone(true)} />;
+        <TrimeshCollider
+          args={[
+            nodes.map.geometry.attributes.position.array,
+            nodes.map.geometry.index.array,
+          ]}
+        />
+      </RigidBody>
+    </group>
   );
 };
 
@@ -44,12 +56,14 @@ const Pear = (props) => {
   };
 
   return (
-    <RigidBody {...props}>
-      <Clone object={nodes.pear} castShadow receiveShadow />
-      <ConvexHullCollider
-        args={[nodes.pear.geometry.attributes.position.array]}
-      />
-    </RigidBody>
+    <group {...props}>
+      <RigidBody position={[0, 2, 0]}>
+        <Clone object={nodes.pear} castShadow receiveShadow />
+        <ConvexHullCollider
+          args={[nodes.pear.geometry.attributes.position.array]}
+        />
+      </RigidBody>
+    </group>
   );
 };
 
@@ -70,9 +84,9 @@ export const ComponentsExample = ({ setUI }) => {
         <CuboidCollider position={[2, 0, 0]} args={[0.5, 1, 0.5]} />
       </RigidBody>
 
-      <Pear position={[-2, 2, 0]} />
-      <Pear position={[-2, 4, 0]} />
-      <Pear position={[0, 4, 0]} />
+      <Pear position={[0, 12, 0]} />
+      {/* <Pear position={[-2, 4, 0]} /> */}
+      {/* <Pear position={[0, 4, 0]} /> */}
 
       <Map />
     </group>

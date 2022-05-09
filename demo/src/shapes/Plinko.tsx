@@ -34,16 +34,14 @@ export default function Plinko({ ...props }: JSX.IntrinsicElements["group"]) {
 
   const [plinko] = useTrimesh.fromMesh<Mesh>(nodes.plinko, {
     type: "fixed",
-    position: [0, 7.58, -1.06],
   });
 
   const [wall] = useConvexHull.fromMesh<Mesh>(nodes.wall, {
-    type: "fixed",
-    position: [0, -0.39, 0.44],
+    type: "fixed"
   });
 
   const [container] = useTrimesh.fromMesh<Mesh>(nodes.container, {
-    type: "fixed",
+    type: "fixed"
   });
 
   return (
@@ -53,15 +51,16 @@ export default function Plinko({ ...props }: JSX.IntrinsicElements["group"]) {
         geometry={nodes.plinko.geometry}
         material={materials.blue}
         material-color="blue"
-        position={[0, 7.58, -1.06]}
         castShadow
         receiveShadow
+        position={[0, 7.58, -1.06]}
       />
       <mesh
         ref={container}
         geometry={nodes.container.geometry}
         material={materials.Material}
         castShadow
+        rotation={[0, 1, 0]}
       />
       <mesh
         ref={wall}

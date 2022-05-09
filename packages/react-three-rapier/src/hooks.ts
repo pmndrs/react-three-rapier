@@ -8,13 +8,17 @@ import {
 } from "react";
 import { RapierContext } from "./RapierWorld";
 import { useRef } from "react";
-import { Mesh, Object3D, Quaternion } from "three";
+import { Euler, Mesh, Object3D, Quaternion, Vector2, Vector3 } from "three";
 
 import type Rapier from "@dimforge/rapier3d-compat";
 
 export const useRapier = () => {
   return useContext(RapierContext) as RapierContext;
 };
+
+// Global objects to reuse when handling transforms
+const _quaternion = new Quaternion()
+const _vector3 = new Vector3()
 
 // Private hook for updating the simulations on objects
 const useRapierStep = (callback: () => void) => {
@@ -135,10 +139,14 @@ export const useRigidBody = <O extends Object3D>(
 ): [RefObject<O>, RigidBody] => {
   const { RAPIER, world } = useRapier();
   const ref = useRef<O>(null);
+  const startTransforms = useRef<{
+    position: Vector3,
+    worldPosition: Vector3,
+    rotation: Quaternion,
+    worldRotation: Quaternion
+  }>()
 
   const rigidBody = useMemo(() => {
-    const [rx, ry, rz] = options?.rotation || [0, 0, 0];
-    const [x, y, z] = options?.position || [0, 0, 0];
     const [lvx, lvy, lvz] = options?.linearVelocity ?? [0, 0, 0];
     const [avx, avy, avz] = options?.angularVelocity ?? [0, 0, 0];
     const gravityScale = options?.gravityScale ?? 1;
@@ -146,14 +154,16 @@ export const useRigidBody = <O extends Object3D>(
     const ccdEnabled = options?.ccd ?? false;
     const type = rigidBodyTypeFromString(options?.type || "dynamic");
 
+    const [x, y, z] = options?.position || [0, 0, 0];
+    const [rx, ry, rz] = options?.rotation || [0, 0, 0];
+
     const rigidBodyDesc = new RAPIER.RigidBodyDesc(type)
-      .setTranslation(x, y, z)
-      .setRotation({ x: rx, y: ry, z: rz, w: 1 })
       .setLinvel(lvx, lvy, lvz)
       .setAngvel({ x: avx, y: avy, z: avz })
       .setGravityScale(gravityScale)
       .setCanSleep(canSleep)
-      .setCcdEnabled(ccdEnabled);
+      .setCcdEnabled(ccdEnabled)
+      .setTranslation(0,0,0)
 
     const body = world.createRigidBody(rigidBodyDesc);
 
@@ -161,17 +171,48 @@ export const useRigidBody = <O extends Object3D>(
   }, []);
 
   useRapierStep(() => {
-    if (rigidBody && ref.current) {
+    if (rigidBody && ref.current && startTransforms.current) {
       const { x, y, z } = rigidBody.translation();
       const { x: rx, y: ry, z: rz, w: rw } = rigidBody.rotation();
-      ref.current.position.set(x, y, z);
-      ref.current.rotation.setFromQuaternion(new Quaternion(rx, ry, rz, rw));
+
+      const p = new Vector3(x, y, z).sub(startTransforms.current.worldPosition).add(startTransforms.current.position);
+
+      const { x: wrx, y: wry, z: wrz, w: wrw } = startTransforms.current.worldRotation
+      const r = new Quaternion(
+        rx - wrx + startTransforms.current.rotation.x, 
+        ry - wry + startTransforms.current.rotation.y, 
+        rz - wrz + startTransforms.current.rotation.z, 
+        rw - startTransforms.current.worldRotation.w + startTransforms.current.rotation.w
+      )
+
+      ref.current.position.copy(p)
+      ref.current.rotation.setFromQuaternion(r);
     }
   });
 
   useEffect(() => {
+    if (!ref.current) {
+      ref.current = new Object3D() as O
+    }
+
+    const worldPosition = ref.current.getWorldPosition(new Vector3())
+    const worldRotation = ref.current.getWorldQuaternion(new Quaternion())
+
+    const [x, y, z] = options?.position || [0, 0, 0];
+    const [rx, ry, rz] = options?.rotation || [0, 0, 0];
+
+    startTransforms.current = {
+      position: ref.current.position.clone(),
+      rotation: new Quaternion().setFromEuler(ref.current.rotation),
+      worldPosition,
+      worldRotation
+    }
+
+    rigidBody.setTranslation({x: worldPosition.x + x, y:worldPosition.y + y, z:worldPosition.z + z}, false)
+    rigidBody.setRotation({x:worldRotation.x + rx, y: worldRotation.y + ry,z: worldRotation.z + rz, w:worldRotation.w}, false)
+
     return () => world.removeRigidBody(rigidBody);
-  }, []);
+  }, [])
 
   return [ref, rigidBody];
 };
