@@ -1,9 +1,7 @@
 import React from "react";
 
-import {
-  Collider,
-  RigidBody as RapierRigidBody,
-} from "@dimforge/rapier3d-compat";
+import { Collider } from "@dimforge/rapier3d-compat";
+
 import {
   createContext,
   forwardRef,
@@ -22,6 +20,7 @@ import {
   CylinderArgs,
   HeightfieldArgs,
   PolylineArgs,
+  RapierRigidBody,
   RoundConeArgs,
   RoundConvexHullArgs,
   RoundCuboidArgs,
@@ -31,7 +30,7 @@ import {
   UseRigidBodyOptions,
 } from "./types";
 
-const RigidBodyContext = createContext<RapierRigidBody>(null!);
+const RigidBodyContext = createContext<RapierRigidBody>(undefined!);
 
 const useParentRigidBody = () => useContext(RigidBodyContext);
 

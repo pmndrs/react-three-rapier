@@ -49,7 +49,7 @@ const Label = ({ label }: { label: string }) => {
 
 const RigidBox = memo(() => {
   const color = useRandomColor();
-  const [box] = useCuboid(
+  const [box, rigidBody] = useCuboid(
     {
       position: [-4 + Math.random() * 8, 10, 0],
     },
@@ -57,6 +57,11 @@ const RigidBox = memo(() => {
       args: [0.2, 0.2, 0.2],
     }
   );
+
+  useEffect(() => {
+    rigidBody.applyImpulse({ x: 0, y: 0.2, z: 0 }, true);
+    rigidBody.applyTorqueImpulse({ x: 0, y: 0, z: Math.random() * 0.1 }, true);
+  }, []);
 
   return (
     <Box scale={0.4} ref={box} receiveShadow castShadow>
@@ -166,13 +171,16 @@ const MeshBoat = () => {
   );
 
   return (
-    <mesh
-      castShadow
-      receiveShadow
-      ref={boat}
-      geometry={g}
-      material={nodes.boat.material}
-    />
+    <group>
+      <mesh
+        castShadow
+        receiveShadow
+        ref={boat}
+        geometry={g}
+        material={nodes.boat.material}
+        rotation={[0, 0, Math.PI / 2]}
+      />
+    </group>
   );
 };
 

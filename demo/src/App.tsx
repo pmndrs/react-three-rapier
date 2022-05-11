@@ -7,7 +7,14 @@ import Joints from "./joints/Joints";
 import Shapes from "./shapes/Shapes";
 import { ComponentsExample } from "./components/Components";
 import { CradleExample } from "./cradle/Cradle";
-import { InheritTranslations } from "./inherit-translations/InheritTranslations";
+import { Transforms } from "./transforms/Transforms";
+
+export interface Demo {
+  (props: {
+    children?: ReactNode;
+    setUI: (ui: ReactNode) => void;
+  }): JSX.Element;
+}
 
 const Floor = () => {
   useCuboid(
@@ -34,7 +41,7 @@ const Floor = () => {
 
 export const App = () => {
   const [ui, setUI] = useState<ReactNode>();
-  const [demo, setDemo] = useState("cradle");
+  const [demo, setDemo] = useState("transforms");
 
   return (
     <div
@@ -64,7 +71,7 @@ export const App = () => {
             {demo === "joints" && <Joints setUI={setUI} />}
             {demo === "components" && <ComponentsExample setUI={setUI} />}
             {demo === "cradle" && <CradleExample setUI={setUI} />}
-            {demo === "inherit" && <InheritTranslations setUI={setUI} />}
+            {demo === "transforms" && <Transforms setUI={setUI} />}
 
             <Floor />
           </RapierWorld>
@@ -81,8 +88,8 @@ export const App = () => {
           <button onClick={() => setDemo("joints")}>Joints</button>
           <button onClick={() => setDemo("components")}>Components</button>
           <button onClick={() => setDemo("cradle")}>Cradle</button>
-          <button onClick={() => setDemo("inherit")}>
-            Inherit Translations
+          <button onClick={() => setDemo("transforms")}>
+            Inherited Transforms
           </button>
         </div>
 

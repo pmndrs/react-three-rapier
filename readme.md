@@ -27,12 +27,30 @@ This is equivalent to the above 👆
 ```tsx
 import { Box } from "@react-three/drei";
 
-const RigidBox = () => {
+const Scene = () => {
   return (
     <RigidBody position={[1, 1, 1]}>
       <Box />
       <CuboidCollider args={[0.5, 0.5, 0.5]} />
     </RigidBody>
+  );
+};
+```
+
+Objects work inside other transformed objects as well. Simulation runs in world space and is transformed to the objects local space, so that things act as you'd expect.
+
+```tsx
+import { Box } from "@react-three/drei";
+import { RigidBody, CuboidCollider } from "@react-three/rapier";
+
+const Scene = () => {
+  return (
+    <group position={[2, 5, 0]} rotation={[0, 0.3, 2]}>
+      <RigidBody>
+        <Box />
+        <CuboidCollider args={[0.5, 0.5, 0.5]} />
+      </RigidBody>
+    </group>
   );
 };
 ```
@@ -43,9 +61,10 @@ In order, but also not necessarily:
 
 - [x] Draft of all base shapes
 - [x] Draft of all base joints
+- [x] Nested objects retain world transforms
+- [ ] Nested objects retain correct collider scale
 - [ ] Translation and rotational constraints
-- [ ] Collision events -- Rapier Event Queue
-- [ ] Switch to using Vite for development?
+- [ ] Collision events
 - [ ] Docs
 - [ ] CodeSandbox examples
 - [ ] Helpers, for things like Vehicle, Rope, Player, etc

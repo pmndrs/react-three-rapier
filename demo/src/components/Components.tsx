@@ -8,9 +8,10 @@ import {
   TrimeshCollider,
 } from "@react-three/rapier";
 import { useRef } from "react";
-import { useFrame } from "@react-three/fiber";
+import { GroupProps, Object3DNode, useFrame } from "@react-three/fiber";
 import type { RigidBody as RB } from "@dimforge/rapier3d-compat";
 import { Mesh } from "three";
+import { Demo } from "../App";
 
 const Map = () => {
   const { nodes } = useGLTF(
@@ -28,7 +29,7 @@ const Map = () => {
         <TrimeshCollider
           args={[
             nodes.map.geometry.attributes.position.array,
-            nodes.map.geometry.index.array,
+            nodes.map?.geometry?.index?.array || [],
           ]}
         />
       </RigidBody>
@@ -38,7 +39,7 @@ const Map = () => {
         <TrimeshCollider
           args={[
             nodes.map.geometry.attributes.position.array,
-            nodes.map.geometry.index.array,
+            nodes.map?.geometry?.index?.array || [],
           ]}
         />
       </RigidBody>
@@ -46,7 +47,7 @@ const Map = () => {
   );
 };
 
-const Pear = (props) => {
+const Pear = (props: GroupProps) => {
   const { nodes } = useGLTF(
     new URL("../shapes/objects.glb", import.meta.url).toString()
   ) as unknown as {
@@ -67,8 +68,8 @@ const Pear = (props) => {
   );
 };
 
-export const ComponentsExample = ({ setUI }) => {
-  setUI();
+export const ComponentsExample:Demo = ({ setUI }) => {
+  setUI("");
 
   return (
     <group>
@@ -84,7 +85,8 @@ export const ComponentsExample = ({ setUI }) => {
         <CuboidCollider position={[2, 0, 0]} args={[0.5, 1, 0.5]} />
       </RigidBody>
 
-      <Pear position={[0, 12, 0]} />
+      {Array.from({length: 500}).map((_, i) => <Pear position={[0, 4 * i, 0]} key={i} />)}
+      
       {/* <Pear position={[-2, 4, 0]} /> */}
       {/* <Pear position={[0, 4, 0]} /> */}
 
