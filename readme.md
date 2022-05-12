@@ -1,4 +1,4 @@
-<h1 align="center">use-rapier 🗡</h1>
+<h1 align="center">@react-three/rapier 🗡</h1>
 
 <p align="center">⚠️ Under heavy development. All APIs are subject to change. ⚠️</p>
 
@@ -31,7 +31,6 @@ const Scene = () => {
   return (
     <RigidBody position={[1, 1, 1]}>
       <Box />
-      <CuboidCollider args={[0.5, 0.5, 0.5]} />
     </RigidBody>
   );
 };
@@ -62,9 +61,11 @@ In order, but also not necessarily:
 - [x] Draft of all base shapes
 - [x] Draft of all base joints
 - [x] Nested objects retain world transforms
-- [ ] Nested objects retain correct collider scale
+- [x] Nested objects retain correct collider scale
+- [x] Automatic colliders based on rigidbody children
 - [ ] Translation and rotational constraints
 - [ ] Collision events
+- [ ] InstancedMesh support
 - [ ] Docs
 - [ ] CodeSandbox examples
 - [ ] Helpers, for things like Vehicle, Rope, Player, etc

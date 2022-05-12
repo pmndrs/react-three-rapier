@@ -27,7 +27,7 @@ interface RapierWorldProps {
   children: ReactNode;
 }
 
-export const RapierWorld: FC<RapierWorldProps> = ({
+export const Physics: FC<RapierWorldProps> = ({
   colliders = RigidBodyAutoCollider.Cuboid,
   gravity = [0, -9.81, 0],
   children,

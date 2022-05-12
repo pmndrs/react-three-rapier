@@ -2,7 +2,7 @@ import React from "react";
 import { Box, Environment, OrbitControls, Plane } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { ReactNode, Suspense, useState } from "react";
-import { RapierWorld, useCuboid } from "@react-three/rapier";
+import { Physics, useCuboid } from "@react-three/rapier";
 import Joints from "./joints/Joints";
 import Shapes from "./shapes/Shapes";
 import { ComponentsExample } from "./components/Components";
@@ -53,7 +53,7 @@ export const App = () => {
     >
       <Suspense fallback="Loading...">
         <Canvas shadows>
-          <RapierWorld colliders={false}>
+          <Physics colliders={false}>
             <directionalLight
               castShadow
               position={[10, 10, 10]}
@@ -74,7 +74,7 @@ export const App = () => {
             {demo === "transforms" && <Transforms setUI={setUI} />}
 
             <Floor />
-          </RapierWorld>
+          </Physics>
         </Canvas>
 
         <div

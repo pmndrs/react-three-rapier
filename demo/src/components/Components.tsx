@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 
 import { Box, Clone, useGLTF } from "@react-three/drei";
 import {
@@ -42,10 +42,12 @@ const Pear = (props: GroupProps) => {
     };
   };
 
+  const scale = useMemo(() => Math.random() * .5, [])
+
   return (
     <group {...props} scale={.5}>
       <RigidBody position={[0, 2, 0]} colliders={RigidBodyAutoCollider.ConvexHull}>
-        <Clone object={nodes.pear} castShadow receiveShadow scale={.5} />
+        <Clone object={nodes.pear} castShadow receiveShadow scale={scale} />
       </RigidBody>
     </group>
   );

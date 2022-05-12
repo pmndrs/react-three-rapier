@@ -4,7 +4,7 @@ import React, {
   useEffect,
   useLayoutEffect,
   useMemo, } from "react";
-import { RapierContext } from "./RapierWorld";
+import { RapierContext } from "./Physics";
 import { useRef } from "react";
 import { Euler, Matrix4, Mesh, Object3D, Quaternion, Vector3 } from "three/src/three";
 
