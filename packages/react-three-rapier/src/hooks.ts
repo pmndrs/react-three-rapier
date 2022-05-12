@@ -63,7 +63,7 @@ import {
   SphericalImpulseJoint,
 } from "@dimforge/rapier3d-compat";
 
-import { rigidBodyTypeFromString, vectorArrayToObject } from "./utils";
+import { createCollidersFromChildren, rigidBodyTypeFromString, vectorArrayToObject } from "./utils";
 
 export const useCollider = <A>(
   body: RapierRigidBody,
@@ -81,6 +81,7 @@ export const useCollider = <A>(
       mass * 0.2,
     ];
     const [x, y, z] = options?.position || [0, 0, 0];
+    const [rx, ry, rz] = options?.rotation || [0, 0, 0]
 
     let colliderDesc = (
       RAPIER.ColliderDesc[colliderShape](
@@ -89,6 +90,7 @@ export const useCollider = <A>(
       ) as Rapier.ColliderDesc
     )
       .setTranslation(x, y, z)
+      .setRotation({x: rx, y: ry, z: rz, w: 1})
       .setRestitution(options?.restitution ?? 0)
       .setRestitutionCombineRule(
         options?.restitutionCombineRule ?? RAPIER.CoefficientCombineRule.Average
@@ -132,12 +134,6 @@ export const useRigidBody = <O extends Object3D>(
 ): [MutableRefObject<O>, RapierRigidBody] => {
   const { RAPIER, world } = useRapier();
   const ref = useRef<O>();
-  const startTransforms = useRef<{
-    position: Vector3,
-    worldPosition: Vector3,
-    rotation: Quaternion,
-    worldRotation: Quaternion
-  }>()
 
   // Create rigidbody
   const rigidBody = useMemo(() => {
@@ -194,11 +190,17 @@ export const useRigidBody = <O extends Object3D>(
     rigidBody.resetForces(false)
     rigidBody.resetTorques(false)
 
-    return () => world.removeRigidBody(rigidBody);
+    const colliderSetting = options?.colliders ?? false;
+    const autoColliders = colliderSetting !== false ? createCollidersFromChildren(ref.current, rigidBody, colliderSetting, world) : []
+    
+    return () => {
+      world.removeRigidBody(rigidBody)
+      autoColliders.forEach(collider => world.removeCollider(collider, false))
+    }
   }, [])
 
   useRapierStep(() => {
-    if (rigidBody && ref.current && startTransforms.current) {
+    if (rigidBody && ref.current) {
       const { x, y, z } = rigidBody.translation();
       const { x: rx, y: ry, z: rz, w: rw } = rigidBody.rotation();
 

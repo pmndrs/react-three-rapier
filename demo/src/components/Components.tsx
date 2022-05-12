@@ -5,6 +5,7 @@ import {
   ConvexHullCollider,
   CuboidCollider,
   RigidBody,
+  RigidBodyAutoCollider,
   TrimeshCollider,
 } from "@react-three/rapier";
 import { useRef } from "react";
@@ -24,24 +25,9 @@ const Map = () => {
 
   return (
     <group position={[0, -3, 0]}>
-      <RigidBody position={[3, 0, 0]}>
+      <RigidBody position={[0, 0, 0]} colliders={RigidBodyAutoCollider.Trimesh} >
         <primitive object={nodes.map} />;
-        <TrimeshCollider
-          args={[
-            nodes.map.geometry.attributes.position.array,
-            nodes.map?.geometry?.index?.array || [],
-          ]}
-        />
-      </RigidBody>
-
-      <RigidBody position={[10, 0, 0]}>
-        <primitive object={nodes.map.clone(true)} />;
-        <TrimeshCollider
-          args={[
-            nodes.map.geometry.attributes.position.array,
-            nodes.map?.geometry?.index?.array || [],
-          ]}
-        />
+        <primitive object={nodes.map.clone(true)} position={[10,0,0]} />;
       </RigidBody>
     </group>
   );
@@ -57,12 +43,9 @@ const Pear = (props: GroupProps) => {
   };
 
   return (
-    <group {...props}>
-      <RigidBody position={[0, 2, 0]}>
-        <Clone object={nodes.pear} castShadow receiveShadow />
-        <ConvexHullCollider
-          args={[nodes.pear.geometry.attributes.position.array]}
-        />
+    <group {...props} scale={.5}>
+      <RigidBody position={[0, 2, 0]} colliders={RigidBodyAutoCollider.ConvexHull}>
+        <Clone object={nodes.pear} castShadow receiveShadow scale={.5} />
       </RigidBody>
     </group>
   );
@@ -73,22 +56,16 @@ export const ComponentsExample:Demo = ({ setUI }) => {
 
   return (
     <group>
-      <RigidBody rotation={[0, 0, 0.2]}>
+      <RigidBody rotation={[0, 0, 0.2]} colliders={RigidBodyAutoCollider.Cuboid}>
         <Box castShadow>
           <meshPhysicalMaterial />
         </Box>
         <Box position={[2, 0, 0]} scale={[1, 2, 1]} castShadow>
           <meshPhysicalMaterial />
         </Box>
-
-        <CuboidCollider position={[0, 0, 0]} args={[0.5, 0.5, 0.5]} />
-        <CuboidCollider position={[2, 0, 0]} args={[0.5, 1, 0.5]} />
       </RigidBody>
 
-      {Array.from({length: 500}).map((_, i) => <Pear position={[0, 4 * i, 0]} key={i} />)}
-      
-      {/* <Pear position={[-2, 4, 0]} /> */}
-      {/* <Pear position={[0, 4, 0]} /> */}
+      {Array.from({length: 100}).map((_, i) => <Pear position={[0, 4 * i, 0]} key={i} />)}
 
       <Map />
     </group>

@@ -16,6 +16,13 @@ export {
   CoefficientCombineRule as CoefficientCombineRule,
 } from "@dimforge/rapier3d-compat";
 
+export const enum RigidBodyAutoCollider {
+  Ball,
+  Cuboid,
+  Trimesh,
+  ConvexHull
+}
+
 export interface UseRigidBodyAPI {
   rigidBody: RapierRigidBody;
   collider: RapierCollider;
@@ -206,6 +213,17 @@ export interface UseRigidBodyOptions {
    * Initial rotation of the RigidBody
    */
   rotation?: Vector3Array;
+
+  /**
+   * Automatically generate colliders based on meshes inside this
+   * rigid body.
+   * 
+   * You can change the default setting globally by setting the colliders
+   * prop on the <Physics /> component.
+   * 
+   * Setting this to false will disable automatic colliders.
+   */
+  colliders?: RigidBodyAutoCollider | false
 }
 
 // Joints

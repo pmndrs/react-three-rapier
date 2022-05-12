@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 import { Collider } from "@dimforge/rapier3d-compat";
 
@@ -21,6 +21,8 @@ import {
   HeightfieldArgs,
   PolylineArgs,
   RapierRigidBody,
+  RigidBodyAutoCollider,
+  RigidBodyShape,
   RoundConeArgs,
   RoundConvexHullArgs,
   RoundCuboidArgs,
@@ -37,6 +39,7 @@ const useParentRigidBody = () => useContext(RigidBodyContext);
 // RigidBody
 interface RigidBodyProps extends UseRigidBodyOptions {
   children?: ReactNode;
+  colliders?: RigidBodyAutoCollider | false;
 }
 
 export const RigidBody = forwardRef<RapierRigidBody, RigidBodyProps>(
