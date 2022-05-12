@@ -1,6 +1,4 @@
-import React, { useEffect } from "react";
-
-import { Collider } from "@dimforge/rapier3d-compat";
+import React, { MutableRefObject, useEffect } from "react";
 
 import {
   createContext,
@@ -9,8 +7,8 @@ import {
   useContext,
   useImperativeHandle,
 } from "react";
-import { Group } from "three";
-import { useCollider, useRigidBody } from "./hooks";
+import { Group, Vector3 } from "three";
+import { useCollider, useRapier, useRigidBody } from "./hooks";
 import {
   BallArgs,
   CapsuleArgs,
@@ -19,20 +17,18 @@ import {
   CuboidArgs,
   CylinderArgs,
   HeightfieldArgs,
-  PolylineArgs,
   RapierRigidBody,
   RigidBodyAutoCollider,
-  RigidBodyShape,
-  RoundConeArgs,
-  RoundConvexHullArgs,
   RoundCuboidArgs,
-  RoundCylinderArgs,
   TrimeshArgs,
   UseColliderOptions,
   UseRigidBodyOptions,
 } from "./types";
+import { createColliderFromOptions, scaleVertices } from "./utils";
 
-const RigidBodyContext = createContext<RapierRigidBody>(undefined!);
+const RigidBodyContext = createContext<
+  [MutableRefObject<Group>, RapierRigidBody]
+>(undefined!);
 
 const useParentRigidBody = () => useContext(RigidBodyContext);
 
@@ -49,7 +45,7 @@ export const RigidBody = forwardRef<RapierRigidBody, RigidBodyProps>(
     useImperativeHandle(ref, () => rigidBody);
 
     return (
-      <RigidBodyContext.Provider value={rigidBody}>
+      <RigidBodyContext.Provider value={[group, rigidBody]}>
         <group ref={group}>{children}</group>
       </RigidBodyContext.Provider>
     );
@@ -59,192 +55,249 @@ export const RigidBody = forwardRef<RapierRigidBody, RigidBodyProps>(
 // Colliders
 type ColliderProps<A> = Omit<UseColliderOptions<A>, "shape">;
 
-export const CuboidCollider = forwardRef<Collider, ColliderProps<CuboidArgs>>(
-  (props, ref) => {
-    const rigidBody = useParentRigidBody();
-    const [collider] = useCollider(rigidBody, {
-      shape: "cuboid",
-      ...props,
-    });
+export const CuboidCollider = (props: UseColliderOptions<CuboidArgs>) => {
+  const { world } = useRapier();
+  const [ref, rigidBody] = useParentRigidBody();
 
-    useImperativeHandle(ref, () => collider);
+  useEffect(() => {
+    const [x, y, z] = props.args || [0.5, 0.5, 0.5];
+    const scale = ref.current.getWorldScale(new Vector3());
 
-    return null;
-  }
-);
+    const collider = createColliderFromOptions(
+      {
+        shape: "cuboid",
+        ...props,
+        args: [scale.x * x, scale.y * y, scale.z * z],
+      },
+      world,
+      rigidBody
+    );
 
-export const RoundCuboidCollider = forwardRef<
-  Collider,
-  ColliderProps<RoundCuboidArgs>
->((props, ref) => {
-  const rigidBody = useParentRigidBody();
-  const [collider] = useCollider(rigidBody, {
-    shape: "roundCuboid",
-    ...props,
-  });
-
-  useImperativeHandle(ref, () => collider);
+    return () => {
+      world.removeCollider(collider, false);
+    };
+  }, []);
 
   return null;
-});
+};
 
-export const BallCollider = forwardRef<Collider, ColliderProps<BallArgs>>(
-  (props, ref) => {
-    const rigidBody = useParentRigidBody();
-    const [collider] = useCollider(rigidBody, {
-      shape: "ball",
-      ...props,
-    });
+export const RoundCuboidCollider = (
+  props: UseColliderOptions<RoundCuboidArgs>
+) => {
+  const { world } = useRapier();
+  const [ref, rigidBody] = useParentRigidBody();
 
-    useImperativeHandle(ref, () => collider);
+  useEffect(() => {
+    const [x, y, z, r] = props.args || [0.5, 0.5, 0.5, 0.1];
+    const scale = ref.current.getWorldScale(new Vector3());
 
-    return null;
-  }
-);
+    const collider = createColliderFromOptions(
+      {
+        shape: "roundCuboid",
+        ...props,
+        args: [scale.x * x, scale.y * y, scale.z * z, scale.x * r],
+      },
+      world,
+      rigidBody
+    );
 
-export const CapsuleCollider = forwardRef<Collider, ColliderProps<CapsuleArgs>>(
-  (props, ref) => {
-    const rigidBody = useParentRigidBody();
-    const [collider] = useCollider(rigidBody, {
-      shape: "capsule",
-      ...props,
-    });
-
-    useImperativeHandle(ref, () => collider);
-
-    return null;
-  }
-);
-
-export const HeightfieldCollider = forwardRef<
-  Collider,
-  ColliderProps<HeightfieldArgs>
->((props, ref) => {
-  const rigidBody = useParentRigidBody();
-  const [collider] = useCollider(rigidBody, {
-    shape: "heightfield",
-    ...props,
+    return () => {
+      world.removeCollider(collider, false);
+    };
   });
 
-  useImperativeHandle(ref, () => collider);
+  return null;
+};
+
+export const BallCollider = (props: UseColliderOptions<BallArgs>) => {
+  const { world } = useRapier();
+  const [ref, rigidBody] = useParentRigidBody();
+
+  useEffect(() => {
+    const [radius] = props.args || [0.5];
+    const scale = ref.current.getWorldScale(new Vector3());
+
+    const collider = createColliderFromOptions(
+      {
+        shape: "ball",
+        ...props,
+        args: [scale.x * radius],
+      },
+      world,
+      rigidBody
+    );
+
+    return () => {
+      world.removeCollider(collider, false);
+    };
+  }, []);
 
   return null;
-});
+};
 
-export const TrimeshCollider = forwardRef<Collider, ColliderProps<TrimeshArgs>>(
-  (props, ref) => {
-    const rigidBody = useParentRigidBody();
-    const [collider] = useCollider(rigidBody, {
-      shape: "trimesh",
-      ...props,
-    });
+export const CapsuleCollider = (props: UseColliderOptions<CapsuleArgs>) => {
+  const { world } = useRapier();
+  const [ref, rigidBody] = useParentRigidBody();
 
-    useImperativeHandle(ref, () => collider);
+  useEffect(() => {
+    const [radius, height] = props.args || [0.5, 1];
+    const scale = ref.current.getWorldScale(new Vector3());
 
-    return null;
-  }
-);
+    const collider = createColliderFromOptions(
+      {
+        shape: "capsule",
+        ...props,
+        args: [scale.x * radius, scale.y * height],
+      },
+      world,
+      rigidBody
+    );
 
-export const PolylineCollider = forwardRef<
-  Collider,
-  ColliderProps<PolylineArgs>
->((props, ref) => {
-  const rigidBody = useParentRigidBody();
-  const [collider] = useCollider(rigidBody, {
-    shape: "polyline",
-    ...props,
-  });
-
-  useImperativeHandle(ref, () => collider);
+    return () => {
+      world.removeCollider(collider, false);
+    };
+  }, []);
 
   return null;
-});
+};
 
-export const CylinderCollider = forwardRef<
-  Collider,
-  ColliderProps<CylinderArgs>
->((props, ref) => {
-  const rigidBody = useParentRigidBody();
-  const [collider] = useCollider(rigidBody, {
-    shape: "cylinder",
-    ...props,
-  });
+export const HeightfieldCollider = (
+  props: UseColliderOptions<HeightfieldArgs>
+) => {
+  const { world } = useRapier();
+  const [ref, rigidBody] = useParentRigidBody();
 
-  useImperativeHandle(ref, () => collider);
+  useEffect(() => {
+    const [width, height, heights, fieldScale] = props.args || [1, 1, [1], 1];
+    const scale = ref.current.getWorldScale(new Vector3());
 
-  return null;
-});
+    const collider = createColliderFromOptions(
+      {
+        shape: "heightfield",
+        ...props,
+        args: [
+          width,
+          height,
+          heights.map((h) => h * scale.x),
+          fieldScale * scale.x,
+        ],
+      },
+      world,
+      rigidBody
+    );
 
-export const RoundCylinderCollider = forwardRef<
-  Collider,
-  ColliderProps<RoundCylinderArgs>
->((props, ref) => {
-  const rigidBody = useParentRigidBody();
-  const [collider] = useCollider(rigidBody, {
-    shape: "roundCylinder",
-    ...props,
-  });
-
-  useImperativeHandle(ref, () => collider);
-
-  return null;
-});
-
-export const ConeCollider = forwardRef<Collider, ColliderProps<ConeArgs>>(
-  (props, ref) => {
-    const rigidBody = useParentRigidBody();
-    const [collider] = useCollider(rigidBody, {
-      shape: "cone",
-      ...props,
-    });
-
-    useImperativeHandle(ref, () => collider);
-
-    return null;
-  }
-);
-
-export const RoundConeCollider = forwardRef<
-  Collider,
-  ColliderProps<RoundConeArgs>
->((props, ref) => {
-  const rigidBody = useParentRigidBody();
-  const [collider] = useCollider(rigidBody, {
-    shape: "roundCone",
-    ...props,
-  });
-
-  useImperativeHandle(ref, () => collider);
+    return () => {
+      world.removeCollider(collider, false);
+    };
+  }, []);
 
   return null;
-});
+};
 
-export const ConvexHullCollider = forwardRef<
-  Collider,
-  ColliderProps<ConvexHullArgs>
->((props, ref) => {
-  const rigidBody = useParentRigidBody();
-  const [collider] = useCollider(rigidBody, {
-    shape: "convexHull",
-    ...props,
-  });
+export const TrimeshCollider = (props: UseColliderOptions<TrimeshArgs>) => {
+  const { world } = useRapier();
+  const [ref, rigidBody] = useParentRigidBody();
 
-  useImperativeHandle(ref, () => collider);
+  useEffect(() => {
+    const [vertices, indices] = props.args || [[], []];
+    const scale = ref.current.getWorldScale(new Vector3());
 
-  return null;
-});
+    const scaledVertices = scaleVertices(vertices, scale);
 
-export const RoundConvexHullCollider = forwardRef<
-  Collider,
-  ColliderProps<RoundConvexHullArgs>
->((props, ref) => {
-  const rigidBody = useParentRigidBody();
-  const [collider] = useCollider(rigidBody, {
-    shape: "roundConvexHull",
-    ...props,
-  });
+    const collider = createColliderFromOptions(
+      {
+        shape: "trimesh",
+        ...props,
+        args: [scaledVertices, indices],
+      },
+      world,
+      rigidBody
+    );
 
-  useImperativeHandle(ref, () => collider);
+    return () => {
+      world.removeCollider(collider, false);
+    };
+  }, []);
 
   return null;
-});
+};
+
+export const ConeCollider = (props: UseColliderOptions<ConeArgs>) => {
+  const { world } = useRapier();
+  const [ref, rigidBody] = useParentRigidBody();
+
+  useEffect(() => {
+    const [radius, height] = props.args || [0.5, 1];
+    const scale = ref.current.getWorldScale(new Vector3());
+
+    const collider = createColliderFromOptions(
+      {
+        shape: "cone",
+        ...props,
+        args: [scale.x * radius, scale.y * height],
+      },
+      world,
+      rigidBody
+    );
+
+    return () => {
+      world.removeCollider(collider, false);
+    };
+  }, []);
+
+  return null;
+};
+
+export const CylinderCollider = (props: UseColliderOptions<CylinderArgs>) => {
+  const { world } = useRapier();
+  const [ref, rigidBody] = useParentRigidBody();
+
+  useEffect(() => {
+    const [radius, height] = props.args || [0.5, 1];
+    const scale = ref.current.getWorldScale(new Vector3());
+
+    const collider = createColliderFromOptions(
+      {
+        shape: "cylinder",
+        ...props,
+        args: [scale.x * radius, scale.y * height],
+      },
+      world,
+      rigidBody
+    );
+
+    return () => {
+      world.removeCollider(collider, false);
+    };
+  }, []);
+
+  return null;
+};
+
+export const ConvexHullCollider = (
+  props: UseColliderOptions<ConvexHullArgs>
+) => {
+  const { world } = useRapier();
+  const [ref, rigidBody] = useParentRigidBody();
+
+  useEffect(() => {
+    const [vertices] = props.args || [[]];
+    const scale = ref.current.getWorldScale(new Vector3());
+
+    const collider = createColliderFromOptions(
+      {
+        shape: "convexHull",
+        ...props,
+        args: [scaleVertices(vertices, scale)],
+      },
+      world,
+      rigidBody
+    );
+
+    return () => {
+      world.removeCollider(collider, false);
+    };
+  }, []);
+
+  return null;
+};

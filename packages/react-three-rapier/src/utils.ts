@@ -1,10 +1,18 @@
-import { Collider, ColliderDesc, World } from "@dimforge/rapier3d-compat";
 import React from "react";
+
+import {
+  CoefficientCombineRule,
+  Collider,
+  ColliderDesc,
+  World,
+} from "@dimforge/rapier3d-compat";
+
 import { Mesh, Object3D, Quaternion, Vector3 } from "three/src/Three";
 import {
   RapierRigidBody,
   RigidBodyAutoCollider,
   RigidBodyTypeString,
+  UseColliderOptions,
   Vector3Array,
 } from "./types";
 
@@ -24,6 +32,58 @@ const rigidBodyTypeMap: {
 
 export const rigidBodyTypeFromString = (type: RigidBodyTypeString) =>
   rigidBodyTypeMap[type];
+
+export const createColliderFromOptions = <A>(
+  options: UseColliderOptions<A>,
+  world: World,
+  body: RapierRigidBody
+) => {
+  const mass = options?.mass || 1;
+  const colliderShape = options?.shape ?? "cuboid";
+  const colliderArgs = options?.args ?? [];
+  const [cmx, cmy, cmz] = options?.centerOfMass || [0, 0, 0];
+  const [pix, piy, piz] = options?.principalAngularInertia || [
+    mass * 0.2,
+    mass * 0.2,
+    mass * 0.2,
+  ];
+  const [x, y, z] = options?.position || [0, 0, 0];
+  const [rx, ry, rz] = options?.rotation || [0, 0, 0];
+
+  let colliderDesc = (ColliderDesc[colliderShape](
+    // @ts-ignore
+    ...colliderArgs
+  ) as ColliderDesc)
+    .setTranslation(x, y, z)
+    .setRotation({ x: rx, y: ry, z: rz, w: 1 })
+    .setRestitution(options?.restitution ?? 0)
+    .setRestitutionCombineRule(
+      options?.restitutionCombineRule ?? CoefficientCombineRule.Average
+    )
+    .setFriction(options?.friction ?? 0.7)
+    .setFrictionCombineRule(
+      options?.frictionCombineRule ?? CoefficientCombineRule.Average
+    );
+
+  // If any of the mass properties are specified, add mass properties
+  if (
+    options?.mass ||
+    options?.centerOfMass ||
+    options?.principalAngularInertia
+  ) {
+    colliderDesc.setDensity(0);
+    colliderDesc.setMassProperties(
+      mass,
+      { x: cmx, y: cmy, z: cmz },
+      { x: pix, y: piy, z: piz },
+      { x: 0, y: 0, z: 0, w: 1 }
+    );
+  }
+
+  const collider = world.createCollider(colliderDesc, body.handle);
+
+  return collider;
+};
 
 export const createCollidersFromChildren = (
   object: Object3D,
@@ -93,7 +153,16 @@ export const createCollidersFromChildren = (
           break;
       }
 
-      desc.setTranslation(x, y, z).setRotation({ x: rx, y: ry, z: rz, w: rw });
+      // We translate the colliders based on the parent's world scale
+      const parentWorldScale = child.parent!.getWorldScale(new Vector3());
+
+      desc
+        .setTranslation(
+          x * parentWorldScale.x,
+          y * parentWorldScale.y,
+          z * parentWorldScale.z
+        )
+        .setRotation({ x: rx, y: ry, z: rz, w: rw });
 
       const collider = world.createCollider(desc, rigidBody.handle);
       colliders.push(collider);
@@ -101,4 +170,16 @@ export const createCollidersFromChildren = (
   });
 
   return colliders;
+};
+
+export const scaleVertices = (vertices: ArrayLike<number>, scale: Vector3) => {
+  const scaledVerts = Array.from(vertices);
+
+  for (let i = 0; i < vertices.length / 3; i++) {
+    scaledVerts[i * 3] *= scale.x;
+    scaledVerts[i * 3 + 1] *= scale.y;
+    scaledVerts[i * 3 + 2] *= scale.z;
+  }
+
+  return scaledVerts;
 };

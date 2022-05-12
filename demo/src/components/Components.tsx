@@ -2,8 +2,6 @@ import React, { useMemo } from "react";
 
 import { Box, Clone, useGLTF } from "@react-three/drei";
 import {
-  ConvexHullCollider,
-  CuboidCollider,
   RigidBody,
   RigidBodyAutoCollider,
   TrimeshCollider,
@@ -24,10 +22,10 @@ const Map = () => {
   nodes.map.receiveShadow = true;
 
   return (
-    <group position={[0, -3, 0]}>
-      <RigidBody position={[0, 0, 0]} colliders={RigidBodyAutoCollider.Trimesh} >
-        <primitive object={nodes.map} />;
-        <primitive object={nodes.map.clone(true)} position={[10,0,0]} />;
+    <group position={[0, -3, 0]} scale={1.2}>
+      <RigidBody position={[0, -2, 0]}>
+        <primitive object={nodes.map.clone(true)} position={[0,0,0]} />;
+        <TrimeshCollider args={[nodes.map.geometry.attributes.position.array, nodes.map.geometry.index?.array || []]} />;
       </RigidBody>
     </group>
   );
@@ -42,10 +40,10 @@ const Pear = (props: GroupProps) => {
     };
   };
 
-  const scale = useMemo(() => Math.random() * .5, [])
+  const scale = useMemo(() => .4 + Math.random() * .5, [])
 
   return (
-    <group {...props} scale={.5}>
+    <group {...props} scale={1}>
       <RigidBody position={[0, 2, 0]} colliders={RigidBodyAutoCollider.ConvexHull}>
         <Clone object={nodes.pear} castShadow receiveShadow scale={scale} />
       </RigidBody>
@@ -58,18 +56,23 @@ export const ComponentsExample:Demo = ({ setUI }) => {
 
   return (
     <group>
-      <RigidBody rotation={[0, 0, 0.2]} colliders={RigidBodyAutoCollider.Cuboid}>
-        <Box castShadow>
-          <meshPhysicalMaterial />
-        </Box>
-        <Box position={[2, 0, 0]} scale={[1, 2, 1]} castShadow>
-          <meshPhysicalMaterial />
-        </Box>
-      </RigidBody>
+      <group scale={1}>
+        <RigidBody colliders={RigidBodyAutoCollider.Cuboid}>
+          <Box castShadow>
+            <meshPhysicalMaterial />
+          </Box>
+          <Box position={[2, 1, 1]} scale={[4,1,2]} castShadow>
+            <meshPhysicalMaterial />
+          </Box>
+          <Box position={[7, 3, 0]} scale={4} castShadow>
+            <meshPhysicalMaterial />
+          </Box>
+        </RigidBody>
+      </group>
 
-      {Array.from({length: 100}).map((_, i) => <Pear position={[0, 4 * i, 0]} key={i} />)}
+      {/* {Array.from({length: 20}).map((_, i) => <Pear position={[0, 4 * i, 0]} key={i} />)} */}
 
-      <Map />
+      {/* <Map /> */}
     </group>
   );
 };

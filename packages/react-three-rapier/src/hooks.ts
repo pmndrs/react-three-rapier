@@ -63,61 +63,15 @@ import {
   SphericalImpulseJoint,
 } from "@dimforge/rapier3d-compat";
 
-import { createCollidersFromChildren, rigidBodyTypeFromString, vectorArrayToObject } from "./utils";
+import { createColliderFromOptions, createCollidersFromChildren, rigidBodyTypeFromString, vectorArrayToObject } from "./utils";
 
 export const useCollider = <A>(
   body: RapierRigidBody,
-  options?: UseColliderOptions<A>
+  options: UseColliderOptions<A> = {}
 ) => {
   const { RAPIER, world } = useRapier();
   const collider = useMemo(() => {
-    const mass = options?.mass || 1;
-    const colliderShape = options?.shape ?? "cuboid";
-    const colliderArgs = options?.args ?? [];
-    const [cmx, cmy, cmz] = options?.centerOfMass || [0, 0, 0];
-    const [pix, piy, piz] = options?.principalAngularInertia || [
-      mass * 0.2,
-      mass * 0.2,
-      mass * 0.2,
-    ];
-    const [x, y, z] = options?.position || [0, 0, 0];
-    const [rx, ry, rz] = options?.rotation || [0, 0, 0]
-
-    let colliderDesc = (
-      RAPIER.ColliderDesc[colliderShape](
-        // @ts-ignore
-        ...colliderArgs
-      ) as Rapier.ColliderDesc
-    )
-      .setTranslation(x, y, z)
-      .setRotation({x: rx, y: ry, z: rz, w: 1})
-      .setRestitution(options?.restitution ?? 0)
-      .setRestitutionCombineRule(
-        options?.restitutionCombineRule ?? RAPIER.CoefficientCombineRule.Average
-      )
-      .setFriction(options?.friction ?? 0.7)
-      .setFrictionCombineRule(
-        options?.frictionCombineRule ?? RAPIER.CoefficientCombineRule.Average
-      );
-
-    // If any of the mass properties are specified, add mass properties
-    if (
-      options?.mass ||
-      options?.centerOfMass ||
-      options?.principalAngularInertia
-    ) {
-      colliderDesc.setDensity(0);
-      colliderDesc.setMassProperties(
-        mass,
-        { x: cmx, y: cmy, z: cmz },
-        { x: pix, y: piy, z: piz },
-        { x: 0, y: 0, z: 0, w: 1 }
-      );
-    }
-
-    const collider = world.createCollider(colliderDesc, body.handle);
-
-    return collider;
+    return createColliderFromOptions<A>(options, world, body)
   }, []);
 
   useEffect(() => {
@@ -203,15 +157,18 @@ export const useRigidBody = <O extends Object3D>(
     if (rigidBody && ref.current) {
       const { x, y, z } = rigidBody.translation();
       const { x: rx, y: ry, z: rz, w: rw } = rigidBody.rotation();
+      const scale = ref.current.getWorldScale(new Vector3())
 
       if (ref.current.parent) {
         // haha matrixes I have no idea what I'm doing :)
         const o = new Object3D()
         o.position.set(x, y, z)
         o.rotation.setFromQuaternion(new Quaternion(rx, ry, rz, rw))
+        o.scale.set(scale.x, scale.y, scale.z)
         o.updateMatrix()
 
         o.applyMatrix4(ref.current.parent.matrixWorld.clone().invert())
+        o.updateMatrix()
 
         ref.current.position.setFromMatrixPosition(o.matrix)
         ref.current.rotation.setFromRotationMatrix(o.matrix)
