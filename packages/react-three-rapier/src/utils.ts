@@ -11,6 +11,7 @@ import { Mesh, Object3D, Quaternion, Vector3 } from "three/src/Three";
 import {
   RapierRigidBody,
   RigidBodyAutoCollider,
+  RigidBodyShape,
   RigidBodyTypeString,
   UseColliderOptions,
   Vector3Array,
@@ -33,10 +34,34 @@ const rigidBodyTypeMap: {
 export const rigidBodyTypeFromString = (type: RigidBodyTypeString) =>
   rigidBodyTypeMap[type];
 
+export const scaleColliderArgs = (
+  shape: RigidBodyShape,
+  args: (number | ArrayLike<number>)[],
+  scale: Vector3
+) => {
+  // Heightfield only scales the last arg
+  const newArgs = args.slice();
+
+  if (shape === "heightfield") {
+    (newArgs[3] as number) *= scale.x;
+    return newArgs;
+  }
+
+  // Trimesh and convex scale the vertices
+  if (shape === "trimesh" || shape === "convexHull") {
+    scaleVertices(newArgs[0] as ArrayLike<number>, scale);
+    return newArgs;
+  }
+
+  const scaleArray = [scale.x, scale.y, scale.z];
+  return newArgs.map((arg, index) => scaleArray[index] * (arg as number));
+};
+
 export const createColliderFromOptions = <A>(
   options: UseColliderOptions<A>,
   world: World,
-  body: RapierRigidBody
+  body: RapierRigidBody,
+  scale = { x: 1, y: 1, z: 1 }
 ) => {
   const mass = options?.mass || 1;
   const colliderShape = options?.shape ?? "cuboid";
@@ -50,11 +75,14 @@ export const createColliderFromOptions = <A>(
   const [x, y, z] = options?.position || [0, 0, 0];
   const [rx, ry, rz] = options?.rotation || [0, 0, 0];
 
+  // @ts-ignore
+  const scaledArgs = scaleColliderArgs(shape, colliderArgs, scale);
+
   let colliderDesc = (ColliderDesc[colliderShape](
     // @ts-ignore
     ...colliderArgs
   ) as ColliderDesc)
-    .setTranslation(x, y, z)
+    .setTranslation(x * scale.x, y * scale.y, z * scale.z)
     .setRotation({ x: rx, y: ry, z: rz, w: 1 })
     .setRestitution(options?.restitution ?? 0)
     .setRestitutionCombineRule(

@@ -19,10 +19,6 @@ export const Transforms: Demo = () => {
 
   const collider = useRef();
 
-  useEffect(() => {
-    console.log(collider.current);
-  }, []);
-
   return (
     <group>
       <group rotation={[2, 2, 6]} position={[0, -5, 0]} scale={1.2} ref={group}>
@@ -59,11 +55,19 @@ export const Transforms: Demo = () => {
         </RigidBody>
       </group>
 
-      <group scale={0.4} rotation={[2, 0, 1]}>
+      <group scale={1.2} rotation={[2, 0, 1]}>
         <RigidBody>
-          <Box castShadow receiveShadow />
+          <Box
+            castShadow
+            receiveShadow
+            material-color="red"
+            scale={[1, 1, 8]}
+          />
 
-          <CuboidCollider args={[0.5, 0.5, 0.5]} />
+          <Box material-color="red" position={[1, 2, 3]} />
+
+          <CuboidCollider args={[0.5, 0.5, 4]} />
+          <CuboidCollider args={[0.5, 0.5, 0.5]} position={[1, 2, 3]} />
         </RigidBody>
       </group>
     </group>

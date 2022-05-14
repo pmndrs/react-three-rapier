@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 
-import { Box, Clone, useGLTF } from "@react-three/drei";
+import { Box, Clone, Sphere, useGLTF } from "@react-three/drei";
 import {
   RigidBody,
   RigidBodyAutoCollider,
@@ -22,7 +22,7 @@ const Map = () => {
   nodes.map.receiveShadow = true;
 
   return (
-    <group position={[0, -3, 0]} scale={1.2}>
+    <group position={[0, -3, 0]} scale={.2}>
       <RigidBody position={[0, -2, 0]}>
         <primitive object={nodes.map.clone(true)} position={[0,0,0]} />;
         <TrimeshCollider args={[nodes.map.geometry.attributes.position.array, nodes.map.geometry.index?.array || []]} />;
@@ -68,11 +68,18 @@ export const ComponentsExample:Demo = ({ setUI }) => {
             <meshPhysicalMaterial />
           </Box>
         </RigidBody>
+
+
+        <RigidBody colliders={RigidBodyAutoCollider.Ball} position={[5, 0, 0]}>
+            <Sphere castShadow>
+              <meshPhysicalMaterial />
+            </Sphere>
+         </RigidBody>
       </group>
 
       {/* {Array.from({length: 20}).map((_, i) => <Pear position={[0, 4 * i, 0]} key={i} />)} */}
 
-      {/* <Map /> */}
+      <Map />
     </group>
   );
 };
