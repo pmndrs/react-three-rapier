@@ -49,7 +49,7 @@ export const scaleColliderArgs = (
 
   // Trimesh and convex scale the vertices
   if (shape === "trimesh" || shape === "convexHull") {
-    scaleVertices(newArgs[0] as ArrayLike<number>, scale);
+    newArgs[0] = scaleVertices(newArgs[0] as ArrayLike<number>, scale);
     return newArgs;
   }
 
@@ -76,11 +76,11 @@ export const createColliderFromOptions = <A>(
   const [rx, ry, rz] = options?.rotation || [0, 0, 0];
 
   // @ts-ignore
-  const scaledArgs = scaleColliderArgs(shape, colliderArgs, scale);
+  const scaledArgs = scaleColliderArgs(options.shape, colliderArgs, scale);
 
   let colliderDesc = (ColliderDesc[colliderShape](
     // @ts-ignore
-    ...colliderArgs
+    ...scaledArgs
   ) as ColliderDesc)
     .setTranslation(x * scale.x, y * scale.y, z * scale.z)
     .setRotation({ x: rx, y: ry, z: rz, w: 1 })

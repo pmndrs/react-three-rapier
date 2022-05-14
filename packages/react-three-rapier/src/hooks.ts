@@ -182,11 +182,24 @@ export const useRigidBody = <O extends Object3D>(
 export const useRigidBodyWithCollider = <A, O extends Object3D = Object3D>(
   rigidBodyOptions?: UseRigidBodyOptions,
   colliderOptions?: UseColliderOptions<A>
-): [ref: MutableRefObject<O>, rigidBody: RapierRigidBody, collider: Collider] => {
+): [ref: MutableRefObject<O>, rigidBody: RapierRigidBody] => {
+  const {world} = useRapier()
   const [ref, rigidBody] = useRigidBody<O>(rigidBodyOptions);
-  const [collider] = useCollider<A>(rigidBody, colliderOptions);
+  
+  useEffect(() => {
+    if (!colliderOptions) {
+      return 
+    }
 
-  return [ref, rigidBody, collider];
+    const scale = ref.current.getWorldScale(new Vector3());
+    const collider = createColliderFromOptions(colliderOptions, world, rigidBody, scale);
+
+    return () => {
+      world.removeCollider(collider, false);
+    };
+  }, []);
+
+  return [ref, rigidBody];
 };
 
 export const useCuboid = <T extends Object3D>(

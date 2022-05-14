@@ -4,10 +4,17 @@ import {
   CuboidCollider,
   RigidBody,
   RigidBodyAutoCollider,
+  useCuboid,
 } from "@react-three/rapier";
 import { useEffect, useRef } from "react";
 import { Group } from "three/src/Three";
 import { Demo } from "../App";
+
+const HookBox = () => {
+  const [ref] = useCuboid();
+
+  return <Box material-color="blue" />;
+};
 
 export const Transforms: Demo = () => {
   const group = useRef<Group>(null);

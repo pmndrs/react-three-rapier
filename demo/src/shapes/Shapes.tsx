@@ -54,19 +54,21 @@ const RigidBox = memo(() => {
       position: [-4 + Math.random() * 8, 10, 0],
     },
     {
-      args: [0.2, 0.2, 0.2],
+      args: [0.5, 0.5, 0.5],
     }
   );
 
   useEffect(() => {
-    rigidBody.applyImpulse({ x: 0, y: 0.2, z: 0 }, true);
+    rigidBody.applyImpulse({ x: 0, y: 0, z: 0 }, true);
     rigidBody.applyTorqueImpulse({ x: 0, y: 0, z: Math.random() * 0.1 }, true);
   }, []);
 
   return (
-    <Box scale={0.4} ref={box} receiveShadow castShadow>
-      <meshPhysicalMaterial color={color} />
-    </Box>
+    <group scale={2}>
+      <Box scale={0.5} ref={box} receiveShadow castShadow>
+        <meshPhysicalMaterial color={color} />
+      </Box>
+    </group>
   );
 });
 
@@ -171,7 +173,7 @@ const MeshBoat = () => {
   );
 
   return (
-    <group>
+    <group scale={2}>
       <mesh
         castShadow
         receiveShadow
@@ -217,7 +219,7 @@ const Scene: FC<{ setUI: Dispatch<ReactNode> }> = ({ setUI }) => {
   }, []);
 
   return (
-    <group>
+    <group scale={1}>
       {items.map((item, i) => (
         <Thing item={item} key={i} />
       ))}
