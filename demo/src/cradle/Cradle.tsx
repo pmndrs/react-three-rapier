@@ -3,14 +3,17 @@ import { Cylinder, Sphere } from "@react-three/drei";
 import {
   BallCollider,
   CylinderCollider,
+  RapierRigidBody,
   RigidBody,
+  UseRigidBodyOptions,
   useSphericalJoint,
 } from "@react-three/rapier";
 import { useRef } from "react";
+import { Demo } from "../App";
 
-const Rod = (props) => {
-  const anchor = useRef();
-  const rod = useRef();
+const Rod = (props: UseRigidBodyOptions) => {
+  const anchor = useRef<RapierRigidBody>(null);
+  const rod = useRef<RapierRigidBody>(null);
 
   useSphericalJoint(anchor, rod, [
     [0, 0, 0],
@@ -33,23 +36,23 @@ const Rod = (props) => {
           <meshStandardMaterial metalness={1} roughness={0.3} />
         </Sphere>
 
-        <CylinderCollider args={[2, 0.02]} position={[0, -1, 0]} />
+        <CylinderCollider args={[1, 0.02]} position={[0, -1, 0]} />
         <BallCollider args={[0.2]} position={[0, -2, 0]} restitution={1.2} />
       </RigidBody>
     </group>
   );
 };
 
-export const CradleExample = ({ setUI }) => {
-  setUI();
+export const CradleExample: Demo = ({ setUI }) => {
+  setUI("");
 
   return (
-    <group>
+    <group rotation={[2, 0, 0]} scale={2}>
       <Rod position={[0, 0, 0]} />
       <Rod position={[0.5, 0, 0]} />
       <Rod position={[1, 0, 0]} />
       <Rod position={[1.5, 0, 0]} />
-      <Rod position={[2, 0, 0]} rotation={[0, 0, 1]} />
+      <Rod position={[2, 0, 0]} rotation={[0.0, 0, 2]} />
     </group>
   );
 };

@@ -1,9 +1,5 @@
-import React from "react";
+import React, { MutableRefObject, useEffect } from "react";
 
-import {
-  Collider,
-  RigidBody as RapierRigidBody,
-} from "@dimforge/rapier3d-compat";
 import {
   createContext,
   forwardRef,
@@ -11,8 +7,8 @@ import {
   useContext,
   useImperativeHandle,
 } from "react";
-import { Group } from "three";
-import { useCollider, useRigidBody } from "./hooks";
+import { Group, Vector3 } from "three";
+import { useCollider, useRapier, useRigidBody } from "./hooks";
 import {
   BallArgs,
   CapsuleArgs,
@@ -21,23 +17,25 @@ import {
   CuboidArgs,
   CylinderArgs,
   HeightfieldArgs,
-  PolylineArgs,
-  RoundConeArgs,
-  RoundConvexHullArgs,
+  RapierRigidBody,
+  RigidBodyAutoCollider,
   RoundCuboidArgs,
-  RoundCylinderArgs,
   TrimeshArgs,
   UseColliderOptions,
   UseRigidBodyOptions,
 } from "./types";
+import { createColliderFromOptions, scaleVertices } from "./utils";
 
-const RigidBodyContext = createContext<RapierRigidBody>(null!);
+const RigidBodyContext = createContext<
+  [MutableRefObject<Group>, RapierRigidBody]
+>(undefined!);
 
 const useParentRigidBody = () => useContext(RigidBodyContext);
 
 // RigidBody
 interface RigidBodyProps extends UseRigidBodyOptions {
   children?: ReactNode;
+  colliders?: RigidBodyAutoCollider | false;
 }
 
 export const RigidBody = forwardRef<RapierRigidBody, RigidBodyProps>(
@@ -47,7 +45,7 @@ export const RigidBody = forwardRef<RapierRigidBody, RigidBodyProps>(
     useImperativeHandle(ref, () => rigidBody);
 
     return (
-      <RigidBodyContext.Provider value={rigidBody}>
+      <RigidBodyContext.Provider value={[group, rigidBody]}>
         <group ref={group}>{children}</group>
       </RigidBodyContext.Provider>
     );
@@ -55,194 +53,61 @@ export const RigidBody = forwardRef<RapierRigidBody, RigidBodyProps>(
 );
 
 // Colliders
-type ColliderProps<A> = Omit<UseColliderOptions<A>, "shape">;
+const AnyCollider = (props: UseColliderOptions<any>) => {
+  const { world } = useRapier();
+  const [object, rigidBody] = useParentRigidBody();
 
-export const CuboidCollider = forwardRef<Collider, ColliderProps<CuboidArgs>>(
-  (props, ref) => {
-    const rigidBody = useParentRigidBody();
-    const [collider] = useCollider(rigidBody, {
-      shape: "cuboid",
-      ...props,
-    });
+  useEffect(() => {
+    const scale = object.current.getWorldScale(new Vector3());
 
-    useImperativeHandle(ref, () => collider);
+    const collider = createColliderFromOptions(props, world, rigidBody, scale);
 
-    return null;
-  }
-);
-
-export const RoundCuboidCollider = forwardRef<
-  Collider,
-  ColliderProps<RoundCuboidArgs>
->((props, ref) => {
-  const rigidBody = useParentRigidBody();
-  const [collider] = useCollider(rigidBody, {
-    shape: "roundCuboid",
-    ...props,
-  });
-
-  useImperativeHandle(ref, () => collider);
+    return () => {
+      world.removeCollider(collider, false);
+    };
+  }, []);
 
   return null;
-});
+};
 
-export const BallCollider = forwardRef<Collider, ColliderProps<BallArgs>>(
-  (props, ref) => {
-    const rigidBody = useParentRigidBody();
-    const [collider] = useCollider(rigidBody, {
-      shape: "ball",
-      ...props,
-    });
+export const CuboidCollider = (props: UseColliderOptions<CuboidArgs>) => {
+  return <AnyCollider {...props} shape="cuboid" />;
+};
 
-    useImperativeHandle(ref, () => collider);
+export const RoundCuboidCollider = (
+  props: UseColliderOptions<RoundCuboidArgs>
+) => {
+  return <AnyCollider {...props} shape="roundCuboid" />;
+};
 
-    return null;
-  }
-);
+export const BallCollider = (props: UseColliderOptions<BallArgs>) => {
+  return <AnyCollider {...props} shape="ball" />;
+};
 
-export const CapsuleCollider = forwardRef<Collider, ColliderProps<CapsuleArgs>>(
-  (props, ref) => {
-    const rigidBody = useParentRigidBody();
-    const [collider] = useCollider(rigidBody, {
-      shape: "capsule",
-      ...props,
-    });
+export const CapsuleCollider = (props: UseColliderOptions<CapsuleArgs>) => {
+  return <AnyCollider {...props} shape="capsule" />;
+};
 
-    useImperativeHandle(ref, () => collider);
+export const HeightfieldCollider = (
+  props: UseColliderOptions<HeightfieldArgs>
+) => {
+  return <AnyCollider {...props} shape="heightfield" />;
+};
 
-    return null;
-  }
-);
+export const TrimeshCollider = (props: UseColliderOptions<TrimeshArgs>) => {
+  return <AnyCollider {...props} shape="trimesh" />;
+};
 
-export const HeightfieldCollider = forwardRef<
-  Collider,
-  ColliderProps<HeightfieldArgs>
->((props, ref) => {
-  const rigidBody = useParentRigidBody();
-  const [collider] = useCollider(rigidBody, {
-    shape: "heightfield",
-    ...props,
-  });
+export const ConeCollider = (props: UseColliderOptions<ConeArgs>) => {
+  return <AnyCollider {...props} shape="cone" />;
+};
 
-  useImperativeHandle(ref, () => collider);
+export const CylinderCollider = (props: UseColliderOptions<CylinderArgs>) => {
+  return <AnyCollider {...props} shape="cylinder" />;
+};
 
-  return null;
-});
-
-export const TrimeshCollider = forwardRef<Collider, ColliderProps<TrimeshArgs>>(
-  (props, ref) => {
-    const rigidBody = useParentRigidBody();
-    const [collider] = useCollider(rigidBody, {
-      shape: "trimesh",
-      ...props,
-    });
-
-    useImperativeHandle(ref, () => collider);
-
-    return null;
-  }
-);
-
-export const PolylineCollider = forwardRef<
-  Collider,
-  ColliderProps<PolylineArgs>
->((props, ref) => {
-  const rigidBody = useParentRigidBody();
-  const [collider] = useCollider(rigidBody, {
-    shape: "polyline",
-    ...props,
-  });
-
-  useImperativeHandle(ref, () => collider);
-
-  return null;
-});
-
-export const CylinderCollider = forwardRef<
-  Collider,
-  ColliderProps<CylinderArgs>
->((props, ref) => {
-  const rigidBody = useParentRigidBody();
-  const [collider] = useCollider(rigidBody, {
-    shape: "cylinder",
-    ...props,
-  });
-
-  useImperativeHandle(ref, () => collider);
-
-  return null;
-});
-
-export const RoundCylinderCollider = forwardRef<
-  Collider,
-  ColliderProps<RoundCylinderArgs>
->((props, ref) => {
-  const rigidBody = useParentRigidBody();
-  const [collider] = useCollider(rigidBody, {
-    shape: "roundCylinder",
-    ...props,
-  });
-
-  useImperativeHandle(ref, () => collider);
-
-  return null;
-});
-
-export const ConeCollider = forwardRef<Collider, ColliderProps<ConeArgs>>(
-  (props, ref) => {
-    const rigidBody = useParentRigidBody();
-    const [collider] = useCollider(rigidBody, {
-      shape: "cone",
-      ...props,
-    });
-
-    useImperativeHandle(ref, () => collider);
-
-    return null;
-  }
-);
-
-export const RoundConeCollider = forwardRef<
-  Collider,
-  ColliderProps<RoundConeArgs>
->((props, ref) => {
-  const rigidBody = useParentRigidBody();
-  const [collider] = useCollider(rigidBody, {
-    shape: "roundCone",
-    ...props,
-  });
-
-  useImperativeHandle(ref, () => collider);
-
-  return null;
-});
-
-export const ConvexHullCollider = forwardRef<
-  Collider,
-  ColliderProps<ConvexHullArgs>
->((props, ref) => {
-  const rigidBody = useParentRigidBody();
-  const [collider] = useCollider(rigidBody, {
-    shape: "convexHull",
-    ...props,
-  });
-
-  useImperativeHandle(ref, () => collider);
-
-  return null;
-});
-
-export const RoundConvexHullCollider = forwardRef<
-  Collider,
-  ColliderProps<RoundConvexHullArgs>
->((props, ref) => {
-  const rigidBody = useParentRigidBody();
-  const [collider] = useCollider(rigidBody, {
-    shape: "roundConvexHull",
-    ...props,
-  });
-
-  useImperativeHandle(ref, () => collider);
-
-  return null;
-});
+export const ConvexHullCollider = (
+  props: UseColliderOptions<ConvexHullArgs>
+) => {
+  return <AnyCollider {...props} shape="convexHull" />;
+};

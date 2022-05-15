@@ -1,5 +1,5 @@
 import React from "react";
-export { RapierWorld } from "./RapierWorld";
+export { Physics } from "./Physics";
 export * from "./hooks";
 export * from "./types";
 export * from "./components";

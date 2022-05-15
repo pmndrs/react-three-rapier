@@ -1,16 +1,31 @@
-import React from "react";
+import React, { MutableRefObject } from "react";
 import type Rapier from "@dimforge/rapier3d-compat";
 
 import {
   CoefficientCombineRule,
-  RigidBody,
-  RigidBodyType,
+  RigidBody as RapierRigidBody,
+  Collider as RapierCollider
 } from "@dimforge/rapier3d-compat";
-import { RefObject } from "react";
+
+export {
+  RapierRigidBody,
+  RapierCollider
+}
+
+export {
+  CoefficientCombineRule as CoefficientCombineRule,
+} from "@dimforge/rapier3d-compat";
+
+export const enum RigidBodyAutoCollider {
+  Ball,
+  Cuboid,
+  Trimesh,
+  ConvexHull
+}
 
 export interface UseRigidBodyAPI {
-  rigidBody: Rapier.RigidBody;
-  collider: Rapier.Collider;
+  rigidBody: RapierRigidBody;
+  collider: RapierCollider;
 }
 
 export type CuboidArgs = [
@@ -198,6 +213,17 @@ export interface UseRigidBodyOptions {
    * Initial rotation of the RigidBody
    */
   rotation?: Vector3Array;
+
+  /**
+   * Automatically generate colliders based on meshes inside this
+   * rigid body.
+   * 
+   * You can change the default setting globally by setting the colliders
+   * prop on the <Physics /> component.
+   * 
+   * Setting this to false will disable automatic colliders.
+   */
+  colliders?: RigidBodyAutoCollider | false
 }
 
 // Joints
@@ -228,5 +254,5 @@ export type RevoluteJointParams = [
 ];
 
 export interface UseImpulseJoint<P> {
-  (body1: RefObject<RigidBody>, body2: RefObject<RigidBody>, params: P): void;
+  (body1: MutableRefObject<RapierRigidBody | undefined | null>, body2: MutableRefObject<RapierRigidBody | undefined | null>, params: P): void;
 }

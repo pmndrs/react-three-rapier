@@ -49,19 +49,26 @@ const Label = ({ label }: { label: string }) => {
 
 const RigidBox = memo(() => {
   const color = useRandomColor();
-  const [box] = useCuboid(
+  const [box, rigidBody] = useCuboid(
     {
       position: [-4 + Math.random() * 8, 10, 0],
     },
     {
-      args: [0.2, 0.2, 0.2],
+      args: [0.5, 0.5, 0.5],
     }
   );
 
+  useEffect(() => {
+    rigidBody.applyImpulse({ x: 0, y: 0, z: 0 }, true);
+    rigidBody.applyTorqueImpulse({ x: 0, y: 0, z: Math.random() * 0.1 }, true);
+  }, []);
+
   return (
-    <Box scale={0.4} ref={box} receiveShadow castShadow>
-      <meshPhysicalMaterial color={color} />
-    </Box>
+    <group scale={1}>
+      <Box scale={0.5} ref={box} receiveShadow castShadow>
+        <meshPhysicalMaterial color={color} />
+      </Box>
+    </group>
   );
 });
 
@@ -166,13 +173,17 @@ const MeshBoat = () => {
   );
 
   return (
-    <mesh
-      castShadow
-      receiveShadow
-      ref={boat}
-      geometry={g}
-      material={nodes.boat.material}
-    />
+    <group scale={1}>
+      <mesh
+        scale={1}
+        castShadow
+        receiveShadow
+        ref={boat}
+        geometry={g}
+        material={nodes.boat.material}
+        rotation={[0, 0, Math.PI / 2]}
+      />
+    </group>
   );
 };
 
@@ -209,7 +220,7 @@ const Scene: FC<{ setUI: Dispatch<ReactNode> }> = ({ setUI }) => {
   }, []);
 
   return (
-    <group>
+    <group scale={1}>
       {items.map((item, i) => (
         <Thing item={item} key={i} />
       ))}

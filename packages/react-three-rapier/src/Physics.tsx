@@ -2,7 +2,7 @@ import React, { createContext, FC, ReactNode, useMemo, useRef } from "react";
 import { useAsset } from "use-asset";
 import type Rapier from "@dimforge/rapier3d-compat";
 import { useFrame } from "@react-three/fiber";
-import { Vector3Array } from "./types";
+import { RigidBodyAutoCollider, Vector3Array } from "./types";
 import { vectorArrayToObject } from "./utils";
 
 export interface RapierContext {
@@ -23,12 +23,14 @@ const importRapier = async () => {
 
 interface RapierWorldProps {
   gravity?: Vector3Array;
+  colliders?: RigidBodyAutoCollider | false
   children: ReactNode;
 }
 
-export const RapierWorld: FC<RapierWorldProps> = ({
-  children,
+export const Physics: FC<RapierWorldProps> = ({
+  colliders = RigidBodyAutoCollider.Cuboid,
   gravity = [0, -9.81, 0],
+  children,
 }) => {
   const rapier = useAsset(importRapier);
   const stepFuncs = useRef<Array<() => void>>([]);
@@ -58,9 +60,16 @@ export const RapierWorld: FC<RapierWorldProps> = ({
     time.current = now;
   });
 
+  const context = useMemo(() => ({ 
+    RAPIER: rapier, 
+    world,
+    colliders,
+    stepFuncs: stepFuncs.current 
+  }), [rapier])
+
   return (
     <RapierContext.Provider
-      value={{ RAPIER: rapier, world, stepFuncs: stepFuncs.current }}
+      value={context}
     >
       {children}
     </RapierContext.Provider>

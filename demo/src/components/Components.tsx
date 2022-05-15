@@ -1,16 +1,16 @@
-import React from "react";
+import React, { useMemo } from "react";
 
-import { Box, Clone, useGLTF } from "@react-three/drei";
+import { Box, Clone, Sphere, useGLTF } from "@react-three/drei";
 import {
-  ConvexHullCollider,
-  CuboidCollider,
   RigidBody,
+  RigidBodyAutoCollider,
   TrimeshCollider,
 } from "@react-three/rapier";
 import { useRef } from "react";
-import { useFrame } from "@react-three/fiber";
+import { GroupProps, Object3DNode, useFrame } from "@react-three/fiber";
 import type { RigidBody as RB } from "@dimforge/rapier3d-compat";
 import { Mesh } from "three";
+import { Demo } from "../App";
 
 const Map = () => {
   const { nodes } = useGLTF(
@@ -22,19 +22,16 @@ const Map = () => {
   nodes.map.receiveShadow = true;
 
   return (
-    <RigidBody position={[0, -10, 0]}>
-      <primitive object={nodes.map} />;
-      <TrimeshCollider
-        args={[
-          nodes.map.geometry.attributes.position.array,
-          nodes.map.geometry.index.array,
-        ]}
-      />
-    </RigidBody>
+    <group position={[0, -3, 0]} scale={.2}>
+      <RigidBody position={[0, -2, 0]}>
+        <primitive object={nodes.map.clone(true)} position={[0,0,0]} />;
+        <TrimeshCollider args={[nodes.map.geometry.attributes.position.array, nodes.map.geometry.index?.array || []]} />;
+      </RigidBody>
+    </group>
   );
 };
 
-const Pear = (props) => {
+const Pear = (props: GroupProps) => {
   const { nodes } = useGLTF(
     new URL("../shapes/objects.glb", import.meta.url).toString()
   ) as unknown as {
@@ -43,36 +40,44 @@ const Pear = (props) => {
     };
   };
 
+  const scale = useMemo(() => .4 + Math.random() * .5, [])
+
   return (
-    <RigidBody {...props}>
-      <Clone object={nodes.pear} castShadow receiveShadow />
-      <ConvexHullCollider
-        args={[nodes.pear.geometry.attributes.position.array]}
-      />
-    </RigidBody>
+    <group {...props} scale={1}>
+      <RigidBody position={[0, 2, 0]} colliders={RigidBodyAutoCollider.ConvexHull}>
+        <Clone object={nodes.pear} castShadow receiveShadow scale={scale} />
+      </RigidBody>
+    </group>
   );
 };
 
-export const ComponentsExample = ({ setUI }) => {
-  setUI();
+export const ComponentsExample:Demo = ({ setUI }) => {
+  setUI("");
 
   return (
     <group>
-      <RigidBody rotation={[0, 0, 0.2]}>
-        <Box castShadow>
-          <meshPhysicalMaterial />
-        </Box>
-        <Box position={[2, 0, 0]} scale={[1, 2, 1]} castShadow>
-          <meshPhysicalMaterial />
-        </Box>
+      <group scale={1}>
+        <RigidBody colliders={RigidBodyAutoCollider.Cuboid}>
+          <Box castShadow>
+            <meshPhysicalMaterial />
+          </Box>
+          <Box position={[2, 1, 1]} scale={[4,1,2]} castShadow>
+            <meshPhysicalMaterial />
+          </Box>
+          <Box position={[7, 3, 0]} scale={4} castShadow>
+            <meshPhysicalMaterial />
+          </Box>
+        </RigidBody>
 
-        <CuboidCollider position={[0, 0, 0]} args={[0.5, 0.5, 0.5]} />
-        <CuboidCollider position={[2, 0, 0]} args={[0.5, 1, 0.5]} />
-      </RigidBody>
 
-      <Pear position={[-2, 2, 0]} />
-      <Pear position={[-2, 4, 0]} />
-      <Pear position={[0, 4, 0]} />
+        <RigidBody colliders={RigidBodyAutoCollider.Ball} position={[5, 0, 0]}>
+            <Sphere castShadow>
+              <meshPhysicalMaterial />
+            </Sphere>
+         </RigidBody>
+      </group>
+
+      {/* {Array.from({length: 20}).map((_, i) => <Pear position={[0, 4 * i, 0]} key={i} />)} */}
 
       <Map />
     </group>
