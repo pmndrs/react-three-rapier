@@ -47,7 +47,7 @@ export const CradleExample: Demo = ({ setUI }) => {
   setUI("");
 
   return (
-    <group rotation={[2, 0, 0]}>
+    <group rotation={[2, 0, 0]} scale={2}>
       <Rod position={[0, 0, 0]} />
       <Rod position={[0.5, 0, 0]} />
       <Rod position={[1, 0, 0]} />

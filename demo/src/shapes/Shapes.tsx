@@ -64,7 +64,7 @@ const RigidBox = memo(() => {
   }, []);
 
   return (
-    <group scale={2}>
+    <group scale={1}>
       <Box scale={0.5} ref={box} receiveShadow castShadow>
         <meshPhysicalMaterial color={color} />
       </Box>
@@ -173,8 +173,9 @@ const MeshBoat = () => {
   );
 
   return (
-    <group scale={2}>
+    <group scale={1}>
       <mesh
+        scale={1}
         castShadow
         receiveShadow
         ref={boat}

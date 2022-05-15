@@ -123,16 +123,19 @@ export const useRigidBody = <O extends Object3D>(
     // Get intitial world transforms
     const worldPosition = ref.current.getWorldPosition(new Vector3())
     const worldRotation = ref.current.getWorldQuaternion(new Quaternion())
+    const scale = ref.current.parent?.getWorldScale(new Vector3()) || { x: 1, y: 1, z: 1 };
 
     // Transforms from options
     const [x, y, z] = options?.position || [0, 0, 0];
     const [rx, ry, rz] = options?.rotation || [0, 0, 0];
 
+    console.log(y * scale.y)
+
     // Set initial transforms based on world transforms
     rigidBody.setTranslation({
-      x: worldPosition.x + x, 
-      y: worldPosition.y + y, 
-      z: worldPosition.z + z
+      x: worldPosition.x + x * scale.x, 
+      y: worldPosition.y + y * scale.y, 
+      z: worldPosition.z + z * scale.z
     }, false)
 
     const eulerAngles = new Euler(rx, ry, rz, 'XYZ')
