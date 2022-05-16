@@ -9,23 +9,23 @@ import { useGLTF } from "@react-three/drei";
 import type { GLTF } from "three-stdlib";
 import { useConvexHull, useTrimesh } from "@react-three/rapier";
 import { useRef } from "react";
-import { Mesh } from "three";
+import { Group, Mesh, MeshPhysicalMaterial, MeshStandardMaterial } from "three";
 
 type GLTFResult = GLTF & {
   nodes: {
-    plinko: THREE.Mesh;
-    container: THREE.Mesh;
-    wall: THREE.Mesh;
+    plinko: Mesh;
+    container: Mesh;
+    wall: Mesh;
   };
   materials: {
-    blue: THREE.MeshStandardMaterial;
-    Material: THREE.MeshPhysicalMaterial;
-    ["Material.001"]: THREE.MeshPhysicalMaterial;
+    blue: MeshStandardMaterial;
+    Material: MeshPhysicalMaterial;
+    ["Material.001"]: MeshPhysicalMaterial;
   };
 };
 
 export default function Plinko({ ...props }: JSX.IntrinsicElements["group"]) {
-  const group = useRef<THREE.Group>(null);
+  const group = useRef<Group>(null);
 
   const { nodes, materials } = useGLTF(
     // @ts-ignore

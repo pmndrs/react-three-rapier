@@ -6,7 +6,7 @@ import React, {
   useMemo, } from "react";
 import { RapierContext } from "./Physics";
 import { useRef } from "react";
-import { Euler, Matrix4, Mesh, Object3D, Quaternion, Vector3 } from "three/src/three";
+import { Euler, Matrix4, Mesh, Object3D, Quaternion, Vector3 } from "three";
 
 import type Rapier from "@dimforge/rapier3d-compat";
 
@@ -128,8 +128,6 @@ export const useRigidBody = <O extends Object3D>(
     // Transforms from options
     const [x, y, z] = options?.position || [0, 0, 0];
     const [rx, ry, rz] = options?.rotation || [0, 0, 0];
-
-    console.log(y * scale.y)
 
     // Set initial transforms based on world transforms
     rigidBody.setTranslation({
