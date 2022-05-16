@@ -7,7 +7,7 @@ import {
   useCuboid,
 } from "@react-three/rapier";
 import { useEffect, useRef } from "react";
-import { Group } from "three/src/Three";
+import { Group } from "Three";
 import { Demo } from "../App";
 
 const HookBox = () => {

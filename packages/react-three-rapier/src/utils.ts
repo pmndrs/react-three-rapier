@@ -7,7 +7,7 @@ import {
   World,
 } from "@dimforge/rapier3d-compat";
 
-import { Mesh, Object3D, Quaternion, Vector3 } from "three/src/Three";
+import { Mesh, Object3D, Quaternion, Vector3 } from "three";
 import {
   RapierRigidBody,
   RigidBodyAutoCollider,
