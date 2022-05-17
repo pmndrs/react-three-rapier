@@ -4,6 +4,7 @@ import type Rapier from "@dimforge/rapier3d-compat";
 import { useFrame } from "@react-three/fiber";
 import { RigidBodyAutoCollider, Vector3Array } from "./types";
 import { vectorArrayToObject } from "./utils";
+import { RapierDebug } from "./Debug";
 
 export interface RapierContext {
   RAPIER: typeof Rapier;
@@ -23,14 +24,16 @@ const importRapier = async () => {
 
 interface RapierWorldProps {
   gravity?: Vector3Array;
-  colliders?: RigidBodyAutoCollider | false
+  colliders?: RigidBodyAutoCollider
   children: ReactNode;
+  debug: boolean;
 }
 
 export const Physics: FC<RapierWorldProps> = ({
-  colliders = RigidBodyAutoCollider.Cuboid,
+  colliders = 'cuboid',
   gravity = [0, -9.81, 0],
   children,
+  debug = false
 }) => {
   const rapier = useAsset(importRapier);
   const stepFuncs = useRef<Array<() => void>>([]);
@@ -72,6 +75,8 @@ export const Physics: FC<RapierWorldProps> = ({
       value={context}
     >
       {children}
+
+      {debug && <RapierDebug />}
     </RapierContext.Provider>
   );
 };

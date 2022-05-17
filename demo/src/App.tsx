@@ -53,7 +53,7 @@ export const App = () => {
     >
       <Suspense fallback="Loading...">
         <Canvas shadows>
-          <Physics colliders={false}>
+          <Physics colliders={false} debug>
             <directionalLight
               castShadow
               position={[10, 10, 10]}

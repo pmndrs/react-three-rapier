@@ -43,7 +43,7 @@ RigidBodies generate automatic colliders by default for all meshes that it conta
 Generate ConvexHull colliders for all meshes in a RigidBody by default:
 
 ```tsx
-<Physics colliders={RapierAutoColliderShape.ConvexHull}>
+<Physics colliders="hull">
   <RigidBody>
     <Box />
   </RigidBody>
@@ -57,10 +57,10 @@ Turn off automatic collider generation globally:
 
 ```tsx
 <Physics colliders={false}>
-  <RigidBody colliders={RapierAutoColliderShape.Cuboid}>
+  <RigidBody colliders="cuboid">
     <Box />
   </RigidBody>
-  <RigidBody position={[0, 10, 0]} colliders={RapierAutoColliderShape.Ball}>
+  <RigidBody position={[0, 10, 0]} colliders="ball">
     <Sphere />
   </RigidBody>
   // Use defined colliders
