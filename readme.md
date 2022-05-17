@@ -43,33 +43,37 @@ RigidBodies generate automatic colliders by default for all meshes that it conta
 Generate ConvexHull colliders for all meshes in a RigidBody by default:
 
 ```tsx
-<Physics colliders={RapierAutoColliderShape.ConvexHull}>
-  <RigidBody>
-    <Box />
-  </RigidBody>
-  <RigidBody position={[0, 10, 0]}>
-    <Sphere />
-  </RigidBody>
-</Physics>
+const scene = (
+  <Physics colliders="hull">
+    <RigidBody>
+      <Box />
+    </RigidBody>
+    <RigidBody position={[0, 10, 0]}>
+      <Sphere />
+    </RigidBody>
+  </Physics>
+);
 ```
 
 Turn off automatic collider generation globally:
 
 ```tsx
-<Physics colliders={false}>
-  <RigidBody colliders={RapierAutoColliderShape.Cuboid}>
-    <Box />
-  </RigidBody>
-  <RigidBody position={[0, 10, 0]} colliders={RapierAutoColliderShape.Ball}>
-    <Sphere />
-  </RigidBody>
-  // Use defined colliders
-  <RigidBody position={[0, 10, 0]}>
-    <Sphere />
-    <BallCollider args={0.5} />
-    <BallCollider args={0.5} position={[1, 0, 0]} />
-  </RigidBody>
-</Physics>
+const scene = (
+  <Physics colliders={false}>
+    <RigidBody colliders="cuboid">
+      <Box />
+    </RigidBody>
+    <RigidBody position={[0, 10, 0]} colliders="ball">
+      <Sphere />
+    </RigidBody>
+    // Use defined colliders
+    <RigidBody position={[0, 10, 0]}>
+      <Sphere />
+      <BallCollider args={0.5} />
+      <BallCollider args={0.5} position={[1, 0, 0]} />
+    </RigidBody>
+  </Physics>
+);
 ```
 
 Objects work inside other transformed objects as well. Simulation runs in world space and is transformed to the objects local space, so that things act as you'd expect.
@@ -86,6 +90,32 @@ const Scene = () => {
         <CuboidCollider args={[0.5, 0.5, 0.5]} />
       </RigidBody>
     </group>
+  );
+};
+```
+
+## Debug
+
+Use the Debug component to see live representations of all colliders in a scene.
+
+> Note: Experimental. Not all shapes are supported.
+
+```tsx
+import { Box, Sphere } from "@react-three/drei";
+import { RigidBody, Debug } from "@react-three/rapier";
+
+const Scene = () => {
+  return (
+    <Physics>
+      <Debug />
+
+      <RigidBody>
+        <Box />
+      </RigidBody>
+      <RigidBody>
+        <Sphere />
+      </RigidBody>
+    </Physics>
   );
 };
 ```

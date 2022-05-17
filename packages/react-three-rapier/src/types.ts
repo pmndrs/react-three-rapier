@@ -16,12 +16,7 @@ export {
   CoefficientCombineRule as CoefficientCombineRule,
 } from "@dimforge/rapier3d-compat";
 
-export const enum RigidBodyAutoCollider {
-  Ball,
-  Cuboid,
-  Trimesh,
-  ConvexHull
-}
+export type RigidBodyAutoCollider = 'ball' | 'cuboid' | 'hull' | 'trimesh' | false
 
 export interface UseRigidBodyAPI {
   rigidBody: RapierRigidBody;

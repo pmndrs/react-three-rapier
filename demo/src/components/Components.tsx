@@ -44,7 +44,7 @@ const Pear = (props: GroupProps) => {
 
   return (
     <group {...props} scale={1}>
-      <RigidBody position={[0, 2, 0]} colliders={RigidBodyAutoCollider.ConvexHull}>
+      <RigidBody position={[0, 2, 0]} colliders="hull">
         <Clone object={nodes.pear} castShadow receiveShadow scale={scale} />
       </RigidBody>
     </group>
@@ -57,7 +57,7 @@ export const ComponentsExample:Demo = ({ setUI }) => {
   return (
     <group>
       <group scale={1}>
-        <RigidBody colliders={RigidBodyAutoCollider.Cuboid}>
+        <RigidBody colliders="cuboid">
           <Box castShadow>
             <meshPhysicalMaterial />
           </Box>
@@ -70,7 +70,7 @@ export const ComponentsExample:Demo = ({ setUI }) => {
         </RigidBody>
 
 
-        <RigidBody colliders={RigidBodyAutoCollider.Ball} position={[5, 0, 0]}>
+        <RigidBody colliders="ball" position={[5, 0, 0]}>
             <Sphere castShadow>
               <meshPhysicalMaterial />
             </Sphere>

@@ -33,18 +33,12 @@ export const Transforms: Demo = () => {
           <meshPhysicalMaterial />
         </Box>
 
-        <RigidBody
-          position={[-0.5, 2, 1]}
-          colliders={RigidBodyAutoCollider.Ball}
-        >
+        <RigidBody position={[-0.5, 2, 1]} colliders="ball">
           <Sphere scale={0.2} castShadow receiveShadow>
             <meshPhysicalMaterial />
           </Sphere>
         </RigidBody>
-        <RigidBody
-          position={[0, 0, 1]}
-          colliders={RigidBodyAutoCollider.Cuboid}
-        >
+        <RigidBody position={[0, 0, 1]} colliders="cuboid">
           <Box castShadow receiveShadow scale={2} position={[0, 0, 2]}>
             <meshPhysicalMaterial />
           </Box>
@@ -52,10 +46,7 @@ export const Transforms: Demo = () => {
             <meshPhysicalMaterial />
           </Box>
         </RigidBody>
-        <RigidBody
-          position={[3, 0, 1]}
-          colliders={RigidBodyAutoCollider.Cuboid}
-        >
+        <RigidBody position={[3, 0, 1]} colliders="cuboid">
           <Box castShadow receiveShadow>
             <meshPhysicalMaterial />
           </Box>

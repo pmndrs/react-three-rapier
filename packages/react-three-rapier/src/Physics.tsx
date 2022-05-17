@@ -23,14 +23,14 @@ const importRapier = async () => {
 
 interface RapierWorldProps {
   gravity?: Vector3Array;
-  colliders?: RigidBodyAutoCollider | false
+  colliders?: RigidBodyAutoCollider
   children: ReactNode;
 }
 
 export const Physics: FC<RapierWorldProps> = ({
-  colliders = RigidBodyAutoCollider.Cuboid,
+  colliders = 'cuboid',
   gravity = [0, -9.81, 0],
-  children,
+  children
 }) => {
   const rapier = useAsset(importRapier);
   const stepFuncs = useRef<Array<() => void>>([]);

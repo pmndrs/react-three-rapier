@@ -2,7 +2,7 @@ import React from "react";
 import { Box, Environment, OrbitControls, Plane } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { ReactNode, Suspense, useState } from "react";
-import { Physics, useCuboid } from "@react-three/rapier";
+import { Debug, Physics, useCuboid } from "@react-three/rapier";
 import Joints from "./joints/Joints";
 import Shapes from "./shapes/Shapes";
 import { ComponentsExample } from "./components/Components";
@@ -41,7 +41,7 @@ const Floor = () => {
 
 export const App = () => {
   const [ui, setUI] = useState<ReactNode>();
-  const [demo, setDemo] = useState("transforms");
+  const [demo, setDemo] = useState("shapes");
 
   return (
     <div
@@ -54,6 +54,8 @@ export const App = () => {
       <Suspense fallback="Loading...">
         <Canvas shadows>
           <Physics colliders={false}>
+            <Debug key={demo} />
+
             <directionalLight
               castShadow
               position={[10, 10, 10]}

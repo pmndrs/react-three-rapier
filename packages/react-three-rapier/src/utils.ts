@@ -121,6 +121,8 @@ export const createCollidersFromChildren = (
 ) => {
   const colliders: Collider[] = [];
 
+  let desc: ColliderDesc;
+
   object.traverse((child: Object3D | Mesh) => {
     if ("isMesh" in child) {
       const { geometry } = child;
@@ -130,10 +132,8 @@ export const createCollidersFromChildren = (
       );
       const scale = child.getWorldScale(new Vector3());
 
-      let desc: ColliderDesc;
-
       switch (type) {
-        case RigidBodyAutoCollider.Cuboid:
+        case "cuboid":
           {
             geometry.computeBoundingBox();
             const { boundingBox } = geometry;
@@ -148,7 +148,7 @@ export const createCollidersFromChildren = (
           }
           break;
 
-        case RigidBodyAutoCollider.Ball:
+        case "ball":
           {
             geometry.computeBoundingSphere();
             const { boundingSphere } = geometry;
@@ -159,7 +159,7 @@ export const createCollidersFromChildren = (
           }
           break;
 
-        case RigidBodyAutoCollider.Trimesh:
+        case "trimesh":
           {
             const g = geometry.clone().scale(scale.x, scale.y, scale.z);
 
@@ -170,7 +170,7 @@ export const createCollidersFromChildren = (
           }
           break;
 
-        case RigidBodyAutoCollider.ConvexHull:
+        case "hull":
           const g = geometry.clone().scale(scale.x, scale.y, scale.z);
 
           {
