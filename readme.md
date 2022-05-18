@@ -6,12 +6,18 @@
 
 ```tsx
 import { Box } from "@react-three/drei";
+import { Canvas } from "@react-three/fiber";
+import { Physics, RigidBody } from "@react-three/rapier";
 
-const Scene = () => {
+const App = () => {
   return (
-    <RigidBody>
-      <Box />
-    </RigidBody>
+    <Canvas>
+      <Physics>
+        <RigidBody>
+          <Box />
+        </RigidBody>
+      </Physics>
+    </Canvas>
   );
 };
 ```
@@ -86,7 +92,7 @@ const Scene = () => {
 
 Use the Debug component to see live representations of all colliders in a scene.
 
-> Note: Experimental. Not all shapes are supported.
+> Note: Experimental. Not all shapes are supported. Unsupported shapes are always represented by cubes.
 
 ```tsx
 import { Box, Sphere } from "@react-three/drei";
