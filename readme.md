@@ -4,32 +4,12 @@
 
 ## Usage
 
-Hooks:
-
-```tsx
-import { Box } from "@react-three/drei";
-import { useCuboid } from "@react-three/rapier";
-
-const RigidBox = () => {
-  // Generates a RigidBody and attaches a BoxCollider to it, returns a ref
-  const [box, rigidBody, collider] = useCuboid(
-    { position: [1, 1, 1] },
-    { args: [0.5, 0.5, 0.5] }
-  );
-
-  return <Box ref={box} />;
-};
-```
-
-Or, using components:  
-This is equivalent to the above 👆
-
 ```tsx
 import { Box } from "@react-three/drei";
 
 const Scene = () => {
   return (
-    <RigidBody position={[1, 1, 1]}>
+    <RigidBody>
       <Box />
     </RigidBody>
   );
@@ -70,10 +50,11 @@ const scene = (
     <RigidBody colliders="cuboid">
       <Box />
     </RigidBody>
+
     <RigidBody position={[0, 10, 0]} colliders="ball">
       <Sphere />
     </RigidBody>
-    // Use defined colliders
+
     <RigidBody position={[0, 10, 0]}>
       <Sphere />
       <BallCollider args={0.5} />
@@ -127,7 +108,26 @@ const Scene = () => {
 };
 ```
 
-## Roadmap
+## Hooks
+
+You can also use hooks to generate rigid bodies and colliders, but it's not encouraged.
+
+```tsx
+import { Box } from "@react-three/drei";
+import { useCuboid } from "@react-three/rapier";
+
+const RigidBox = () => {
+  // Generates a RigidBody and attaches a BoxCollider to it, returns a ref
+  const [box, rigidBody, collider] = useCuboid(
+    { position: [1, 1, 1] },
+    { args: [0.5, 0.5, 0.5] }
+  );
+
+  return <Box ref={box} />;
+};
+```
+
+## Roadmap?
 
 In order, but also not necessarily:
 
