@@ -11,7 +11,7 @@ import { Euler, Matrix4, Mesh, Object3D, Quaternion, Vector3 } from "three";
 import type Rapier from "@dimforge/rapier3d-compat";
 
 export const useRapier = () => {
-  return useContext(RapierContext) as RapierContext;
+return useContext(RapierContext) as RapierContext;
 };
 
 // Private hook for updating the simulations on objects
@@ -87,7 +87,7 @@ export const useCollider = <A>(
 export const useRigidBody = <O extends Object3D>(
   options?: UseRigidBodyOptions
 ): [MutableRefObject<O>, RapierRigidBody] => {
-  const { RAPIER, world } = useRapier();
+  const { RAPIER, world, colliders } = useRapier();
   const ref = useRef<O>();
 
   // Create rigidbody
@@ -146,7 +146,7 @@ export const useRigidBody = <O extends Object3D>(
     rigidBody.resetForces(false)
     rigidBody.resetTorques(false)
 
-    const colliderSetting = options?.colliders ?? false;
+    const colliderSetting = options?.colliders ?? colliders ?? false;
     const autoColliders = colliderSetting !== false ? createCollidersFromChildren(ref.current, rigidBody, colliderSetting, world) : []
     
     return () => {
