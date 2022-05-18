@@ -51,10 +51,11 @@ import {
   RevoluteJointParams,
   UseColliderOptions,
   RapierRigidBody,
+  ConvexMeshArgs,
+  RoundConvexMeshArgs,
 } from "./types";
 
 import {
-  Collider,
   FixedImpulseJoint,
   ImpulseJoint,
   PrismaticImpulseJoint,
@@ -367,43 +368,45 @@ export const useRoundConvexHull = <T extends Object3D>(
   });
 };
 
-// ConvexMesh crashes Rapier for some reason
-// export const useConvexMesh = (options: UseBodyOptions<ConvexMeshArgs> = {}) => {
-//   return useRigidBody<ConvexMeshArgs>({
-//     shape: "convexMesh",
-//     ...options,
-//   });
-// };
-// useConvexMesh.fromMesh = (
-//   mesh: Mesh,
-//   options?: Omit<UseBodyOptions<ConvexMeshArgs>, "colliderArgs">
-// ) => {
-//   return useConvexMesh({
-//     colliderArgs: [
-//       mesh.geometry.attributes.position.array,
-//       mesh.geometry?.index?.array || [],
-//     ],
-//     ...options,
-//   });
-// };
+export const useConvexMesh =  <T extends Object3D>(  
+  rigidBodyOptions: UseBodyOptions = {},
+  colliderOptions: UseColliderOptions<ConvexMeshArgs> = {}
+  ) => {
+  return useRigidBodyWithCollider<ConvexMeshArgs>(rigidBodyOptions, {
+    shape: "convexMesh",
+    ...colliderOptions,
+  });
+};
 
-// export const useRoundConvexMesh = (
-//   options: UseBodyOptions<RoundConvexMeshArgs> = {}
-// ) => {
-//   return useRigidBody<RoundConvexMeshArgs>({
-//     shape: "roundConvexMesh",
-//     ...options,
-//   });
-// };
+useConvexMesh.fromMesh = <T extends Object3D>(
+  mesh: Mesh,
+  rigidBodyOptions: UseBodyOptions = {},
+  colliderOptions: Omit<UseColliderOptions<ConvexMeshArgs>, "colliderArgs"> = {}
+) => {
+  return useConvexMesh<T>(rigidBodyOptions, {
+    args: [
+      mesh?.geometry?.attributes?.position?.array, 
+      mesh.geometry?.index?.array || []
+    ],
+    ...colliderOptions,
+  });
+};
+
+export const useRoundConvexMesh =  <T extends Object3D>(  
+  rigidBodyOptions: UseBodyOptions = {},
+  colliderOptions: UseColliderOptions<RoundConvexMeshArgs> = {}
+  ) => {
+  return useRigidBodyWithCollider<RoundConvexMeshArgs>(rigidBodyOptions, {
+    shape: "convexMesh",
+    ...colliderOptions,
+  });
+};
 
 // Joints
-
-// JOINTS is currently unfinished
 interface UseImpulseJointState<T> {
   joint?: T;
 }
 
-// TODO: how can we return this after the layout effect? Do we need to use `current`?
 export const useImpulseJoint = <T extends ImpulseJoint>(
   body1: MutableRefObject<RapierRigidBody | undefined | null>,
   body2: MutableRefObject<RapierRigidBody | undefined | null>,

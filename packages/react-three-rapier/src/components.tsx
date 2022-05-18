@@ -8,7 +8,7 @@ import {
   useImperativeHandle,
 } from "react";
 import { Group, Vector3 } from "three";
-import { useCollider, useRapier, useRigidBody } from "./hooks";
+import { useRapier, useRigidBody } from "./hooks";
 import {
   BallArgs,
   CapsuleArgs,
@@ -70,44 +70,60 @@ const AnyCollider = (props: UseColliderOptions<any>) => {
   return null;
 };
 
-export const CuboidCollider = (props: UseColliderOptions<CuboidArgs>) => {
+type UseColliderOptionsRequiredArgs<T> = Omit<UseColliderOptions<T>, "args"> & {
+  args: T;
+};
+
+export const CuboidCollider = (
+  props: UseColliderOptionsRequiredArgs<CuboidArgs>
+) => {
   return <AnyCollider {...props} shape="cuboid" />;
 };
 
 export const RoundCuboidCollider = (
-  props: UseColliderOptions<RoundCuboidArgs>
+  props: UseColliderOptionsRequiredArgs<RoundCuboidArgs>
 ) => {
   return <AnyCollider {...props} shape="roundCuboid" />;
 };
 
-export const BallCollider = (props: UseColliderOptions<BallArgs>) => {
+export const BallCollider = (
+  props: UseColliderOptionsRequiredArgs<BallArgs>
+) => {
   return <AnyCollider {...props} shape="ball" />;
 };
 
-export const CapsuleCollider = (props: UseColliderOptions<CapsuleArgs>) => {
+export const CapsuleCollider = (
+  props: UseColliderOptionsRequiredArgs<CapsuleArgs>
+) => {
   return <AnyCollider {...props} shape="capsule" />;
 };
 
 export const HeightfieldCollider = (
-  props: UseColliderOptions<HeightfieldArgs>
+  props: UseColliderOptionsRequiredArgs<HeightfieldArgs>
 ) => {
   return <AnyCollider {...props} shape="heightfield" />;
 };
 
-export const TrimeshCollider = (props: UseColliderOptions<TrimeshArgs>) => {
+export const TrimeshCollider = (
+  props: UseColliderOptionsRequiredArgs<TrimeshArgs>
+) => {
   return <AnyCollider {...props} shape="trimesh" />;
 };
 
-export const ConeCollider = (props: UseColliderOptions<ConeArgs>) => {
+export const ConeCollider = (
+  props: UseColliderOptionsRequiredArgs<ConeArgs>
+) => {
   return <AnyCollider {...props} shape="cone" />;
 };
 
-export const CylinderCollider = (props: UseColliderOptions<CylinderArgs>) => {
+export const CylinderCollider = (
+  props: UseColliderOptionsRequiredArgs<CylinderArgs>
+) => {
   return <AnyCollider {...props} shape="cylinder" />;
 };
 
 export const ConvexHullCollider = (
-  props: UseColliderOptions<ConvexHullArgs>
+  props: UseColliderOptionsRequiredArgs<ConvexHullArgs>
 ) => {
   return <AnyCollider {...props} shape="convexHull" />;
 };

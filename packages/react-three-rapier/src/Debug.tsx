@@ -1,8 +1,6 @@
 import React, {
   createRef,
-  forwardRef,
   memo,
-  MutableRefObject,
   RefObject,
   useMemo,
   useRef,
@@ -16,9 +14,7 @@ import {
   BufferAttribute,
   BufferGeometry,
   CylinderBufferGeometry,
-  Group,
   Mesh,
-  MeshBasicMaterial,
   Quaternion,
   SphereBufferGeometry,
 } from "three";
@@ -95,10 +91,10 @@ const DebugShape = memo<{ colliderHandle: number }>(({ colliderHandle }) => {
     }
   });
 
-  const geometry = useMemo(
-    () => geometryFromCollider(world.getCollider(colliderHandle)),
-    [colliderHandle]
-  );
+  const geometry = useMemo(() => {
+    const collider = world.getCollider(colliderHandle);
+    return geometryFromCollider(collider);
+  }, [colliderHandle]);
 
   return (
     <mesh ref={ref}>

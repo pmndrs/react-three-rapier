@@ -1,13 +1,15 @@
 import React from "react";
-import { Box, Environment, OrbitControls, Plane } from "@react-three/drei";
+import { Environment, OrbitControls, Plane } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { ReactNode, Suspense, useState } from "react";
-import { Debug, Physics, useCuboid } from "@react-three/rapier";
+import { Physics, useCuboid } from "@react-three/rapier";
 import Joints from "./joints/Joints";
 import Shapes from "./shapes/Shapes";
 import { ComponentsExample } from "./components/Components";
 import { CradleExample } from "./cradle/Cradle";
 import { Transforms } from "./transforms/Transforms";
+import { Cluster } from "./cluster/Cluster";
+import { AllShapes } from "./all-shapes/AllShapes";
 
 export interface Demo {
   (props: {
@@ -49,12 +51,13 @@ export const App = () => {
         position: "fixed",
         inset: 0,
         background: "linear-gradient(blue, white)",
+        fontFamily: "sans-serif",
       }}
     >
       <Suspense fallback="Loading...">
         <Canvas shadows>
           <Physics colliders={false}>
-            <Debug key={demo} />
+            {/* <Debug key={demo} /> */}
 
             <directionalLight
               castShadow
@@ -74,6 +77,8 @@ export const App = () => {
             {demo === "components" && <ComponentsExample setUI={setUI} />}
             {demo === "cradle" && <CradleExample setUI={setUI} />}
             {demo === "transforms" && <Transforms setUI={setUI} />}
+            {demo === "cluster" && <Cluster setUI={setUI} />}
+            {demo === "all-shapes" && <AllShapes setUI={setUI} />}
 
             <Floor />
           </Physics>
@@ -90,6 +95,8 @@ export const App = () => {
           <button onClick={() => setDemo("joints")}>Joints</button>
           <button onClick={() => setDemo("components")}>Components</button>
           <button onClick={() => setDemo("cradle")}>Cradle</button>
+          <button onClick={() => setDemo("cluster")}>Cluster</button>
+          <button onClick={() => setDemo("all-shapes")}>All Shapes</button>
           <button onClick={() => setDemo("transforms")}>
             Inherited Transforms
           </button>

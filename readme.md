@@ -40,6 +40,13 @@ const Scene = () => {
 
 RigidBodies generate automatic colliders by default for all meshes that it contains. You can control the default collider by setting the `colliders` prop on a `<RigidBody />`, or change it globally by setting `colliders` on `<Physics />`. Setting `colliders={false}` disables auto-generation.
 
+Current supported auto collider shapes:
+
+- cuboid
+- ball
+- trimesh
+- hull
+
 Generate ConvexHull colliders for all meshes in a RigidBody by default:
 
 ```tsx
