@@ -28,8 +28,8 @@
     "build": "preconstruct build",
     "dev": "preconstruct dev",
     "watch": "preconstruct watch",
-    "publish": "changeset publish",
-    "demo": "cd demo && yarn dev"
+    "demo": "cd demo && yarn dev",
+    "release": "yarn build && changeset publish"
   },
   "private": true,
   "workspaces": [
