@@ -15,7 +15,7 @@
     "@types/three": "^0.139.0",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
-    "three": "^0.140.0"
+    "three": "^0.139.2"
   },
   "peerDependencies": {
     "@react-three/fiber": "^8.0.12",
@@ -26,5 +26,5 @@
     "@dimforge/rapier3d-compat": "^0.8.0-alpha.2",
     "use-asset": "^1.0.4"
   },
-  "repository": "null//github.com/pmndrs/react-three-rapier/tree/master/packages/react-three-rapier"
+  "repository": "https://github.com/pmndrs/react-three-rapier/tree/master/packages/react-three-rapier"
 }

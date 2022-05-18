@@ -2,7 +2,7 @@
   "name": "react-three-rapier",
   "version": "0.1.0",
   "main": "index.js",
-  "repository": "null//github.com/pmndrs/react-three-rapier",
+  "repository": "https://github.com/pmndrs/react-three-rapier",
   "author": "Hugo Wiledal <hugo.wiledal@gmail.com>",
   "license": "MIT",
   "preconstruct": {
@@ -15,18 +15,20 @@
     "@babel/preset-env": "^7.17.10",
     "@babel/preset-react": "^7.16.7",
     "@babel/preset-typescript": "^7.16.7",
+    "@changesets/cli": "^2.22.0",
     "@manypkg/cli": "^0.19.1",
     "@preconstruct/cli": "^2.1.5",
     "buffer": "^6.0.3",
-    "typescript": "^4.6.3",
-    "@changesets/cli": "^2.22.0"
+    "np": "^7.6.1",
+    "typescript": "^4.6.3"
   },
   "scripts": {
-    "ci": "manypkg check",
+    "ci": "preconstruct validate; manypkg check",
     "postinstall": "preconstruct dev",
     "build": "preconstruct build",
     "dev": "preconstruct dev",
     "watch": "preconstruct watch",
+    "publish": "changeset publish",
     "demo": "cd demo && yarn dev"
   },
   "private": true,
