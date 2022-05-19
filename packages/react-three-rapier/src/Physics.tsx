@@ -8,6 +8,7 @@ import { vectorArrayToObject } from "./utils";
 export interface RapierContext {
   RAPIER: typeof Rapier;
   world: Rapier.World;
+  colliders: RigidBodyAutoCollider;
   stepFuncs: Array<() => void>;
 }
 
