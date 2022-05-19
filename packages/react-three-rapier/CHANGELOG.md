@@ -1,5 +1,11 @@
 # @react-three/rapier
 
+## 0.1.2
+
+### Patch Changes
+
+- 4f7440c: fix: make global colliders setting progate to children
+
 ## 0.1.1
 
 ### Patch Changes
