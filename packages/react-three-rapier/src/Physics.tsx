@@ -1,14 +1,19 @@
-import React, { createContext, FC, ReactNode, useMemo, useRef } from "react";
+import React, { createContext, FC, MutableRefObject, ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { useAsset } from "use-asset";
 import type Rapier from "@dimforge/rapier3d-compat";
 import { useFrame } from "@react-three/fiber";
 import { RigidBodyAutoCollider, Vector3Array } from "./types";
-import { vectorArrayToObject } from "./utils";
+import { ColliderHandle, RigidBodyHandle, World } from "@dimforge/rapier3d-compat";
+import { Object3D } from "three";
 
 export interface RapierContext {
-  RAPIER: typeof Rapier;
-  world: Rapier.World;
-  colliders: RigidBodyAutoCollider;
+  rapier: typeof Rapier;
+  worldGetter: MutableRefObject<() => World>;
+  colliderMeshes: Map<ColliderHandle, Object3D>;
+  rigidBodyMeshes: Map<ColliderHandle, Object3D>;
+  physicsOptions: {
+    colliders: RigidBodyAutoCollider;
+  }
   stepFuncs: Array<() => void>;
 }
 
@@ -36,17 +41,33 @@ export const Physics: FC<RapierWorldProps> = ({
   const rapier = useAsset(importRapier);
   const stepFuncs = useRef<Array<() => void>>([]);
 
-  const world = useMemo(() => {
-    if (!rapier.World) return null;
+  const worldRef = useRef<World | null>(null)
+  const [colliderMeshes] = useState<Map<ColliderHandle, Object3D>>(() => new Map());
+  const [rigidBodyMeshes] = useState<Map<RigidBodyHandle, Object3D>>(() => new Map());
 
-    let world = new rapier.World(vectorArrayToObject(gravity));
+  const worldGetter = useRef(() => {
+    if (worldRef.current === null) {
+      const gravity = { x: 0.0, y: -9.81, z: 0.0 }
+      worldRef.current = new rapier.World(gravity)
+    }
+    return worldRef.current
+  })
 
-    return world;
-  }, [rapier]) as Rapier.World;
+  useEffect(() => {
+    return () => {
+      if (worldRef.current !== null) {
+        worldRef.current.free()
+        worldRef.current = null
+      }
+    }
+  }, [])
 
   const time = useRef(performance.now());
 
   useFrame((context) => {
+    const world = worldGetter.current()
+    if (!world) return
+
     // Set timestep to current delta, to allow for variable frame rates
     // We cap the delta at 100, so that the physics simulation doesn't get wild
     const now = performance.now();
@@ -61,10 +82,14 @@ export const Physics: FC<RapierWorldProps> = ({
     time.current = now;
   });
 
-  const context = useMemo(() => ({ 
-    RAPIER: rapier, 
-    world,
-    colliders,
+  const context = useMemo<RapierContext>(() => ({ 
+    rapier,
+    worldGetter,
+    colliderMeshes,
+    rigidBodyMeshes,
+    physicsOptions: {
+      colliders
+    },
     stepFuncs: stepFuncs.current 
   }), [rapier])
 

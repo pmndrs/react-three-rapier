@@ -56,10 +56,12 @@ import {
 } from "./types";
 
 import {
+  Collider,
   FixedImpulseJoint,
   ImpulseJoint,
   PrismaticImpulseJoint,
   RevoluteImpulseJoint,
+  RigidBody,
   RoundCone,
   SphericalImpulseJoint,
 } from "@dimforge/rapier3d-compat";
@@ -70,56 +72,75 @@ export const useCollider = <A>(
   body: RapierRigidBody,
   options: UseColliderOptions<A> = {}
 ) => {
-  const { RAPIER, world } = useRapier();
-  const collider = useMemo(() => {
-    return createColliderFromOptions<A>(options, world, body)
-  }, []);
+  const { rapier, worldGetter } = useRapier();
+
+  const colliderRef = useRef<Collider>()
+
+  const colliderGetter = useRef(() => {
+    if (!colliderRef.current) {
+      const world = worldGetter.current()
+      colliderRef.current = createColliderFromOptions<A>(options, world, body)
+    }
+    return colliderRef.current
+  })
 
   useEffect(() => {
     return () => {
-      world.removeCollider(collider, false);
+      const world = worldGetter.current()
+      world.removeCollider(colliderGetter.current(), false);
     };
   }, []);
 
-  return [collider];
+  return [colliderGetter];
 };
 
 export const useRigidBody = <O extends Object3D>(
   options?: UseRigidBodyOptions
-): [MutableRefObject<O>, RapierRigidBody] => {
-  const { RAPIER, world, colliders } = useRapier();
+): [MutableRefObject<O>, MutableRefObject<() => RapierRigidBody>] => {
+  const { rapier, worldGetter, physicsOptions } = useRapier();
   const ref = useRef<O>();
 
+  const rigidBodyRef = useRef<RigidBody>()
+  const rigidBodyGetter = useRef(() => {
+    if (!rigidBodyRef.current) {
+      const world = worldGetter.current()
+      const type = rigidBodyTypeFromString(options?.type || "dynamic");
+      const desc = new rapier.RigidBodyDesc(type)
+      rigidBodyRef.current = world.createRigidBody(desc)
+    }
+    return rigidBodyRef.current
+  })
+
   // Create rigidbody
-  const rigidBody = useMemo(() => {
-    const [lvx, lvy, lvz] = options?.linearVelocity ?? [0, 0, 0];
-    const [avx, avy, avz] = options?.angularVelocity ?? [0, 0, 0];
-    const gravityScale = options?.gravityScale ?? 1;
-    const canSleep = options?.canSleep ?? true;
-    const ccdEnabled = options?.ccd ?? false;
-    const type = rigidBodyTypeFromString(options?.type || "dynamic");
-
-    const [x, y, z] = options?.position || [0, 0, 0];
-    const [rx, ry, rz] = options?.rotation || [0, 0, 0];
-
-    const rigidBodyDesc = new RAPIER.RigidBodyDesc(type)
-      .setLinvel(lvx, lvy, lvz)
-      .setAngvel({ x: avx, y: avy, z: avz })
-      .setGravityScale(gravityScale)
-      .setCanSleep(canSleep)
-      .setCcdEnabled(ccdEnabled)
-      .setTranslation(0,0,0)
-
-    const body = world.createRigidBody(rigidBodyDesc);
-
-    return body;
-  }, []);
 
   // Setup
   useEffect(() => {
+    const world = worldGetter.current()
+    const rigidBody = rigidBodyGetter.current()
+
     if (!ref.current) {
       ref.current = new Object3D() as O
     }
+
+    // const [lvx, lvy, lvz] = options?.linearVelocity ?? [0, 0, 0];
+    // const [avx, avy, avz] = options?.angularVelocity ?? [0, 0, 0];
+    // const gravityScale = options?.gravityScale ?? 1;
+    // const canSleep = options?.canSleep ?? true;
+    // const ccdEnabled = options?.ccd ?? false;
+    // const type = rigidBodyTypeFromString(options?.type || "dynamic");
+
+    // const [x, y, z] = options?.position || [0, 0, 0];
+    // const [rx, ry, rz] = options?.rotation || [0, 0, 0];
+
+    // const rigidBodyDesc = new rapier.RigidBodyDesc(type)
+    //   .setLinvel(lvx, lvy, lvz)
+    //   .setAngvel({ x: avx, y: avy, z: avz })
+    //   .setGravityScale(gravityScale)
+    //   .setCanSleep(canSleep)
+    //   .setCcdEnabled(ccdEnabled)
+    //   .setTranslation(0,0,0)
+
+    // const body = world.createRigidBody(rigidBodyDesc);
 
     // Get intitial world transforms
     const worldPosition = ref.current.getWorldPosition(new Vector3())
@@ -146,7 +167,7 @@ export const useRigidBody = <O extends Object3D>(
     rigidBody.resetForces(false)
     rigidBody.resetTorques(false)
 
-    const colliderSetting = options?.colliders ?? colliders ?? false;
+    const colliderSetting = options?.colliders ?? physicsOptions.colliders ?? false;
     const autoColliders = colliderSetting !== false ? createCollidersFromChildren(ref.current, rigidBody, colliderSetting, world) : []
     
     return () => {
@@ -156,6 +177,8 @@ export const useRigidBody = <O extends Object3D>(
   }, [])
 
   useRapierStep(() => {
+    const rigidBody = rigidBodyGetter.current()
+
     if (rigidBody && ref.current) {
       const { x, y, z } = rigidBody.translation();
       const { x: rx, y: ry, z: rz, w: rw } = rigidBody.rotation();
@@ -178,20 +201,23 @@ export const useRigidBody = <O extends Object3D>(
     }
   });
 
-  return [ref as MutableRefObject<O>, rigidBody];
+  return [ref as MutableRefObject<O>, rigidBodyGetter];
 };
 
 export const useRigidBodyWithCollider = <A, O extends Object3D = Object3D>(
   rigidBodyOptions?: UseRigidBodyOptions,
   colliderOptions?: UseColliderOptions<A>
-): [ref: MutableRefObject<O>, rigidBody: RapierRigidBody] => {
-  const {world} = useRapier()
-  const [ref, rigidBody] = useRigidBody<O>(rigidBodyOptions);
+): [ref: MutableRefObject<O>, rigidBody: MutableRefObject<() => RapierRigidBody>] => {
+  const { worldGetter } = useRapier()
+  const [ref, rigidBodyGetter] = useRigidBody<O>(rigidBodyOptions);
   
   useEffect(() => {
     if (!colliderOptions) {
       return 
     }
+    
+    const world = worldGetter.current()
+    const rigidBody = rigidBodyGetter.current()
 
     const scale = ref.current.getWorldScale(new Vector3());
     const collider = createColliderFromOptions(colliderOptions, world, rigidBody, scale);
@@ -201,7 +227,7 @@ export const useRigidBodyWithCollider = <A, O extends Object3D = Object3D>(
     };
   }, []);
 
-  return [ref, rigidBody];
+  return [ref, rigidBodyGetter];
 };
 
 export const useCuboid = <T extends Object3D>(
@@ -412,9 +438,10 @@ export const useImpulseJoint = <T extends ImpulseJoint>(
   body2: MutableRefObject<RapierRigidBody | undefined | null>,
   params: Rapier.JointData
 ) => {
-  const { world, RAPIER } = useRapier();
+  const { worldGetter } = useRapier();
 
   useLayoutEffect(() => {
+    const world = worldGetter.current()
     let joint: T;
 
     if (body1 && body2 && params) {
@@ -442,12 +469,12 @@ export const useFixedJoint: UseImpulseJoint<FixedJointParams> = (
   body2,
   [body1Anchor, body1LocalFrame, body2Anchor, body2LocalFrame]
 ) => {
-  const { RAPIER } = useRapier();
+  const { rapier } = useRapier();
 
   return useImpulseJoint<FixedImpulseJoint>(
     body1,
     body2,
-    RAPIER.JointData.fixed(
+    rapier.JointData.fixed(
       vectorArrayToObject(body1Anchor),
       { ...vectorArrayToObject(body1LocalFrame), w: 1 },
       vectorArrayToObject(body2Anchor),
@@ -467,12 +494,12 @@ export const useSphericalJoint: UseImpulseJoint<SphericalJointParams> = (
   body2,
   [body1Anchor, body2Anchor]
 ) => {
-  const { RAPIER } = useRapier();
+  const { rapier } = useRapier();
 
   return useImpulseJoint<SphericalImpulseJoint>(
     body1,
     body2,
-    RAPIER.JointData.spherical(
+    rapier.JointData.spherical(
       vectorArrayToObject(body1Anchor),
       vectorArrayToObject(body2Anchor)
     )
@@ -489,12 +516,12 @@ export const useRevoluteJoint: UseImpulseJoint<RevoluteJointParams> = (
   body2,
   [body1Anchor, body2Anchor, axis]
 ) => {
-  const { RAPIER } = useRapier();
+  const { rapier } = useRapier();
 
   return useImpulseJoint<RevoluteImpulseJoint>(
     body1,
     body2,
-    RAPIER.JointData.revolute(
+    rapier.JointData.revolute(
       vectorArrayToObject(body1Anchor),
       vectorArrayToObject(body2Anchor),
       vectorArrayToObject(axis)
@@ -512,12 +539,12 @@ export const usePrismaticJoint: UseImpulseJoint<PrismaticJointParams> = (
   body2,
   [body1Anchor, body2Anchor, axis]
 ) => {
-  const { RAPIER } = useRapier();
+  const { rapier } = useRapier();
 
   return useImpulseJoint<PrismaticImpulseJoint>(
     body1,
     body2,
-    RAPIER.JointData.prismatic(
+    rapier.JointData.prismatic(
       vectorArrayToObject(body1Anchor),
       vectorArrayToObject(body2Anchor),
       vectorArrayToObject(axis)

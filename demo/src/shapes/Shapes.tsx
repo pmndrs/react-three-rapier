@@ -49,7 +49,7 @@ const Label = ({ label }: { label: string }) => {
 
 const RigidBox = memo(() => {
   const color = useRandomColor();
-  const [box, rigidBody] = useCuboid(
+  const [box, api] = useCuboid(
     {
       position: [-4 + Math.random() * 8, 10, 0],
     },
@@ -59,6 +59,7 @@ const RigidBox = memo(() => {
   );
 
   useEffect(() => {
+    const rigidBody = api.current();
     rigidBody.applyImpulse({ x: 0, y: 0, z: 0 }, true);
     rigidBody.applyTorqueImpulse({ x: 0, y: 0, z: Math.random() * 0.1 }, true);
   }, []);

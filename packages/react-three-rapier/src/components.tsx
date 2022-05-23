@@ -27,7 +27,7 @@ import {
 import { createColliderFromOptions, scaleVertices } from "./utils";
 
 const RigidBodyContext = createContext<
-  [MutableRefObject<Group>, RapierRigidBody]
+  [MutableRefObject<Group>, MutableRefObject<() => RapierRigidBody>]
 >(undefined!);
 
 const useParentRigidBody = () => useContext(RigidBodyContext);
@@ -40,12 +40,12 @@ interface RigidBodyProps extends UseRigidBodyOptions {
 
 export const RigidBody = forwardRef<RapierRigidBody, RigidBodyProps>(
   ({ children, ...props }, ref) => {
-    const [group, rigidBody] = useRigidBody<Group>(props);
+    const [group, rigidBodyGetter] = useRigidBody<Group>(props);
 
-    useImperativeHandle(ref, () => rigidBody);
+    useImperativeHandle(ref, () => rigidBodyGetter.current());
 
     return (
-      <RigidBodyContext.Provider value={[group, rigidBody]}>
+      <RigidBodyContext.Provider value={[group, rigidBodyGetter]}>
         <group ref={group}>{children}</group>
       </RigidBodyContext.Provider>
     );
@@ -53,25 +53,36 @@ export const RigidBody = forwardRef<RapierRigidBody, RigidBodyProps>(
 );
 
 // Colliders
-const AnyCollider = (props: UseColliderOptions<any>) => {
-  const { world } = useRapier();
-  const [object, rigidBody] = useParentRigidBody();
+const AnyCollider = ({
+  children,
+  ...props
+}: UseColliderOptions<any> & { children: ReactNode }) => {
+  const { worldGetter } = useRapier();
+  const [object, rigidBodyGetter] = useParentRigidBody();
 
   useEffect(() => {
+    const world = worldGetter.current();
+
     const scale = object.current.getWorldScale(new Vector3());
 
-    const collider = createColliderFromOptions(props, world, rigidBody, scale);
+    const collider = createColliderFromOptions(
+      props,
+      world,
+      rigidBodyGetter.current(),
+      scale
+    );
 
     return () => {
       world.removeCollider(collider, false);
     };
   }, []);
 
-  return null;
+  return <object3D>{children}</object3D>;
 };
 
 type UseColliderOptionsRequiredArgs<T> = Omit<UseColliderOptions<T>, "args"> & {
   args: T;
+  children: ReactNode;
 };
 
 export const CuboidCollider = (
