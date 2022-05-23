@@ -5,6 +5,7 @@ import { useFrame } from "@react-three/fiber";
 import { RigidBodyAutoCollider, Vector3Array } from "./types";
 import { ColliderHandle, RigidBodyHandle, World } from "@dimforge/rapier3d-compat";
 import { Object3D } from "three";
+import { vectorArrayToObject } from "./utils";
 
 export interface RapierContext {
   rapier: typeof Rapier;
@@ -39,16 +40,15 @@ export const Physics: FC<RapierWorldProps> = ({
   children
 }) => {
   const rapier = useAsset(importRapier);
-  const stepFuncs = useRef<Array<() => void>>([]);
 
   const worldRef = useRef<World | null>(null)
   const [colliderMeshes] = useState<Map<ColliderHandle, Object3D>>(() => new Map());
   const [rigidBodyMeshes] = useState<Map<RigidBodyHandle, Object3D>>(() => new Map());
+  const [stepFuncs] = useState(() => new Array<() => void>());
 
   const worldGetter = useRef(() => {
     if (worldRef.current === null) {
-      const gravity = { x: 0.0, y: -9.81, z: 0.0 }
-      worldRef.current = new rapier.World(gravity)
+      worldRef.current = new rapier.World(vectorArrayToObject(gravity))
     }
     return worldRef.current
   })
@@ -77,7 +77,7 @@ export const Physics: FC<RapierWorldProps> = ({
     world.step();
 
     // Run all step funcs
-    stepFuncs.current.forEach((func) => func());
+    stepFuncs.forEach((func) => func());
 
     time.current = now;
   });
@@ -85,13 +85,14 @@ export const Physics: FC<RapierWorldProps> = ({
   const context = useMemo<RapierContext>(() => ({ 
     rapier,
     worldGetter,
+    physicsOptions: {
+      colliders,
+      gravity
+    },
+    stepFuncs,
     colliderMeshes,
     rigidBodyMeshes,
-    physicsOptions: {
-      colliders
-    },
-    stepFuncs: stepFuncs.current 
-  }), [rapier])
+  }), [])
 
   return (
     <RapierContext.Provider
