@@ -62,13 +62,15 @@ export const App = () => {
             <Environment preset="apartment" />
             <OrbitControls />
 
-            {demo === "shapes" && <Shapes setUI={setUI} />}
-            {demo === "joints" && <Joints setUI={setUI} />}
-            {demo === "components" && <ComponentsExample setUI={setUI} />}
-            {demo === "cradle" && <CradleExample setUI={setUI} />}
-            {demo === "transforms" && <Transforms setUI={setUI} />}
-            {demo === "cluster" && <Cluster setUI={setUI} />}
-            {demo === "all-shapes" && <AllShapes setUI={setUI} />}
+            <Suspense>
+              {demo === "shapes" && <Shapes setUI={setUI} />}
+              {demo === "joints" && <Joints setUI={setUI} />}
+              {demo === "components" && <ComponentsExample setUI={setUI} />}
+              {demo === "cradle" && <CradleExample setUI={setUI} />}
+              {demo === "transforms" && <Transforms setUI={setUI} />}
+              {demo === "cluster" && <Cluster setUI={setUI} />}
+              {demo === "all-shapes" && <AllShapes setUI={setUI} />}
+            </Suspense>
 
             <Floor />
           </Physics>

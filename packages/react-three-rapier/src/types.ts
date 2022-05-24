@@ -6,6 +6,7 @@ import {
   RigidBody as RapierRigidBody,
   Collider as RapierCollider
 } from "@dimforge/rapier3d-compat";
+import { JointApi, RigidBodyApi } from ".";
 
 export {
   RapierRigidBody,
@@ -16,7 +17,7 @@ export {
   CoefficientCombineRule as CoefficientCombineRule,
 } from "@dimforge/rapier3d-compat";
 
-export type RefGetter<T> = MutableRefObject<() => T>
+export type RefGetter<T> = MutableRefObject<() => T | undefined>
 
 export type RigidBodyAutoCollider = 'ball' | 'cuboid' | 'hull' | 'trimesh' | false
 
@@ -251,5 +252,5 @@ export type RevoluteJointParams = [
 ];
 
 export interface UseImpulseJoint<P> {
-  (body1: MutableRefObject<RapierRigidBody | undefined | null>, body2: MutableRefObject<RapierRigidBody | undefined | null>, params: P): void;
+  (body1: MutableRefObject<RapierRigidBody | undefined | null>, body2: MutableRefObject<RapierRigidBody | undefined | null>, params: P): JointApi;
 }

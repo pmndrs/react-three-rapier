@@ -3,6 +3,7 @@ import {
   ColliderDesc,
   ImpulseJoint,
   JointData,
+  PrismaticImpulseJoint,
   RigidBody,
   RigidBodyDesc,
   World,
@@ -13,6 +14,7 @@ import { RefGetter } from "./types";
 
 export const createRigidBodyApi = (ref: RefGetter<RigidBody>) => {
   return {
+    raw: () => ref.current(),
     get handle() {
       return ref.current()!.handle;
     },
@@ -37,6 +39,7 @@ export type RigidBodyApi = ReturnType<typeof createRigidBodyApi>;
 
 export const createColliderApi = (ref: RefGetter<Collider>) => {
   return {
+    raw: () => ref.current(),
     get handle() {
       return ref.current()!.handle;
     },
@@ -47,6 +50,7 @@ export type ColliderApi = ReturnType<typeof createColliderApi>;
 
 export const createWorldApi = (ref: RefGetter<World>) => {
   return {
+    raw: () => ref.current(),
     getCollider: (handle: number) => ref.current()!.getCollider(handle),
     getRigidBody: (handle: number) => ref.current()!.getRigidBody(handle),
     createRigidBody: (desc: RigidBodyDesc) =>
@@ -68,3 +72,29 @@ export const createWorldApi = (ref: RefGetter<World>) => {
 };
 
 export type WorldApi = ReturnType<typeof createWorldApi>;
+
+export const createJointApi = (ref: RefGetter<ImpulseJoint>) => {
+  return {
+    raw: () => ref.current(),
+    get handle() {
+      return ref.current()!.handle;
+    },
+    configureMotorPosition: (
+      targetPos: number,
+      stiffness: number,
+      damping: number
+    ) =>
+      (ref.current()! as PrismaticImpulseJoint).configureMotorPosition(
+        targetPos,
+        stiffness,
+        damping
+      ),
+    configureMotorVelocity: (targetVel: number, damping: number) =>
+      (ref.current()! as PrismaticImpulseJoint).configureMotorVelocity(
+        targetVel,
+        damping
+      ),
+  };
+};
+
+export type JointApi = ReturnType<typeof createJointApi>;

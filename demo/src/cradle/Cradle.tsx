@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Cylinder, Sphere } from "@react-three/drei";
 import {
   BallCollider,
   CylinderCollider,
   RapierRigidBody,
   RigidBody,
+  RigidBodyApi,
   UseRigidBodyOptions,
   useSphericalJoint,
 } from "@react-three/rapier";
@@ -12,10 +13,10 @@ import { useRef } from "react";
 import { Demo } from "../App";
 
 const Rod = (props: UseRigidBodyOptions) => {
-  const anchor = useRef<RapierRigidBody>(null);
-  const rod = useRef<RapierRigidBody>(null);
+  const anchor = useRef<RigidBodyApi>(null);
+  const rod = useRef<RigidBodyApi>(null);
 
-  useSphericalJoint(anchor, rod, [
+  const joint = useSphericalJoint(anchor, rod, [
     [0, 0, 0],
     [0, 0, 0],
   ]);

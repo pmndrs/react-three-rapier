@@ -67,7 +67,7 @@ import {
 } from "@dimforge/rapier3d-compat";
 
 import { createColliderFromOptions, createCollidersFromChildren, rigidBodyTypeFromString, vectorArrayToObject } from "./utils";
-import { createColliderApi, createRigidBodyApi, RigidBodyApi } from "./api";
+import { createColliderApi, createJointApi, createRigidBodyApi, RigidBodyApi } from "./api";
 
 export const useRigidBody = <O extends Object3D>(
   options: UseRigidBodyOptions = {}
@@ -87,7 +87,7 @@ export const useRigidBody = <O extends Object3D>(
     return rigidBodyRef.current
   })
   
-  useLayoutEffect(() => {
+  useEffect(() => {
     const rigidBody = getRigidBodyRef.current()
     rigidBody.sleep()
     rigidBodyRef.current = rigidBody
@@ -455,39 +455,54 @@ export const useImpulseJoint = <T extends ImpulseJoint>(
 ) => {
   const { world } = useRapier();
 
-  useLayoutEffect(() => {
-    
-    let joint: T;
+  const jointRef = useRef<ImpulseJoint>()
+  const getJointRef = useRef(() => {
+    if (!jointRef.current) {
+      let rb1: RapierRigidBody;
+      let rb2: RapierRigidBody;
 
-    let rb1: RapierRigidBody;
-    let rb2: RapierRigidBody;
+      if ('handle' in body1 && 'handle' in body2) {
+        rb1 = world.getRigidBody(body1.handle);
+        rb2 = world.getRigidBody(body2.handle);
 
-    if ('handle' in body1 && 'handle' in body2) {
-      rb1 = world.getRigidBody(body1.handle);
-      rb2 = world.getRigidBody(body2.handle);
+        jointRef.current = world.createImpulseJoint(
+          params,
+          rb1,
+          rb2
+        ) as T;
+      }
 
-      joint = world.createImpulseJoint(
-        params,
-        rb1,
-        rb2
-      ) as T;
+      if ('current' in body1 && body1.current && 'current' in body2 && body2.current) {
+        rb1 = world.getRigidBody(body1.current.handle);
+        rb2 = world.getRigidBody(body2.current.handle);
+
+        const newJoint = world.createImpulseJoint(
+          params,
+          rb1,
+          rb2
+        ) as T;
+
+        jointRef.current = newJoint
+      }
     }
+    return jointRef.current
+  })
 
-    if ('current' in body1 && body1.current && 'current' in body2 && body2.current) {
-      rb1 = world.getRigidBody(body1.current.handle);
-      rb2 = world.getRigidBody(body2.current.handle);
-
-      joint = world.createImpulseJoint(
-        params,
-        rb1,
-        rb2
-      ) as T;
-    }
+  useEffect(() => {
+    const joint = getJointRef.current()
 
     return () => {
-      if (joint) world.removeImpulseJoint(joint);
+      if (joint) {
+        console.log('remove joint', joint)
+        world.removeImpulseJoint(joint);
+        jointRef.current = undefined
+      }
     };
   }, []);
+
+  const api = useMemo(() => createJointApi(getJointRef), []);
+
+  return api
 };
 
 /**
