@@ -1,5 +1,3 @@
-import React from "react";
-
 import { Box, Shadow } from "@react-three/drei";
 import { createRef, forwardRef, ReactNode, useEffect, useRef } from "react";
 import {

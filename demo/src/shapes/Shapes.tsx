@@ -1,4 +1,3 @@
-import React from "react";
 import { Dispatch, FC, memo, ReactNode, useEffect, useState } from "react";
 
 import { Box, Html, Plane, Sphere, useGLTF } from "@react-three/drei";
