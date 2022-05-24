@@ -37,7 +37,7 @@ export const AllShapes: Demo = ({ setUI }) => {
 
   return (
     <>
-      <Debug />
+      {/* <Debug /> */}
       <group>
         <RigidBody colliders="cuboid">
           <Suzanne />

@@ -16,6 +16,7 @@ import {
   UseColliderOptions,
   Vector3Array,
 } from "./types";
+import { WorldApi } from "./api";
 
 export const vectorArrayToObject = (arr: Vector3Array) => {
   const [x, y, z] = arr;
@@ -59,8 +60,8 @@ export const scaleColliderArgs = (
 
 export const createColliderFromOptions = <A>(
   options: UseColliderOptions<A>,
-  world: World,
-  body: RapierRigidBody,
+  world: WorldApi,
+  rigidBodyHandle: number,
   scale = { x: 1, y: 1, z: 1 }
 ) => {
   const mass = options?.mass || 1;
@@ -108,7 +109,7 @@ export const createColliderFromOptions = <A>(
     );
   }
 
-  const collider = world.createCollider(colliderDesc, body.handle);
+  const collider = world.createCollider(colliderDesc, rigidBodyHandle);
 
   return collider;
 };
@@ -117,7 +118,7 @@ export const createCollidersFromChildren = (
   object: Object3D,
   rigidBody: RapierRigidBody,
   type: RigidBodyAutoCollider,
-  world: World
+  world: WorldApi
 ) => {
   const colliders: Collider[] = [];
 

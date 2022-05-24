@@ -76,11 +76,10 @@ const geometryFromCollider = (collider: Collider) => {
 };
 
 const DebugShape = memo<{ colliderHandle: number }>(({ colliderHandle }) => {
-  const { worldGetter } = useRapier();
+  const { world } = useRapier();
   const ref = useRef<Mesh>(null);
 
   useFrame(() => {
-    const world = worldGetter.current();
     const collider = world.getCollider(colliderHandle);
 
     if (ref.current && collider) {
@@ -93,7 +92,6 @@ const DebugShape = memo<{ colliderHandle: number }>(({ colliderHandle }) => {
   });
 
   const geometry = useMemo(() => {
-    const world = worldGetter.current();
     const collider = world.getCollider(colliderHandle);
     return geometryFromCollider(collider);
   }, [colliderHandle]);
@@ -107,7 +105,7 @@ const DebugShape = memo<{ colliderHandle: number }>(({ colliderHandle }) => {
 });
 
 export const Debug = () => {
-  const { worldGetter } = useRapier();
+  const { world } = useRapier();
   const [colliders, setColliders] = useState<number[]>([]);
   const refs = useRef<Record<number, RefObject<Mesh>>>({});
 
@@ -119,12 +117,11 @@ export const Debug = () => {
   };
 
   useFrame(() => {
-    const world = worldGetter.current();
     const newColliders: number[] = [];
 
-    world.colliders.forEachCollider((collider) => {
-      newColliders.push(collider.handle);
-    });
+    // world.forEachCollider((collider) => {
+    //   newColliders.push(collider.handle);
+    // });
 
     setColliders(newColliders);
   });

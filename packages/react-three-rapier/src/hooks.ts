@@ -67,56 +67,40 @@ import {
 } from "@dimforge/rapier3d-compat";
 
 import { createColliderFromOptions, createCollidersFromChildren, rigidBodyTypeFromString, vectorArrayToObject } from "./utils";
-
-export const useCollider = <A>(
-  body: RapierRigidBody,
-  options: UseColliderOptions<A> = {}
-) => {
-  const { rapier, worldGetter } = useRapier();
-
-  const colliderRef = useRef<Collider>()
-
-  const colliderGetter = useRef(() => {
-    if (!colliderRef.current) {
-      const world = worldGetter.current()
-      colliderRef.current = createColliderFromOptions<A>(options, world, body)
-    }
-    return colliderRef.current
-  })
-
-  useEffect(() => {
-    return () => {
-      const world = worldGetter.current()
-      world.removeCollider(colliderGetter.current(), false);
-    };
-  }, []);
-
-  return [colliderGetter];
-};
+import { createColliderApi, createRigidBodyApi, RigidBodyApi } from "./api";
 
 export const useRigidBody = <O extends Object3D>(
-  options?: UseRigidBodyOptions
-): [MutableRefObject<O>, MutableRefObject<() => RapierRigidBody>] => {
-  const { rapier, worldGetter, physicsOptions } = useRapier();
+  options: UseRigidBodyOptions = {}
+): [MutableRefObject<O>, RigidBodyApi] => {
+  const { rapier, world, physicsOptions } = useRapier();
   const ref = useRef<O>();
 
+  // Create rigidbody
   const rigidBodyRef = useRef<RigidBody>()
-  const rigidBodyGetter = useRef(() => {
+  const getRigidBodyRef = useRef(() => {
     if (!rigidBodyRef.current) {
-      const world = worldGetter.current()
       const type = rigidBodyTypeFromString(options?.type || "dynamic");
       const desc = new rapier.RigidBodyDesc(type)
-      rigidBodyRef.current = world.createRigidBody(desc)
+      const rigidBody = world.createRigidBody(desc)
+      rigidBodyRef.current = rigidBody
     }
     return rigidBodyRef.current
   })
+  
+  useLayoutEffect(() => {
+    const rigidBody = getRigidBodyRef.current()
+    rigidBody.sleep()
+    rigidBodyRef.current = rigidBody
 
-  // Create rigidbody
+    return () => {
+      world.removeRigidBody(rigidBody)
+      rigidBodyRef.current = undefined
+    }
+  }, [])
 
   // Setup
   useEffect(() => {
-    const world = worldGetter.current()
-    const rigidBody = rigidBodyGetter.current()
+    const rigidBody = getRigidBodyRef.current()
 
     if (!ref.current) {
       ref.current = new Object3D() as O
@@ -169,15 +153,16 @@ export const useRigidBody = <O extends Object3D>(
 
     const colliderSetting = options?.colliders ?? physicsOptions.colliders ?? false;
     const autoColliders = colliderSetting !== false ? createCollidersFromChildren(ref.current, rigidBody, colliderSetting, world) : []
+
+    rigidBody.wakeUp()
     
     return () => {
-      world.removeRigidBody(rigidBody)
-      autoColliders.forEach(collider => world.removeCollider(collider, false))
+      autoColliders.forEach(collider => world.removeCollider(collider))
     }
   }, [])
 
   useRapierStep(() => {
-    const rigidBody = rigidBodyGetter.current()
+    const rigidBody = rigidBodyRef.current!
 
     if (rigidBody && ref.current) {
       const { x, y, z } = rigidBody.translation();
@@ -201,33 +186,63 @@ export const useRigidBody = <O extends Object3D>(
     }
   });
 
-  return [ref as MutableRefObject<O>, rigidBodyGetter];
+  const api = useMemo(() => createRigidBodyApi(getRigidBodyRef), [])
+
+  return [ref as MutableRefObject<O>, api];
+};
+
+export const useCollider = <A>(
+  body: RigidBodyApi,
+  options: UseColliderOptions<A> = {}
+) => {
+  const { world } = useRapier();
+
+  const colliderRef = useRef<Collider>()
+
+  const objectRef = useRef<Object3D>()
+  const getColliderRef = useRef(() => {
+    if (!colliderRef.current) {
+      colliderRef.current = createColliderFromOptions<A>(options, world, body.handle)
+    }
+    return colliderRef.current
+  })
+
+  useEffect(() => {
+    const collider = getColliderRef.current()    
+
+    return () => {
+      if (collider) world.removeCollider(collider);
+      colliderRef.current = undefined
+    };
+  }, []);
+
+  const api = useMemo(() => createColliderApi(getColliderRef), [])
+
+  return [objectRef, api];
 };
 
 export const useRigidBodyWithCollider = <A, O extends Object3D = Object3D>(
   rigidBodyOptions?: UseRigidBodyOptions,
   colliderOptions?: UseColliderOptions<A>
-): [ref: MutableRefObject<O>, rigidBody: MutableRefObject<() => RapierRigidBody>] => {
-  const { worldGetter } = useRapier()
-  const [ref, rigidBodyGetter] = useRigidBody<O>(rigidBodyOptions);
+): [ref: MutableRefObject<O>, rigidBody: RigidBodyApi] => {
+  const { world } = useRapier()
+  const [ref, rigidBody] = useRigidBody<O>(rigidBodyOptions);
   
   useEffect(() => {
     if (!colliderOptions) {
       return 
     }
     
-    const world = worldGetter.current()
-    const rigidBody = rigidBodyGetter.current()
-
+    
     const scale = ref.current.getWorldScale(new Vector3());
-    const collider = createColliderFromOptions(colliderOptions, world, rigidBody, scale);
+    const collider = createColliderFromOptions(colliderOptions, world, rigidBody.handle, scale);
 
     return () => {
-      world.removeCollider(collider, false);
+      world.removeCollider(collider);
     };
   }, []);
 
-  return [ref, rigidBodyGetter];
+  return [ref, rigidBody];
 };
 
 export const useCuboid = <T extends Object3D>(
@@ -434,28 +449,45 @@ interface UseImpulseJointState<T> {
 }
 
 export const useImpulseJoint = <T extends ImpulseJoint>(
-  body1: MutableRefObject<RapierRigidBody | undefined | null>,
-  body2: MutableRefObject<RapierRigidBody | undefined | null>,
+  body1: MutableRefObject<RapierRigidBody | undefined | null> | RigidBodyApi,
+  body2: MutableRefObject<RapierRigidBody | undefined | null> | RigidBodyApi,
   params: Rapier.JointData
 ) => {
-  const { worldGetter } = useRapier();
+  const { world } = useRapier();
 
   useLayoutEffect(() => {
-    const world = worldGetter.current()
+    
     let joint: T;
 
-    if (body1 && body2 && params) {
+    let rb1: RapierRigidBody;
+    let rb2: RapierRigidBody;
+
+    if ('handle' in body1 && 'handle' in body2) {
+      rb1 = world.getRigidBody(body1.handle);
+      rb2 = world.getRigidBody(body2.handle);
+
       joint = world.createImpulseJoint(
         params,
-        body1.current!,
-        body2.current!
+        rb1,
+        rb2
+      ) as T;
+    }
+
+    if ('current' in body1 && body1.current && 'current' in body2 && body2.current) {
+      rb1 = world.getRigidBody(body1.current.handle);
+      rb2 = world.getRigidBody(body2.current.handle);
+
+      joint = world.createImpulseJoint(
+        params,
+        rb1,
+        rb2
       ) as T;
     }
 
     return () => {
-      if (joint) world.removeImpulseJoint(joint, true);
+      if (joint) world.removeImpulseJoint(joint);
     };
-  }, [body1, body2]);
+  }, []);
 };
 
 /**

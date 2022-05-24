@@ -1,9 +1,8 @@
 import { RigidBody as RapierRigidBody } from "@dimforge/rapier3d-compat";
 import { Environment, Sphere } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import { RigidBody } from "@react-three/rapier";
+import { RigidBody, RigidBodyApi } from "@react-three/rapier";
 import { createRef, useEffect, useRef } from "react";
-import { Vector3 } from "three";
 import { Demo } from "../App";
 
 const BALLS = 1000;
@@ -14,16 +13,15 @@ export const Cluster: Demo = ({ setUI }) => {
   }, []);
 
   const refs = useRef(
-    Array.from({ length: BALLS }).map(() => createRef<RapierRigidBody>())
+    Array.from({ length: BALLS }).map(() => createRef<RigidBodyApi>())
   );
 
   useFrame(() => {
     refs.current.forEach((ref) => {
-      const p = ref.current?.translation();
-      const v = new Vector3(p?.x, p?.y, p?.z);
-      v.normalize().multiplyScalar(-0.02);
+      const p = ref.current!.translation();
+      p.normalize().multiplyScalar(-0.02);
 
-      ref.current?.applyImpulse({ x: v.x, y: v.y, z: v.z }, true);
+      ref.current?.applyImpulse(p);
     });
   });
 

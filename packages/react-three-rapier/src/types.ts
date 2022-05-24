@@ -16,6 +16,8 @@ export {
   CoefficientCombineRule as CoefficientCombineRule,
 } from "@dimforge/rapier3d-compat";
 
+export type RefGetter<T> = MutableRefObject<() => T>
+
 export type RigidBodyAutoCollider = 'ball' | 'cuboid' | 'hull' | 'trimesh' | false
 
 export interface UseRigidBodyAPI {

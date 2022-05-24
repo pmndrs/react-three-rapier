@@ -40,7 +40,7 @@ const RopeSegment = forwardRef(
       }
     );
 
-    useImperativeHandle(ref, () => api.current());
+    useImperativeHandle(ref, () => api);
 
     const RopeLink = component;
 

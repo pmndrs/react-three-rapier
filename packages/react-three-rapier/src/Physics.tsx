@@ -1,4 +1,4 @@
-import React, { createContext, FC, MutableRefObject, ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import React, { createContext, FC, MutableRefObject, ReactNode, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useAsset } from "use-asset";
 import type Rapier from "@dimforge/rapier3d-compat";
 import { useFrame } from "@react-three/fiber";
@@ -6,10 +6,11 @@ import { RigidBodyAutoCollider, Vector3Array } from "./types";
 import { ColliderHandle, RigidBodyHandle, World } from "@dimforge/rapier3d-compat";
 import { Object3D } from "three";
 import { vectorArrayToObject } from "./utils";
+import { createWorldApi, WorldApi } from "./api";
 
 export interface RapierContext {
   rapier: typeof Rapier;
-  worldGetter: MutableRefObject<() => World>;
+  world: WorldApi
   colliderMeshes: Map<ColliderHandle, Object3D>;
   rigidBodyMeshes: Map<ColliderHandle, Object3D>;
   physicsOptions: {
@@ -41,23 +42,27 @@ export const Physics: FC<RapierWorldProps> = ({
 }) => {
   const rapier = useAsset(importRapier);
 
-  const worldRef = useRef<World | null>(null)
+  const worldRef = useRef<World>()
+  const getWorldRef = useRef(() => {
+    if (!worldRef.current) {
+      const world = new rapier.World(vectorArrayToObject(gravity));
+      worldRef.current = world
+    }
+    return worldRef.current;
+  })
+
   const [colliderMeshes] = useState<Map<ColliderHandle, Object3D>>(() => new Map());
   const [rigidBodyMeshes] = useState<Map<RigidBodyHandle, Object3D>>(() => new Map());
   const [stepFuncs] = useState(() => new Array<() => void>());
 
-  const worldGetter = useRef(() => {
-    if (worldRef.current === null) {
-      worldRef.current = new rapier.World(vectorArrayToObject(gravity))
-    }
-    return worldRef.current
-  })
+  // Init world
+  useLayoutEffect(() => {
+    const world = getWorldRef.current()
 
-  useEffect(() => {
     return () => {
-      if (worldRef.current !== null) {
-        worldRef.current.free()
-        worldRef.current = null
+      if (world) {
+        world.free()
+        worldRef.current = undefined
       }
     }
   }, [])
@@ -65,7 +70,7 @@ export const Physics: FC<RapierWorldProps> = ({
   const time = useRef(performance.now());
 
   useFrame((context) => {
-    const world = worldGetter.current()
+    const world = worldRef.current
     if (!world) return
 
     // Set timestep to current delta, to allow for variable frame rates
@@ -82,9 +87,11 @@ export const Physics: FC<RapierWorldProps> = ({
     time.current = now;
   });
 
+  const api = useMemo(() => createWorldApi(getWorldRef), [])
+
   const context = useMemo<RapierContext>(() => ({ 
     rapier,
-    worldGetter,
+    world: api,
     physicsOptions: {
       colliders,
       gravity

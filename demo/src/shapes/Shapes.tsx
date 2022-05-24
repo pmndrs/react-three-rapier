@@ -9,7 +9,7 @@ import {
   useCylinder,
 } from "@react-three/rapier";
 import Plinko from "./Plinko";
-import { Mesh } from "three";
+import { Mesh, Vector3 } from "three";
 
 const colors = ["red", "green", "blue", "yellow", "orange", "purple"];
 const randomColor = () => colors[Math.floor(Math.random() * colors.length)];
@@ -59,9 +59,8 @@ const RigidBox = memo(() => {
   );
 
   useEffect(() => {
-    const rigidBody = api.current();
-    rigidBody.applyImpulse({ x: 0, y: 0, z: 0 }, true);
-    rigidBody.applyTorqueImpulse({ x: 0, y: 0, z: Math.random() * 0.1 }, true);
+    api.applyImpulse(new Vector3(0, 0, 0));
+    api.applyTorqueImpulse(new Vector3(0, 0, Math.random() * 0.1));
   }, []);
 
   return (
@@ -85,7 +84,7 @@ const RigidCylinder = memo(() => {
   );
 
   return (
-    <mesh ref={cylinder} castShadow receiveShadow>
+    <mesh ref={cylinder} castShadow receiveShadow scale={1}>
       <cylinderBufferGeometry args={[0.4, 0.4, 0.4, 16]} />
       <meshPhysicalMaterial color={color} />
     </mesh>
