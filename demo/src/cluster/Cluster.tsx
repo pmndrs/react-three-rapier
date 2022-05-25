@@ -35,7 +35,16 @@ export const Cluster: Demo = ({ setUI }) => {
           key={i}
         >
           <Sphere scale={0.2}>
-            <meshPhysicalMaterial roughness={0} metalness={0.5} />
+            <meshPhysicalMaterial
+              roughness={0}
+              metalness={0.5}
+              color={
+                "#" +
+                Math.floor(Math.random() * 0xffffff)
+                  .toString(16)
+                  .padEnd(6, "0")
+              }
+            />
           </Sphere>
         </RigidBody>
       ))}

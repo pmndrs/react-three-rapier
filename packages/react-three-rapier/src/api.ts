@@ -12,6 +12,7 @@ import { MutableRefObject } from "react";
 import { Quaternion, Vector3 } from "three";
 import { RefGetter } from "./types";
 
+// TODO: Flesh this out
 export const createRigidBodyApi = (ref: RefGetter<RigidBody>) => {
   return {
     raw: () => ref.current(),
@@ -35,8 +36,7 @@ export const createRigidBodyApi = (ref: RefGetter<RigidBody>) => {
   };
 };
 
-export type RigidBodyApi = ReturnType<typeof createRigidBodyApi>;
-
+// TODO: Flesh this out
 export const createColliderApi = (ref: RefGetter<Collider>) => {
   return {
     raw: () => ref.current(),
@@ -45,8 +45,6 @@ export const createColliderApi = (ref: RefGetter<Collider>) => {
     },
   };
 };
-
-export type ColliderApi = ReturnType<typeof createColliderApi>;
 
 export const createWorldApi = (ref: RefGetter<World>) => {
   return {
@@ -68,11 +66,12 @@ export const createWorldApi = (ref: RefGetter<World>) => {
     ) => ref.current()!.createImpulseJoint(params, rigidBodyA, rigidBodyB),
     removeImpulseJoint: (joint: ImpulseJoint) =>
       ref.current()!.removeImpulseJoint(joint, true),
+    forEachCollider: (callback: (collider: Collider) => void) =>
+      ref.current()!.forEachCollider(callback),
   };
 };
 
-export type WorldApi = ReturnType<typeof createWorldApi>;
-
+// TODO: Broken currently, waiting for Rapier3D to fix
 export const createJointApi = (ref: RefGetter<ImpulseJoint>) => {
   return {
     raw: () => ref.current(),
@@ -96,5 +95,3 @@ export const createJointApi = (ref: RefGetter<ImpulseJoint>) => {
       ),
   };
 };
-
-export type JointApi = ReturnType<typeof createJointApi>;

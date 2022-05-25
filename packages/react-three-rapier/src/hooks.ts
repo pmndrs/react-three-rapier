@@ -38,6 +38,7 @@ import {
   RapierRigidBody,
   ConvexMeshArgs,
   RoundConvexMeshArgs,
+  RigidBodyApi,
 } from "./types";
 
 import {
@@ -52,7 +53,7 @@ import {
 } from "@dimforge/rapier3d-compat";
 
 import { createColliderFromOptions, createCollidersFromChildren, rigidBodyTypeFromString, vectorArrayToObject } from "./utils";
-import { createColliderApi, createJointApi, createRigidBodyApi, RigidBodyApi } from "./api";
+import { createColliderApi, createJointApi, createRigidBodyApi } from "./api";
 
 export const useRigidBody = <O extends Object3D>(
   options: UseRigidBodyOptions = {}

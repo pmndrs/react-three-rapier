@@ -15,8 +15,8 @@ import {
   RigidBodyTypeString,
   UseColliderOptions,
   Vector3Array,
+  WorldApi,
 } from "./types";
-import { WorldApi } from "./api";
 
 export const vectorArrayToObject = (arr: Vector3Array) => {
   const [x, y, z] = arr;
@@ -123,6 +123,7 @@ export const createCollidersFromChildren = (
   const colliders: Collider[] = [];
 
   let desc: ColliderDesc;
+  let offset = new Vector3();
 
   object.traverse((child: Object3D | Mesh) => {
     if ("isMesh" in child) {
@@ -140,6 +141,7 @@ export const createCollidersFromChildren = (
             const { boundingBox } = geometry;
 
             const size = boundingBox!.getSize(new Vector3());
+            boundingBox!.getCenter(offset);
 
             desc = ColliderDesc.cuboid(
               (size.x / 2) * scale.x,
@@ -155,6 +157,7 @@ export const createCollidersFromChildren = (
             const { boundingSphere } = geometry;
 
             const radius = boundingSphere!.radius * scale.x;
+            offset.copy(boundingSphere!.center);
 
             desc = ColliderDesc.ball(radius);
           }
@@ -187,9 +190,9 @@ export const createCollidersFromChildren = (
 
       desc
         .setTranslation(
-          x * parentWorldScale.x,
-          y * parentWorldScale.y,
-          z * parentWorldScale.z
+          (x + offset.x) * parentWorldScale.x,
+          (y + offset.y) * parentWorldScale.y,
+          (z + offset.z) * parentWorldScale.z
         )
         .setRotation({ x: rx, y: ry, z: rz, w: rw });
 

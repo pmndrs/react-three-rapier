@@ -2,11 +2,11 @@ import React, { createContext, FC, MutableRefObject, ReactNode, useEffect, useLa
 import { useAsset } from "use-asset";
 import type Rapier from "@dimforge/rapier3d-compat";
 import { useFrame } from "@react-three/fiber";
-import { RigidBodyAutoCollider, Vector3Array } from "./types";
+import { RigidBodyAutoCollider, Vector3Array, WorldApi } from "./types";
 import { ColliderHandle, RigidBodyHandle, World } from "@dimforge/rapier3d-compat";
 import { Object3D, Quaternion, Vector3 } from "three";
 import { vectorArrayToObject } from "./utils";
-import { createWorldApi, WorldApi } from "./api";
+import { createWorldApi } from "./api";
 
 export interface RapierContext {
   rapier: typeof Rapier;

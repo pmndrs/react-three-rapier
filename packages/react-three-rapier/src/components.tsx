@@ -8,7 +8,6 @@ import {
   useImperativeHandle,
 } from "react";
 import { Group, Object3D, Vector3 } from "three";
-import { RigidBodyApi } from "./api";
 import { useRapier, useRigidBody } from "./hooks";
 import {
   BallArgs,
@@ -19,6 +18,7 @@ import {
   CylinderArgs,
   HeightfieldArgs,
   RapierRigidBody,
+  RigidBodyApi,
   RigidBodyAutoCollider,
   RoundCuboidArgs,
   TrimeshArgs,
