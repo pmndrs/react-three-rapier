@@ -11,21 +11,7 @@ import { Euler, Matrix4, Mesh, Object3D, Quaternion, Vector3 } from "three";
 import type Rapier from "@dimforge/rapier3d-compat";
 
 export const useRapier = () => {
-return useContext(RapierContext) as RapierContext;
-};
-
-// Private hook for updating the simulations on objects
-const useRapierStep = (callback: () => void) => {
-  const { stepFuncs } = useRapier();
-
-  useEffect(() => {
-    stepFuncs.push(callback);
-
-    return () => {
-      const index = stepFuncs.indexOf(callback);
-      stepFuncs.splice(index, 1);
-    };
-  }, [callback]);
+  return useContext(RapierContext) as RapierContext;
 };
 
 import {
@@ -37,7 +23,6 @@ import {
   CylinderArgs,
   HeightfieldArgs,
   PolylineArgs,
-  RoundConeArgs,
   RoundConvexHullArgs,
   RoundCuboidArgs,
   RoundCylinderArgs,
@@ -72,7 +57,7 @@ import { createColliderApi, createJointApi, createRigidBodyApi, RigidBodyApi } f
 export const useRigidBody = <O extends Object3D>(
   options: UseRigidBodyOptions = {}
 ): [MutableRefObject<O>, RigidBodyApi] => {
-  const { rapier, world, physicsOptions } = useRapier();
+  const { rapier, world, rigidBodyMeshes, physicsOptions } = useRapier();
   const ref = useRef<O>();
 
   // Create rigidbody
@@ -86,21 +71,11 @@ export const useRigidBody = <O extends Object3D>(
     }
     return rigidBodyRef.current
   })
-  
-  useEffect(() => {
-    const rigidBody = getRigidBodyRef.current()
-    rigidBody.sleep()
-    rigidBodyRef.current = rigidBody
-
-    return () => {
-      world.removeRigidBody(rigidBody)
-      rigidBodyRef.current = undefined
-    }
-  }, [])
 
   // Setup
   useEffect(() => {
     const rigidBody = getRigidBodyRef.current()
+    rigidBodyRef.current = rigidBody
 
     if (!ref.current) {
       ref.current = new Object3D() as O
@@ -155,36 +130,16 @@ export const useRigidBody = <O extends Object3D>(
     const autoColliders = colliderSetting !== false ? createCollidersFromChildren(ref.current, rigidBody, colliderSetting, world) : []
 
     rigidBody.wakeUp()
+
+    rigidBodyMeshes.set(rigidBody.handle, ref.current)
     
     return () => {
       autoColliders.forEach(collider => world.removeCollider(collider))
+      world.removeRigidBody(rigidBody)
+      rigidBodyRef.current = undefined
+      rigidBodyMeshes.delete(rigidBody.handle)
     }
   }, [])
-
-  useRapierStep(() => {
-    const rigidBody = rigidBodyRef.current!
-
-    if (rigidBody && ref.current) {
-      const { x, y, z } = rigidBody.translation();
-      const { x: rx, y: ry, z: rz, w: rw } = rigidBody.rotation();
-      const scale = ref.current.getWorldScale(new Vector3())
-
-      if (ref.current.parent) {
-        // haha matrixes I have no idea what I'm doing :)
-        const o = new Object3D()
-        o.position.set(x, y, z)
-        o.rotation.setFromQuaternion(new Quaternion(rx, ry, rz, rw))
-        o.scale.set(scale.x, scale.y, scale.z)
-        o.updateMatrix()
-
-        o.applyMatrix4(ref.current.parent.matrixWorld.clone().invert())
-        o.updateMatrix()
-
-        ref.current.position.setFromMatrixPosition(o.matrix)
-        ref.current.rotation.setFromRotationMatrix(o.matrix)
-      }
-    }
-  });
 
   const api = useMemo(() => createRigidBodyApi(getRigidBodyRef), [])
 

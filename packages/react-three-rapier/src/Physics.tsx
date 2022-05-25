@@ -4,7 +4,7 @@ import type Rapier from "@dimforge/rapier3d-compat";
 import { useFrame } from "@react-three/fiber";
 import { RigidBodyAutoCollider, Vector3Array } from "./types";
 import { ColliderHandle, RigidBodyHandle, World } from "@dimforge/rapier3d-compat";
-import { Object3D } from "three";
+import { Object3D, Quaternion, Vector3 } from "three";
 import { vectorArrayToObject } from "./utils";
 import { createWorldApi, WorldApi } from "./api";
 
@@ -16,7 +16,6 @@ export interface RapierContext {
   physicsOptions: {
     colliders: RigidBodyAutoCollider;
   }
-  stepFuncs: Array<() => void>;
 }
 
 export const RapierContext = createContext<RapierContext | undefined>(
@@ -53,7 +52,6 @@ export const Physics: FC<RapierWorldProps> = ({
 
   const [colliderMeshes] = useState<Map<ColliderHandle, Object3D>>(() => new Map());
   const [rigidBodyMeshes] = useState<Map<RigidBodyHandle, Object3D>>(() => new Map());
-  const [stepFuncs] = useState(() => new Array<() => void>());
 
   // Init world
   useLayoutEffect(() => {
@@ -81,8 +79,33 @@ export const Physics: FC<RapierWorldProps> = ({
     world.timestep = delta / 1000;
     world.step();
 
-    // Run all step funcs
-    stepFuncs.forEach((func) => func());
+    // Update meshes
+    rigidBodyMeshes.forEach((mesh, handle) => {
+      const rigidBody = world.getRigidBody(handle);
+
+      if (!rigidBody || rigidBody.isSleeping()) {
+        return
+      }
+
+      const { x, y, z } = rigidBody.translation();
+      const { x: rx, y: ry, z: rz, w: rw } = rigidBody.rotation();
+      const scale = mesh.getWorldScale(new Vector3())
+
+      if (mesh.parent) {
+        // haha matrixes I have no idea what I'm doing :)
+        const o = new Object3D()
+        o.position.set(x, y, z)
+        o.rotation.setFromQuaternion(new Quaternion(rx, ry, rz, rw))
+        o.scale.set(scale.x, scale.y, scale.z)
+        o.updateMatrix()
+
+        o.applyMatrix4(mesh.parent.matrixWorld.clone().invert())
+        o.updateMatrix()
+
+        mesh.position.setFromMatrixPosition(o.matrix)
+        mesh.rotation.setFromRotationMatrix(o.matrix)
+      }
+    })
 
     time.current = now;
   });
@@ -96,7 +119,6 @@ export const Physics: FC<RapierWorldProps> = ({
       colliders,
       gravity
     },
-    stepFuncs,
     colliderMeshes,
     rigidBodyMeshes,
   }), [])
