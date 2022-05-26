@@ -156,25 +156,23 @@ export const useRigidBody = <O extends Object3D>(
   }, [])
 
   useRapierStep(() => {
-    if (rigidBody && ref.current) {
+    if (rigidBody && !rigidBody.isSleeping() && !rigidBody.isFixed() && ref.current && ref.current.parent) {
       const { x, y, z } = rigidBody.translation();
       const { x: rx, y: ry, z: rz, w: rw } = rigidBody.rotation();
       const scale = ref.current.getWorldScale(new Vector3())
 
-      if (ref.current.parent) {
-        // haha matrixes I have no idea what I'm doing :)
-        const o = new Object3D()
-        o.position.set(x, y, z)
-        o.rotation.setFromQuaternion(new Quaternion(rx, ry, rz, rw))
-        o.scale.set(scale.x, scale.y, scale.z)
-        o.updateMatrix()
+      // haha matrixes I have no idea what I'm doing :)
+      const o = new Object3D()
+      o.position.set(x, y, z)
+      o.rotation.setFromQuaternion(new Quaternion(rx, ry, rz, rw))
+      o.scale.set(scale.x, scale.y, scale.z)
+      o.updateMatrix()
 
-        o.applyMatrix4(ref.current.parent.matrixWorld.clone().invert())
-        o.updateMatrix()
+      o.applyMatrix4(ref.current.parent.matrixWorld.clone().invert())
+      o.updateMatrix()
 
-        ref.current.position.setFromMatrixPosition(o.matrix)
-        ref.current.rotation.setFromRotationMatrix(o.matrix)
-      }
+      ref.current.position.setFromMatrixPosition(o.matrix)
+      ref.current.rotation.setFromRotationMatrix(o.matrix)
     }
   });
 
