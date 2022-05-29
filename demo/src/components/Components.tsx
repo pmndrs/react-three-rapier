@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 
 import { Box, Clone, Sphere, useGLTF } from "@react-three/drei";
 import {
@@ -55,6 +55,23 @@ const Pear = (props: GroupProps) => {
   );
 };
 
+const Ball = () => {
+  const [colliding, setColliding] = useState(false);
+
+  return (
+    <RigidBody
+      colliders="ball"
+      position={[5, 0, 0]}
+      onCollisionEnter={() => setColliding(true)}
+      onCollisionExit={() => setColliding(false)}
+    >
+      <Sphere castShadow>
+        <meshPhysicalMaterial color={colliding ? "blue" : "green"} />
+      </Sphere>
+    </RigidBody>
+  );
+};
+
 export const ComponentsExample: Demo = ({ setUI }) => {
   setUI("");
 
@@ -72,15 +89,9 @@ export const ComponentsExample: Demo = ({ setUI }) => {
             <meshPhysicalMaterial />
           </Box>
         </RigidBody>
-
-        <RigidBody colliders="ball" position={[5, 0, 0]}>
-          <Sphere castShadow>
-            <meshPhysicalMaterial />
-          </Sphere>
-        </RigidBody>
       </group>
 
-      {/* {Array.from({length: 20}).map((_, i) => <Pear position={[0, 4 * i, 0]} key={i} />)} */}
+      <Ball />
 
       <Map />
     </group>

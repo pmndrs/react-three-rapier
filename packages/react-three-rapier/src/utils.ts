@@ -1,8 +1,8 @@
 import {
+  ActiveEvents,
   CoefficientCombineRule,
   Collider,
   ColliderDesc,
-  World,
 } from "@dimforge/rapier3d-compat";
 
 import { Mesh, Object3D, Quaternion, Vector3 } from "three";
@@ -60,7 +60,8 @@ export const createColliderFromOptions = <A>(
   options: UseColliderOptions<A>,
   world: WorldApi,
   rigidBodyHandle: number,
-  scale = { x: 1, y: 1, z: 1 }
+  scale = { x: 1, y: 1, z: 1 },
+  hasCollisionEvents: boolean = false
 ) => {
   const mass = options?.mass || 1;
   const colliderShape = options?.shape ?? "cuboid";
@@ -92,6 +93,10 @@ export const createColliderFromOptions = <A>(
       options?.frictionCombineRule ?? CoefficientCombineRule.Average
     );
 
+  if (hasCollisionEvents) {
+    colliderDesc = colliderDesc.setActiveEvents(ActiveEvents.COLLISION_EVENTS);
+  }
+
   // If any of the mass properties are specified, add mass properties
   if (
     options?.mass ||
@@ -116,7 +121,8 @@ export const createCollidersFromChildren = (
   object: Object3D,
   rigidBody: RapierRigidBody,
   type: RigidBodyAutoCollider,
-  world: WorldApi
+  world: WorldApi,
+  hasCollisionEvents: boolean = false
 ) => {
   const colliders: Collider[] = [];
 
@@ -193,6 +199,10 @@ export const createCollidersFromChildren = (
           (z + offset.z) * parentWorldScale.z
         )
         .setRotation({ x: rx, y: ry, z: rz, w: rw });
+
+      if (hasCollisionEvents) {
+        desc.setActiveEvents(ActiveEvents.COLLISION_EVENTS);
+      }
 
       const collider = world.createCollider(desc, rigidBody.handle);
       colliders.push(collider);

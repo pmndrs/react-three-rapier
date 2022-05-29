@@ -221,6 +221,16 @@ export interface UseRigidBodyOptions {
    * Setting this to false will disable automatic colliders.
    */
   colliders?: RigidBodyAutoCollider | false
+
+  /**
+   * Callback when this rigidbody collides with another rigidbody
+   */
+  onCollisionEnter?({target}: {target: RapierRigidBody}): void;
+
+  /**
+   * Callback when this rigidbody stops colliding with another rigidbody
+   */
+  onCollisionExit?({target}: {target: RapierRigidBody}): void;
 }
 
 // Joints

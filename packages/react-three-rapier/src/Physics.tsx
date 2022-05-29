@@ -3,7 +3,7 @@ import { useAsset } from "use-asset";
 import type Rapier from "@dimforge/rapier3d-compat";
 import { useFrame } from "@react-three/fiber";
 import { RigidBodyAutoCollider, Vector3Array, WorldApi } from "./types";
-import { ColliderHandle, RigidBodyHandle, World } from "@dimforge/rapier3d-compat";
+import { Collider, ColliderHandle, EventQueue, RigidBody, RigidBodyHandle, World } from "@dimforge/rapier3d-compat";
 import { Object3D, Quaternion, Vector3 } from "three";
 import { vectorArrayToObject } from "./utils";
 import { createWorldApi } from "./api";
@@ -16,6 +16,7 @@ export interface RapierContext {
   physicsOptions: {
     colliders: RigidBodyAutoCollider;
   }
+  rigidBodyEvents: EventMap
 }
 
 export const RapierContext = createContext<RapierContext | undefined>(
@@ -27,6 +28,16 @@ const importRapier = async () => {
   await r.init();
   return r;
 };
+
+type EventMap = Map<
+  ColliderHandle | RigidBodyHandle,
+  {
+    onSleep?(): void;
+    onWake?(): void;
+    onCollisionEnter?({target}: {target: RigidBody}): void;
+    onCollisionExit?({target}: {target: RigidBody}): void;
+  }
+>;
 
 interface RapierWorldProps {
   gravity?: Vector3Array;
@@ -52,6 +63,8 @@ export const Physics: FC<RapierWorldProps> = ({
 
   const [colliderMeshes] = useState<Map<ColliderHandle, Object3D>>(() => new Map());
   const [rigidBodyMeshes] = useState<Map<RigidBodyHandle, Object3D>>(() => new Map());
+  const [rigidBodyEvents] = useState<EventMap>(() => new Map());
+  const [eventQueue] = useState(() => new EventQueue(false))
 
   // Init world
   useLayoutEffect(() => {
@@ -77,7 +90,7 @@ export const Physics: FC<RapierWorldProps> = ({
     const delta = Math.min(100, now - time.current);
 
     world.timestep = delta / 1000;
-    world.step();
+    world.step(eventQueue);
 
     // Update meshes
     rigidBodyMeshes.forEach((mesh, handle) => {
@@ -105,6 +118,27 @@ export const Physics: FC<RapierWorldProps> = ({
       mesh.rotation.setFromRotationMatrix(o.matrix)
     })
 
+    // Collision events
+    eventQueue.drainCollisionEvents((handle1, handle2, started) => {
+      const rigidBody1 = world.getRigidBody(handle1);
+      const rigidBody2 = world.getRigidBody(handle2);
+
+      if (!rigidBody1 || !rigidBody2) {
+        return
+      }
+
+      const events1 = rigidBodyEvents.get(handle1)
+      const events2 = rigidBodyEvents.get(handle2)
+
+      if (started) {
+        events1?.onCollisionEnter?.({target: rigidBody2})
+        events2?.onCollisionEnter?.({target: rigidBody1})
+      } else {
+        events1?.onCollisionExit?.({target: rigidBody2})
+        events2?.onCollisionExit?.({target: rigidBody1})
+      }
+    })
+
     time.current = now;
   });
 
@@ -119,6 +153,7 @@ export const Physics: FC<RapierWorldProps> = ({
     },
     colliderMeshes,
     rigidBodyMeshes,
+    rigidBodyEvents
   }), [])
 
   return (

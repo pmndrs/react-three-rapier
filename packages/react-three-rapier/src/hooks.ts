@@ -2,7 +2,6 @@ import React, {
   MutableRefObject, 
   useContext,
   useEffect,
-  useLayoutEffect,
   useMemo, } from "react";
 import { RapierContext } from "./Physics";
 import { useRef } from "react";
@@ -58,7 +57,7 @@ import { createColliderApi, createJointApi, createRigidBodyApi } from "./api";
 export const useRigidBody = <O extends Object3D>(
   options: UseRigidBodyOptions = {}
 ): [MutableRefObject<O>, RigidBodyApi] => {
-  const { rapier, world, rigidBodyMeshes, physicsOptions } = useRapier();
+  const { rapier, world, rigidBodyMeshes, physicsOptions, rigidBodyEvents } = useRapier();
   const ref = useRef<O>();
 
   // Create rigidbody
@@ -120,7 +119,10 @@ export const useRigidBody = <O extends Object3D>(
     rigidBody.resetTorques(false)
 
     const colliderSetting = options?.colliders ?? physicsOptions.colliders ?? false;
-    const autoColliders = colliderSetting !== false ? createCollidersFromChildren(ref.current, rigidBody, colliderSetting, world) : []
+
+    const hasCollisionEvents = !!(options.onCollisionEnter || options.onCollisionExit);
+
+    const autoColliders = colliderSetting !== false ? createCollidersFromChildren(ref.current, rigidBody, colliderSetting, world, hasCollisionEvents) : []
 
     rigidBody.wakeUp()
 
@@ -133,6 +135,19 @@ export const useRigidBody = <O extends Object3D>(
       rigidBodyMeshes.delete(rigidBody.handle)
     }
   }, [])
+
+  useEffect(() => {
+    const rigidBody = getRigidBodyRef.current()
+
+    rigidBodyEvents.set(rigidBody.handle, {
+      onCollisionEnter: options?.onCollisionEnter,
+      onCollisionExit: options?.onCollisionExit,
+    })
+
+    return () => {
+      rigidBodyEvents.delete(rigidBody.handle)
+    }
+  }, [options.onCollisionEnter, options.onCollisionExit])
 
   const api = useMemo(() => createRigidBodyApi(getRigidBodyRef), [])
 
