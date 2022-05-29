@@ -1,4 +1,3 @@
-import React from "react";
 export { Physics } from "./Physics";
 export * from "./hooks";
 export * from "./components";

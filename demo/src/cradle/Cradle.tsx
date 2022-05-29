@@ -1,4 +1,3 @@
-import React, { useEffect } from "react";
 import { Cylinder, Sphere } from "@react-three/drei";
 import {
   BallCollider,
