@@ -13,6 +13,7 @@ import {
   RigidBodyTypeString,
   UseColliderOptions,
   Vector3Array,
+  WorldApi,
 } from "./types";
 
 export const vectorArrayToObject = (arr: Vector3Array) => {
@@ -57,8 +58,8 @@ export const scaleColliderArgs = (
 
 export const createColliderFromOptions = <A>(
   options: UseColliderOptions<A>,
-  world: World,
-  body: RapierRigidBody,
+  world: WorldApi,
+  rigidBodyHandle: number,
   scale = { x: 1, y: 1, z: 1 }
 ) => {
   const mass = options?.mass || 1;
@@ -106,7 +107,7 @@ export const createColliderFromOptions = <A>(
     );
   }
 
-  const collider = world.createCollider(colliderDesc, body.handle);
+  const collider = world.createCollider(colliderDesc, rigidBodyHandle);
 
   return collider;
 };
@@ -115,11 +116,12 @@ export const createCollidersFromChildren = (
   object: Object3D,
   rigidBody: RapierRigidBody,
   type: RigidBodyAutoCollider,
-  world: World
+  world: WorldApi
 ) => {
   const colliders: Collider[] = [];
 
   let desc: ColliderDesc;
+  let offset = new Vector3();
 
   object.traverse((child: Object3D | Mesh) => {
     if ("isMesh" in child) {
@@ -137,6 +139,7 @@ export const createCollidersFromChildren = (
             const { boundingBox } = geometry;
 
             const size = boundingBox!.getSize(new Vector3());
+            boundingBox!.getCenter(offset);
 
             desc = ColliderDesc.cuboid(
               (size.x / 2) * scale.x,
@@ -152,6 +155,7 @@ export const createCollidersFromChildren = (
             const { boundingSphere } = geometry;
 
             const radius = boundingSphere!.radius * scale.x;
+            offset.copy(boundingSphere!.center);
 
             desc = ColliderDesc.ball(radius);
           }
@@ -184,9 +188,9 @@ export const createCollidersFromChildren = (
 
       desc
         .setTranslation(
-          x * parentWorldScale.x,
-          y * parentWorldScale.y,
-          z * parentWorldScale.z
+          (x + offset.x) * parentWorldScale.x,
+          (y + offset.y) * parentWorldScale.y,
+          (z + offset.z) * parentWorldScale.z
         )
         .setRotation({ x: rx, y: ry, z: rz, w: rw });
 

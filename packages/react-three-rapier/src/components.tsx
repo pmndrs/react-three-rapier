@@ -1,4 +1,4 @@
-import React, { MutableRefObject, useEffect } from "react";
+import React, { MutableRefObject, useEffect, useRef } from "react";
 
 import {
   createContext,
@@ -7,7 +7,7 @@ import {
   useContext,
   useImperativeHandle,
 } from "react";
-import { Group, Vector3 } from "three";
+import { Group, Object3D, Vector3 } from "three";
 import { useRapier, useRigidBody } from "./hooks";
 import {
   BallArgs,
@@ -17,7 +17,7 @@ import {
   CuboidArgs,
   CylinderArgs,
   HeightfieldArgs,
-  RapierRigidBody,
+  RigidBodyApi,
   RigidBodyAutoCollider,
   RoundCuboidArgs,
   TrimeshArgs,
@@ -27,7 +27,7 @@ import {
 import { createColliderFromOptions, scaleVertices } from "./utils";
 
 const RigidBodyContext = createContext<
-  [MutableRefObject<Group>, RapierRigidBody]
+  [MutableRefObject<Object3D>, RigidBodyApi]
 >(undefined!);
 
 const useParentRigidBody = () => useContext(RigidBodyContext);
@@ -38,40 +38,50 @@ interface RigidBodyProps extends UseRigidBodyOptions {
   colliders?: RigidBodyAutoCollider | false;
 }
 
-export const RigidBody = forwardRef<RapierRigidBody, RigidBodyProps>(
+export const RigidBody = forwardRef<RigidBodyApi, RigidBodyProps>(
   ({ children, ...props }, ref) => {
-    const [group, rigidBody] = useRigidBody<Group>(props);
+    const [object, rigidBody] = useRigidBody<Object3D>(props);
 
     useImperativeHandle(ref, () => rigidBody);
 
     return (
-      <RigidBodyContext.Provider value={[group, rigidBody]}>
-        <group ref={group}>{children}</group>
+      <RigidBodyContext.Provider value={[object, rigidBody]}>
+        <object3D ref={object}>{children}</object3D>
       </RigidBodyContext.Provider>
     );
   }
 );
 
 // Colliders
-const AnyCollider = (props: UseColliderOptions<any>) => {
+const AnyCollider = ({
+  children,
+  ...props
+}: UseColliderOptions<any> & { children?: ReactNode }) => {
   const { world } = useRapier();
-  const [object, rigidBody] = useParentRigidBody();
+  const [, rigidBody] = useParentRigidBody();
+  const ref = useRef<Object3D>(null);
 
   useEffect(() => {
-    const scale = object.current.getWorldScale(new Vector3());
+    const scale = ref.current!.getWorldScale(new Vector3());
 
-    const collider = createColliderFromOptions(props, world, rigidBody, scale);
+    const collider = createColliderFromOptions(
+      props,
+      world,
+      rigidBody.handle,
+      scale
+    );
 
     return () => {
-      world.removeCollider(collider, false);
+      world.removeCollider(collider);
     };
   }, []);
 
-  return null;
+  return <object3D ref={ref}>{children}</object3D>;
 };
 
 type UseColliderOptionsRequiredArgs<T> = Omit<UseColliderOptions<T>, "args"> & {
   args: T;
+  children?: ReactNode;
 };
 
 export const CuboidCollider = (

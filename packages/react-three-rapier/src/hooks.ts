@@ -11,21 +11,7 @@ import { Euler, Matrix4, Mesh, Object3D, Quaternion, Vector3 } from "three";
 import type Rapier from "@dimforge/rapier3d-compat";
 
 export const useRapier = () => {
-return useContext(RapierContext) as RapierContext;
-};
-
-// Private hook for updating the simulations on objects
-const useRapierStep = (callback: () => void) => {
-  const { stepFuncs } = useRapier();
-
-  useEffect(() => {
-    stepFuncs.push(callback);
-
-    return () => {
-      const index = stepFuncs.indexOf(callback);
-      stepFuncs.splice(index, 1);
-    };
-  }, [callback]);
+  return useContext(RapierContext) as RapierContext;
 };
 
 import {
@@ -37,7 +23,6 @@ import {
   CylinderArgs,
   HeightfieldArgs,
   PolylineArgs,
-  RoundConeArgs,
   RoundConvexHullArgs,
   RoundCuboidArgs,
   RoundCylinderArgs,
@@ -53,70 +38,58 @@ import {
   RapierRigidBody,
   ConvexMeshArgs,
   RoundConvexMeshArgs,
+  RigidBodyApi,
 } from "./types";
 
 import {
+  Collider,
   FixedImpulseJoint,
   ImpulseJoint,
   PrismaticImpulseJoint,
   RevoluteImpulseJoint,
+  RigidBody,
   RoundCone,
   SphericalImpulseJoint,
 } from "@dimforge/rapier3d-compat";
 
 import { createColliderFromOptions, createCollidersFromChildren, rigidBodyTypeFromString, vectorArrayToObject } from "./utils";
-
-export const useCollider = <A>(
-  body: RapierRigidBody,
-  options: UseColliderOptions<A> = {}
-) => {
-  const { RAPIER, world } = useRapier();
-  const collider = useMemo(() => {
-    return createColliderFromOptions<A>(options, world, body)
-  }, []);
-
-  useEffect(() => {
-    return () => {
-      world.removeCollider(collider, false);
-    };
-  }, []);
-
-  return [collider];
-};
+import { createColliderApi, createJointApi, createRigidBodyApi } from "./api";
 
 export const useRigidBody = <O extends Object3D>(
-  options?: UseRigidBodyOptions
-): [MutableRefObject<O>, RapierRigidBody] => {
-  const { RAPIER, world, colliders } = useRapier();
+  options: UseRigidBodyOptions = {}
+): [MutableRefObject<O>, RigidBodyApi] => {
+  const { rapier, world, rigidBodyMeshes, physicsOptions } = useRapier();
   const ref = useRef<O>();
 
   // Create rigidbody
-  const rigidBody = useMemo(() => {
-    const [lvx, lvy, lvz] = options?.linearVelocity ?? [0, 0, 0];
-    const [avx, avy, avz] = options?.angularVelocity ?? [0, 0, 0];
-    const gravityScale = options?.gravityScale ?? 1;
-    const canSleep = options?.canSleep ?? true;
-    const ccdEnabled = options?.ccd ?? false;
-    const type = rigidBodyTypeFromString(options?.type || "dynamic");
+  const rigidBodyRef = useRef<RigidBody>()
+  const getRigidBodyRef = useRef(() => {
+    if (!rigidBodyRef.current) {
+      const type = rigidBodyTypeFromString(options?.type || "dynamic");
+      const [lvx, lvy, lvz] = options?.linearVelocity ?? [0, 0, 0];
+      const [avx, avy, avz] = options?.angularVelocity ?? [0, 0, 0];
+      const gravityScale = options?.gravityScale ?? 1;
+      const canSleep = options?.canSleep ?? true;
+      const ccdEnabled = options?.ccd ?? false;
 
-    const [x, y, z] = options?.position || [0, 0, 0];
-    const [rx, ry, rz] = options?.rotation || [0, 0, 0];
+      const desc = new rapier.RigidBodyDesc(type)
+        .setLinvel(lvx, lvy, lvz)
+        .setAngvel({ x: avx, y: avy, z: avz })
+        .setGravityScale(gravityScale)
+        .setCanSleep(canSleep)
+        .setCcdEnabled(ccdEnabled)
 
-    const rigidBodyDesc = new RAPIER.RigidBodyDesc(type)
-      .setLinvel(lvx, lvy, lvz)
-      .setAngvel({ x: avx, y: avy, z: avz })
-      .setGravityScale(gravityScale)
-      .setCanSleep(canSleep)
-      .setCcdEnabled(ccdEnabled)
-      .setTranslation(0,0,0)
-
-    const body = world.createRigidBody(rigidBodyDesc);
-
-    return body;
-  }, []);
+      const rigidBody = world.createRigidBody(desc)
+      rigidBodyRef.current = rigidBody
+    }
+    return rigidBodyRef.current
+  })
 
   // Setup
   useEffect(() => {
+    const rigidBody = getRigidBodyRef.current()
+    rigidBodyRef.current = rigidBody
+
     if (!ref.current) {
       ref.current = new Object3D() as O
     }
@@ -146,58 +119,73 @@ export const useRigidBody = <O extends Object3D>(
     rigidBody.resetForces(false)
     rigidBody.resetTorques(false)
 
-    const colliderSetting = options?.colliders ?? colliders ?? false;
+    const colliderSetting = options?.colliders ?? physicsOptions.colliders ?? false;
     const autoColliders = colliderSetting !== false ? createCollidersFromChildren(ref.current, rigidBody, colliderSetting, world) : []
+
+    rigidBody.wakeUp()
+
+    rigidBodyMeshes.set(rigidBody.handle, ref.current)
     
     return () => {
+      autoColliders.forEach(collider => world.removeCollider(collider))
       world.removeRigidBody(rigidBody)
-      autoColliders.forEach(collider => world.removeCollider(collider, false))
+      rigidBodyRef.current = undefined
+      rigidBodyMeshes.delete(rigidBody.handle)
     }
   }, [])
 
-  useRapierStep(() => {
-    if (rigidBody && ref.current) {
-      const { x, y, z } = rigidBody.translation();
-      const { x: rx, y: ry, z: rz, w: rw } = rigidBody.rotation();
-      const scale = ref.current.getWorldScale(new Vector3())
+  const api = useMemo(() => createRigidBodyApi(getRigidBodyRef), [])
 
-      if (ref.current.parent) {
-        // haha matrixes I have no idea what I'm doing :)
-        const o = new Object3D()
-        o.position.set(x, y, z)
-        o.rotation.setFromQuaternion(new Quaternion(rx, ry, rz, rw))
-        o.scale.set(scale.x, scale.y, scale.z)
-        o.updateMatrix()
+  return [ref as MutableRefObject<O>, api];
+};
 
-        o.applyMatrix4(ref.current.parent.matrixWorld.clone().invert())
-        o.updateMatrix()
+export const useCollider = <A>(
+  body: RigidBodyApi,
+  options: UseColliderOptions<A> = {}
+) => {
+  const { world } = useRapier();
 
-        ref.current.position.setFromMatrixPosition(o.matrix)
-        ref.current.rotation.setFromRotationMatrix(o.matrix)
-      }
+  const colliderRef = useRef<Collider>()
+
+  const objectRef = useRef<Object3D>()
+  const getColliderRef = useRef(() => {
+    if (!colliderRef.current) {
+      colliderRef.current = createColliderFromOptions<A>(options, world, body.handle)
     }
-  });
+    return colliderRef.current
+  })
 
-  return [ref as MutableRefObject<O>, rigidBody];
+  useEffect(() => {
+    const collider = getColliderRef.current()    
+
+    return () => {
+      if (collider) world.removeCollider(collider);
+      colliderRef.current = undefined
+    };
+  }, []);
+
+  const api = useMemo(() => createColliderApi(getColliderRef), [])
+
+  return [objectRef, api];
 };
 
 export const useRigidBodyWithCollider = <A, O extends Object3D = Object3D>(
   rigidBodyOptions?: UseRigidBodyOptions,
   colliderOptions?: UseColliderOptions<A>
-): [ref: MutableRefObject<O>, rigidBody: RapierRigidBody] => {
-  const {world} = useRapier()
+): [ref: MutableRefObject<O>, rigidBody: RigidBodyApi] => {
+  const { world } = useRapier()
   const [ref, rigidBody] = useRigidBody<O>(rigidBodyOptions);
   
   useEffect(() => {
     if (!colliderOptions) {
       return 
     }
-
+    
     const scale = ref.current.getWorldScale(new Vector3());
-    const collider = createColliderFromOptions(colliderOptions, world, rigidBody, scale);
+    const collider = createColliderFromOptions(colliderOptions, world, rigidBody.handle, scale);
 
     return () => {
-      world.removeCollider(collider, false);
+      world.removeCollider(collider);
     };
   }, []);
 
@@ -408,27 +396,60 @@ interface UseImpulseJointState<T> {
 }
 
 export const useImpulseJoint = <T extends ImpulseJoint>(
-  body1: MutableRefObject<RapierRigidBody | undefined | null>,
-  body2: MutableRefObject<RapierRigidBody | undefined | null>,
+  body1: MutableRefObject<RapierRigidBody | undefined | null> | RigidBodyApi,
+  body2: MutableRefObject<RapierRigidBody | undefined | null> | RigidBodyApi,
   params: Rapier.JointData
 ) => {
-  const { world, RAPIER } = useRapier();
+  const { world } = useRapier();
 
-  useLayoutEffect(() => {
-    let joint: T;
+  const jointRef = useRef<ImpulseJoint>()
+  const getJointRef = useRef(() => {
+    if (!jointRef.current) {
+      let rb1: RapierRigidBody;
+      let rb2: RapierRigidBody;
 
-    if (body1 && body2 && params) {
-      joint = world.createImpulseJoint(
-        params,
-        body1.current!,
-        body2.current!
-      ) as T;
+      if ('handle' in body1 && 'handle' in body2) {
+        rb1 = world.getRigidBody(body1.handle);
+        rb2 = world.getRigidBody(body2.handle);
+
+        jointRef.current = world.createImpulseJoint(
+          params,
+          rb1,
+          rb2
+        ) as T;
+      }
+
+      if ('current' in body1 && body1.current && 'current' in body2 && body2.current) {
+        rb1 = world.getRigidBody(body1.current.handle);
+        rb2 = world.getRigidBody(body2.current.handle);
+
+        const newJoint = world.createImpulseJoint(
+          params,
+          rb1,
+          rb2
+        ) as T;
+
+        jointRef.current = newJoint
+      }
     }
+    return jointRef.current
+  })
+
+  useEffect(() => {
+    const joint = getJointRef.current()
 
     return () => {
-      if (joint) world.removeImpulseJoint(joint, true);
+      if (joint) {
+        console.log('remove joint', joint)
+        world.removeImpulseJoint(joint);
+        jointRef.current = undefined
+      }
     };
-  }, [body1, body2]);
+  }, []);
+
+  const api = useMemo(() => createJointApi(getJointRef), []);
+
+  return api
 };
 
 /**
@@ -442,12 +463,12 @@ export const useFixedJoint: UseImpulseJoint<FixedJointParams> = (
   body2,
   [body1Anchor, body1LocalFrame, body2Anchor, body2LocalFrame]
 ) => {
-  const { RAPIER } = useRapier();
+  const { rapier } = useRapier();
 
   return useImpulseJoint<FixedImpulseJoint>(
     body1,
     body2,
-    RAPIER.JointData.fixed(
+    rapier.JointData.fixed(
       vectorArrayToObject(body1Anchor),
       { ...vectorArrayToObject(body1LocalFrame), w: 1 },
       vectorArrayToObject(body2Anchor),
@@ -467,12 +488,12 @@ export const useSphericalJoint: UseImpulseJoint<SphericalJointParams> = (
   body2,
   [body1Anchor, body2Anchor]
 ) => {
-  const { RAPIER } = useRapier();
+  const { rapier } = useRapier();
 
   return useImpulseJoint<SphericalImpulseJoint>(
     body1,
     body2,
-    RAPIER.JointData.spherical(
+    rapier.JointData.spherical(
       vectorArrayToObject(body1Anchor),
       vectorArrayToObject(body2Anchor)
     )
@@ -489,12 +510,12 @@ export const useRevoluteJoint: UseImpulseJoint<RevoluteJointParams> = (
   body2,
   [body1Anchor, body2Anchor, axis]
 ) => {
-  const { RAPIER } = useRapier();
+  const { rapier } = useRapier();
 
   return useImpulseJoint<RevoluteImpulseJoint>(
     body1,
     body2,
-    RAPIER.JointData.revolute(
+    rapier.JointData.revolute(
       vectorArrayToObject(body1Anchor),
       vectorArrayToObject(body2Anchor),
       vectorArrayToObject(axis)
@@ -512,12 +533,12 @@ export const usePrismaticJoint: UseImpulseJoint<PrismaticJointParams> = (
   body2,
   [body1Anchor, body2Anchor, axis]
 ) => {
-  const { RAPIER } = useRapier();
+  const { rapier } = useRapier();
 
   return useImpulseJoint<PrismaticImpulseJoint>(
     body1,
     body2,
-    RAPIER.JointData.prismatic(
+    rapier.JointData.prismatic(
       vectorArrayToObject(body1Anchor),
       vectorArrayToObject(body2Anchor),
       vectorArrayToObject(axis)

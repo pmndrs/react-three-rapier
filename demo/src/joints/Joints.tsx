@@ -28,7 +28,7 @@ const RopeSegment = forwardRef(
     },
     ref
   ) => {
-    const [cuboid, rigidBody] = useCuboid(
+    const [cuboid, api] = useCuboid(
       {
         position: position,
         type,
@@ -38,7 +38,7 @@ const RopeSegment = forwardRef(
       }
     );
 
-    useImperativeHandle(ref, () => rigidBody);
+    useImperativeHandle(ref, () => api);
 
     const RopeLink = component;
 

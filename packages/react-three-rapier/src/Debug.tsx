@@ -119,7 +119,7 @@ export const Debug = () => {
   useFrame(() => {
     const newColliders: number[] = [];
 
-    world.colliders.forEachCollider((collider) => {
+    world.forEachCollider((collider) => {
       newColliders.push(collider.handle);
     });
 
