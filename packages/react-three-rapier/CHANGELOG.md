@@ -1,5 +1,17 @@
 # @react-three/rapier
 
+## 0.2.0
+
+### Minor Changes
+
+- 584ce08: Expose joint api, however no joint is returned when created (rapier bug?)
+
+### Patch Changes
+
+- 584ce08: All parts now uses a more rigid initiation process
+- 584ce08: Apply bounding box offset for auto colliders
+- 584ce08: Use single update loop instead of individual rigid body callbacks
+
 ## 0.1.2
 
 ### Patch Changes
