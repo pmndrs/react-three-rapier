@@ -130,9 +130,10 @@ export const AllShapes: Demo = ({ setUI }) => {
           <BallCollider args={[0.5]} position={[-1, -1, 1]} />
         </RigidBody>
 
-        <group scale={1.5} position={[2, 2, -1]}>
-          <RigidBody colliders="cuboid">
+        <group scale={1.5} position={[5, 10, 0]}>
+          <RigidBody colliders="ball">
             <Torus />
+            <Html>Mesh with offset geometry</Html>
           </RigidBody>
         </group>
       </group>

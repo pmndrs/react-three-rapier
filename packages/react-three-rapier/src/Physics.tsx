@@ -83,7 +83,7 @@ export const Physics: FC<RapierWorldProps> = ({
     rigidBodyMeshes.forEach((mesh, handle) => {
       const rigidBody = world.getRigidBody(handle);
 
-      if (!rigidBody || rigidBody.isSleeping()) {
+      if (!rigidBody || rigidBody.isSleeping() || rigidBody.isFixed() || !mesh.parent) {
         return
       }
 
@@ -91,20 +91,18 @@ export const Physics: FC<RapierWorldProps> = ({
       const { x: rx, y: ry, z: rz, w: rw } = rigidBody.rotation();
       const scale = mesh.getWorldScale(new Vector3())
 
-      if (mesh.parent) {
-        // haha matrixes I have no idea what I'm doing :)
-        const o = new Object3D()
-        o.position.set(x, y, z)
-        o.rotation.setFromQuaternion(new Quaternion(rx, ry, rz, rw))
-        o.scale.set(scale.x, scale.y, scale.z)
-        o.updateMatrix()
+      // haha matrixes I have no idea what I'm doing :)
+      const o = new Object3D()
+      o.position.set(x, y, z)
+      o.rotation.setFromQuaternion(new Quaternion(rx, ry, rz, rw))
+      o.scale.set(scale.x, scale.y, scale.z)
+      o.updateMatrix()
 
-        o.applyMatrix4(mesh.parent.matrixWorld.clone().invert())
-        o.updateMatrix()
+      o.applyMatrix4(mesh.parent.matrixWorld.clone().invert())
+      o.updateMatrix()
 
-        mesh.position.setFromMatrixPosition(o.matrix)
-        mesh.rotation.setFromRotationMatrix(o.matrix)
-      }
+      mesh.position.setFromMatrixPosition(o.matrix)
+      mesh.rotation.setFromRotationMatrix(o.matrix)
     })
 
     time.current = now;

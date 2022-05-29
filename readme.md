@@ -32,7 +32,7 @@ Supported values:
 - `"ball"`, creates a SphereCollider based on the bounding sphere of the mesh
 - `"trimesh"`, creates a TrimeshCollider based on the mesh's geometry -- note trimeshes are massless by default (https://rapier.rs/docs/user_guides/javascript/common_mistakes#rigid-body-isnt-affected-by-gravity)
 - `"hull"`, creates a ConvexHullCollider based on the mesh's geometry
-- `false`, disables auto-generation for this RigidBody
+- `false`, disables auto-generation
 
 Generate ConvexHull colliders for all meshes in a RigidBody by default:
 
@@ -49,7 +49,7 @@ const Scene = () => (
 );
 ```
 
-Turn off automatic collider generation globally:
+Turn off automatic collider generation globally, but apply auto generation locally:
 
 ```tsx
 const Scene = () => (

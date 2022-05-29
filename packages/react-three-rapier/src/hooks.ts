@@ -66,7 +66,19 @@ export const useRigidBody = <O extends Object3D>(
   const getRigidBodyRef = useRef(() => {
     if (!rigidBodyRef.current) {
       const type = rigidBodyTypeFromString(options?.type || "dynamic");
+      const [lvx, lvy, lvz] = options?.linearVelocity ?? [0, 0, 0];
+      const [avx, avy, avz] = options?.angularVelocity ?? [0, 0, 0];
+      const gravityScale = options?.gravityScale ?? 1;
+      const canSleep = options?.canSleep ?? true;
+      const ccdEnabled = options?.ccd ?? false;
+
       const desc = new rapier.RigidBodyDesc(type)
+        .setLinvel(lvx, lvy, lvz)
+        .setAngvel({ x: avx, y: avy, z: avz })
+        .setGravityScale(gravityScale)
+        .setCanSleep(canSleep)
+        .setCcdEnabled(ccdEnabled)
+
       const rigidBody = world.createRigidBody(desc)
       rigidBodyRef.current = rigidBody
     }
@@ -81,26 +93,6 @@ export const useRigidBody = <O extends Object3D>(
     if (!ref.current) {
       ref.current = new Object3D() as O
     }
-
-    // const [lvx, lvy, lvz] = options?.linearVelocity ?? [0, 0, 0];
-    // const [avx, avy, avz] = options?.angularVelocity ?? [0, 0, 0];
-    // const gravityScale = options?.gravityScale ?? 1;
-    // const canSleep = options?.canSleep ?? true;
-    // const ccdEnabled = options?.ccd ?? false;
-    // const type = rigidBodyTypeFromString(options?.type || "dynamic");
-
-    // const [x, y, z] = options?.position || [0, 0, 0];
-    // const [rx, ry, rz] = options?.rotation || [0, 0, 0];
-
-    // const rigidBodyDesc = new rapier.RigidBodyDesc(type)
-    //   .setLinvel(lvx, lvy, lvz)
-    //   .setAngvel({ x: avx, y: avy, z: avz })
-    //   .setGravityScale(gravityScale)
-    //   .setCanSleep(canSleep)
-    //   .setCcdEnabled(ccdEnabled)
-    //   .setTranslation(0,0,0)
-
-    // const body = world.createRigidBody(rigidBodyDesc);
 
     // Get intitial world transforms
     const worldPosition = ref.current.getWorldPosition(new Vector3())
@@ -188,7 +180,6 @@ export const useRigidBodyWithCollider = <A, O extends Object3D = Object3D>(
     if (!colliderOptions) {
       return 
     }
-    
     
     const scale = ref.current.getWorldScale(new Vector3());
     const collider = createColliderFromOptions(colliderOptions, world, rigidBody.handle, scale);
