@@ -26,17 +26,18 @@ const App = () => {
 
 RigidBodies generate automatic colliders by default for all meshes that it contains. You can control the default collider by setting the `colliders` prop on a `<RigidBody />`, or change it globally by setting `colliders` on `<Physics />`. Setting `colliders={false}` disables auto-generation.
 
-Current supported auto collider shapes:
+Supported values:
 
-- cuboid
-- ball
-- trimesh
-- hull
+- `"cuboid"`, creates a CuboidCollider based on the bounding box of the mesh
+- `"ball"`, creates a SphereCollider based on the bounding sphere of the mesh
+- `"trimesh"`, creates a TrimeshCollider based on the mesh's geometry -- note trimeshes are massless by default (https://rapier.rs/docs/user_guides/javascript/common_mistakes#rigid-body-isnt-affected-by-gravity)
+- `"hull"`, creates a ConvexHullCollider based on the mesh's geometry
+- `false`, disables auto-generation
 
 Generate ConvexHull colliders for all meshes in a RigidBody by default:
 
 ```tsx
-const scene = (
+const Scene = () => (
   <Physics colliders="hull">
     <RigidBody>
       <Box />
@@ -48,10 +49,10 @@ const scene = (
 );
 ```
 
-Turn off automatic collider generation globally:
+Turn off automatic collider generation globally, but apply auto generation locally:
 
 ```tsx
-const scene = (
+const Scene = () => (
   <Physics colliders={false}>
     <RigidBody colliders="cuboid">
       <Box />

@@ -23,11 +23,28 @@ const useSuzanne = () => {
   };
 };
 
+const useOffsetTorus = () => {
+  // @ts-ignore
+  return useGLTF(new URL("./offset-torus.glb", import.meta.url).toString()) as {
+    nodes: {
+      Torus: Mesh;
+    };
+  };
+};
+
 const Suzanne = () => {
   const { nodes } = useSuzanne();
 
   return (
     <mesh geometry={nodes.Suzanne.geometry} material={nodes.Suzanne.material} />
+  );
+};
+
+const Torus = () => {
+  const { nodes } = useOffsetTorus();
+
+  return (
+    <mesh geometry={nodes.Torus.geometry} material={nodes.Torus.material} />
   );
 };
 
@@ -112,6 +129,13 @@ export const AllShapes: Demo = ({ setUI }) => {
           <CuboidCollider args={[0.5, 0.5, 0.5]} position={[1, 1, 1]} />
           <BallCollider args={[0.5]} position={[-1, -1, 1]} />
         </RigidBody>
+
+        <group scale={1.5} position={[5, 10, 0]}>
+          <RigidBody colliders="ball">
+            <Torus />
+            <Html>Mesh with offset geometry</Html>
+          </RigidBody>
+        </group>
       </group>
     </>
   );

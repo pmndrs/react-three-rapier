@@ -1,8 +1,8 @@
 import React from "react";
-import { Environment, OrbitControls, Plane } from "@react-three/drei";
+import { Box, Environment, OrbitControls, Plane } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { ReactNode, Suspense, useState } from "react";
-import { Physics, useCuboid } from "@react-three/rapier";
+import { Debug, Physics, RigidBody, useCuboid } from "@react-three/rapier";
 import Joints from "./joints/Joints";
 import Shapes from "./shapes/Shapes";
 import { ComponentsExample } from "./components/Components";
@@ -19,25 +19,17 @@ export interface Demo {
 }
 
 const Floor = () => {
-  useCuboid(
-    {
-      position: [0, -12.7, 0],
-      type: "fixed",
-    },
-    {
-      args: [200, 0.2, 200],
-    }
-  );
-
   return (
-    <Plane
-      position={[0, -12.55, 0]}
-      scale={200}
-      rotation={[-Math.PI / 2, 0, 0]}
-      receiveShadow
-    >
-      <shadowMaterial opacity={0.2} />
-    </Plane>
+    <RigidBody type="fixed" colliders="cuboid">
+      <Box
+        position={[0, -12.55, 0]}
+        scale={[100, 0.1, 100]}
+        rotation={[0, 0, 0]}
+        receiveShadow
+      >
+        <shadowMaterial opacity={0.2} />
+      </Box>
+    </RigidBody>
   );
 };
 
@@ -57,8 +49,6 @@ export const App = () => {
       <Suspense fallback="Loading...">
         <Canvas shadows>
           <Physics colliders={false}>
-            {/* <Debug key={demo} /> */}
-
             <directionalLight
               castShadow
               position={[10, 10, 10]}
@@ -72,13 +62,15 @@ export const App = () => {
             <Environment preset="apartment" />
             <OrbitControls />
 
-            {demo === "shapes" && <Shapes setUI={setUI} />}
-            {demo === "joints" && <Joints setUI={setUI} />}
-            {demo === "components" && <ComponentsExample setUI={setUI} />}
-            {demo === "cradle" && <CradleExample setUI={setUI} />}
-            {demo === "transforms" && <Transforms setUI={setUI} />}
-            {demo === "cluster" && <Cluster setUI={setUI} />}
-            {demo === "all-shapes" && <AllShapes setUI={setUI} />}
+            <Suspense>
+              {demo === "shapes" && <Shapes setUI={setUI} />}
+              {demo === "joints" && <Joints setUI={setUI} />}
+              {demo === "components" && <ComponentsExample setUI={setUI} />}
+              {demo === "cradle" && <CradleExample setUI={setUI} />}
+              {demo === "transforms" && <Transforms setUI={setUI} />}
+              {demo === "cluster" && <Cluster setUI={setUI} />}
+              {demo === "all-shapes" && <AllShapes setUI={setUI} />}
+            </Suspense>
 
             <Floor />
           </Physics>
