@@ -1,5 +1,11 @@
 # @react-three/rapier
 
+## 0.3.0
+
+### Minor Changes
+
+- 7e36172: Add collision and sleep/awake events
+
 ## 0.2.0
 
 ### Minor Changes
