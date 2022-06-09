@@ -22,6 +22,7 @@ import {
   UNSAFE_LocationContext,
   UNSAFE_NavigationContext,
   UNSAFE_RouteContext,
+  useLocation,
 } from "react-router-dom";
 
 export interface Demo {
@@ -53,6 +54,7 @@ export const App = () => {
     UNSAFE_NavigationContext,
     UNSAFE_RouteContext
   );
+  const location = useLocation();
 
   return (
     <div
@@ -102,7 +104,7 @@ export const App = () => {
                 />
               </Routes>
 
-              <Floor />
+              <Floor key={location.pathname} />
             </Physics>
           </ContextBridge>
         </Canvas>

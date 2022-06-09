@@ -18,7 +18,6 @@ import {
   CylinderArgs,
   HeightfieldArgs,
   RigidBodyApi,
-  RigidBodyAutoCollider,
   RoundCuboidArgs,
   TrimeshArgs,
   UseColliderOptions,
@@ -27,15 +26,14 @@ import {
 import { createColliderFromOptions, scaleVertices } from "./utils";
 
 const RigidBodyContext = createContext<
-  [MutableRefObject<Object3D>, RigidBodyApi]
+  [ref: MutableRefObject<Object3D>, api: RigidBodyApi, hasCollisionEvents: boolean]
 >(undefined!);
 
-const useParentRigidBody = () => useContext(RigidBodyContext);
+const useRigidBodyContext = () => useContext(RigidBodyContext);
 
 // RigidBody
 interface RigidBodyProps extends UseRigidBodyOptions {
   children?: ReactNode;
-  colliders?: RigidBodyAutoCollider | false;
 }
 
 export const RigidBody = forwardRef<RigidBodyApi, RigidBodyProps>(
@@ -45,7 +43,7 @@ export const RigidBody = forwardRef<RigidBodyApi, RigidBodyProps>(
     useImperativeHandle(ref, () => rigidBody);
 
     return (
-      <RigidBodyContext.Provider value={[object, rigidBody]}>
+      <RigidBodyContext.Provider value={[object, rigidBody, !!(props.onCollisionEnter || props.onCollisionExit)]}>
         <object3D ref={object}>{children}</object3D>
       </RigidBodyContext.Provider>
     );
@@ -58,7 +56,7 @@ const AnyCollider = ({
   ...props
 }: UseColliderOptions<any> & { children?: ReactNode }) => {
   const { world } = useRapier();
-  const [, rigidBody] = useParentRigidBody();
+  const [, rigidBody, hasCollisionEvents] = useRigidBodyContext();
   const ref = useRef<Object3D>(null);
 
   useEffect(() => {
@@ -68,7 +66,8 @@ const AnyCollider = ({
       props,
       world,
       rigidBody.handle,
-      scale
+      scale,
+      hasCollisionEvents
     );
 
     return () => {

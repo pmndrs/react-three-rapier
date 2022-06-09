@@ -3,7 +3,8 @@ import React, { MutableRefObject } from "react";
 import {
   CoefficientCombineRule,
   RigidBody as RapierRigidBody,
-  Collider as RapierCollider
+  Collider as RapierCollider,
+  TempContactManifold
 } from "@dimforge/rapier3d-compat";
 import { createColliderApi, createJointApi, createRigidBodyApi, createWorldApi } from "./api";
 
@@ -221,6 +222,20 @@ export interface UseRigidBodyOptions {
    * Setting this to false will disable automatic colliders.
    */
   colliders?: RigidBodyAutoCollider | false
+
+  /**
+   * Callback when this rigidbody collides with another rigidbody
+   */
+  onCollisionEnter?({}: {target: RapierRigidBody, manifold: TempContactManifold, flipped: boolean}): void;
+
+  /**
+   * Callback when this rigidbody stops colliding with another rigidbody
+   */
+  onCollisionExit?({}: {target: RapierRigidBody}): void;
+
+  onSleep?(): void
+
+  onWake?(): void
 }
 
 // Joints

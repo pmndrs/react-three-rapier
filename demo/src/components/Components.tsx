@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 
 import { Box, Clone, Sphere, useGLTF } from "@react-three/drei";
 import {
@@ -55,32 +55,53 @@ const Pear = (props: GroupProps) => {
   );
 };
 
+const Ball = () => {
+  const [colliding, setColliding] = useState(false);
+
+  return (
+    <RigidBody
+      colliders="ball"
+      position={[5, 0, 0]}
+      onCollisionEnter={({ manifold }) => {
+        setColliding(true);
+      }}
+      onCollisionExit={() => setColliding(false)}
+    >
+      <Sphere castShadow>
+        <meshPhysicalMaterial color={colliding ? "blue" : "green"} />
+      </Sphere>
+    </RigidBody>
+  );
+};
+
+const CompoundShape = () => {
+  const [asleep, setAsleep] = useState(false);
+
+  return (
+    <group scale={1}>
+      <RigidBody colliders="cuboid" onSleep={() => setAsleep(true)}>
+        <Box castShadow>
+          <meshPhysicalMaterial color={asleep ? "red" : "white"} />
+        </Box>
+        <Box position={[2, 1, 1]} scale={[4, 1, 2]} castShadow>
+          <meshPhysicalMaterial />
+        </Box>
+        <Box position={[7, 3, 0]} scale={4} castShadow>
+          <meshPhysicalMaterial />
+        </Box>
+      </RigidBody>
+    </group>
+  );
+};
+
 export const ComponentsExample: Demo = ({ setUI }) => {
   setUI("");
 
   return (
     <group>
-      <group scale={1}>
-        <RigidBody colliders="cuboid">
-          <Box castShadow>
-            <meshPhysicalMaterial />
-          </Box>
-          <Box position={[2, 1, 1]} scale={[4, 1, 2]} castShadow>
-            <meshPhysicalMaterial />
-          </Box>
-          <Box position={[7, 3, 0]} scale={4} castShadow>
-            <meshPhysicalMaterial />
-          </Box>
-        </RigidBody>
+      <CompoundShape />
 
-        <RigidBody colliders="ball" position={[5, 0, 0]}>
-          <Sphere castShadow>
-            <meshPhysicalMaterial />
-          </Sphere>
-        </RigidBody>
-      </group>
-
-      {/* {Array.from({length: 20}).map((_, i) => <Pear position={[0, 4 * i, 0]} key={i} />)} */}
+      <Ball />
 
       <Map />
     </group>

@@ -2,7 +2,6 @@ import React, {
   MutableRefObject, 
   useContext,
   useEffect,
-  useLayoutEffect,
   useMemo, } from "react";
 import { RapierContext } from "./Physics";
 import { useRef } from "react";
@@ -58,7 +57,7 @@ import { createColliderApi, createJointApi, createRigidBodyApi } from "./api";
 export const useRigidBody = <O extends Object3D>(
   options: UseRigidBodyOptions = {}
 ): [MutableRefObject<O>, RigidBodyApi] => {
-  const { rapier, world, rigidBodyMeshes, physicsOptions } = useRapier();
+  const { rapier, world, rigidBodyMeshes, physicsOptions, rigidBodyEvents } = useRapier();
   const ref = useRef<O>();
 
   // Create rigidbody
@@ -94,6 +93,9 @@ export const useRigidBody = <O extends Object3D>(
       ref.current = new Object3D() as O
     }
 
+    // isSleeping used for onSleep and onWake events
+    ref.current.userData.isSleeping = false
+
     // Get intitial world transforms
     const worldPosition = ref.current.getWorldPosition(new Vector3())
     const worldRotation = ref.current.getWorldQuaternion(new Quaternion())
@@ -120,7 +122,10 @@ export const useRigidBody = <O extends Object3D>(
     rigidBody.resetTorques(false)
 
     const colliderSetting = options?.colliders ?? physicsOptions.colliders ?? false;
-    const autoColliders = colliderSetting !== false ? createCollidersFromChildren(ref.current, rigidBody, colliderSetting, world) : []
+
+    const hasCollisionEvents = !!(options.onCollisionEnter || options.onCollisionExit);
+
+    const autoColliders = colliderSetting !== false ? createCollidersFromChildren(ref.current, rigidBody, colliderSetting, world, hasCollisionEvents) : []
 
     rigidBody.wakeUp()
 
@@ -133,6 +138,22 @@ export const useRigidBody = <O extends Object3D>(
       rigidBodyMeshes.delete(rigidBody.handle)
     }
   }, [])
+
+  // Events
+  useEffect(() => {
+    const rigidBody = getRigidBodyRef.current()
+
+    rigidBodyEvents.set(rigidBody.handle, {
+      onCollisionEnter: options?.onCollisionEnter,
+      onCollisionExit: options?.onCollisionExit,
+      onSleep: options?.onSleep,
+      onWake: options?.onWake,
+    })
+
+    return () => {
+      rigidBodyEvents.delete(rigidBody.handle)
+    }
+  }, [options.onCollisionEnter, options.onCollisionExit])
 
   const api = useMemo(() => createRigidBodyApi(getRigidBodyRef), [])
 

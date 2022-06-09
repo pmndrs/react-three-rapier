@@ -115,6 +115,31 @@ const Scene = () => {
 };
 ```
 
+## Events
+
+You can subscribe collision and state events on the RigidBody.
+
+```tsx
+const RigidBottle = () => {
+  const [isAsleep, setIsAsleep] = useState(false);
+
+return (
+    <RigidBody
+      colliders="hull"
+      onSleep={() => setIsAsleep(true)}
+      onWake={() => setIsAsleep(false)}
+      onCollision={({manifold}) => {
+        console.log('Collision at world position ', manifold.solverContactPoint(0))
+      }}
+    >
+      <Sphere>
+        <meshPhysicalMaterial color={isAsleep ? 'white' : 'blue'}>
+      </Sphere>
+    </RigidBody>
+  )
+}
+```
+
 ## Hooks
 
 You can also use hooks to generate rigid bodies and colliders, but it's not encouraged.
@@ -144,7 +169,7 @@ In order, but also not necessarily:
 - [x] Nested objects retain correct collider scale
 - [x] Automatic colliders based on rigidbody children
 - [ ] Translation and rotational constraints
-- [ ] Collision events
+- [x] Collision events
 - [ ] InstancedMesh support
 - [ ] Docs
 - [ ] CodeSandbox examples
