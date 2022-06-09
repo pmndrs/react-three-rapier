@@ -64,7 +64,6 @@ const Ball = () => {
       position={[5, 0, 0]}
       onCollisionEnter={({ manifold }) => {
         setColliding(true);
-        console.log(manifold.solverContactPoint(0));
       }}
       onCollisionExit={() => setColliding(false)}
     >
