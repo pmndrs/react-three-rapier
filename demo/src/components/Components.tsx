@@ -72,24 +72,32 @@ const Ball = () => {
   );
 };
 
+const CompoundShape = () => {
+  const [asleep, setAsleep] = useState(false);
+
+  return (
+    <group scale={1}>
+      <RigidBody colliders="cuboid" onSleep={() => setAsleep(true)}>
+        <Box castShadow>
+          <meshPhysicalMaterial color={asleep ? "red" : "white"} />
+        </Box>
+        <Box position={[2, 1, 1]} scale={[4, 1, 2]} castShadow>
+          <meshPhysicalMaterial />
+        </Box>
+        <Box position={[7, 3, 0]} scale={4} castShadow>
+          <meshPhysicalMaterial />
+        </Box>
+      </RigidBody>
+    </group>
+  );
+};
+
 export const ComponentsExample: Demo = ({ setUI }) => {
   setUI("");
 
   return (
     <group>
-      <group scale={1}>
-        <RigidBody colliders="cuboid">
-          <Box castShadow>
-            <meshPhysicalMaterial />
-          </Box>
-          <Box position={[2, 1, 1]} scale={[4, 1, 2]} castShadow>
-            <meshPhysicalMaterial />
-          </Box>
-          <Box position={[7, 3, 0]} scale={4} castShadow>
-            <meshPhysicalMaterial />
-          </Box>
-        </RigidBody>
-      </group>
+      <CompoundShape />
 
       <Ball />
 

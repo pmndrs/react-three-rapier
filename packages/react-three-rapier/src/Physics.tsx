@@ -96,6 +96,17 @@ export const Physics: FC<RapierWorldProps> = ({
     rigidBodyMeshes.forEach((mesh, handle) => {
       const rigidBody = world.getRigidBody(handle);
 
+      const events = rigidBodyEvents.get(handle)
+      if (events?.onSleep || events?.onWake) {
+        if (rigidBody.isSleeping() && !mesh.userData.isSleeping) {
+          events?.onSleep?.()
+        } 
+        if (!rigidBody.isSleeping() && mesh.userData.isSleeping) {
+          events?.onWake?.()
+        }
+        mesh.userData.isSleeping = rigidBody.isSleeping()
+      }
+
       if (!rigidBody || rigidBody.isSleeping() || rigidBody.isFixed() || !mesh.parent) {
         return
       }
@@ -120,15 +131,21 @@ export const Physics: FC<RapierWorldProps> = ({
 
     // Collision events
     eventQueue.drainCollisionEvents((handle1, handle2, started) => {
-      const rigidBody1 = world.getRigidBody(handle1);
-      const rigidBody2 = world.getRigidBody(handle2);
+      const collider1 = world.getCollider(handle1);
+      const collider2 = world.getCollider(handle2);
 
-      if (!rigidBody1 || !rigidBody2) {
+      const rigidBodyHandle1 = collider1.parent()
+      const rigidBodyHandle2 = collider2.parent()
+
+      if (!collider1 || !collider2 || !rigidBodyHandle1 || !rigidBodyHandle2) {
         return
       }
 
-      const events1 = rigidBodyEvents.get(handle1)
-      const events2 = rigidBodyEvents.get(handle2)
+      const rigidBody1 = world.getRigidBody(rigidBodyHandle1)
+      const rigidBody2 = world.getRigidBody(rigidBodyHandle2)
+
+      const events1 = rigidBodyEvents.get(rigidBodyHandle1)
+      const events2 = rigidBodyEvents.get(rigidBodyHandle2)
 
       if (started) {
         events1?.onCollisionEnter?.({target: rigidBody2})

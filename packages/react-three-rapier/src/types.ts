@@ -231,6 +231,10 @@ export interface UseRigidBodyOptions {
    * Callback when this rigidbody stops colliding with another rigidbody
    */
   onCollisionExit?({target}: {target: RapierRigidBody}): void;
+
+  onSleep?(): void
+
+  onWake?(): void
 }
 
 // Joints

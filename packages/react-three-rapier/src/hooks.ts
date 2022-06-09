@@ -93,6 +93,9 @@ export const useRigidBody = <O extends Object3D>(
       ref.current = new Object3D() as O
     }
 
+    // isSleeping used for onSleep and onWake events
+    ref.current.userData.isSleeping = false
+
     // Get intitial world transforms
     const worldPosition = ref.current.getWorldPosition(new Vector3())
     const worldRotation = ref.current.getWorldQuaternion(new Quaternion())
@@ -136,12 +139,15 @@ export const useRigidBody = <O extends Object3D>(
     }
   }, [])
 
+  // Events
   useEffect(() => {
     const rigidBody = getRigidBodyRef.current()
 
     rigidBodyEvents.set(rigidBody.handle, {
       onCollisionEnter: options?.onCollisionEnter,
       onCollisionExit: options?.onCollisionExit,
+      onSleep: options?.onSleep,
+      onWake: options?.onWake,
     })
 
     return () => {
