@@ -1,9 +1,9 @@
-import React, { createContext, FC, MutableRefObject, ReactNode, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import React, { createContext, FC, ReactNode, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useAsset } from "use-asset";
 import type Rapier from "@dimforge/rapier3d-compat";
 import { useFrame } from "@react-three/fiber";
 import { RigidBodyAutoCollider, Vector3Array, WorldApi } from "./types";
-import { Collider, ColliderHandle, EventQueue, RigidBody, RigidBodyHandle, World } from "@dimforge/rapier3d-compat";
+import { ColliderHandle, EventQueue, RigidBody, RigidBodyHandle, TempContactManifold, World } from "@dimforge/rapier3d-compat";
 import { Object3D, Quaternion, Vector3 } from "three";
 import { vectorArrayToObject } from "./utils";
 import { createWorldApi } from "./api";
@@ -34,7 +34,7 @@ type EventMap = Map<
   {
     onSleep?(): void;
     onWake?(): void;
-    onCollisionEnter?({target}: {target: RigidBody}): void;
+    onCollisionEnter?({target, manifold, flipped}: {target: RigidBody, manifold: TempContactManifold, flipped: boolean}): void;
     onCollisionExit?({target}: {target: RigidBody}): void;
   }
 >;
@@ -148,8 +148,10 @@ export const Physics: FC<RapierWorldProps> = ({
       const events2 = rigidBodyEvents.get(rigidBodyHandle2)
 
       if (started) {
-        events1?.onCollisionEnter?.({target: rigidBody2})
-        events2?.onCollisionEnter?.({target: rigidBody1})
+        const collisionPair = world.contactPair(handle1, handle2, (manifold, flipped) => {
+          events1?.onCollisionEnter?.({target: rigidBody2, manifold, flipped})
+          events2?.onCollisionEnter?.({target: rigidBody1, manifold, flipped})  
+       });
       } else {
         events1?.onCollisionExit?.({target: rigidBody2})
         events2?.onCollisionExit?.({target: rigidBody1})

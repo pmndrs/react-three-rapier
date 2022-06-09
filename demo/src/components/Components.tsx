@@ -62,7 +62,10 @@ const Ball = () => {
     <RigidBody
       colliders="ball"
       position={[5, 0, 0]}
-      onCollisionEnter={() => setColliding(true)}
+      onCollisionEnter={({ manifold }) => {
+        setColliding(true);
+        console.log(manifold.solverContactPoint(0));
+      }}
       onCollisionExit={() => setColliding(false)}
     >
       <Sphere castShadow>
