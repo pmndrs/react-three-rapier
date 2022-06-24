@@ -25,24 +25,25 @@ export const Car: Demo = ({ setUI }) => {
 
   useFrame(() => {
     wheelRefs.current.forEach((ref) => {
-      ref.current?.applyTorqueImpulse({x:0,y:0,z:.1})
+      ref.current?.applyTorqueImpulse({x:0, y:0, z:0.1})
     });
   });
 
   return ( 
     <group>
-      <Debug />
       <RigidBody
         colliders="cuboid"
         ref={bodyRef}
         type="dynamic"
         >
           <Box 
-          scale={[6,1,1.9]}
+          scale={[6, 1, 1.9]}
           castShadow
           receiveShadow
           name="chassis"
-         />
+          >
+            <meshStandardMaterial color={"red"} />
+          </Box>
       </RigidBody>
       { wheelPositions.map( (wheelPosition, index) => (
         <RigidBody
@@ -54,10 +55,12 @@ export const Car: Demo = ({ setUI }) => {
           >
           <Cylinder 
             rotation={[Math.PI/2, 0, 0]}
-            args={[1,1,1,32]}
+            args={[1, 1, 1, 32]}
             castShadow
             receiveShadow
-          />
+          >
+            <meshStandardMaterial color={"grey"} />
+          </Cylinder>
         </RigidBody>
       ))}
       { wheelPositions.map( (wheelPosition, index) => (
@@ -66,8 +69,8 @@ export const Car: Demo = ({ setUI }) => {
           body={bodyRef} 
           wheel={wheelRefs.current[index]}  
           bodyAnchor={wheelPosition}
-          wheelAnchor={[0,0,0]}
-          rotationAxis={[0,0,1]}
+          wheelAnchor={[0, 0, 0]}
+          rotationAxis={[0, 0, 1]}
         />
       ))}
     </group>
