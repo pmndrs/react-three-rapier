@@ -1,5 +1,11 @@
 # @react-three/rapier
 
+## 0.3.1
+
+### Patch Changes
+
+- 37d2621: Pin rapier3d version to 0.8.0-alpha.2
+
 ## 0.3.0
 
 ### Minor Changes
