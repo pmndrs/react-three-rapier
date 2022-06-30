@@ -134,8 +134,8 @@ export const Physics: FC<RapierWorldProps> = ({
       const collider1 = world.getCollider(handle1);
       const collider2 = world.getCollider(handle2);
 
-      const rigidBodyHandle1 = collider1.parent()
-      const rigidBodyHandle2 = collider2.parent()
+      const rigidBodyHandle1 = collider1.parent()?.handle
+      const rigidBodyHandle2 = collider2.parent()?.handle
 
       if (!collider1 || !collider2 || !rigidBodyHandle1 || !rigidBodyHandle2) {
         return
@@ -148,7 +148,7 @@ export const Physics: FC<RapierWorldProps> = ({
       const events2 = rigidBodyEvents.get(rigidBodyHandle2)
 
       if (started) {
-        const collisionPair = world.contactPair(handle1, handle2, (manifold, flipped) => {
+        const collisionPair = world.contactPair(collider1, collider2, (manifold, flipped) => {
           events1?.onCollisionEnter?.({target: rigidBody2, manifold, flipped})
           events2?.onCollisionEnter?.({target: rigidBody1, manifold, flipped})  
        });

@@ -53,8 +53,8 @@ export const createWorldApi = (ref: RefGetter<World>) => {
     getRigidBody: (handle: number) => ref.current()!.getRigidBody(handle),
     createRigidBody: (desc: RigidBodyDesc) =>
       ref.current()!.createRigidBody(desc),
-    createCollider: (desc: ColliderDesc, rigidBodyHandle: number) =>
-      ref.current()!.createCollider(desc, rigidBodyHandle),
+    createCollider: (desc: ColliderDesc, rigidBody: RigidBody) =>
+      ref.current()!.createCollider(desc, rigidBody),
     removeRigidBody: (rigidBody: RigidBody) =>
       ref.current()!.removeRigidBody(rigidBody),
     removeCollider: (collider: Collider) =>
@@ -63,7 +63,8 @@ export const createWorldApi = (ref: RefGetter<World>) => {
       params: JointData,
       rigidBodyA: RigidBody,
       rigidBodyB: RigidBody
-    ) => ref.current()!.createImpulseJoint(params, rigidBodyA, rigidBodyB),
+    ) =>
+      ref.current()!.createImpulseJoint(params, rigidBodyA, rigidBodyB, true),
     removeImpulseJoint: (joint: ImpulseJoint) =>
       ref.current()!.removeImpulseJoint(joint, true),
     forEachCollider: (callback: (collider: Collider) => void) =>

@@ -171,7 +171,7 @@ export const useCollider = <A>(
   const objectRef = useRef<Object3D>()
   const getColliderRef = useRef(() => {
     if (!colliderRef.current) {
-      colliderRef.current = createColliderFromOptions<A>(options, world, body.handle)
+      colliderRef.current = createColliderFromOptions<A>(options, world, world.getRigidBody(body.handle))
     }
     return colliderRef.current
   })
@@ -203,7 +203,7 @@ export const useRigidBodyWithCollider = <A, O extends Object3D = Object3D>(
     }
     
     const scale = ref.current.getWorldScale(new Vector3());
-    const collider = createColliderFromOptions(colliderOptions, world, rigidBody.handle, scale);
+    const collider = createColliderFromOptions(colliderOptions, world, world.getRigidBody(rigidBody.handle), scale);
 
     return () => {
       world.removeCollider(collider);

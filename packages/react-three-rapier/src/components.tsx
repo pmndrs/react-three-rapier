@@ -65,7 +65,7 @@ const AnyCollider = ({
     const collider = createColliderFromOptions(
       props,
       world,
-      rigidBody.handle,
+      world.getRigidBody(rigidBody.handle),
       scale,
       hasCollisionEvents
     );
