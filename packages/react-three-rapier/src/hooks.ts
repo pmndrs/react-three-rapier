@@ -112,6 +112,8 @@ export const useRigidBody = <O extends Object3D>(
       z: worldPosition.z + z * scale.z
     }, false)
 
+    console.log(rigidBody.isKinematic())
+
     const eulerAngles = new Euler(rx, ry, rz, 'XYZ')
     const rotation = new Quaternion().setFromEuler(eulerAngles)
       .multiply(worldRotation)

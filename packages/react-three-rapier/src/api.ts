@@ -8,7 +8,6 @@ import {
   RigidBodyDesc,
   World,
 } from "@dimforge/rapier3d-compat";
-import { MutableRefObject } from "react";
 import { Quaternion, Vector3 } from "three";
 import { RefGetter } from "./types";
 
@@ -32,6 +31,17 @@ export const createRigidBodyApi = (ref: RefGetter<RigidBody>) => {
     rotation() {
       const { x, y, z, w } = ref.current()!.rotation();
       return new Quaternion(x, y, z, w);
+    },
+    setNextKinematicRotation({ x, y, z }: Vector3) {
+      ref.current()!.setNextKinematicRotation({
+        x,
+        y,
+        z,
+        w: 1,
+      });
+    },
+    setNextKinematicTranslation({ x, y, z }: Vector3) {
+      ref.current()!.setNextKinematicTranslation({ x, y, z });
     },
   };
 };
