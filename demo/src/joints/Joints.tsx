@@ -1,6 +1,7 @@
 import { Box, Shadow, Sphere } from "@react-three/drei";
 import { createRef, forwardRef, ReactNode, useEffect, useRef } from "react";
 import {
+  RigidBodyApi,
   RigidBodyTypeString,
   useBall,
   useCuboid,
@@ -61,12 +62,12 @@ const Rope = (props: {
   length: number;
 }) => {
   const refs = useRef(
-    Array.from({ length: props.length }).map(() => createRef())
+    Array.from({ length: props.length }).map(() => createRef<RigidBodyApi>())
   );
 
   useFrame(() => {
     const now = performance.now();
-    refs.current[0].current.setNextKinematicRotation({
+    refs.current[0].current!.setNextKinematicRotation({
       x: 0,
       y: Math.sin(now / 500) * 3,
       z: 0,

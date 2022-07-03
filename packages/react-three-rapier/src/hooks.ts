@@ -86,7 +86,7 @@ export const useRigidBody = <O extends Object3D>(
 
   // Setup
   useEffect(() => {
-    const rigidBody = getRigidBodyRef.current()
+    const rigidBody = getRigidBodyRef.current() as RigidBody
     rigidBodyRef.current = rigidBody
 
     if (!ref.current) {
@@ -112,8 +112,6 @@ export const useRigidBody = <O extends Object3D>(
       z: worldPosition.z + z * scale.z
     }, false)
 
-    console.log(rigidBody.isKinematic())
-
     const eulerAngles = new Euler(rx, ry, rz, 'XYZ')
     const rotation = new Quaternion().setFromEuler(eulerAngles)
       .multiply(worldRotation)
@@ -134,8 +132,7 @@ export const useRigidBody = <O extends Object3D>(
     rigidBodyMeshes.set(rigidBody.handle, ref.current)
     
     return () => {
-      const actualBody = world.getRigidBody(rigidBody.handle)
-      world.removeRigidBody(actualBody)
+      world.removeRigidBody(rigidBody)
       autoColliders.forEach(collider => world.removeCollider(collider))
       rigidBodyRef.current = undefined
       rigidBodyMeshes.delete(rigidBody.handle)
@@ -144,7 +141,7 @@ export const useRigidBody = <O extends Object3D>(
 
   // Events
   useEffect(() => {
-    const rigidBody = getRigidBodyRef.current()
+    const rigidBody = getRigidBodyRef.current() as RigidBody
 
     rigidBodyEvents.set(rigidBody.handle, {
       onCollisionEnter: options?.onCollisionEnter,
@@ -174,7 +171,7 @@ export const useCollider = <A>(
   const objectRef = useRef<Object3D>()
   const getColliderRef = useRef(() => {
     if (!colliderRef.current) {
-      colliderRef.current = createColliderFromOptions<A>(options, world, world.getRigidBody(body.handle))
+      colliderRef.current = createColliderFromOptions<A>(options, world, world.getRigidBody(body.handle)!)
     }
     return colliderRef.current
   })
@@ -206,7 +203,7 @@ export const useRigidBodyWithCollider = <A, O extends Object3D = Object3D>(
     }
     
     const scale = ref.current.getWorldScale(new Vector3());
-    const collider = createColliderFromOptions(colliderOptions, world, world.getRigidBody(rigidBody.handle), scale);
+    const collider = createColliderFromOptions(colliderOptions, world, world.getRigidBody(rigidBody.handle)!, scale);
 
     return () => {
       world.removeCollider(collider);
@@ -433,8 +430,8 @@ export const useImpulseJoint = <T extends ImpulseJoint>(
       let rb2: RapierRigidBody;
 
       if ('handle' in body1 && 'handle' in body2) {
-        rb1 = world.getRigidBody(body1.handle);
-        rb2 = world.getRigidBody(body2.handle);
+        rb1 = world.getRigidBody(body1.handle)!;
+        rb2 = world.getRigidBody(body2.handle)!;
 
         jointRef.current = world.createImpulseJoint(
           params,
@@ -444,8 +441,8 @@ export const useImpulseJoint = <T extends ImpulseJoint>(
       }
 
       if ('current' in body1 && body1.current && 'current' in body2 && body2.current) {
-        rb1 = world.getRigidBody(body1.current.handle);
-        rb2 = world.getRigidBody(body2.current.handle);
+        rb1 = world.getRigidBody(body1.current.handle)!;
+        rb2 = world.getRigidBody(body2.current.handle)!;
 
         const newJoint = world.createImpulseJoint(
           params,
