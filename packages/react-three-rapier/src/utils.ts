@@ -204,8 +204,6 @@ export const createCollidersFromChildren = (
         desc.setActiveEvents(ActiveEvents.COLLISION_EVENTS);
       }
 
-      console.log(desc, rigidBody);
-
       const collider = world.createCollider(desc, rigidBody);
       colliders.push(collider);
     }

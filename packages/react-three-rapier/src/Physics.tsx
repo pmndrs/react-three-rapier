@@ -1,4 +1,4 @@
-import React, { createContext, FC, ReactNode, useLayoutEffect, useMemo, useRef, useState } from "react";
+import React, { createContext, FC, ReactNode, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useAsset } from "use-asset";
 import type Rapier from "@dimforge/rapier3d-compat";
 import { useFrame } from "@react-three/fiber";
@@ -67,7 +67,7 @@ export const Physics: FC<RapierWorldProps> = ({
   const [eventQueue] = useState(() => new EventQueue(false))
 
   // Init world
-  useLayoutEffect(() => {
+  useEffect(() => {
     const world = getWorldRef.current()
 
     return () => {

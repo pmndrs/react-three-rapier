@@ -79,7 +79,7 @@ export const useRigidBody = <O extends Object3D>(
         .setCcdEnabled(ccdEnabled)
 
       const rigidBody = world.createRigidBody(desc)
-      rigidBodyRef.current = rigidBody
+      rigidBodyRef.current = world.getRigidBody(rigidBody.handle)
     }
     return rigidBodyRef.current
   })
@@ -132,8 +132,9 @@ export const useRigidBody = <O extends Object3D>(
     rigidBodyMeshes.set(rigidBody.handle, ref.current)
     
     return () => {
+      const actualBody = world.getRigidBody(rigidBody.handle)
+      world.removeRigidBody(actualBody)
       autoColliders.forEach(collider => world.removeCollider(collider))
-      world.removeRigidBody(rigidBody)
       rigidBodyRef.current = undefined
       rigidBodyMeshes.delete(rigidBody.handle)
     }
@@ -461,7 +462,6 @@ export const useImpulseJoint = <T extends ImpulseJoint>(
 
     return () => {
       if (joint) {
-        console.log('remove joint', joint)
         world.removeImpulseJoint(joint);
         jointRef.current = undefined
       }
