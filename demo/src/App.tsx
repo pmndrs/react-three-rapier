@@ -126,7 +126,7 @@ export const App = () => {
         <Link to="components">Components</Link>
         <Link to="cradle">Cradle</Link>
         <Link to="cluster">Cluster</Link>
-        <Link to="car">Car</Link>
+        <Link to="car">Simple Car</Link>
         <Link to="all-shapes">All Shapes</Link>
         <Link to="transforms">Inherited Transforms</Link>
       </div>
