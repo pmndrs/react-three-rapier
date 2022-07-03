@@ -25,6 +25,7 @@ import {
   UNSAFE_RouteContext,
   useLocation,
 } from "react-router-dom";
+import { ApiUsage } from "./api-usage/ApiUsage";
 
 export interface Demo {
   (props: {
@@ -104,6 +105,7 @@ export const App = () => {
                   element={<AllShapes setUI={setUI} />}
                 />
                 <Route path="car" element={<Car setUI={setUI} />} />
+                <Route path="api-usage" element={<ApiUsage setUI={setUI} />} />
               </Routes>
 
               <Floor />
@@ -129,6 +131,7 @@ export const App = () => {
         <Link to="car">Simple Car</Link>
         <Link to="all-shapes">All Shapes</Link>
         <Link to="transforms">Inherited Transforms</Link>
+        <Link to="api-usage">API usage</Link>
       </div>
 
       <div
