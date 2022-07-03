@@ -1,5 +1,11 @@
 # @react-three/rapier
 
+## 0.4.1
+
+### Patch Changes
+
+- bb7a269: Add useful proxied api methods to rigidbody
+
 ## 0.4.0
 
 ### Minor Changes
