@@ -8,7 +8,16 @@ import React, {
 } from "react";
 import { useFrame } from "@react-three/fiber";
 import { useRapier } from "./hooks";
-import { Collider, ColliderHandle, ShapeType } from "@dimforge/rapier3d-compat";
+import {
+  Ball,
+  Collider,
+  ColliderHandle,
+  ConvexPolyhedron,
+  Cuboid,
+  Cylinder,
+  ShapeType,
+  TriMesh,
+} from "@dimforge/rapier3d-compat";
 import {
   BoxBufferGeometry,
   BufferAttribute,
@@ -20,27 +29,29 @@ import {
 } from "three";
 
 const geometryFromCollider = (collider: Collider) => {
-  switch (collider.shapeType()) {
+  switch (collider.shape.type) {
     case ShapeType.Cuboid: {
-      const { x, y, z } = collider.halfExtents();
+      const { x, y, z } = (collider.shape as Cuboid).halfExtents;
       return new BoxBufferGeometry(x * 2 + 0.01, y * 2 + 0.01, z * 2 + 0.01);
 
       break;
     }
 
     case ShapeType.Ball: {
-      const r = collider.radius();
+      const r = (collider.shape as Ball).radius;
       return new SphereBufferGeometry(r + +0.01, 8, 8);
 
       break;
     }
 
     case ShapeType.TriMesh: {
-      const v = collider.vertices();
-      const i = collider.indices();
+      const v = (collider.shape as TriMesh).vertices;
+      const i = (collider.shape as TriMesh).indices;
 
       const g = new BufferGeometry();
-      g.setAttribute("position", new BufferAttribute(v, 3));
+      // Vertices are not always a float3darray (???), so we need to convert them
+      const safeVerts = Float32Array.from(v);
+      g.setAttribute("position", new BufferAttribute(safeVerts, 3));
       g.index?.set(i);
       g.setDrawRange(0, g.attributes.position.array.length / 3 - 1);
 
@@ -50,10 +61,12 @@ const geometryFromCollider = (collider: Collider) => {
     }
 
     case ShapeType.ConvexPolyhedron: {
-      const cv = collider.vertices();
+      const cv = (collider.shape as ConvexPolyhedron).vertices;
 
+      // Vertices are not always a float3darray (???), so we need to convert them
+      const safeVerts = Float32Array.from(cv);
       const cg = new BufferGeometry();
-      cg.setAttribute("position", new BufferAttribute(cv, 3));
+      cg.setAttribute("position", new BufferAttribute(safeVerts, 3));
 
       return cg;
 
@@ -61,8 +74,8 @@ const geometryFromCollider = (collider: Collider) => {
     }
 
     case ShapeType.Cylinder: {
-      const r = collider.radius();
-      const h = collider.halfHeight();
+      const r = (collider.shape as Cylinder).radius;
+      const h = (collider.shape as Cylinder).halfHeight;
 
       const g = new CylinderBufferGeometry(r, r, h);
 

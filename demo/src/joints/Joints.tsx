@@ -1,4 +1,4 @@
-import { Box, Shadow } from "@react-three/drei";
+import { Box, Shadow, Sphere } from "@react-three/drei";
 import { createRef, forwardRef, ReactNode, useEffect, useRef } from "react";
 import {
   RigidBodyTypeString,
@@ -8,11 +8,12 @@ import {
   Vector3Array,
 } from "@react-three/rapier";
 import { useImperativeHandle } from "react";
+import { useFrame } from "@react-three/fiber";
 
-const ShadowBox = forwardRef((_, ref) => (
-  <Box castShadow ref={ref}>
+const ShadowElement = forwardRef((_, ref) => (
+  <Sphere castShadow ref={ref} args={[0.5]}>
     <meshPhysicalMaterial />
-  </Box>
+  </Sphere>
 ));
 
 const RopeSegment = forwardRef(
@@ -28,13 +29,13 @@ const RopeSegment = forwardRef(
     },
     ref
   ) => {
-    const [cuboid, api] = useCuboid(
+    const [cuboid, api] = useBall(
       {
-        position: position,
+        position,
         type,
       },
       {
-        args: [0.5, 0.5, 0.5],
+        args: [0.5],
       }
     );
 
@@ -48,8 +49,8 @@ const RopeSegment = forwardRef(
 
 const RopeJoint = ({ a, b }) => {
   const joint = useSphericalJoint(a, b, [
-    [0.5, 0.5, 0.5],
-    [-0.5, -0.5, -0.5],
+    [-0.5, 0, 0],
+    [0.5, 0, 0],
   ]);
   return null;
 };
@@ -63,15 +64,24 @@ const Rope = (props: {
     Array.from({ length: props.length }).map(() => createRef())
   );
 
+  useFrame(() => {
+    const now = performance.now();
+    refs.current[0].current.setNextKinematicRotation({
+      x: 0,
+      y: Math.sin(now / 500) * 3,
+      z: 0,
+    });
+  });
+
   return (
     <group>
       {refs.current.map((ref, i) => (
         <RopeSegment
           ref={ref}
           key={i}
-          position={[i * 1.1, 10, 0]}
-          component={ShadowBox}
-          type={i == 0 ? "fixed" : "dynamic"}
+          position={[i * 1, 0, 0]}
+          component={ShadowElement}
+          type={i === 0 ? "kinematicPosition" : "dynamic"}
         />
       ))}
       {refs.current.map(
@@ -89,7 +99,7 @@ const Joints = ({ setUI }) => {
 
   return (
     <group>
-      <Rope length={40} component={ShadowBox} />
+      <Rope length={40} component={ShadowElement} />
     </group>
   );
 };

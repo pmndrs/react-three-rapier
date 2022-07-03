@@ -8,7 +8,6 @@ import {
   RigidBodyDesc,
   World,
 } from "@dimforge/rapier3d-compat";
-import { MutableRefObject } from "react";
 import { Quaternion, Vector3 } from "three";
 import { RefGetter } from "./types";
 
@@ -33,6 +32,17 @@ export const createRigidBodyApi = (ref: RefGetter<RigidBody>) => {
       const { x, y, z, w } = ref.current()!.rotation();
       return new Quaternion(x, y, z, w);
     },
+    setNextKinematicRotation({ x, y, z }: Vector3) {
+      ref.current()!.setNextKinematicRotation({
+        x,
+        y,
+        z,
+        w: 1,
+      });
+    },
+    setNextKinematicTranslation({ x, y, z }: Vector3) {
+      ref.current()!.setNextKinematicTranslation({ x, y, z });
+    },
   };
 };
 
@@ -53,8 +63,8 @@ export const createWorldApi = (ref: RefGetter<World>) => {
     getRigidBody: (handle: number) => ref.current()!.getRigidBody(handle),
     createRigidBody: (desc: RigidBodyDesc) =>
       ref.current()!.createRigidBody(desc),
-    createCollider: (desc: ColliderDesc, rigidBodyHandle: number) =>
-      ref.current()!.createCollider(desc, rigidBodyHandle),
+    createCollider: (desc: ColliderDesc, rigidBody: RigidBody) =>
+      ref.current()!.createCollider(desc, rigidBody),
     removeRigidBody: (rigidBody: RigidBody) =>
       ref.current()!.removeRigidBody(rigidBody),
     removeCollider: (collider: Collider) =>
@@ -63,7 +73,8 @@ export const createWorldApi = (ref: RefGetter<World>) => {
       params: JointData,
       rigidBodyA: RigidBody,
       rigidBodyB: RigidBody
-    ) => ref.current()!.createImpulseJoint(params, rigidBodyA, rigidBodyB),
+    ) =>
+      ref.current()!.createImpulseJoint(params, rigidBodyA, rigidBodyB, true),
     removeImpulseJoint: (joint: ImpulseJoint) =>
       ref.current()!.removeImpulseJoint(joint, true),
     forEachCollider: (callback: (collider: Collider) => void) =>

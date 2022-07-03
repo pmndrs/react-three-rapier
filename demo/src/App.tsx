@@ -14,7 +14,7 @@ import { CradleExample } from "./cradle/Cradle";
 import { Transforms } from "./transforms/Transforms";
 import { Cluster } from "./cluster/Cluster";
 import { AllShapes } from "./all-shapes/AllShapes";
-import { Car } from './car/Car';
+import { Car } from "./car/Car";
 import {
   NavLink,
   NavLinkProps,
@@ -66,8 +66,8 @@ export const App = () => {
         fontFamily: "sans-serif",
       }}
     >
-      <Suspense fallback="Loading...">
-        <Canvas shadows>
+      <Canvas shadows>
+        <Suspense fallback="Loading...">
           <ContextBridge>
             <Physics colliders={false}>
               <directionalLight
@@ -103,46 +103,43 @@ export const App = () => {
                   path="all-shapes"
                   element={<AllShapes setUI={setUI} />}
                 />
-                <Route
-                  path="car"
-                  element={<Car setUI={setUI} />}
-                />
+                <Route path="car" element={<Car setUI={setUI} />} />
               </Routes>
 
-              <Floor key={location.pathname} />
+              <Floor />
             </Physics>
           </ContextBridge>
-        </Canvas>
+        </Suspense>
+      </Canvas>
 
-        <div
-          style={{
-            position: "absolute",
-            top: 24,
-            left: 24,
-            display: "flex",
-            gap: 12,
-          }}
-        >
-          <Link to="/">Shapes</Link>
-          <Link to="joints">Joints</Link>
-          <Link to="components">Components</Link>
-          <Link to="cradle">Cradle</Link>
-          <Link to="cluster">Cluster</Link>
-          <Link to="car">Car</Link>
-          <Link to="all-shapes">All Shapes</Link>
-          <Link to="transforms">Inherited Transforms</Link>
-        </div>
+      <div
+        style={{
+          position: "absolute",
+          top: 24,
+          left: 24,
+          display: "flex",
+          gap: 12,
+        }}
+      >
+        <Link to="/">Shapes</Link>
+        <Link to="joints">Joints</Link>
+        <Link to="components">Components</Link>
+        <Link to="cradle">Cradle</Link>
+        <Link to="cluster">Cluster</Link>
+        <Link to="car">Simple Car</Link>
+        <Link to="all-shapes">All Shapes</Link>
+        <Link to="transforms">Inherited Transforms</Link>
+      </div>
 
-        <div
-          style={{
-            position: "absolute",
-            top: 24,
-            right: 24,
-          }}
-        >
-          {ui}
-        </div>
-      </Suspense>
+      <div
+        style={{
+          position: "absolute",
+          top: 24,
+          right: 24,
+        }}
+      >
+        {ui}
+      </div>
     </div>
   );
 };

@@ -3,11 +3,11 @@ import {
   CoefficientCombineRule,
   Collider,
   ColliderDesc,
+  RigidBody,
 } from "@dimforge/rapier3d-compat";
 
 import { Mesh, Object3D, Quaternion, Vector3 } from "three";
 import {
-  RapierRigidBody,
   RigidBodyAutoCollider,
   RigidBodyShape,
   RigidBodyTypeString,
@@ -59,7 +59,7 @@ export const scaleColliderArgs = (
 export const createColliderFromOptions = <A>(
   options: UseColliderOptions<A>,
   world: WorldApi,
-  rigidBodyHandle: number,
+  rigidBody: RigidBody,
   scale = { x: 1, y: 1, z: 1 },
   hasCollisionEvents: boolean = false
 ) => {
@@ -112,14 +112,14 @@ export const createColliderFromOptions = <A>(
     );
   }
 
-  const collider = world.createCollider(colliderDesc, rigidBodyHandle);
+  const collider = world.createCollider(colliderDesc, rigidBody);
 
   return collider;
 };
 
 export const createCollidersFromChildren = (
   object: Object3D,
-  rigidBody: RapierRigidBody,
+  rigidBody: RigidBody,
   type: RigidBodyAutoCollider,
   world: WorldApi,
   hasCollisionEvents: boolean = false
@@ -204,7 +204,7 @@ export const createCollidersFromChildren = (
         desc.setActiveEvents(ActiveEvents.COLLISION_EVENTS);
       }
 
-      const collider = world.createCollider(desc, rigidBody.handle);
+      const collider = world.createCollider(desc, rigidBody);
       colliders.push(collider);
     }
   });

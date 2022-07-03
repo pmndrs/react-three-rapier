@@ -29,7 +29,6 @@ const Map = () => {
             nodes.map.geometry.index?.array || [],
           ]}
         />
-        ;
       </RigidBody>
     </group>
   );
@@ -100,9 +99,8 @@ export const ComponentsExample: Demo = ({ setUI }) => {
   return (
     <group>
       <CompoundShape />
-
+      <Pear />
       <Ball />
-
       <Map />
     </group>
   );

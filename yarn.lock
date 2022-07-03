@@ -1216,10 +1216,10 @@
   resolved "https://registry.yarnpkg.com/@chevrotain/utils/-/utils-10.1.2.tgz#d2fb7b968141139e5c2419553e5295382c265e7d"
   integrity sha512-bbZIpW6fdyf7FMaeDmw3cBbkTqsecxEkwlVKgVfqqXWBPLH6azxhPA2V9F7OhoZSVrsnMYw7QuyK6qutXPjEew==
 
-"@dimforge/rapier3d-compat@0.8.0-alpha.2":
-  version "0.8.0-alpha.2"
-  resolved "https://registry.yarnpkg.com/@dimforge/rapier3d-compat/-/rapier3d-compat-0.8.0-alpha.2.tgz#96c67fc9c586b9604f47f15c81c0add169bb5f1b"
-  integrity sha512-YskoCyCbq65zA0n6gTI8cc6vS3xQA2tluPRUoPE/Wl+vynh2MMXYyWqhaipW3Cbklc5njh6raUtZFwu9mCML/w==
+"@dimforge/rapier3d-compat@0.8.1":
+  version "0.8.1"
+  resolved "https://registry.yarnpkg.com/@dimforge/rapier3d-compat/-/rapier3d-compat-0.8.1.tgz#7918044ac6b47d30c4bea71b21b6fdadcbd95ac2"
+  integrity sha512-D+Q7HR+qdMnXcb3ioqIl+TtLtag8A55fumO+LY9/0WTf2kX1xmFlpHJJNC9fpOza3pl5RYfeZW6K+5YQlEcptw==
 
 "@jridgewell/gen-mapping@^0.1.0":
   version "0.1.1"
