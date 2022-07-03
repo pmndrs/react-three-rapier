@@ -1,8 +1,7 @@
-import { Cylinder, Sphere, Torus } from "@react-three/drei";
+import { Torus } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { RigidBody, RigidBodyApi } from "@react-three/rapier";
 import { useEffect, useRef } from "react";
-import { setTokenSourceMapRange } from "typescript";
 import { Demo } from "../App";
 
 export const ApiUsage: Demo = ({ setUI }) => {
