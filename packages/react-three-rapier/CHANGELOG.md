@@ -1,5 +1,15 @@
 # @react-three/rapier
 
+## 0.4.0
+
+### Minor Changes
+
+- dd535aa: Update to @dimforge/rapier3d-compat@0.8.1, pinned version
+
+### Patch Changes
+
+- dd535aa: Better <Physics /> lifecycle making reinitialization more stable
+
 ## 0.3.1
 
 ### Patch Changes
