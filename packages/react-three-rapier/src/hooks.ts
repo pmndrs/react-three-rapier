@@ -123,11 +123,7 @@ export const useRigidBody = <O extends Object3D>(
 
     const colliderSetting = options?.colliders ?? physicsOptions.colliders ?? false;
 
-    const hasCollisionEvents = !!(options.onCollisionEnter || options.onCollisionExit);
-
-    const autoColliders = colliderSetting !== false ? createCollidersFromChildren(ref.current, rigidBody, colliderSetting, world, hasCollisionEvents) : []
-
-    rigidBody.wakeUp()
+    const autoColliders = colliderSetting !== false ? createCollidersFromChildren(ref.current, rigidBody, options, world) : []
 
     rigidBodyMeshes.set(rigidBody.handle, ref.current)
     

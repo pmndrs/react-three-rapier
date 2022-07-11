@@ -8,10 +8,10 @@ import {
 
 import { Mesh, Object3D, Quaternion, Vector3 } from "three";
 import {
-  RigidBodyAutoCollider,
   RigidBodyShape,
   RigidBodyTypeString,
   UseColliderOptions,
+  UseRigidBodyOptions,
   Vector3Array,
   WorldApi,
 } from "./types";
@@ -120,10 +120,12 @@ export const createColliderFromOptions = <A>(
 export const createCollidersFromChildren = (
   object: Object3D,
   rigidBody: RigidBody,
-  type: RigidBodyAutoCollider,
-  world: WorldApi,
-  hasCollisionEvents: boolean = false
+  options: UseRigidBodyOptions,
+  world: WorldApi
 ) => {
+  const hasCollisionEvents = !!(
+    options.onCollisionEnter || options.onCollisionExit
+  );
   const colliders: Collider[] = [];
 
   let desc: ColliderDesc;
@@ -138,7 +140,7 @@ export const createCollidersFromChildren = (
       );
       const scale = child.getWorldScale(new Vector3());
 
-      switch (type) {
+      switch (options.colliders) {
         case "cuboid":
           {
             geometry.computeBoundingBox();
@@ -200,9 +202,12 @@ export const createCollidersFromChildren = (
         )
         .setRotation({ x: rx, y: ry, z: rz, w: rw });
 
-      if (hasCollisionEvents) {
+      if (hasCollisionEvents)
         desc.setActiveEvents(ActiveEvents.COLLISION_EVENTS);
-      }
+      if (Number.isFinite(options.friction))
+        desc.setFriction(options.friction as number);
+      if (Number.isFinite(options.restitution))
+        desc.setRestitution(options.restitution as number);
 
       const collider = world.createCollider(desc, rigidBody);
       colliders.push(collider);
