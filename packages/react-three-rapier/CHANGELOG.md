@@ -1,5 +1,11 @@
 # @react-three/rapier
 
+## 0.4.2
+
+### Patch Changes
+
+- 387b32c: Add restitution and friction as props for auto-generated colliders on RigidBody
+
 ## 0.4.1
 
 ### Patch Changes
