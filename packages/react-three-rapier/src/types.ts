@@ -224,6 +224,18 @@ export interface UseRigidBodyOptions {
   colliders?: RigidBodyAutoCollider | false
 
   /**
+   * Set the friction of auto-generated colliders.
+   * This does not affect any non-automatic child collider-components.
+   */
+  friction?: number,
+
+  /**
+   * Set the restitution (bounciness) of auto-generated colliders.
+   * This does not affect any non-automatic child collider-components.
+   */
+  restitution?: number
+
+  /**
    * Callback when this rigidbody collides with another rigidbody
    */
   onCollisionEnter?({}: {target: RapierRigidBody, manifold: TempContactManifold, flipped: boolean}): void;

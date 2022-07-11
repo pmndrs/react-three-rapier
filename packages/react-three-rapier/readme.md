@@ -5,18 +5,24 @@
 ## Usage
 
 ```tsx
-import { Box } from "@react-three/drei";
+import { Box, Torus } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { Physics, RigidBody } from "@react-three/rapier";
 
 const App = () => {
   return (
     <Canvas>
-      <Physics>
-        <RigidBody>
-          <Box />
-        </RigidBody>
-      </Physics>
+      <Suspense>
+        <Physics>
+          <RigidBody colliders={"hull"} restitution={2}>
+            <Torus />
+          </RigidBody>
+
+          <RigidBody position={[0, -2, 0]} type="kinematicPosition">
+            <Box args={[20, 0.5, 20]} />
+          </RigidBody>
+        </Physics>
+      </Suspense>
     </Canvas>
   );
 };
