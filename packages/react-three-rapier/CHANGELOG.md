@@ -1,5 +1,12 @@
 # @react-three/rapier
 
+## 0.4.3
+
+### Patch Changes
+
+- f7a8a2d: Rigid body creation hooks should not use auto colliders
+- 663eeb5: Fix default collider setting
+
 ## 0.4.2
 
 ### Patch Changes
