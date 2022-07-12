@@ -191,7 +191,7 @@ export const useRigidBodyWithCollider = <A, O extends Object3D = Object3D>(
   colliderOptions?: UseColliderOptions<A>
 ): [ref: MutableRefObject<O>, rigidBody: RigidBodyApi] => {
   const { world } = useRapier()
-  const [ref, rigidBody] = useRigidBody<O>(rigidBodyOptions);
+  const [ref, rigidBody] = useRigidBody<O>({...rigidBodyOptions, colliders: false});
   
   useEffect(() => {
     if (!colliderOptions) {
