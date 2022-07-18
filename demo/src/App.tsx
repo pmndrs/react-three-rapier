@@ -26,6 +26,7 @@ import {
   useLocation,
 } from "react-router-dom";
 import { ApiUsage } from "./api-usage/ApiUsage";
+import { Kinematics } from "./kinematics/Kinematics";
 
 export interface Demo {
   (props: {
@@ -105,6 +106,10 @@ export const App = () => {
                 />
                 <Route path="car" element={<Car setUI={setUI} />} />
                 <Route path="api-usage" element={<ApiUsage setUI={setUI} />} />
+                <Route
+                  path="kinematics"
+                  element={<Kinematics setUI={setUI} />}
+                />
               </Routes>
 
               <Floor />
@@ -131,6 +136,7 @@ export const App = () => {
         <Link to="all-shapes">All Shapes</Link>
         <Link to="transforms">Inherited Transforms</Link>
         <Link to="api-usage">API usage</Link>
+        <Link to="kinematics">Kinematics</Link>
       </div>
 
       <div

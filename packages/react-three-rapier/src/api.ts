@@ -8,8 +8,9 @@ import {
   RigidBodyDesc,
   World,
 } from "@dimforge/rapier3d-compat";
-import { Quaternion, Vector3 } from "three";
+import { Euler, Quaternion, Vector3 } from "three";
 import { RefGetter } from "./types";
+import { vector3ToQuaternion } from "./utils";
 
 type Vector3Object = { x: number; y: number; z: number };
 
@@ -190,11 +191,12 @@ export const createRigidBodyApi = (ref: RefGetter<RigidBody>): RigidBodyApi => {
     },
     setAngvel: (velocity) => ref.current()!.setAngvel(velocity, true),
 
-    setNextKinematicRotation: (rotation) =>
-      ref.current()!.setNextKinematicRotation({
-        ...rotation,
-        w: 1,
-      }),
+    setNextKinematicRotation: ({ x, y, z }) => {
+      const q = vector3ToQuaternion(new Vector3(x, y, z));
+      ref
+        .current()!
+        .setNextKinematicRotation({ x: q.x, y: q.y, z: q.z, w: q.w });
+    },
     setNextKinematicTranslation: (translation) =>
       ref.current()!.setNextKinematicTranslation(translation),
 
