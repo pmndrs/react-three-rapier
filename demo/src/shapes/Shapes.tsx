@@ -1,14 +1,23 @@
-import { Dispatch, FC, memo, ReactNode, useEffect, useState } from "react";
+import {
+  Dispatch,
+  FC,
+  memo,
+  ReactNode,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 import { Box, Html, Plane, Sphere, useGLTF } from "@react-three/drei";
-import {
-  useBall,
-  useConvexHull,
-  useCuboid,
-  useCylinder,
-} from "@react-three/rapier";
+import { CylinderCollider, RigidBody, RigidBodyApi } from "@react-three/rapier";
 import Plinko from "./Plinko";
-import { Mesh, Vector3 } from "three";
+import {
+  BufferGeometry,
+  Material,
+  Mesh,
+  MeshPhysicalMaterial,
+  Vector3,
+} from "three";
 
 const colors = ["red", "green", "blue", "yellow", "orange", "purple"];
 const randomColor = () => colors[Math.floor(Math.random() * colors.length)];
@@ -48,63 +57,55 @@ const Label = ({ label }: { label: string }) => {
 
 const RigidBox = memo(() => {
   const color = useRandomColor();
-  const [box, api] = useCuboid(
-    {
-      position: [-4 + Math.random() * 8, 10, 0],
-    },
-    {
-      args: [0.5, 0.5, 0.5],
-    }
-  );
+
+  const box = useRef<RigidBodyApi>(null);
 
   useEffect(() => {
-    api.applyImpulse(new Vector3(0, 0, 0));
-    api.applyTorqueImpulse(new Vector3(0, 0, Math.random() * 0.1));
+    const api = box.current;
+    if (api) {
+      console.log(api);
+      api.applyTorqueImpulse({ x: 0, y: 0, z: 0.2 });
+    }
   }, []);
 
   return (
-    <group scale={1}>
-      <Box scale={0.5} ref={box} receiveShadow castShadow>
-        <meshPhysicalMaterial color={color} />
-      </Box>
-    </group>
+    <RigidBody
+      colliders="cuboid"
+      ref={box}
+      position={[-4 + Math.random() * 8, 10, 0]}
+    >
+      <group scale={1}>
+        <Box scale={0.5} receiveShadow castShadow>
+          <meshPhysicalMaterial color={color} />
+        </Box>
+      </group>
+    </RigidBody>
   );
 });
 
 const RigidCylinder = memo(() => {
   const color = useRandomColor();
-  const [cylinder, api] = useCylinder<Mesh>(
-    {
-      position: [-4 + Math.random() * 8, 10, 0],
-    },
-    {
-      args: [0.2, 0.4],
-    }
-  );
 
   return (
-    <mesh ref={cylinder} castShadow receiveShadow scale={1}>
-      <cylinderBufferGeometry args={[0.4, 0.4, 0.4, 16]} />
-      <meshPhysicalMaterial color={color} />
-    </mesh>
+    <RigidBody colliders={false}>
+      <mesh castShadow receiveShadow scale={1}>
+        <cylinderBufferGeometry args={[0.4, 0.4, 0.4, 16]} />
+        <meshPhysicalMaterial color={color} />
+      </mesh>
+      <CylinderCollider args={[0.4, 0.4]} />
+    </RigidBody>
   );
 });
 
 const RigidBall = memo(() => {
   const color = useRandomColor();
-  const [ball] = useBall(
-    {
-      position: [-4 + Math.random() * 8, 10, 0],
-    },
-    {
-      args: [0.2],
-    }
-  );
 
   return (
-    <Sphere scale={0.2} ref={ball} castShadow receiveShadow>
-      <meshPhysicalMaterial color={color} />
-    </Sphere>
+    <RigidBody colliders="ball" position={[-4 + Math.random() * 8, 10, 0]}>
+      <Sphere scale={0.2} castShadow receiveShadow>
+        <meshPhysicalMaterial color={color} />
+      </Sphere>
+    </RigidBody>
   );
 });
 
@@ -119,30 +120,16 @@ const HullPear = () => {
     };
   };
 
-  const [g] = useState(() => {
-    let g = nodes.pear.geometry.clone();
-    g.scale(0.5, 0.5, 0.5);
-
-    return g;
-  });
-
-  const [pear] = useConvexHull<Mesh>(
-    {
-      position: [-4 + Math.random() * 8, 10, 0],
-    },
-    {
-      args: [g.attributes.position.array],
-    }
-  );
-
   return (
-    <mesh
-      castShadow
-      receiveShadow
-      ref={pear}
-      geometry={g}
-      material={nodes.pear.material}
-    />
+    <RigidBody colliders="hull" position={[-4 + Math.random() * 8, 10, 0]}>
+      <mesh
+        scale={0.5}
+        castShadow
+        receiveShadow
+        geometry={nodes.pear.geometry}
+        material={nodes.pear.material}
+      />
+    </RigidBody>
   );
 };
 
@@ -155,34 +142,18 @@ const MeshBoat = () => {
     };
   };
 
-  const [g] = useState(() => {
-    let g = nodes.boat.geometry.clone();
-    g.scale(0.3, 0.3, 0.3);
-
-    return g;
-  });
-
-  const [boat] = useConvexHull<Mesh>(
-    {
-      position: [-4 + Math.random() * 8, 10, 0],
-    },
-    {
-      args: [g.attributes.position.array],
-    }
-  );
-
   return (
-    <group scale={1}>
-      <mesh
-        scale={1}
-        castShadow
-        receiveShadow
-        ref={boat}
-        geometry={g}
-        material={nodes.boat.material}
-        rotation={[0, 0, Math.PI / 2]}
-      />
-    </group>
+    <RigidBody colliders="hull" position={[-4 + Math.random() * 8, 10, 0]}>
+      <group scale={0.3}>
+        <mesh
+          castShadow
+          receiveShadow
+          geometry={nodes.boat.geometry}
+          material={nodes.boat.material}
+          rotation={[0, 0, Math.PI / 2]}
+        />
+      </group>
+    </RigidBody>
   );
 };
 

@@ -1,10 +1,9 @@
-import { Box, Shadow, Sphere } from "@react-three/drei";
+import { Sphere } from "@react-three/drei";
 import { createRef, forwardRef, ReactNode, useEffect, useRef } from "react";
 import {
+  RigidBody,
   RigidBodyApi,
   RigidBodyTypeString,
-  useBall,
-  useCuboid,
   useSphericalJoint,
   Vector3Array,
 } from "@react-three/rapier";
@@ -30,21 +29,16 @@ const RopeSegment = forwardRef(
     },
     ref
   ) => {
-    const [cuboid, api] = useBall(
-      {
-        position,
-        type,
-      },
-      {
-        args: [0.5],
-      }
-    );
-
-    useImperativeHandle(ref, () => api);
+    const rb = useRef<RigidBodyApi>(null);
+    useImperativeHandle(ref, () => rb.current);
 
     const RopeLink = component;
 
-    return <RopeLink ref={cuboid} />;
+    return (
+      <RigidBody ref={rb} type={type} position={position}>
+        <RopeLink />
+      </RigidBody>
+    );
   }
 );
 
