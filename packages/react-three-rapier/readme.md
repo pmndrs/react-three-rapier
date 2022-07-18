@@ -159,8 +159,9 @@ In order, but also not necessarily:
 - [x] Nested objects retain world transforms
 - [x] Nested objects retain correct collider scale
 - [x] Automatic colliders based on rigidbody children
-- [ ] Translation and rotational constraints
+- [x] Translation and rotational constraints
 - [x] Collision events
+- [ ] Colliders outside RigidBodies
 - [ ] InstancedMesh support
 - [ ] Docs
 - [ ] CodeSandbox examples

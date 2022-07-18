@@ -54,6 +54,8 @@ export const useRigidBody = <O extends Object3D>(
       const gravityScale = options?.gravityScale ?? 1;
       const canSleep = options?.canSleep ?? true;
       const ccdEnabled = options?.ccd ?? false;
+      const [erx, ery, erz] = options?.enabledRotations ?? [true, true, true]
+      const [etx, ety, etz] = options?.enabledTranslations ?? [true, true, true]
 
       const desc = new rapier.RigidBodyDesc(type)
         .setLinvel(lvx, lvy, lvz)
@@ -61,10 +63,16 @@ export const useRigidBody = <O extends Object3D>(
         .setGravityScale(gravityScale)
         .setCanSleep(canSleep)
         .setCcdEnabled(ccdEnabled)
+        .enabledRotations(erx, ery, erz)
+        .enabledTranslations(etx, ety, etz)
+
+      if (options.lockRotations) desc.lockRotations()
+      if (options.lockTranslations) desc.lockTranslations()
 
       const rigidBody = world.createRigidBody(desc)
       rigidBodyRef.current = world.getRigidBody(rigidBody.handle)
     }
+    
     return rigidBodyRef.current
   })
 

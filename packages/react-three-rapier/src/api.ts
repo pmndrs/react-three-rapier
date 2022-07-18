@@ -122,6 +122,26 @@ export interface RigidBodyApi {
    * Resets to zero the user torques applied to this rigid-body.
    */
   resetTorques(): void;
+
+  /**
+   * Locks or unlocks the ability of this rigid-body to rotate.
+   */
+  lockRotations(locked: boolean): void;
+
+  /**
+   * Locks or unlocks the ability of this rigid-body to translate.
+   */
+  lockTranslations(locked: boolean): void;
+
+  /**
+   * Locks or unlocks the ability of this rigid-body to rotate along individual coordinate axes.
+   */
+  setEnabledRotations(x: boolean, y: boolean, z: boolean): void;
+
+  /**
+   * Locks or unlocks the ability of this rigid-body to translate along individual coordinate axes.
+   */
+  setEnabledTranslations(x: boolean, y: boolean, z: boolean): void;
 }
 
 export const createRigidBodyApi = (ref: RefGetter<RigidBody>): RigidBodyApi => {
@@ -180,6 +200,14 @@ export const createRigidBodyApi = (ref: RefGetter<RigidBody>): RigidBodyApi => {
 
     resetForces: () => ref.current()!.resetForces(true),
     resetTorques: () => ref.current()!.resetTorques(true),
+
+    lockRotations: (locked) => ref.current()!.lockRotations(locked, true),
+    lockTranslations: (locked) => ref.current()!.lockTranslations(locked, true),
+
+    setEnabledRotations: (x, y, z) =>
+      ref.current()!.setEnabledRotations(x, y, z, true),
+    setEnabledTranslations: (x, y, z) =>
+      ref.current()!.setEnabledTranslations(x, y, z, true),
   };
 };
 

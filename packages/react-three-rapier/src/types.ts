@@ -104,6 +104,7 @@ export type RigidBodyShape =
   | "roundConvexMesh";
 
 export type Vector3Array = [x: number, y: number, z: number];
+export type Boolean3Array = [x: boolean, y: boolean, z: boolean];
 
 export interface UseColliderOptions<A> {
   /**
@@ -248,6 +249,26 @@ export interface UseRigidBodyOptions {
   onSleep?(): void
 
   onWake?(): void
+
+  /**
+   * Locks all rotations that would have resulted from forces on the created rigid-body.
+   */
+  lockRotations?: boolean
+
+  /**
+   * Locks all translations that would have resulted from forces on the created rigid-body.
+   */
+  lockTranslations?: boolean
+
+  /**
+   * Allow rotation of this rigid-body only along specific axes.
+   */
+  enabledRotations?: Boolean3Array
+
+  /**
+   * Allow rotation of this rigid-body only along specific axes.
+   */
+  enabledTranslations?: Boolean3Array
 }
 
 // Joints
