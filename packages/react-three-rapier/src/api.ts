@@ -208,6 +208,7 @@ export interface WorldApi {
   ): ImpulseJoint;
   removeImpulseJoint(joint: ImpulseJoint): void;
   forEachCollider(callback: (collider: Collider) => void): void;
+  setGravity(gravity: Vector3): void;
 }
 
 export const createWorldApi = (ref: RefGetter<World>): WorldApi => {
@@ -233,6 +234,8 @@ export const createWorldApi = (ref: RefGetter<World>): WorldApi => {
       ref.current()!.removeImpulseJoint(joint, true),
     forEachCollider: (callback: (collider: Collider) => void) =>
       ref.current()!.forEachCollider(callback),
+    setGravity: ({ x, y, z }: Vector3) =>
+      (ref.current()!.gravity = { x, y, z }),
   };
 };
 

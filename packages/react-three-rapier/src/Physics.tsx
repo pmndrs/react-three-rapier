@@ -43,12 +43,14 @@ interface RapierWorldProps {
   gravity?: Vector3Array;
   colliders?: RigidBodyAutoCollider
   children: ReactNode;
+  timeStep?: number | 'vary'
 }
 
 export const Physics: FC<RapierWorldProps> = ({
   colliders = 'cuboid',
   gravity = [0, -9.81, 0],
-  children
+  children,
+  timeStep = 'vary'
 }) => {
   const rapier = useAsset(importRapier);
 
@@ -78,6 +80,14 @@ export const Physics: FC<RapierWorldProps> = ({
     }
   }, [])
 
+  // Update gravity
+  useEffect(() => {
+    const world = worldRef.current
+    if (world) {
+      world.gravity = vectorArrayToObject(gravity)
+    }
+  }, [gravity])
+
   const time = useRef(performance.now());
 
   useFrame((context) => {
@@ -89,7 +99,12 @@ export const Physics: FC<RapierWorldProps> = ({
     const now = performance.now();
     const delta = Math.min(100, now - time.current);
 
-    world.timestep = delta / 1000;
+    if (timeStep === 'vary') {
+      world.timestep = delta / 1000;
+    } else {
+      world.timestep = timeStep
+    }
+
     world.step(eventQueue);
 
     // Update meshes

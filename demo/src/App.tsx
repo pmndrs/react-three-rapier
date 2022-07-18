@@ -5,8 +5,8 @@ import {
   useContextBridge,
 } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
-import { ReactNode, Suspense, useState } from "react";
-import { Physics, RigidBody } from "@react-three/rapier";
+import { ReactNode, Suspense, useEffect, useRef, useState } from "react";
+import { Physics, RigidBody, useRapier } from "@react-three/rapier";
 import Joints from "./joints/Joints";
 import Shapes from "./shapes/Shapes";
 import { ComponentsExample } from "./components/Components";
@@ -56,7 +56,6 @@ export const App = () => {
     UNSAFE_NavigationContext,
     UNSAFE_RouteContext
   );
-  const location = useLocation();
 
   return (
     <div
