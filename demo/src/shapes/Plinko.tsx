@@ -34,7 +34,6 @@ export default function Plinko({ ...props }: JSX.IntrinsicElements["group"]) {
   return (
     <group ref={group} {...props} dispose={null} rotation={[0, -1, 0]}>
       <RigidBody type="fixed" colliders="trimesh">
-        <group position={[0, 0, -.4]} rotation={[-.1, 0, 0]}>
           <mesh
             geometry={nodes.plinko.geometry}
             material={materials.blue}
@@ -44,7 +43,6 @@ export default function Plinko({ ...props }: JSX.IntrinsicElements["group"]) {
             rotation={[0, 0, .2]}
             position={[0, 7.58, -1.06]}
           />
-        </group>
       </RigidBody>
       <RigidBody type="fixed" colliders={'trimesh'}>
         <mesh
