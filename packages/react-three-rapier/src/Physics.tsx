@@ -40,9 +40,32 @@ type EventMap = Map<
 >;
 
 interface RapierWorldProps {
-  gravity?: Vector3Array;
-  colliders?: RigidBodyAutoCollider
   children: ReactNode;
+  /**
+   * Set the gravity of the physics world
+   * @defaultValue [0, -9.81, 0]
+   */
+  gravity?: Vector3Array;
+
+  /**
+   * Set the base automatic colliders for this physics world
+   * All Meshes inside RigidBodies will generate a collider
+   * based on this value, if not overridden.
+   */
+  colliders?: RigidBodyAutoCollider
+
+  /**
+   * Set the timestep for the simulation.
+   * Setting this to a number (eg. 1/60) will run the
+   * simulation at that framerate.
+   * 
+   * "vary" will run the simulation at a delta-value based
+   * on the users current framerate. This ensures simulations
+   * run at the same percieved speed at all framerates, but
+   * can also lead to instability.
+   * 
+   * @defaultValue "vary"
+   */
   timeStep?: number | 'vary'
 }
 
