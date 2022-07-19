@@ -1,11 +1,7 @@
 import React, { useMemo, useState } from "react";
 
 import { Box, Clone, Sphere, useGLTF } from "@react-three/drei";
-import {
-  RigidBody,
-  RigidBodyAutoCollider,
-  TrimeshCollider,
-} from "@react-three/rapier";
+import { RigidBody, TrimeshCollider } from "@react-three/rapier";
 import { GroupProps, Object3DNode, useFrame } from "@react-three/fiber";
 import { Mesh } from "three";
 import { Demo } from "../App";

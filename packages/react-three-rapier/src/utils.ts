@@ -6,7 +6,7 @@ import {
   RigidBody,
 } from "@dimforge/rapier3d-compat";
 
-import { Mesh, Object3D, Quaternion, Vector3 } from "three";
+import { Euler, Mesh, Object3D, Quaternion, Vector3 } from "three";
 import {
   RigidBodyShape,
   RigidBodyTypeString,
@@ -227,4 +227,10 @@ export const scaleVertices = (vertices: ArrayLike<number>, scale: Vector3) => {
   }
 
   return scaledVerts;
+};
+
+const quaternion = new Quaternion();
+const euler = new Euler();
+export const vector3ToQuaternion = (v: Vector3) => {
+  return quaternion.setFromEuler(euler.setFromVector3(v));
 };

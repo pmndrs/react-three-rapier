@@ -104,6 +104,7 @@ export type RigidBodyShape =
   | "roundConvexMesh";
 
 export type Vector3Array = [x: number, y: number, z: number];
+export type Boolean3Array = [x: boolean, y: boolean, z: boolean];
 
 export interface UseColliderOptions<A> {
   /**
@@ -248,6 +249,26 @@ export interface UseRigidBodyOptions {
   onSleep?(): void
 
   onWake?(): void
+
+  /**
+   * Locks all rotations that would have resulted from forces on the created rigid-body.
+   */
+  lockRotations?: boolean
+
+  /**
+   * Locks all translations that would have resulted from forces on the created rigid-body.
+   */
+  lockTranslations?: boolean
+
+  /**
+   * Allow rotation of this rigid-body only along specific axes.
+   */
+  enabledRotations?: Boolean3Array
+
+  /**
+   * Allow rotation of this rigid-body only along specific axes.
+   */
+  enabledTranslations?: Boolean3Array
 }
 
 // Joints
@@ -272,13 +293,14 @@ export type PrismaticJointParams = [
 
 export type RevoluteJointParams = [
   body1Anchor: Vector3Array,
-  body1LocalFrame: Vector3Array,
   body2Anchor: Vector3Array,
-  body2LocalFrame: Vector3Array
+  axis: Vector3Array
 ];
 
+export type RigidBodyApiRef = MutableRefObject<undefined | null | RigidBodyApi>
+
 export interface UseImpulseJoint<P> {
-  (body1: MutableRefObject<RapierRigidBody | undefined | null>, body2: MutableRefObject<RapierRigidBody | undefined | null>, params: P): JointApi;
+  (body1: RigidBodyApiRef, body2: RigidBodyApiRef, params: P): JointApi;
 }
 
 export type RigidBodyApi = ReturnType<typeof createRigidBodyApi>;

@@ -7,7 +7,7 @@ import {
   useContext,
   useImperativeHandle,
 } from "react";
-import { Group, Object3D, Vector3 } from "three";
+import { Object3D, Vector3 } from "three";
 import { useRapier, useRigidBody } from "./hooks";
 import {
   BallArgs,
@@ -23,7 +23,7 @@ import {
   UseColliderOptions,
   UseRigidBodyOptions,
 } from "./types";
-import { createColliderFromOptions, scaleVertices } from "./utils";
+import { createColliderFromOptions } from "./utils";
 
 const RigidBodyContext = createContext<
   [ref: MutableRefObject<Object3D>, api: RigidBodyApi, hasCollisionEvents: boolean]

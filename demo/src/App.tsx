@@ -5,8 +5,8 @@ import {
   useContextBridge,
 } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
-import { ReactNode, Suspense, useState } from "react";
-import { Physics, RigidBody } from "@react-three/rapier";
+import { ReactNode, Suspense, useEffect, useRef, useState } from "react";
+import { Physics, RigidBody, useRapier } from "@react-three/rapier";
 import Joints from "./joints/Joints";
 import Shapes from "./shapes/Shapes";
 import { ComponentsExample } from "./components/Components";
@@ -26,6 +26,7 @@ import {
   useLocation,
 } from "react-router-dom";
 import { ApiUsage } from "./api-usage/ApiUsage";
+import { Kinematics } from "./kinematics/Kinematics";
 
 export interface Demo {
   (props: {
@@ -56,7 +57,6 @@ export const App = () => {
     UNSAFE_NavigationContext,
     UNSAFE_RouteContext
   );
-  const location = useLocation();
 
   return (
     <div
@@ -106,6 +106,10 @@ export const App = () => {
                 />
                 <Route path="car" element={<Car setUI={setUI} />} />
                 <Route path="api-usage" element={<ApiUsage setUI={setUI} />} />
+                <Route
+                  path="kinematics"
+                  element={<Kinematics setUI={setUI} />}
+                />
               </Routes>
 
               <Floor />
@@ -132,6 +136,7 @@ export const App = () => {
         <Link to="all-shapes">All Shapes</Link>
         <Link to="transforms">Inherited Transforms</Link>
         <Link to="api-usage">API usage</Link>
+        <Link to="kinematics">Kinematics</Link>
       </div>
 
       <div

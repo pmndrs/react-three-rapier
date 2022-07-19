@@ -134,7 +134,7 @@ return (
       colliders="hull"
       onSleep={() => setIsAsleep(true)}
       onWake={() => setIsAsleep(false)}
-      onCollision={({manifold}) => {
+      onCollisionEnter={({manifold}) => {
         console.log('Collision at world position ', manifold.solverContactPoint(0))
       }}
     >
@@ -146,24 +146,9 @@ return (
 }
 ```
 
-## Hooks
+## Joints
 
-You can also use hooks to generate rigid bodies and colliders, but it's not encouraged.
-
-```tsx
-import { Box } from "@react-three/drei";
-import { useCuboid } from "@react-three/rapier";
-
-const RigidBox = () => {
-  // Generates a RigidBody and attaches a BoxCollider to it, returns a ref
-  const [box, rigidBody, collider] = useCuboid(
-    { position: [1, 1, 1] },
-    { args: [0.5, 0.5, 0.5] }
-  );
-
-  return <Box ref={box} />;
-};
-```
+WIP
 
 ## Roadmap?
 
@@ -174,8 +159,9 @@ In order, but also not necessarily:
 - [x] Nested objects retain world transforms
 - [x] Nested objects retain correct collider scale
 - [x] Automatic colliders based on rigidbody children
-- [ ] Translation and rotational constraints
+- [x] Translation and rotational constraints
 - [x] Collision events
+- [ ] Colliders outside RigidBodies
 - [ ] InstancedMesh support
 - [ ] Docs
 - [ ] CodeSandbox examples

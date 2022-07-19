@@ -8,8 +8,9 @@ import {
   RigidBodyDesc,
   World,
 } from "@dimforge/rapier3d-compat";
-import { Quaternion, Vector3 } from "three";
+import { Euler, Quaternion, Vector3 } from "three";
 import { RefGetter } from "./types";
+import { vector3ToQuaternion } from "./utils";
 
 type Vector3Object = { x: number; y: number; z: number };
 
@@ -122,6 +123,26 @@ export interface RigidBodyApi {
    * Resets to zero the user torques applied to this rigid-body.
    */
   resetTorques(): void;
+
+  /**
+   * Locks or unlocks the ability of this rigid-body to rotate.
+   */
+  lockRotations(locked: boolean): void;
+
+  /**
+   * Locks or unlocks the ability of this rigid-body to translate.
+   */
+  lockTranslations(locked: boolean): void;
+
+  /**
+   * Locks or unlocks the ability of this rigid-body to rotate along individual coordinate axes.
+   */
+  setEnabledRotations(x: boolean, y: boolean, z: boolean): void;
+
+  /**
+   * Locks or unlocks the ability of this rigid-body to translate along individual coordinate axes.
+   */
+  setEnabledTranslations(x: boolean, y: boolean, z: boolean): void;
 }
 
 export const createRigidBodyApi = (ref: RefGetter<RigidBody>): RigidBodyApi => {
@@ -170,16 +191,25 @@ export const createRigidBodyApi = (ref: RefGetter<RigidBody>): RigidBodyApi => {
     },
     setAngvel: (velocity) => ref.current()!.setAngvel(velocity, true),
 
-    setNextKinematicRotation: (rotation) =>
-      ref.current()!.setNextKinematicRotation({
-        ...rotation,
-        w: 1,
-      }),
+    setNextKinematicRotation: ({ x, y, z }) => {
+      const q = vector3ToQuaternion(new Vector3(x, y, z));
+      ref
+        .current()!
+        .setNextKinematicRotation({ x: q.x, y: q.y, z: q.z, w: q.w });
+    },
     setNextKinematicTranslation: (translation) =>
       ref.current()!.setNextKinematicTranslation(translation),
 
     resetForces: () => ref.current()!.resetForces(true),
     resetTorques: () => ref.current()!.resetTorques(true),
+
+    lockRotations: (locked) => ref.current()!.lockRotations(locked, true),
+    lockTranslations: (locked) => ref.current()!.lockTranslations(locked, true),
+
+    setEnabledRotations: (x, y, z) =>
+      ref.current()!.setEnabledRotations(x, y, z, true),
+    setEnabledTranslations: (x, y, z) =>
+      ref.current()!.setEnabledTranslations(x, y, z, true),
   };
 };
 
@@ -208,6 +238,7 @@ export interface WorldApi {
   ): ImpulseJoint;
   removeImpulseJoint(joint: ImpulseJoint): void;
   forEachCollider(callback: (collider: Collider) => void): void;
+  setGravity(gravity: Vector3): void;
 }
 
 export const createWorldApi = (ref: RefGetter<World>): WorldApi => {
@@ -233,6 +264,8 @@ export const createWorldApi = (ref: RefGetter<World>): WorldApi => {
       ref.current()!.removeImpulseJoint(joint, true),
     forEachCollider: (callback: (collider: Collider) => void) =>
       ref.current()!.forEachCollider(callback),
+    setGravity: ({ x, y, z }: Vector3) =>
+      (ref.current()!.gravity = { x, y, z }),
   };
 };
 

@@ -40,15 +40,40 @@ type EventMap = Map<
 >;
 
 interface RapierWorldProps {
-  gravity?: Vector3Array;
-  colliders?: RigidBodyAutoCollider
   children: ReactNode;
+  /**
+   * Set the gravity of the physics world
+   * @defaultValue [0, -9.81, 0]
+   */
+  gravity?: Vector3Array;
+
+  /**
+   * Set the base automatic colliders for this physics world
+   * All Meshes inside RigidBodies will generate a collider
+   * based on this value, if not overridden.
+   */
+  colliders?: RigidBodyAutoCollider
+
+  /**
+   * Set the timestep for the simulation.
+   * Setting this to a number (eg. 1/60) will run the
+   * simulation at that framerate.
+   * 
+   * "vary" will run the simulation at a delta-value based
+   * on the users current framerate. This ensures simulations
+   * run at the same percieved speed at all framerates, but
+   * can also lead to instability.
+   * 
+   * @defaultValue "vary"
+   */
+  timeStep?: number | 'vary'
 }
 
 export const Physics: FC<RapierWorldProps> = ({
   colliders = 'cuboid',
   gravity = [0, -9.81, 0],
-  children
+  children,
+  timeStep = 'vary'
 }) => {
   const rapier = useAsset(importRapier);
 
@@ -78,6 +103,14 @@ export const Physics: FC<RapierWorldProps> = ({
     }
   }, [])
 
+  // Update gravity
+  useEffect(() => {
+    const world = worldRef.current
+    if (world) {
+      world.gravity = vectorArrayToObject(gravity)
+    }
+  }, [gravity])
+
   const time = useRef(performance.now());
 
   useFrame((context) => {
@@ -89,7 +122,12 @@ export const Physics: FC<RapierWorldProps> = ({
     const now = performance.now();
     const delta = Math.min(100, now - time.current);
 
-    world.timestep = delta / 1000;
+    if (timeStep === 'vary') {
+      world.timestep = delta / 1000;
+    } else {
+      world.timestep = timeStep
+    }
+
     world.step(eventQueue);
 
     // Update meshes
