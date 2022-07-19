@@ -23,6 +23,7 @@ import {
   UseColliderOptions,
   RapierRigidBody,
   RigidBodyApi,
+  RigidBodyApiRef,
 } from "./types";
 
 import {
@@ -184,8 +185,8 @@ interface UseImpulseJointState<T> {
 }
 
 export const useImpulseJoint = <T extends ImpulseJoint>(
-  body1: MutableRefObject<RapierRigidBody | undefined | null> | RigidBodyApi,
-  body2: MutableRefObject<RapierRigidBody | undefined | null> | RigidBodyApi,
+  body1: RigidBodyApiRef,
+  body2: RigidBodyApiRef,
   params: Rapier.JointData
 ) => {
   const { world } = useRapier();
@@ -195,17 +196,6 @@ export const useImpulseJoint = <T extends ImpulseJoint>(
     if (!jointRef.current) {
       let rb1: RapierRigidBody;
       let rb2: RapierRigidBody;
-
-      if ('handle' in body1 && 'handle' in body2) {
-        rb1 = world.getRigidBody(body1.handle)!;
-        rb2 = world.getRigidBody(body2.handle)!;
-
-        jointRef.current = world.createImpulseJoint(
-          params,
-          rb1,
-          rb2
-        ) as T;
-      }
 
       if ('current' in body1 && body1.current && 'current' in body2 && body2.current) {
         rb1 = world.getRigidBody(body1.current.handle)!;
@@ -305,7 +295,7 @@ export const useRevoluteJoint: UseImpulseJoint<RevoluteJointParams> = (
     rapier.JointData.revolute(
       vectorArrayToObject(body1Anchor),
       vectorArrayToObject(body2Anchor),
-      vectorArrayToObject(axis)
+      vectorArrayToObject(axis),
     )
   );
 };

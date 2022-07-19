@@ -293,13 +293,14 @@ export type PrismaticJointParams = [
 
 export type RevoluteJointParams = [
   body1Anchor: Vector3Array,
-  body1LocalFrame: Vector3Array,
   body2Anchor: Vector3Array,
-  body2LocalFrame: Vector3Array
+  axis: Vector3Array
 ];
 
+export type RigidBodyApiRef = MutableRefObject<undefined | null | RigidBodyApi>
+
 export interface UseImpulseJoint<P> {
-  (body1: MutableRefObject<RapierRigidBody | undefined | null>, body2: MutableRefObject<RapierRigidBody | undefined | null>, params: P): JointApi;
+  (body1: RigidBodyApiRef, body2: RigidBodyApiRef, params: P): JointApi;
 }
 
 export type RigidBodyApi = ReturnType<typeof createRigidBodyApi>;
