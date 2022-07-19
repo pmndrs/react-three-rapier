@@ -3,12 +3,14 @@ import { createRef, forwardRef, ReactNode, useEffect, useRef } from "react";
 import {
   RigidBody,
   RigidBodyApi,
+  RigidBodyApiRef,
   RigidBodyTypeString,
   useSphericalJoint,
   Vector3Array,
 } from "@react-three/rapier";
 import { useImperativeHandle } from "react";
 import { useFrame } from "@react-three/fiber";
+import { Demo } from "../App";
 
 const ShadowElement = forwardRef((_, ref) => (
   <Sphere castShadow ref={ref} args={[0.5]}>
@@ -32,17 +34,15 @@ const RopeSegment = forwardRef(
     const rb = useRef<RigidBodyApi>(null);
     useImperativeHandle(ref, () => rb.current);
 
-    const RopeLink = component;
-
     return (
       <RigidBody ref={rb} type={type} position={position}>
-        <RopeLink />
+        {component}
       </RigidBody>
     );
   }
 );
 
-const RopeJoint = ({ a, b }) => {
+const RopeJoint = ({ a, b }: { a: RigidBodyApiRef; b: RigidBodyApiRef }) => {
   const joint = useSphericalJoint(a, b, [
     [-0.5, 0, 0],
     [0.5, 0, 0],
@@ -50,11 +50,7 @@ const RopeJoint = ({ a, b }) => {
   return null;
 };
 
-const Rope = (props: {
-  component: ReactNode;
-  anchor: Vector3Array;
-  length: number;
-}) => {
+const Rope = (props: { component: ReactNode; length: number }) => {
   const refs = useRef(
     Array.from({ length: props.length }).map(() => createRef<RigidBodyApi>())
   );
@@ -75,7 +71,7 @@ const Rope = (props: {
           ref={ref}
           key={i}
           position={[i * 1, 0, 0]}
-          component={ShadowElement}
+          component={<ShadowElement />}
           type={i === 0 ? "kinematicPosition" : "dynamic"}
         />
       ))}
@@ -89,12 +85,14 @@ const Rope = (props: {
   );
 };
 
-const Joints = ({ setUI }) => {
-  setUI();
+const Joints: Demo = ({ setUI }) => {
+  useEffect(() => {
+    setUI("");
+  }, []);
 
   return (
     <group>
-      <Rope length={40} component={ShadowElement} />
+      <Rope length={40} component={<ShadowElement />} />
     </group>
   );
 };
