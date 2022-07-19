@@ -1,5 +1,20 @@
 # @react-three/rapier
 
+## 0.5.0
+
+### Minor Changes
+
+- a3be5f6: Remove hooks api in favor of better fleshed out components
+
+### Patch Changes
+
+- a3be5f6: Update types for Joints -- now only allow RefObjects of RigidBodyApi
+- a3be5f6: Fix setKinematicRotation (convert Vector3 to Quaternion)
+- a3be5f6: Update to @dimforge/rapier3d-compat@0.9.0
+- a3be5f6: Allow setting the physics timeStep
+- a3be5f6: Add rotational and transitional constraits to RigidBody
+- a3be5f6: Allow updating the gravity at runtime
+
 ## 0.4.3
 
 ### Patch Changes
