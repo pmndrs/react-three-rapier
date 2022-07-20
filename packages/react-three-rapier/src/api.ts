@@ -178,8 +178,10 @@ export const createRigidBodyApi = (ref: RefGetter<RigidBody>): RigidBodyApi => {
       const { x, y, z, w } = ref.current()!.rotation();
       return new Quaternion(x, y, z, w);
     },
-    setRotation: (rotation) =>
-      ref.current()!.setRotation({ ...rotation, w: 1 }, true),
+    setRotation: ({ x, y, z }) => {
+      const q = vector3ToQuaternion(new Vector3(x, y, z));
+      ref.current()!.setRotation({ x: q.x, y: q.y, z: q.z, w: q.w }, true);
+    },
     linvel() {
       const { x, y, z } = ref.current()!.linvel();
       return new Vector3(x, y, z);
