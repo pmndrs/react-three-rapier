@@ -60,16 +60,36 @@ Turn off automatic collider generation globally, but apply auto generation local
 ```tsx
 const Scene = () => (
   <Physics colliders={false}>
+    {/* Use an automatic CuboidCollider for all meshes inside this RigidBody */}
     <RigidBody colliders="cuboid">
       <Box />
     </RigidBody>
 
+    {/* Use an automatic BallCollider for all meshes inside this RigidBody */}
     <RigidBody position={[0, 10, 0]} colliders="ball">
       <Sphere />
     </RigidBody>
 
+    {/* Make a compound shape with two custom BallColliders */}
     <RigidBody position={[0, 10, 0]}>
       <Sphere />
+      <BallCollider args={0.5} />
+      <BallCollider args={0.5} position={[1, 0, 0]} />
+    </RigidBody>
+
+    {/* Make a compound shape with two custom BallColliders, an automatic BallCollider,
+        Two automatic MeshColliders, based on two different shape strategies */}
+    <RigidBody position={[0, 10, 0]} colliders='ball'>
+      <MeshCollider type="trimesh">
+        <mesh ... />
+      </MeshCollider>
+
+      <MeshCollider type="hull">
+        <mesh ... />
+      </MeshCollider>
+
+      <Sphere />
+
       <BallCollider args={0.5} />
       <BallCollider args={0.5} position={[1, 0, 0]} />
     </RigidBody>

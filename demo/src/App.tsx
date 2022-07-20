@@ -27,6 +27,7 @@ import {
 } from "react-router-dom";
 import { ApiUsage } from "./api-usage/ApiUsage";
 import { Kinematics } from "./kinematics/Kinematics";
+import { MeshColliderTest } from "./mesh-collider-test/MeshColliderTest";
 
 export interface Demo {
   (props: {
@@ -110,6 +111,10 @@ export const App = () => {
                   path="kinematics"
                   element={<Kinematics setUI={setUI} />}
                 />
+                <Route
+                  path="mesh-collider-test"
+                  element={<MeshColliderTest setUI={setUI} />}
+                />
               </Routes>
 
               <Floor />
@@ -137,6 +142,7 @@ export const App = () => {
         <Link to="transforms">Inherited Transforms</Link>
         <Link to="api-usage">API usage</Link>
         <Link to="kinematics">Kinematics</Link>
+        <Link to="mesh-collider-test">MeshCollider</Link>
       </div>
 
       <div

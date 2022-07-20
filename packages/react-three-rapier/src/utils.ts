@@ -8,6 +8,7 @@ import {
 
 import { Euler, Mesh, Object3D, Quaternion, Vector3 } from "three";
 import {
+  RigidBodyApi,
   RigidBodyShape,
   RigidBodyTypeString,
   UseColliderOptions,
@@ -117,11 +118,21 @@ export const createColliderFromOptions = <A>(
   return collider;
 };
 
+const isChildOfMeshCollider = (child: Mesh) => {
+  let flag = false;
+  child.traverseAncestors((a) => {
+    console.log(a);
+    if (a.userData.r3RapierType === "MeshCollider") flag = true;
+  });
+  return flag;
+};
+
 export const createCollidersFromChildren = (
   object: Object3D,
-  rigidBody: RigidBody,
+  rigidBody: RigidBodyApi,
   options: UseRigidBodyOptions,
-  world: WorldApi
+  world: WorldApi,
+  ignoreMeshColliders = true
 ) => {
   const hasCollisionEvents = !!(
     options.onCollisionEnter || options.onCollisionExit
@@ -133,6 +144,8 @@ export const createCollidersFromChildren = (
 
   object.traverse((child: Object3D | Mesh) => {
     if ("isMesh" in child) {
+      if (ignoreMeshColliders && isChildOfMeshCollider(child)) return;
+
       const { geometry } = child;
       const { x, y, z } = child.position;
       const { x: rx, y: ry, z: rz, w: rw } = new Quaternion().setFromEuler(
@@ -209,7 +222,8 @@ export const createCollidersFromChildren = (
       if (Number.isFinite(options.restitution))
         desc.setRestitution(options.restitution as number);
 
-      const collider = world.createCollider(desc, rigidBody);
+      const actualRigidBody = world.getRigidBody(rigidBody?.handle)!;
+      const collider = world.createCollider(desc, actualRigidBody);
       colliders.push(collider);
     }
   });
