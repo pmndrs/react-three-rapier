@@ -1,5 +1,11 @@
 # @react-three/rapier
 
+## 0.5.1
+
+### Patch Changes
+
+- c36be39: Add MeshCollider, allowing more fine control over automatic collider creation
+
 ## 0.5.0
 
 ### Minor Changes
