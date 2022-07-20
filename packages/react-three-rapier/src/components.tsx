@@ -1,3 +1,4 @@
+import { Collider } from "@dimforge/rapier3d-compat";
 import React, { MutableRefObject, useEffect, useRef } from "react";
 
 import {
@@ -18,15 +19,16 @@ import {
   CylinderArgs,
   HeightfieldArgs,
   RigidBodyApi,
+  RigidBodyAutoCollider,
   RoundCuboidArgs,
   TrimeshArgs,
   UseColliderOptions,
   UseRigidBodyOptions,
 } from "./types";
-import { createColliderFromOptions } from "./utils";
+import { createColliderFromOptions, createCollidersFromChildren } from "./utils";
 
 const RigidBodyContext = createContext<
-  [ref: MutableRefObject<Object3D>, api: RigidBodyApi, hasCollisionEvents: boolean]
+  [ref: MutableRefObject<Object3D>, api: RigidBodyApi, hasCollisionEvents: boolean, options: UseRigidBodyOptions]
 >(undefined!);
 
 const useRigidBodyContext = () => useContext(RigidBodyContext);
@@ -43,12 +45,52 @@ export const RigidBody = forwardRef<RigidBodyApi, RigidBodyProps>(
     useImperativeHandle(ref, () => rigidBody);
 
     return (
-      <RigidBodyContext.Provider value={[object, rigidBody, !!(props.onCollisionEnter || props.onCollisionExit)]}>
+      <RigidBodyContext.Provider value={[object, rigidBody, !!(props.onCollisionEnter || props.onCollisionExit), props]}>
         <object3D ref={object}>{children}</object3D>
       </RigidBodyContext.Provider>
     );
   }
 );
+
+interface MeshColliderProps {
+  children: ReactNode
+  type: RigidBodyAutoCollider
+}
+
+export const MeshCollider = ({
+  children,
+  type
+}: MeshColliderProps) => {
+  const {physicsOptions, world} = useRapier()
+  const object = useRef<Object3D>(null)
+  const [, rigidBody, hasCollisionEvents, rigidBodyOptions] = useRigidBodyContext();
+
+  useEffect(() => {
+    let autoColliders:Collider[] = []
+
+    if (object.current) {
+      const colliderSetting = type ?? physicsOptions.colliders ?? false;
+      autoColliders = colliderSetting !== false ? createCollidersFromChildren(object.current, 
+        rigidBody, 
+        {...rigidBodyOptions, colliders: colliderSetting}, 
+        world, 
+        false
+      ) : []
+    }
+
+    return () => {
+      autoColliders.forEach(collider => {
+        world.removeCollider(collider)
+      })
+    }
+  }, [])
+
+  return <object3D ref={object} userData={{
+    r3RapierType: 'MeshCollider'
+  }}>
+    {children}
+  </object3D>
+}
 
 // Colliders
 const AnyCollider = ({
