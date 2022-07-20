@@ -8,7 +8,7 @@ import {
   RigidBodyDesc,
   World,
 } from "@dimforge/rapier3d-compat";
-import { Euler, Quaternion, Vector3 } from "three";
+import { Quaternion, Vector3 } from "three";
 import { RefGetter } from "./types";
 import { vector3ToQuaternion } from "./utils";
 
@@ -230,7 +230,7 @@ export interface WorldApi {
   getCollider(handle: number): Collider | undefined;
   getRigidBody(handle: number): RigidBody | undefined;
   createRigidBody(desc: RigidBodyDesc): RigidBody;
-  createCollider(desc: ColliderDesc, rigidBody: RigidBody): Collider;
+  createCollider(desc: ColliderDesc, parent?: RigidBody): Collider;
   removeRigidBody(rigidBody: RigidBody): void;
   removeCollider(collider: Collider): void;
   createImpulseJoint(

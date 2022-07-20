@@ -70,7 +70,12 @@ export const MeshCollider = ({
 
     if (object.current) {
       const colliderSetting = type ?? physicsOptions.colliders ?? false;
-      autoColliders = colliderSetting !== false ? createCollidersFromChildren(object.current, rigidBody, {...rigidBodyOptions, colliders: colliderSetting}, world, false) : []
+      autoColliders = colliderSetting !== false ? createCollidersFromChildren(object.current, 
+        rigidBody, 
+        {...rigidBodyOptions, colliders: colliderSetting}, 
+        world, 
+        false
+      ) : []
     }
 
     return () => {

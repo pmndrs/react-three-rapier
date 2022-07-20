@@ -60,7 +60,7 @@ export const scaleColliderArgs = (
 export const createColliderFromOptions = <A>(
   options: UseColliderOptions<A>,
   world: WorldApi,
-  rigidBody: RigidBody,
+  rigidBody?: RigidBody,
   scale = { x: 1, y: 1, z: 1 },
   hasCollisionEvents: boolean = false
 ) => {
