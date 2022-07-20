@@ -119,12 +119,10 @@ export const createColliderFromOptions = <A>(
 };
 
 const isChildOfMeshCollider = (child: Mesh) => {
-  let flag = false;
   child.traverseAncestors((a) => {
-    console.log(a);
-    if (a.userData.r3RapierType === "MeshCollider") flag = true;
+    if (a.userData.r3RapierType === "MeshCollider") return true;
   });
-  return flag;
+  return false;
 };
 
 export const createCollidersFromChildren = (
