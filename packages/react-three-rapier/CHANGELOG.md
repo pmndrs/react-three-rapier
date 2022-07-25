@@ -1,5 +1,12 @@
 # @react-three/rapier
 
+## 0.5.2
+
+### Patch Changes
+
+- 2b16541: Fix colliders with initial rotations
+- 2b16541: Allow shape Colliders to be created outside RigidBodies
+
 ## 0.5.1
 
 ### Patch Changes
