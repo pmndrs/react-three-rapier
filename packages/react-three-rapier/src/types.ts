@@ -4,22 +4,27 @@ import {
   CoefficientCombineRule,
   RigidBody as RapierRigidBody,
   Collider as RapierCollider,
-  TempContactManifold
+  TempContactManifold,
 } from "@dimforge/rapier3d-compat";
-import { createColliderApi, createJointApi, createRigidBodyApi, createWorldApi } from "./api";
+import {
+  createColliderApi,
+  createJointApi,
+  createRigidBodyApi,
+  createWorldApi,
+} from "./api";
 
-export {
-  RapierRigidBody,
-  RapierCollider
-}
+export { RapierRigidBody, RapierCollider };
 
-export {
-  CoefficientCombineRule as CoefficientCombineRule,
-} from "@dimforge/rapier3d-compat";
+export { CoefficientCombineRule as CoefficientCombineRule } from "@dimforge/rapier3d-compat";
 
-export type RefGetter<T> = MutableRefObject<() => T | undefined>
+export type RefGetter<T> = MutableRefObject<() => T | undefined>;
 
-export type RigidBodyAutoCollider = 'ball' | 'cuboid' | 'hull' | 'trimesh' | false
+export type RigidBodyAutoCollider =
+  | "ball"
+  | "cuboid"
+  | "hull"
+  | "trimesh"
+  | false;
 
 export interface UseRigidBodyAPI {
   rigidBody: RapierRigidBody;
@@ -106,7 +111,7 @@ export type RigidBodyShape =
 export type Vector3Array = [x: number, y: number, z: number];
 export type Boolean3Array = [x: boolean, y: boolean, z: boolean];
 
-export interface UseColliderOptions<A> {
+export interface UseColliderOptions<ColliderArgs> {
   /**
    * The shape of your collider
    */
@@ -115,7 +120,7 @@ export interface UseColliderOptions<A> {
   /**
    * Arguments to pass to the collider
    */
-  args?: A;
+  args?: ColliderArgs;
 
   /**
    * The mass of this rigid body.
@@ -216,59 +221,63 @@ export interface UseRigidBodyOptions {
   /**
    * Automatically generate colliders based on meshes inside this
    * rigid body.
-   * 
+   *
    * You can change the default setting globally by setting the colliders
    * prop on the <Physics /> component.
-   * 
+   *
    * Setting this to false will disable automatic colliders.
    */
-  colliders?: RigidBodyAutoCollider | false
+  colliders?: RigidBodyAutoCollider | false;
 
   /**
    * Set the friction of auto-generated colliders.
    * This does not affect any non-automatic child collider-components.
    */
-  friction?: number,
+  friction?: number;
 
   /**
    * Set the restitution (bounciness) of auto-generated colliders.
    * This does not affect any non-automatic child collider-components.
    */
-  restitution?: number
+  restitution?: number;
 
   /**
    * Callback when this rigidbody collides with another rigidbody
    */
-  onCollisionEnter?({}: {target: RapierRigidBody, manifold: TempContactManifold, flipped: boolean}): void;
+  onCollisionEnter?({}: {
+    target: RapierRigidBody;
+    manifold: TempContactManifold;
+    flipped: boolean;
+  }): void;
 
   /**
    * Callback when this rigidbody stops colliding with another rigidbody
    */
-  onCollisionExit?({}: {target: RapierRigidBody}): void;
+  onCollisionExit?({}: { target: RapierRigidBody }): void;
 
-  onSleep?(): void
+  onSleep?(): void;
 
-  onWake?(): void
+  onWake?(): void;
 
   /**
    * Locks all rotations that would have resulted from forces on the created rigid-body.
    */
-  lockRotations?: boolean
+  lockRotations?: boolean;
 
   /**
    * Locks all translations that would have resulted from forces on the created rigid-body.
    */
-  lockTranslations?: boolean
+  lockTranslations?: boolean;
 
   /**
    * Allow rotation of this rigid-body only along specific axes.
    */
-  enabledRotations?: Boolean3Array
+  enabledRotations?: Boolean3Array;
 
   /**
    * Allow rotation of this rigid-body only along specific axes.
    */
-  enabledTranslations?: Boolean3Array
+  enabledTranslations?: Boolean3Array;
 }
 
 // Joints
@@ -297,7 +306,7 @@ export type RevoluteJointParams = [
   axis: Vector3Array
 ];
 
-export type RigidBodyApiRef = MutableRefObject<undefined | null | RigidBodyApi>
+export type RigidBodyApiRef = MutableRefObject<undefined | null | RigidBodyApi>;
 
 export interface UseImpulseJoint<P> {
   (body1: RigidBodyApiRef, body2: RigidBodyApiRef, params: P): JointApi;

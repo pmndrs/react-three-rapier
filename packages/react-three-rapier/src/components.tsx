@@ -25,11 +25,17 @@ import {
   UseColliderOptions,
   UseRigidBodyOptions,
 } from "./types";
-import { createColliderFromOptions, createCollidersFromChildren } from "./utils";
+import {
+  createColliderFromOptions,
+  createCollidersFromChildren,
+} from "./utils";
 
-const RigidBodyContext = createContext<
-  [ref: MutableRefObject<Object3D>, api: RigidBodyApi, hasCollisionEvents: boolean, options: UseRigidBodyOptions]
->(undefined!);
+const RigidBodyContext = createContext<{
+  ref: MutableRefObject<Object3D>;
+  api: RigidBodyApi;
+  hasCollisionEvents: boolean;
+  options: UseRigidBodyOptions;
+}>(undefined!);
 
 const useRigidBodyContext = () => useContext(RigidBodyContext);
 
@@ -40,12 +46,21 @@ interface RigidBodyProps extends UseRigidBodyOptions {
 
 export const RigidBody = forwardRef<RigidBodyApi, RigidBodyProps>(
   ({ children, ...props }, ref) => {
-    const [object, rigidBody] = useRigidBody<Object3D>(props);
+    const [object, api] = useRigidBody<Object3D>(props);
 
-    useImperativeHandle(ref, () => rigidBody);
+    useImperativeHandle(ref, () => api);
 
     return (
-      <RigidBodyContext.Provider value={[object, rigidBody, !!(props.onCollisionEnter || props.onCollisionExit), props]}>
+      <RigidBodyContext.Provider
+        value={{
+          ref: object,
+          api,
+          hasCollisionEvents: !!(
+            props.onCollisionEnter || props.onCollisionExit
+          ),
+          options: props,
+        }}
+      >
         <object3D ref={object}>{children}</object3D>
       </RigidBodyContext.Provider>
     );
@@ -53,44 +68,53 @@ export const RigidBody = forwardRef<RigidBodyApi, RigidBodyProps>(
 );
 
 interface MeshColliderProps {
-  children: ReactNode
-  type: RigidBodyAutoCollider
+  children: ReactNode;
+  type: RigidBodyAutoCollider;
 }
 
-export const MeshCollider = ({
-  children,
-  type
-}: MeshColliderProps) => {
-  const {physicsOptions, world} = useRapier()
-  const object = useRef<Object3D>(null)
-  const [, rigidBody, hasCollisionEvents, rigidBodyOptions] = useRigidBodyContext();
+export const MeshCollider = ({ children, type }: MeshColliderProps) => {
+  const { physicsOptions, world } = useRapier();
+  const object = useRef<Object3D>(null);
+  const { api, options } = useRigidBodyContext();
 
   useEffect(() => {
-    let autoColliders:Collider[] = []
+    let autoColliders: Collider[] = [];
 
     if (object.current) {
       const colliderSetting = type ?? physicsOptions.colliders ?? false;
-      autoColliders = colliderSetting !== false ? createCollidersFromChildren(object.current, 
-        rigidBody, 
-        {...rigidBodyOptions, colliders: colliderSetting}, 
-        world, 
-        false
-      ) : []
+      autoColliders =
+        colliderSetting !== false
+          ? createCollidersFromChildren(
+              object.current,
+              api,
+              {
+                ...options,
+                colliders: colliderSetting,
+              },
+              world,
+              false
+            )
+          : [];
     }
 
     return () => {
-      autoColliders.forEach(collider => {
-        world.removeCollider(collider)
-      })
-    }
-  }, [])
+      autoColliders.forEach((collider) => {
+        world.removeCollider(collider);
+      });
+    };
+  }, []);
 
-  return <object3D ref={object} userData={{
-    r3RapierType: 'MeshCollider'
-  }}>
-    {children}
-  </object3D>
-}
+  return (
+    <object3D
+      ref={object}
+      userData={{
+        r3RapierType: "MeshCollider",
+      }}
+    >
+      {children}
+    </object3D>
+  );
+};
 
 // Colliders
 const AnyCollider = ({
@@ -98,19 +122,19 @@ const AnyCollider = ({
   ...props
 }: UseColliderOptions<any> & { children?: ReactNode }) => {
   const { world } = useRapier();
-  const [, rigidBody, hasCollisionEvents] = useRigidBodyContext();
+  const rigidBodyContext = useRigidBodyContext();
   const ref = useRef<Object3D>(null);
 
   useEffect(() => {
     const scale = ref.current!.getWorldScale(new Vector3());
 
-    const collider = createColliderFromOptions(
-      props,
+    const collider = createColliderFromOptions({
+      options: props,
       world,
-      rigidBody.raw(),
+      rigidBody: rigidBodyContext?.api?.raw(),
       scale,
-      hasCollisionEvents
-    );
+      hasCollisionEvents: rigidBodyContext?.hasCollisionEvents,
+    });
 
     return () => {
       world.removeCollider(collider);
