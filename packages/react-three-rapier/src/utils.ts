@@ -22,6 +22,12 @@ export const vectorArrayToObject = (arr: Vector3Array) => {
   return { x, y, z };
 };
 
+const quaternion = new Quaternion();
+const euler = new Euler();
+export const vector3ToQuaternion = (v: Vector3) => {
+  return quaternion.setFromEuler(euler.setFromVector3(v));
+};
+
 const rigidBodyTypeMap: {
   [key: string]: number;
 } = {
@@ -57,13 +63,23 @@ export const scaleColliderArgs = (
   return newArgs.map((arg, index) => scaleArray[index] * (arg as number));
 };
 
-export const createColliderFromOptions = <A>(
-  options: UseColliderOptions<A>,
-  world: WorldApi,
-  rigidBody?: RigidBody,
-  scale = { x: 1, y: 1, z: 1 },
-  hasCollisionEvents: boolean = false
-) => {
+interface CreateColliderFromOptions {
+  <ColliderArgs>(options: {
+    options: UseColliderOptions<ColliderArgs>;
+    world: WorldApi;
+    rigidBody?: RigidBody;
+    scale: { x: number; y: number; z: number };
+    hasCollisionEvents: boolean;
+  }): Collider;
+}
+
+export const createColliderFromOptions: CreateColliderFromOptions = ({
+  options,
+  world,
+  rigidBody,
+  scale,
+  hasCollisionEvents,
+}) => {
   const mass = options?.mass || 1;
   const colliderShape = options?.shape ?? "cuboid";
   const colliderArgs = options?.args ?? [];
@@ -75,16 +91,24 @@ export const createColliderFromOptions = <A>(
   ];
   const [x, y, z] = options?.position || [0, 0, 0];
   const [rx, ry, rz] = options?.rotation || [0, 0, 0];
+  const qRotation = vector3ToQuaternion(new Vector3(rx, ry, rz));
 
   // @ts-ignore
   const scaledArgs = scaleColliderArgs(options.shape, colliderArgs, scale);
 
-  let colliderDesc = (ColliderDesc[colliderShape](
-    // @ts-ignore
-    ...scaledArgs
-  ) as ColliderDesc)
+  let colliderDesc = (
+    ColliderDesc[colliderShape](
+      // @ts-ignore
+      ...scaledArgs
+    ) as ColliderDesc
+  )
     .setTranslation(x * scale.x, y * scale.y, z * scale.z)
-    .setRotation({ x: rx, y: ry, z: rz, w: 1 })
+    .setRotation({
+      x: qRotation.x,
+      y: qRotation.y,
+      z: qRotation.z,
+      w: qRotation.w,
+    })
     .setRestitution(options?.restitution ?? 0)
     .setRestitutionCombineRule(
       options?.restitutionCombineRule ?? CoefficientCombineRule.Average
@@ -99,6 +123,8 @@ export const createColliderFromOptions = <A>(
   }
 
   // If any of the mass properties are specified, add mass properties
+  const qMassRot = vector3ToQuaternion(new Vector3(0, 0, 0));
+
   if (
     options?.mass ||
     options?.centerOfMass ||
@@ -109,7 +135,7 @@ export const createColliderFromOptions = <A>(
       mass,
       { x: cmx, y: cmy, z: cmz },
       { x: pix, y: piy, z: piz },
-      { x: 0, y: 0, z: 0, w: 1 }
+      { x: qMassRot.x, y: qMassRot.y, z: qMassRot.z, w: qMassRot.w }
     );
   }
 
@@ -147,9 +173,12 @@ export const createCollidersFromChildren = (
 
       const { geometry } = child;
       const { x, y, z } = child.position;
-      const { x: rx, y: ry, z: rz, w: rw } = new Quaternion().setFromEuler(
-        child.rotation
-      );
+      const {
+        x: rx,
+        y: ry,
+        z: rz,
+        w: rw,
+      } = new Quaternion().setFromEuler(child.rotation);
       const scale = child.getWorldScale(new Vector3());
 
       switch (options.colliders) {
@@ -240,10 +269,4 @@ export const scaleVertices = (vertices: ArrayLike<number>, scale: Vector3) => {
   }
 
   return scaledVerts;
-};
-
-const quaternion = new Quaternion();
-const euler = new Euler();
-export const vector3ToQuaternion = (v: Vector3) => {
-  return quaternion.setFromEuler(euler.setFromVector3(v));
 };

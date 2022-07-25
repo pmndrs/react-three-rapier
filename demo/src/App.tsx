@@ -28,6 +28,7 @@ import {
 import { ApiUsage } from "./api-usage/ApiUsage";
 import { Kinematics } from "./kinematics/Kinematics";
 import { MeshColliderTest } from "./mesh-collider-test/MeshColliderTest";
+import { Colliders } from "./colliders/Colliders";
 
 export interface Demo {
   (props: {
@@ -115,6 +116,7 @@ export const App = () => {
                   path="mesh-collider-test"
                   element={<MeshColliderTest setUI={setUI} />}
                 />
+                <Route path="colliders" element={<Colliders setUI={setUI} />} />
               </Routes>
 
               <Floor />
@@ -143,6 +145,7 @@ export const App = () => {
         <Link to="api-usage">API usage</Link>
         <Link to="kinematics">Kinematics</Link>
         <Link to="mesh-collider-test">MeshCollider</Link>
+        <Link to="colliders">Free Colliders</Link>
       </div>
 
       <div
