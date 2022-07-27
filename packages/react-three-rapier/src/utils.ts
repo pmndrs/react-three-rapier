@@ -154,7 +154,7 @@ const isChildOfMeshCollider = (child: Mesh) => {
 
 export const createCollidersFromChildren = (
   object: Object3D,
-  rigidBody: RigidBodyApi,
+  rigidBody: RigidBodyApi | RigidBody,
   options: UseRigidBodyOptions,
   world: WorldApi,
   ignoreMeshColliders = true

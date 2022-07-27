@@ -14,7 +14,7 @@ import {
 import { Demo } from "../App";
 import { Mesh } from "three";
 
-const useSuzanne = () => {
+export const useSuzanne = () => {
   // @ts-ignore
   return useGLTF(new URL("./susanne.glb", import.meta.url).toString()) as {
     nodes: {

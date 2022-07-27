@@ -29,6 +29,7 @@ import { ApiUsage } from "./api-usage/ApiUsage";
 import { Kinematics } from "./kinematics/Kinematics";
 import { MeshColliderTest } from "./mesh-collider-test/MeshColliderTest";
 import { Colliders } from "./colliders/Colliders";
+import { InstancedMeshes } from "./instanced-meshes/InstancedMeshes";
 
 export interface Demo {
   (props: {
@@ -117,6 +118,10 @@ export const App = () => {
                   element={<MeshColliderTest setUI={setUI} />}
                 />
                 <Route path="colliders" element={<Colliders setUI={setUI} />} />
+                <Route
+                  path="instanced-meshes"
+                  element={<InstancedMeshes setUI={setUI} />}
+                />
               </Routes>
 
               <Floor />
@@ -128,10 +133,13 @@ export const App = () => {
       <div
         style={{
           position: "absolute",
-          top: 24,
+          bottom: 24,
           left: 24,
           display: "flex",
+          justifyContent: "space-between",
+          flexWrap: "wrap",
           gap: 12,
+          maxWidth: 600,
         }}
       >
         <Link to="/">Shapes</Link>
@@ -146,6 +154,7 @@ export const App = () => {
         <Link to="kinematics">Kinematics</Link>
         <Link to="mesh-collider-test">MeshCollider</Link>
         <Link to="colliders">Free Colliders</Link>
+        <Link to="instanced-meshes">Instanced Meshes</Link>
       </div>
 
       <div
@@ -161,14 +170,18 @@ export const App = () => {
   );
 };
 
-function Link(props: NavLinkProps) {
+const Link = (props: NavLinkProps) => {
   return (
     <NavLink
       {...props}
       style={({ isActive }) => ({
-        color: "white",
-        textDecoration: isActive ? "underline" : "none",
+        border: "2px solid blue",
+        borderRadius: 4,
+        padding: 4,
+        background: isActive ? "blue" : "transparent",
+        textDecoration: "none",
+        color: isActive ? "white" : "blue",
       })}
     />
   );
-}
+};

@@ -170,19 +170,19 @@ return (
 
 WIP
 
-## Roadmap?
+## Roadmap
 
 In order, but also not necessarily:
 
-- [x] Draft of all base shapes
-- [x] Draft of all base joints
+- [x] RigidBodies, Colliders
+- [x] Joints
 - [x] Nested objects retain world transforms
 - [x] Nested objects retain correct collider scale
 - [x] Automatic colliders based on rigidbody children
 - [x] Translation and rotational constraints
 - [x] Collision events
-- [ ] Colliders outside RigidBodies
-- [ ] InstancedMesh support
+- [x] Colliders outside RigidBodies
+- [-] InstancedMesh support
 - [ ] Docs
 - [ ] CodeSandbox examples
 - [ ] Helpers, for things like Vehicle, Rope, Player, etc
