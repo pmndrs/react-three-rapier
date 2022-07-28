@@ -63,7 +63,6 @@ const RigidBox = memo(() => {
   useEffect(() => {
     const api = box.current;
     if (api) {
-      console.log(api);
       api.applyTorqueImpulse({ x: 0, y: 0, z: 0.2 });
     }
   }, []);
@@ -112,9 +111,9 @@ const RigidBall = memo(() => {
 useGLTF.preload(new URL("objects.glb", import.meta.url).toString());
 
 const HullPear = () => {
-  const { nodes } = (useGLTF(
+  const { nodes } = useGLTF(
     new URL("objects.glb", import.meta.url).toString()
-  ) as unknown) as {
+  ) as unknown as {
     nodes: {
       pear: Mesh;
     };
@@ -134,9 +133,9 @@ const HullPear = () => {
 };
 
 const MeshBoat = () => {
-  const { nodes } = (useGLTF(
+  const { nodes } = useGLTF(
     new URL("objects.glb", import.meta.url).toString()
-  ) as unknown) as {
+  ) as unknown as {
     nodes: {
       boat: Mesh;
     };

@@ -102,21 +102,3 @@ export const ConvexHullCollider = (
 ) => {
   return <AnyCollider {...props} shape="convexHull" />;
 };
-
-const InstancedRigidBodies = (props: RigidBodyProps) => {
-  const object = useRef<Object3D>(null);
-
-  useEffect(() => {
-    if (object.current) {
-      const instancedMesh = object.current.children[0] as InstancedMesh;
-
-      if (instancedMesh.type === "InstancedMesh") {
-        for (let i = 0; i < instancedMesh.count; i++) {
-          // createColliderFromOptions;
-        }
-      }
-    }
-  }, []);
-
-  return <object3D ref={object}>{props.children}</object3D>;
-};

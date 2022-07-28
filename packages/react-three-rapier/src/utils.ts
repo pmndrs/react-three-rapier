@@ -4,11 +4,25 @@ import {
   Collider,
   ColliderDesc,
   RigidBody,
+  RigidBodyDesc,
+  Vector3 as RapierVector3,
+  Quaternion as RapierQuaternion,
 } from "@dimforge/rapier3d-compat";
 
-import { Euler, Mesh, Object3D, Quaternion, Vector3 } from "three";
+import {
+  BoxBufferGeometry,
+  BufferGeometry,
+  Matrix4,
+  Mesh,
+  Object3D,
+  Quaternion,
+  Sphere,
+  SphereBufferGeometry,
+  Vector3,
+} from "three";
 import {
   RigidBodyApi,
+  RigidBodyAutoCollider,
   RigidBodyShape,
   RigidBodyTypeString,
   UseColliderOptions,
@@ -16,17 +30,26 @@ import {
   Vector3Array,
   WorldApi,
 } from "./types";
+import { _quaternion, _euler, _vector3 } from "./shared-objects";
 
 export const vectorArrayToObject = (arr: Vector3Array) => {
   const [x, y, z] = arr;
   return { x, y, z };
 };
 
-const quaternion = new Quaternion();
-const euler = new Euler();
 export const vector3ToQuaternion = (v: Vector3) => {
-  return quaternion.setFromEuler(euler.setFromVector3(v));
+  return _quaternion.setFromEuler(_euler.setFromVector3(v));
 };
+
+export const rapierVector3ToVector3 = ({ x, y, z }: RapierVector3) =>
+  _vector3.set(x, y, z).clone();
+
+export const rapierQuaternionToQuaternion = ({
+  x,
+  y,
+  z,
+  w,
+}: RapierQuaternion) => _quaternion.set(x, y, z, w);
 
 const rigidBodyTypeMap: {
   [key: string]: number;
@@ -39,6 +62,20 @@ const rigidBodyTypeMap: {
 
 export const rigidBodyTypeFromString = (type: RigidBodyTypeString) =>
   rigidBodyTypeMap[type];
+
+export const decomposeMatrix4 = (m: Matrix4) => {
+  const position = new Vector3();
+  const rotation = new Quaternion();
+  const scale = new Vector3();
+
+  m.decompose(position, rotation, scale);
+
+  return {
+    position,
+    rotation,
+    scale,
+  };
+};
 
 export const scaleColliderArgs = (
   shape: RigidBodyShape,
@@ -181,59 +218,25 @@ export const createCollidersFromChildren = (
       } = new Quaternion().setFromEuler(child.rotation);
       const scale = child.getWorldScale(new Vector3());
 
-      switch (options.colliders) {
-        case "cuboid":
-          {
-            geometry.computeBoundingBox();
-            const { boundingBox } = geometry;
-
-            const size = boundingBox!.getSize(new Vector3());
-            boundingBox!.getCenter(offset);
-
-            desc = ColliderDesc.cuboid(
-              (size.x / 2) * scale.x,
-              (size.y / 2) * scale.y,
-              (size.z / 2) * scale.z
-            );
-          }
-          break;
-
-        case "ball":
-          {
-            geometry.computeBoundingSphere();
-            const { boundingSphere } = geometry;
-
-            const radius = boundingSphere!.radius * scale.x;
-            offset.copy(boundingSphere!.center);
-
-            desc = ColliderDesc.ball(radius);
-          }
-          break;
-
-        case "trimesh":
-          {
-            const g = geometry.clone().scale(scale.x, scale.y, scale.z);
-
-            desc = ColliderDesc.trimesh(
-              g.attributes.position.array as Float32Array,
-              g.index?.array as Uint32Array
-            );
-          }
-          break;
-
-        case "hull":
-          const g = geometry.clone().scale(scale.x, scale.y, scale.z);
-
-          {
-            desc = ColliderDesc.convexHull(
-              g.attributes.position.array as Float32Array
-            ) as ColliderDesc;
-          }
-          break;
-      }
-
       // We translate the colliders based on the parent's world scale
       const parentWorldScale = child.parent!.getWorldScale(new Vector3());
+
+      const desc = colliderDescFromGeometry(
+        geometry,
+        options.colliders!,
+        scale
+      );
+
+      const offset = new Vector3(0, 0, 0);
+
+      if (options.colliders === "cuboid") {
+        geometry.computeBoundingBox();
+        geometry.boundingBox?.getCenter(offset);
+      }
+      if (options.colliders === "ball") {
+        geometry.computeBoundingSphere();
+        offset.copy(geometry.boundingSphere!.center);
+      }
 
       desc
         .setTranslation(
@@ -259,6 +262,65 @@ export const createCollidersFromChildren = (
   return colliders;
 };
 
+export const colliderDescFromGeometry = (
+  geometry: BufferGeometry,
+  colliders: RigidBodyAutoCollider,
+  scale: Vector3
+) => {
+  let desc: ColliderDesc;
+
+  switch (colliders) {
+    case "cuboid":
+      {
+        geometry.computeBoundingBox();
+        const { boundingBox } = geometry;
+
+        const size = boundingBox!.getSize(new Vector3());
+
+        desc = ColliderDesc.cuboid(
+          (size.x / 2) * scale.x,
+          (size.y / 2) * scale.y,
+          (size.z / 2) * scale.z
+        );
+      }
+      break;
+
+    case "ball":
+      {
+        geometry.computeBoundingSphere();
+        const { boundingSphere } = geometry;
+
+        const radius = boundingSphere!.radius * scale.x;
+
+        desc = ColliderDesc.ball(radius);
+      }
+      break;
+
+    case "trimesh":
+      {
+        const g = geometry.clone().scale(scale.x, scale.y, scale.z);
+
+        desc = ColliderDesc.trimesh(
+          g.attributes.position.array as Float32Array,
+          g.index?.array as Uint32Array
+        );
+      }
+      break;
+
+    case "hull":
+      const g = geometry.clone().scale(scale.x, scale.y, scale.z);
+
+      {
+        desc = ColliderDesc.convexHull(
+          g.attributes.position.array as Float32Array
+        ) as ColliderDesc;
+      }
+      break;
+  }
+
+  return desc!;
+};
+
 export const scaleVertices = (vertices: ArrayLike<number>, scale: Vector3) => {
   const scaledVerts = Array.from(vertices);
 
@@ -269,4 +331,29 @@ export const scaleVertices = (vertices: ArrayLike<number>, scale: Vector3) => {
   }
 
   return scaledVerts;
+};
+
+export const rigidBodyDescFromOptions = (options: UseRigidBodyOptions) => {
+  const type = rigidBodyTypeFromString(options?.type || "dynamic");
+  const [lvx, lvy, lvz] = options?.linearVelocity ?? [0, 0, 0];
+  const [avx, avy, avz] = options?.angularVelocity ?? [0, 0, 0];
+  const gravityScale = options?.gravityScale ?? 1;
+  const canSleep = options?.canSleep ?? true;
+  const ccdEnabled = options?.ccd ?? false;
+  const [erx, ery, erz] = options?.enabledRotations ?? [true, true, true];
+  const [etx, ety, etz] = options?.enabledTranslations ?? [true, true, true];
+
+  const desc = new RigidBodyDesc(type)
+    .setLinvel(lvx, lvy, lvz)
+    .setAngvel({ x: avx, y: avy, z: avz })
+    .setGravityScale(gravityScale)
+    .setCanSleep(canSleep)
+    .setCcdEnabled(ccdEnabled)
+    .enabledRotations(erx, ery, erz)
+    .enabledTranslations(etx, ety, etz);
+
+  if (options.lockRotations) desc.lockRotations();
+  if (options.lockTranslations) desc.lockTranslations();
+
+  return desc;
 };

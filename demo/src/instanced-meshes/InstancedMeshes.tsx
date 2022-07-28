@@ -1,10 +1,18 @@
-import { Debug } from "@react-three/rapier";
-import { useEffect, useRef } from "react";
-import { Euler, Group, InstancedMesh, Object3D, Vector3 } from "Three";
+import { Instance, Instances } from "@react-three/drei";
+import { Debug, InstancedRigidBodies } from "@react-three/rapier";
+import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
+import {
+  Euler,
+  Group,
+  InstancedMesh,
+  MeshStandardMaterial,
+  Object3D,
+  Vector3,
+} from "Three";
 import { useSuzanne } from "../all-shapes/AllShapes";
 import { Demo } from "../App";
 
-const COUNT = 100;
+const COUNT = 200;
 
 export const InstancedMeshes: Demo = () => {
   const group = useRef<Group>(null);
@@ -15,7 +23,7 @@ export const InstancedMeshes: Demo = () => {
 
   const mesh = useRef<InstancedMesh>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const o = new Object3D();
 
     for (let i = 0; i < COUNT; i++) {
@@ -37,14 +45,28 @@ export const InstancedMeshes: Demo = () => {
     }
   }, []);
 
+  const blueMat = useMemo(
+    () => new MeshStandardMaterial({ color: "blue" }),
+    []
+  );
+
   return (
     <group>
       <Debug />
 
-      <instancedMesh
-        ref={mesh}
-        args={[Suzanne.geometry, Suzanne.material, COUNT]}
-      />
+      <InstancedRigidBodies colliders="cuboid">
+        <instancedMesh
+          ref={mesh}
+          args={[Suzanne.geometry, Suzanne.material, COUNT]}
+        />
+      </InstancedRigidBodies>
+
+      {/* <InstancedRigidBodies colliders="ball">
+        <Instances geometry={Suzanne.geometry} material={blueMat}>
+          <Instance position={[0, 10, 0]} />
+          <Instance position={[0, 20, 0]} />
+        </Instances>
+      </InstancedRigidBodies> */}
     </group>
   );
 };

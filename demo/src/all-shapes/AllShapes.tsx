@@ -40,7 +40,7 @@ const Suzanne = () => {
   );
 };
 
-const Torus = () => {
+const OffsetTorus = () => {
   const { nodes } = useOffsetTorus();
 
   return (
@@ -132,7 +132,7 @@ export const AllShapes: Demo = ({ setUI }) => {
 
         <group scale={1.5} position={[5, 10, 0]}>
           <RigidBody colliders="ball">
-            <Torus />
+            <OffsetTorus />
             <Html>Mesh with offset geometry</Html>
           </RigidBody>
         </group>

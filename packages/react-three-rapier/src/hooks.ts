@@ -32,15 +32,18 @@ import {
 
 import {
   createCollidersFromChildren,
+  rigidBodyDescFromOptions,
   rigidBodyTypeFromString,
+  vector3ToQuaternion,
   vectorArrayToObject,
 } from "./utils";
-import { createColliderApi, createJointApi, createRigidBodyApi } from "./api";
+import { createJointApi, createRigidBodyApi } from "./api";
+import { _vector3 } from "./shared-objects";
 
 export const useRigidBody = <O extends Object3D>(
   options: UseRigidBodyOptions = {}
 ): [MutableRefObject<O>, RigidBodyApi] => {
-  const { rapier, world, rigidBodyMeshes, physicsOptions, rigidBodyEvents } =
+  const { world, rigidBodyStates, physicsOptions, rigidBodyEvents } =
     useRapier();
   const ref = useRef<O>();
 
@@ -48,30 +51,7 @@ export const useRigidBody = <O extends Object3D>(
   const rigidBodyRef = useRef<RigidBody>();
   const getRigidBodyRef = useRef(() => {
     if (!rigidBodyRef.current) {
-      const type = rigidBodyTypeFromString(options?.type || "dynamic");
-      const [lvx, lvy, lvz] = options?.linearVelocity ?? [0, 0, 0];
-      const [avx, avy, avz] = options?.angularVelocity ?? [0, 0, 0];
-      const gravityScale = options?.gravityScale ?? 1;
-      const canSleep = options?.canSleep ?? true;
-      const ccdEnabled = options?.ccd ?? false;
-      const [erx, ery, erz] = options?.enabledRotations ?? [true, true, true];
-      const [etx, ety, etz] = options?.enabledTranslations ?? [
-        true,
-        true,
-        true,
-      ];
-
-      const desc = new rapier.RigidBodyDesc(type)
-        .setLinvel(lvx, lvy, lvz)
-        .setAngvel({ x: avx, y: avy, z: avz })
-        .setGravityScale(gravityScale)
-        .setCanSleep(canSleep)
-        .setCcdEnabled(ccdEnabled)
-        .enabledRotations(erx, ery, erz)
-        .enabledTranslations(etx, ety, etz);
-
-      if (options.lockRotations) desc.lockRotations();
-      if (options.lockTranslations) desc.lockTranslations();
+      const desc = rigidBodyDescFromOptions(options);
 
       const rigidBody = world.createRigidBody(desc);
       rigidBodyRef.current = world.getRigidBody(rigidBody.handle);
@@ -115,10 +95,9 @@ export const useRigidBody = <O extends Object3D>(
       false
     );
 
-    const eulerAngles = new Euler(rx, ry, rz, "XYZ");
-    const rotation = new Quaternion()
-      .setFromEuler(eulerAngles)
-      .multiply(worldRotation);
+    const rotation = vector3ToQuaternion(new Vector3(rx, ry, rz)).multiply(
+      worldRotation
+    );
 
     rigidBody.setRotation(
       { x: rotation.x, y: rotation.y, z: rotation.z, w: rotation.w },
@@ -141,13 +120,21 @@ export const useRigidBody = <O extends Object3D>(
           )
         : [];
 
-    rigidBodyMeshes.set(rigidBody.handle, ref.current);
+    rigidBodyStates.set(rigidBody.handle, {
+      mesh: ref.current!,
+      invertedMatrixWorld: ref.current.parent!.matrixWorld.clone().invert(),
+      isSleeping: false,
+      worldScale: ref.current.getWorldScale(_vector3).clone(),
+      setMatrix: (mat) => ref.current!.matrix.copy(mat),
+    });
+
+    ref.current.matrixAutoUpdate = false;
 
     return () => {
       world.removeRigidBody(rigidBody);
       autoColliders.forEach((collider) => world.removeCollider(collider));
       rigidBodyRef.current = undefined;
-      rigidBodyMeshes.delete(rigidBody.handle);
+      rigidBodyStates.delete(rigidBody.handle);
     };
   }, []);
 
