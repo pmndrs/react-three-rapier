@@ -1,4 +1,4 @@
-<h1 align="center">@react-three/rapier 🗡</h1>
+![logo](misc/hero.svg)
 
 <p align="center">⚠️ Under heavy development. All APIs are subject to change. ⚠️</p>
 
