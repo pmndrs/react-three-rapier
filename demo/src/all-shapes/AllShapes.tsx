@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 
-import { Box, Clone, Html, Sphere, useGLTF } from "@react-three/drei";
+import { Html, useGLTF } from "@react-three/drei";
 import {
   BallCollider,
   ConeCollider,

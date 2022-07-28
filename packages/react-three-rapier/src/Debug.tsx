@@ -106,7 +106,7 @@ const DebugShape = memo<{ colliderHandle: number }>(({ colliderHandle }) => {
 
   const geometry = useMemo(() => {
     const collider = world.getCollider(colliderHandle);
-    return geometryFromCollider(collider);
+    return geometryFromCollider(collider!);
   }, [colliderHandle]);
 
   return (

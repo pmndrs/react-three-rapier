@@ -1,7 +1,7 @@
 import React, { MutableRefObject, useContext, useEffect, useMemo } from "react";
 import { RapierContext } from "./Physics";
 import { useRef } from "react";
-import { Euler, Matrix4, Mesh, Object3D, Quaternion, Vector3 } from "three";
+import { Object3D, Quaternion, Vector3 } from "three";
 
 import type Rapier from "@dimforge/rapier3d-compat";
 

@@ -8,7 +8,7 @@ import {
   MeshStandardMaterial,
   Object3D,
   Vector3,
-} from "Three";
+} from "three";
 import { useSuzanne } from "../all-shapes/AllShapes";
 import { Demo } from "../App";
 
