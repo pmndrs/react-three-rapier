@@ -215,6 +215,17 @@ export const createRigidBodyApi = (ref: RefGetter<RigidBody>): RigidBodyApi => {
   };
 };
 
+export interface InstancedRigidBodyApi {
+  at(index: number): RigidBodyApi;
+}
+
+export const createInstancedRigidBodiesApi = (
+  bodiesGetter: RefGetter<RigidBody[]>
+): InstancedRigidBodyApi => ({
+  at: (index: number) =>
+    createRigidBodyApi({ current: () => bodiesGetter.current()![index] }),
+});
+
 // TODO: Flesh this out
 export const createColliderApi = (ref: RefGetter<Collider>) => {
   return {

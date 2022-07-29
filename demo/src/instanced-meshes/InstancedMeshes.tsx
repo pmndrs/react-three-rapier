@@ -1,18 +1,12 @@
-import { Instance, Instances } from "@react-three/drei";
+import { ThreeEvent } from "@react-three/fiber";
 import { Debug, InstancedRigidBodies } from "@react-three/rapier";
-import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
-import {
-  Euler,
-  Group,
-  InstancedMesh,
-  MeshStandardMaterial,
-  Object3D,
-  Vector3,
-} from "three";
+import { InstancedRigidBodyApi } from "@react-three/rapier/dist/declarations/src/api";
+import { useRef } from "react";
+import { Group } from "three";
 import { useSuzanne } from "../all-shapes/AllShapes";
 import { Demo } from "../App";
 
-const COUNT = 200;
+const COUNT = 500;
 
 export const InstancedMeshes: Demo = () => {
   const group = useRef<Group>(null);
@@ -21,52 +15,39 @@ export const InstancedMeshes: Demo = () => {
     nodes: { Suzanne },
   } = useSuzanne();
 
-  const mesh = useRef<InstancedMesh>(null);
+  const api = useRef<InstancedRigidBodyApi>(null);
 
-  useLayoutEffect(() => {
-    const o = new Object3D();
-
-    for (let i = 0; i < COUNT; i++) {
-      o.position.copy(
-        new Vector3(Math.random() * 20, Math.random() * 20, Math.random() * 20)
-      );
-      o.rotation.copy(
-        new Euler().setFromVector3(
-          new Vector3(
-            Math.random() * 20,
-            Math.random() * 20,
-            Math.random() * 20
-          )
-        )
-      );
-      o.updateMatrix();
-
-      mesh.current?.setMatrixAt(i, o.matrix);
+  const handleClickInstance = (evt: ThreeEvent<MouseEvent>) => {
+    if (api.current) {
+      api.current
+        .at(evt.instanceId!)
+        .applyTorqueImpulse({ x: 0, y: 500, z: 0 });
     }
-  }, []);
-
-  const blueMat = useMemo(
-    () => new MeshStandardMaterial({ color: "blue" }),
-    []
-  );
+  };
 
   return (
     <group>
       <Debug />
 
-      <InstancedRigidBodies colliders="cuboid">
+      <InstancedRigidBodies
+        ref={api}
+        colliders="cuboid"
+        positions={Array.from({ length: COUNT }, () => [
+          Math.random() * 20,
+          Math.random() * 20,
+          Math.random() * 20,
+        ])}
+        rotations={Array.from({ length: COUNT }, () => [
+          Math.random() * Math.PI * 2,
+          Math.random() * Math.PI * 2,
+          Math.random() * Math.PI * 2,
+        ])}
+      >
         <instancedMesh
-          ref={mesh}
           args={[Suzanne.geometry, Suzanne.material, COUNT]}
+          onClick={handleClickInstance}
         />
       </InstancedRigidBodies>
-
-      {/* <InstancedRigidBodies colliders="ball">
-        <Instances geometry={Suzanne.geometry} material={blueMat}>
-          <Instance position={[0, 10, 0]} />
-          <Instance position={[0, 20, 0]} />
-        </Instances>
-      </InstancedRigidBodies> */}
     </group>
   );
 };

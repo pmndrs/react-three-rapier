@@ -1,4 +1,6 @@
-![logo](misc/hero.svg)
+<p align="center">
+<img src="misc/hero.svg" />
+</p>
 
 <p align="center">⚠️ Under heavy development. All APIs are subject to change. ⚠️</p>
 
@@ -169,6 +171,12 @@ return (
 ## Joints
 
 WIP
+
+## InstancedMeshes
+
+WIP
+
+---
 
 ## Roadmap
 

@@ -43,7 +43,7 @@ const Floor = () => {
     <RigidBody type="fixed" colliders="cuboid">
       <Box
         position={[0, -12.55, 0]}
-        scale={[100, 0.1, 100]}
+        scale={[200, 0.1, 200]}
         rotation={[0, 0, 0]}
         receiveShadow
       >
