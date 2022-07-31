@@ -133,12 +133,10 @@ export const createColliderFromOptions: CreateColliderFromOptions = ({
   // @ts-ignore
   const scaledArgs = scaleColliderArgs(options.shape, colliderArgs, scale);
 
-  let colliderDesc = (
-    ColliderDesc[colliderShape](
-      // @ts-ignore
-      ...scaledArgs
-    ) as ColliderDesc
-  )
+  let colliderDesc = (ColliderDesc[colliderShape](
+    // @ts-ignore
+    ...scaledArgs
+  ) as ColliderDesc)
     .setTranslation(x * scale.x, y * scale.y, z * scale.z)
     .setRotation({
       x: qRotation.x,
@@ -210,12 +208,9 @@ export const createCollidersFromChildren = (
 
       const { geometry } = child;
       const { x, y, z } = child.position;
-      const {
-        x: rx,
-        y: ry,
-        z: rz,
-        w: rw,
-      } = new Quaternion().setFromEuler(child.rotation);
+      const { x: rx, y: ry, z: rz, w: rw } = new Quaternion().setFromEuler(
+        child.rotation
+      );
       const scale = child.getWorldScale(new Vector3());
 
       // We translate the colliders based on the parent's world scale
@@ -224,7 +219,8 @@ export const createCollidersFromChildren = (
       const desc = colliderDescFromGeometry(
         geometry,
         options.colliders!,
-        scale
+        scale,
+        hasCollisionEvents
       );
 
       const offset = new Vector3(0, 0, 0);
@@ -238,6 +234,11 @@ export const createCollidersFromChildren = (
         offset.copy(geometry.boundingSphere!.center);
       }
 
+      if (Number.isFinite(options.friction))
+        desc.setFriction(options.friction as number);
+      if (Number.isFinite(options.restitution))
+        desc.setRestitution(options.restitution as number);
+
       desc
         .setTranslation(
           (x + offset.x) * parentWorldScale.x,
@@ -245,13 +246,6 @@ export const createCollidersFromChildren = (
           (z + offset.z) * parentWorldScale.z
         )
         .setRotation({ x: rx, y: ry, z: rz, w: rw });
-
-      if (hasCollisionEvents)
-        desc.setActiveEvents(ActiveEvents.COLLISION_EVENTS);
-      if (Number.isFinite(options.friction))
-        desc.setFriction(options.friction as number);
-      if (Number.isFinite(options.restitution))
-        desc.setRestitution(options.restitution as number);
 
       const actualRigidBody = world.getRigidBody(rigidBody?.handle)!;
       const collider = world.createCollider(desc, actualRigidBody);
@@ -265,7 +259,8 @@ export const createCollidersFromChildren = (
 export const colliderDescFromGeometry = (
   geometry: BufferGeometry,
   colliders: RigidBodyAutoCollider,
-  scale: Vector3
+  scale: Vector3,
+  hasCollisionEvents: boolean
 ) => {
   let desc: ColliderDesc;
 
@@ -317,6 +312,8 @@ export const colliderDescFromGeometry = (
       }
       break;
   }
+
+  if (hasCollisionEvents) desc!.setActiveEvents(ActiveEvents.COLLISION_EVENTS);
 
   return desc!;
 };

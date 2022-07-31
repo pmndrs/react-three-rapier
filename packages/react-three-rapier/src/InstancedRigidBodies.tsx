@@ -24,7 +24,10 @@ import {
 } from "./utils";
 
 interface InstancedRigidBodiesProps
-  extends Omit<RigidBodyProps, "position" | "rotation"> {
+  extends Omit<
+    RigidBodyProps,
+    "position" | "rotation" | "onCollisionEnter" | "onCollisionExit"
+  > {
   positions?: Vector3Array[];
   rotations?: Vector3Array[];
 }
@@ -68,7 +71,8 @@ export const InstancedRigidBodies = forwardRef<
           const colliderDesc = colliderDescFromGeometry(
             mesh.geometry,
             props.colliders || physicsOptions.colliders,
-            scale
+            scale,
+            false // Collisions currently not enabled for instances
           );
 
           for (let index = 0; index < mesh.count; index++) {

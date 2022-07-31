@@ -16,7 +16,11 @@ export const Transforms: Demo = () => {
   return (
     <group>
       <group rotation={[2, 2, 6]} position={[0, -5, 0]} scale={1.2} ref={group}>
-        <RigidBody position={[-0.5, 2, 1]} colliders="ball">
+        <RigidBody
+          position={[-0.5, 2, 1]}
+          colliders="ball"
+          onCollisionEnter={console.log}
+        >
           <Sphere scale={0.2} castShadow receiveShadow>
             <meshPhysicalMaterial />
           </Sphere>
