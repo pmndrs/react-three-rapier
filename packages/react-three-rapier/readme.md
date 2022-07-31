@@ -234,6 +234,7 @@ In order, but also not necessarily:
 - [x] Collision events
 - [x] Colliders outside RigidBodies
 - [x] InstancedMesh support
+- [ ] Normalize and improve collision events (add events to single Colliders, InstancedRigidBodies, etc)
 - [ ] Docs
 - [ ] CodeSandbox examples
 - [ ] Helpers, for things like Vehicle, Rope, Player, etc
