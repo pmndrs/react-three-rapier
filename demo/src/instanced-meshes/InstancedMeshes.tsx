@@ -4,7 +4,7 @@ import {
   InstancedRigidBodies,
   InstancedRigidBodyApi,
 } from "@react-three/rapier";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useSuzanne } from "../all-shapes/AllShapes";
 import { Demo } from "../App";
 
@@ -24,6 +24,18 @@ export const InstancedMeshes: Demo = () => {
         .applyTorqueImpulse({ x: 0, y: 500, z: 0 });
     }
   };
+
+  useEffect(() => {
+    if (api.current) {
+      api.current.forEach((body) => {
+        body.applyImpulse({
+          x: -Math.random() * 20,
+          y: Math.random() * 20,
+          z: -Math.random() * 20,
+        });
+      });
+    }
+  }, []);
 
   return (
     <group>

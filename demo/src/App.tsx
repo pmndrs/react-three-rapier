@@ -66,7 +66,8 @@ const Floor = () => {
 
 export const App = () => {
   const [ui, setUI] = useState<ReactNode>(null);
-  const [debug, setDebug] = useState<ReactNode>(false);
+  const [debug, setDebug] = useState<boolean>(false);
+  const [perf, setPerf] = useState<boolean>(false);
 
   const ContextBridge = useContextBridge(
     UNSAFE_LocationContext,
@@ -131,12 +132,8 @@ export const App = () => {
 
               <Floor />
 
-              {debug && (
-                <>
-                  <Debug />
-                  <Perf />
-                </>
-              )}
+              {debug && <Debug />}
+              {perf && <Perf />}
             </Physics>
           </ContextBridge>
         </Suspense>
@@ -176,6 +173,17 @@ export const App = () => {
           onClick={() => setDebug((v) => !v)}
         >
           Debug
+        </button>
+        <button
+          style={{
+            background: perf ? "red" : "transparent",
+            border: "2px solid red",
+            color: perf ? "white" : "red",
+            borderRadius: 4,
+          }}
+          onClick={() => setPerf((v) => !v)}
+        >
+          Perf
         </button>
       </div>
 

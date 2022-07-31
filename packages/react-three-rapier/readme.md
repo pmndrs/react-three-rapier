@@ -190,7 +190,7 @@ In order, but also not necessarily:
 - [x] Translation and rotational constraints
 - [x] Collision events
 - [x] Colliders outside RigidBodies
-- [-] InstancedMesh support
+- [x] InstancedMesh support
 - [ ] Docs
 - [ ] CodeSandbox examples
 - [ ] Helpers, for things like Vehicle, Rope, Player, etc

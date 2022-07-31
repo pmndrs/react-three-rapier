@@ -217,13 +217,20 @@ export const createRigidBodyApi = (ref: RefGetter<RigidBody>): RigidBodyApi => {
 
 export interface InstancedRigidBodyApi {
   at(index: number): RigidBodyApi;
+  get count(): number;
+  forEach(callback: (body: RigidBodyApi, index: number, array: RigidBodyApi[]) => void): void
 }
 
 export const createInstancedRigidBodiesApi = (
-  bodiesGetter: RefGetter<RigidBody[]>
+  bodiesGetter: RefGetter<{rigidBody: RigidBody, api: RigidBodyApi}[]>
 ): InstancedRigidBodyApi => ({
-  at: (index: number) =>
-    createRigidBodyApi({ current: () => bodiesGetter.current()![index] }),
+  at: (index: number) => bodiesGetter.current()![index].api,
+  forEach(callback) {
+    return bodiesGetter.current()!.map(b => b.api).forEach(callback)
+  },
+  get count () {
+    return bodiesGetter.current()!.length
+  }
 });
 
 // TODO: Flesh this out

@@ -7,10 +7,14 @@ import {
   Vector3,
   DynamicDrawUsage,
 } from "three";
-import { createInstancedRigidBodiesApi, InstancedRigidBodyApi } from "./api";
+import {
+  createInstancedRigidBodiesApi,
+  createRigidBodyApi,
+  InstancedRigidBodyApi,
+} from "./api";
 import { useRapier } from "./hooks";
 import { RigidBodyProps } from "./RigidBody";
-import { Vector3Array } from "./types";
+import { RigidBodyApi, Vector3Array } from "./types";
 import {
   colliderDescFromGeometry,
   decomposeMatrix4,
@@ -32,7 +36,7 @@ export const InstancedRigidBodies = forwardRef<
   const { world, rigidBodyStates, physicsOptions } = useRapier();
   const object = useRef<Object3D>(null);
 
-  const instancesRef = useRef<RigidBody[]>();
+  const instancesRef = useRef<{ rigidBody: RigidBody; api: RigidBodyApi }[]>();
   const instancesRefGetter = useRef(() => {
     if (!instancesRef.current) {
       instancesRef.current = [];
@@ -103,8 +107,14 @@ export const InstancedRigidBodies = forwardRef<
               worldScale: object.current!.getWorldScale(new Vector3()),
             });
 
+            const api = createRigidBodyApi({
+              current() {
+                return rigidBody;
+              },
+            });
+
             colliders.push(collider);
-            rigidBodies.push(rigidBody);
+            rigidBodies.push({ rigidBody, api });
           }
         }
 
@@ -116,7 +126,7 @@ export const InstancedRigidBodies = forwardRef<
       });
 
       return () => {
-        rigidBodies.forEach((rb) => world.removeRigidBody(rb));
+        rigidBodies.forEach((rb) => world.removeRigidBody(rb.rigidBody));
         colliders.forEach((coll) => world.removeCollider(coll));
         instancesRef.current = undefined;
       };
