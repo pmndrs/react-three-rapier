@@ -25,13 +25,9 @@ const Ball = () => {
   );
 };
 
-export const Kinematics: Demo = ({ setUI }) => {
+export const Kinematics: Demo = () => {
   const torus = useRef<RigidBodyApi>(null);
   const platform = useRef<RigidBodyApi>(null);
-
-  useEffect(() => {
-    setUI("");
-  }, []);
 
   useFrame(() => {
     const now = performance.now();

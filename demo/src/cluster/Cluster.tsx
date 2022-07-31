@@ -7,11 +7,7 @@ import { Demo } from "../App";
 
 const BALLS = 1000;
 
-export const Cluster: Demo = ({ setUI }) => {
-  useEffect(() => {
-    setUI("");
-  }, []);
-
+export const Cluster: Demo = () => {
   const refs = useRef(
     Array.from({ length: BALLS }).map(() => createRef<RigidBodyApi>())
   );

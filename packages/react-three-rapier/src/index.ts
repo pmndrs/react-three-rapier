@@ -1,4 +1,5 @@
 export * from "./types";
+export type { RigidBodyApi, WorldApi, InstancedRigidBodyApi } from "./api";
 
 export { Physics } from "./Physics";
 export { RigidBody } from "./RigidBody";

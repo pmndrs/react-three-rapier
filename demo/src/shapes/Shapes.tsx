@@ -18,6 +18,7 @@ import {
   MeshPhysicalMaterial,
   Vector3,
 } from "three";
+import { useDemo } from "../App";
 
 const colors = ["red", "green", "blue", "yellow", "orange", "purple"];
 const randomColor = () => colors[Math.floor(Math.random() * colors.length)];
@@ -111,9 +112,9 @@ const RigidBall = memo(() => {
 useGLTF.preload(new URL("objects.glb", import.meta.url).toString());
 
 const HullPear = () => {
-  const { nodes } = useGLTF(
+  const { nodes } = (useGLTF(
     new URL("objects.glb", import.meta.url).toString()
-  ) as unknown as {
+  ) as unknown) as {
     nodes: {
       pear: Mesh;
     };
@@ -133,9 +134,9 @@ const HullPear = () => {
 };
 
 const MeshBoat = () => {
-  const { nodes } = useGLTF(
+  const { nodes } = (useGLTF(
     new URL("objects.glb", import.meta.url).toString()
-  ) as unknown as {
+  ) as unknown) as {
     nodes: {
       boat: Mesh;
     };
@@ -169,15 +170,16 @@ const Thing = ({ item }: { item: string }) => {
   return <Thang />;
 };
 
-const Scene: FC<{ setUI: Dispatch<ReactNode> }> = ({ setUI }) => {
+const Scene: FC = () => {
   const [items, setItems] = useState<string[]>([]);
+  const { setUI } = useDemo();
 
   const addItem = (str: string) => {
     setItems((curr) => [...curr, str]);
   };
 
   useEffect(() => {
-    setUI(
+    setUI!(
       <>
         <button onClick={() => addItem("box")}>Box</button>
         <button onClick={() => addItem("cylinder")}>Cylinder</button>
@@ -186,6 +188,8 @@ const Scene: FC<{ setUI: Dispatch<ReactNode> }> = ({ setUI }) => {
         <button onClick={() => addItem("convexHull")}>ConvexHull 2</button>
       </>
     );
+
+    return () => setUI!(null);
   }, []);
 
   return (

@@ -6,7 +6,6 @@ import {
   Matrix4,
   Vector3,
   DynamicDrawUsage,
-  Mesh,
 } from "three";
 import { createInstancedRigidBodiesApi, InstancedRigidBodyApi } from "./api";
 import { useRapier } from "./hooks";
@@ -58,7 +57,7 @@ export const InstancedRigidBodies = forwardRef<
             );
             return;
           }
-
+          hasOneMesh = true;
           mesh.instanceMatrix.setUsage(DynamicDrawUsage);
 
           const rigidBodyDesc = rigidBodyDescFromOptions(props);
@@ -119,6 +118,7 @@ export const InstancedRigidBodies = forwardRef<
       return () => {
         rigidBodies.forEach((rb) => world.removeRigidBody(rb));
         colliders.forEach((coll) => world.removeCollider(coll));
+        instancesRef.current = undefined;
       };
     }
   }, []);

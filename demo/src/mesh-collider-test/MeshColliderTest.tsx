@@ -6,17 +6,11 @@ import {
   RigidBody,
   RigidBodyApi,
 } from "@react-three/rapier";
-import { useEffect, useRef } from "react";
 import { Demo } from "../App";
 
-export const MeshColliderTest: Demo = ({ setUI }) => {
-  useEffect(() => {
-    setUI("");
-  }, []);
-
+export const MeshColliderTest: Demo = () => {
   return (
     <group>
-      <Debug />
       <RigidBody position={[0, 2, 0]} colliders={false}>
         <MeshCollider type="hull">
           <Torus castShadow scale={5} receiveShadow>

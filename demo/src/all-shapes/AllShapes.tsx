@@ -48,13 +48,11 @@ const OffsetTorus = () => {
   );
 };
 
-export const AllShapes: Demo = ({ setUI }) => {
+export const AllShapes: Demo = () => {
   const { nodes } = useSuzanne();
-  setUI("");
 
   return (
     <>
-      <Debug />
       <group>
         <RigidBody colliders="cuboid">
           <Suzanne />

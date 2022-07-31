@@ -1,16 +1,16 @@
 import { ThreeEvent } from "@react-three/fiber";
-import { Debug, InstancedRigidBodies } from "@react-three/rapier";
-import { InstancedRigidBodyApi } from "@react-three/rapier/dist/declarations/src/api";
+import {
+  Debug,
+  InstancedRigidBodies,
+  InstancedRigidBodyApi,
+} from "@react-three/rapier";
 import { useRef } from "react";
-import { Group } from "three";
 import { useSuzanne } from "../all-shapes/AllShapes";
 import { Demo } from "../App";
 
-const COUNT = 500;
+const COUNT = 200;
 
 export const InstancedMeshes: Demo = () => {
-  const group = useRef<Group>(null);
-
   const {
     nodes: { Suzanne },
   } = useSuzanne();
@@ -27,11 +27,9 @@ export const InstancedMeshes: Demo = () => {
 
   return (
     <group>
-      <Debug />
-
       <InstancedRigidBodies
         ref={api}
-        colliders="cuboid"
+        colliders="hull"
         positions={Array.from({ length: COUNT }, () => [
           Math.random() * 20,
           Math.random() * 20,
@@ -44,9 +42,12 @@ export const InstancedMeshes: Demo = () => {
         ])}
       >
         <instancedMesh
-          args={[Suzanne.geometry, Suzanne.material, COUNT]}
+          castShadow
+          args={[Suzanne.geometry, undefined, COUNT]}
           onClick={handleClickInstance}
-        />
+        >
+          <meshPhysicalMaterial color={"yellow"} />
+        </instancedMesh>
       </InstancedRigidBodies>
     </group>
   );

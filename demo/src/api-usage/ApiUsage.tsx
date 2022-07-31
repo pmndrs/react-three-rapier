@@ -3,12 +3,10 @@ import { RigidBody, RigidBodyApi } from "@react-three/rapier";
 import { useEffect, useRef } from "react";
 import { Demo } from "../App";
 
-export const ApiUsage: Demo = ({ setUI }) => {
+export const ApiUsage: Demo = () => {
   const torus = useRef<RigidBodyApi>(null);
 
   useEffect(() => {
-    setUI("");
-
     if (torus.current) {
       torus.current.applyTorqueImpulse({
         x: 1,

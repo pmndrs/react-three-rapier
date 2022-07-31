@@ -32,7 +32,7 @@ const WheelJoint = ({
   return null;
 };
 
-export const Car: Demo = ({ setUI }) => {
+export const Car: Demo = () => {
   const bodyRef = useRef<RigidBodyApi>(null);
   const wheelPositions: [number, number, number][] = [
     [-3, 0, 2],
@@ -41,8 +41,6 @@ export const Car: Demo = ({ setUI }) => {
     [3, 0, -2],
   ];
   const wheelRefs = useRef(wheelPositions.map(() => createRef<RigidBodyApi>()));
-
-  setUI("");
 
   useFrame(() => {
     wheelRefs.current.forEach((ref) => {

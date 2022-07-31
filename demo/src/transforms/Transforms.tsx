@@ -15,8 +15,6 @@ export const Transforms: Demo = () => {
 
   return (
     <group>
-      <Debug />
-
       <group rotation={[2, 2, 6]} position={[0, -5, 0]} scale={1.2} ref={group}>
         <RigidBody position={[-0.5, 2, 1]} colliders="ball">
           <Sphere scale={0.2} castShadow receiveShadow>

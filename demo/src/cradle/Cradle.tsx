@@ -43,9 +43,7 @@ const Rod = (props: UseRigidBodyOptions) => {
   );
 };
 
-export const CradleExample: Demo = ({ setUI }) => {
-  setUI("");
-
+export const CradleExample: Demo = () => {
   return (
     <group rotation={[2, 0, 0]} scale={2}>
       <Rod position={[0, 0, 0]} />
