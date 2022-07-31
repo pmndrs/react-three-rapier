@@ -1,53 +1,44 @@
-import { RigidBody as RapierRigidBody } from "@dimforge/rapier3d-compat";
-import { Environment, Sphere } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import { RigidBody, RigidBodyApi } from "@react-three/rapier";
+import {
+  InstancedRigidBodies,
+  InstancedRigidBodyApi,
+} from "@react-three/rapier";
 import { createRef, useEffect, useRef } from "react";
 import { Demo } from "../App";
 
 const BALLS = 1000;
 
-export const Cluster: Demo = ({ setUI }) => {
-  useEffect(() => {
-    setUI("");
-  }, []);
-
-  const refs = useRef(
-    Array.from({ length: BALLS }).map(() => createRef<RigidBodyApi>())
-  );
+export const Cluster: Demo = () => {
+  const api = useRef<InstancedRigidBodyApi>(null);
 
   useFrame(() => {
-    refs.current.forEach((ref) => {
-      const p = ref.current!.translation();
-      p.normalize().multiplyScalar(-0.02);
-
-      ref.current?.applyImpulse(p);
+    api.current!.forEach((body) => {
+      const p = body.translation();
+      p.normalize().multiplyScalar(-0.01);
+      body.applyImpulse(p);
     });
   });
 
   return (
     <group>
-      {Array.from({ length: BALLS }).map((_, i) => (
-        <RigidBody
-          position={[Math.floor(i / 30) * 0.5, (i % 30) * 0.5, 0]}
-          colliders="ball"
-          ref={refs.current[i]}
-          key={i}
-        >
-          <Sphere scale={0.2}>
-            <meshPhysicalMaterial
-              roughness={0}
-              metalness={0.5}
-              color={
-                "#" +
-                Math.floor(Math.random() * 0xffffff)
-                  .toString(16)
-                  .padEnd(6, "0")
-              }
-            />
-          </Sphere>
-        </RigidBody>
-      ))}
+      <InstancedRigidBodies
+        ref={api}
+        positions={Array.from({ length: BALLS }, (_, i) => [
+          Math.floor(i / 30) * 1,
+          (i % 30) * 0.5,
+          0,
+        ])}
+        colliders="ball"
+      >
+        <instancedMesh args={[undefined, undefined, BALLS]} castShadow>
+          <sphereBufferGeometry args={[0.2]} />
+          <meshPhysicalMaterial
+            roughness={0}
+            metalness={0.5}
+            color={"yellow"}
+          />
+        </instancedMesh>
+      </InstancedRigidBodies>
     </group>
   );
 };

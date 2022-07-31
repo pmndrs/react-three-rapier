@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 
-import { Box, Clone, Html, Sphere, useGLTF } from "@react-three/drei";
+import { Html, useGLTF } from "@react-three/drei";
 import {
   BallCollider,
   ConeCollider,
@@ -14,7 +14,7 @@ import {
 import { Demo } from "../App";
 import { Mesh } from "three";
 
-const useSuzanne = () => {
+export const useSuzanne = () => {
   // @ts-ignore
   return useGLTF(new URL("./susanne.glb", import.meta.url).toString()) as {
     nodes: {
@@ -40,7 +40,7 @@ const Suzanne = () => {
   );
 };
 
-const Torus = () => {
+const OffsetTorus = () => {
   const { nodes } = useOffsetTorus();
 
   return (
@@ -48,13 +48,11 @@ const Torus = () => {
   );
 };
 
-export const AllShapes: Demo = ({ setUI }) => {
+export const AllShapes: Demo = () => {
   const { nodes } = useSuzanne();
-  setUI("");
 
   return (
     <>
-      <Debug />
       <group>
         <RigidBody colliders="cuboid">
           <Suzanne />
@@ -132,7 +130,7 @@ export const AllShapes: Demo = ({ setUI }) => {
 
         <group scale={1.5} position={[5, 10, 0]}>
           <RigidBody colliders="ball">
-            <Torus />
+            <OffsetTorus />
             <Html>Mesh with offset geometry</Html>
           </RigidBody>
         </group>

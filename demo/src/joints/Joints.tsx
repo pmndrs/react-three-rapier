@@ -85,11 +85,7 @@ const Rope = (props: { component: ReactNode; length: number }) => {
   );
 };
 
-const Joints: Demo = ({ setUI }) => {
-  useEffect(() => {
-    setUI("");
-  }, []);
-
+const Joints: Demo = () => {
   return (
     <group>
       <Rope length={40} component={<ShadowElement />} />

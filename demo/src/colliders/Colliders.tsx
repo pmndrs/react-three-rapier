@@ -32,11 +32,7 @@ const Ball = () => {
   );
 };
 
-export const Colliders: Demo = ({ setUI }) => {
-  useEffect(() => {
-    setUI("");
-  }, []);
-
+export const Colliders: Demo = () => {
   return (
     <group>
       <Ball />
@@ -44,8 +40,6 @@ export const Colliders: Demo = ({ setUI }) => {
       <Ball />
       <Ball />
       <Ball />
-
-      <Debug />
 
       <CuboidCollider args={[10, 1, 10]} />
       <BallCollider args={[3]} position={[1, 2, 1]} />

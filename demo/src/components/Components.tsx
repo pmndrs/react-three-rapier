@@ -89,9 +89,7 @@ const CompoundShape = () => {
   );
 };
 
-export const ComponentsExample: Demo = ({ setUI }) => {
-  setUI("");
-
+export const ComponentsExample: Demo = () => {
   return (
     <group>
       <CompoundShape />

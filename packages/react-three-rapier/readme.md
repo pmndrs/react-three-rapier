@@ -1,4 +1,6 @@
-<h1 align="center">@react-three/rapier 🗡</h1>
+<p align="center">
+<img src="misc/hero.svg" />
+</p>
 
 <p align="center">⚠️ Under heavy development. All APIs are subject to change. ⚠️</p>
 
@@ -103,14 +105,61 @@ Objects work inside other transformed objects as well. Simulation runs in world 
 import { Box } from "@react-three/drei";
 import { RigidBody, CuboidCollider } from "@react-three/rapier";
 
+const Scene = () => (
+  <group position={[2, 5, 0]} rotation={[0, 0.3, 2]}>
+    <RigidBody>
+      <Box />
+      <CuboidCollider args={[0.5, 0.5, 0.5]} />
+    </RigidBody>
+  </group>
+);
+```
+
+## Instanced Meshes
+
+Instanced meshes can also be used and have automatic colliders generated from their mesh.
+
+By wrapping the `InstancedMesh` in `<InstancedRigidBodies />`, each instance will be attached to an individual `RigidBody`.
+
+```tsx
+import { InstancedRigidBodies } from "@react-three/rapier";
+
+const COUNT = 1000;
+
 const Scene = () => {
+  const instancedApi = useRef<InstancedRigidBodyApi>(null);
+
+  useEffect(() => {
+    // You can access individual instanced by their index
+    instancedApi.at(40).applyImpulse({ x: 0, y: 10, z: 0 });
+
+    // Or update all instances as if they were in an array
+    instancedApi.forEach((api) => {
+      api.applyImpulse({ x: 0, y: 10, z: 0 });
+    });
+  }, []);
+
+  // We can set the initial positions, and rotations, of the instances by providing an array equal to the instance count
+  const positions = Array.from({ length: COUNT }, (_, index) => [index, 0, 0]);
+
+  const rotations = Array.from({ length: COUNT }, (_, index) => [
+    Math.random(),
+    Math.random(),
+    Math.random(),
+  ]);
+
   return (
-    <group position={[2, 5, 0]} rotation={[0, 0.3, 2]}>
-      <RigidBody>
-        <Box />
-        <CuboidCollider args={[0.5, 0.5, 0.5]} />
-      </RigidBody>
-    </group>
+    <InstancedRigidBodies
+      ref={instancedApi}
+      positions={positions}
+      rotations={rotations}
+      colliders="ball"
+    >
+      <instancedMesh args={[undefined, undefined, COUNT]}>
+        <sphereBufferGeometry args={[0.2]} />
+        <meshPhysicalGeometry color="blue" />
+      </instancedMesh>
+    </InstancedRigidBodies>
   );
 };
 ```
@@ -170,19 +219,22 @@ return (
 
 WIP
 
-## Roadmap?
+---
+
+## Roadmap
 
 In order, but also not necessarily:
 
-- [x] Draft of all base shapes
-- [x] Draft of all base joints
+- [x] RigidBodies, Colliders
+- [x] Joints
 - [x] Nested objects retain world transforms
 - [x] Nested objects retain correct collider scale
 - [x] Automatic colliders based on rigidbody children
 - [x] Translation and rotational constraints
 - [x] Collision events
-- [ ] Colliders outside RigidBodies
-- [ ] InstancedMesh support
+- [x] Colliders outside RigidBodies
+- [x] InstancedMesh support
+- [ ] Normalize and improve collision events (add events to single Colliders, InstancedRigidBodies, etc)
 - [ ] Docs
 - [ ] CodeSandbox examples
 - [ ] Helpers, for things like Vehicle, Rope, Player, etc
