@@ -2,4 +2,4 @@
 "@react-three/rapier": minor
 ---
 
-InstancedMesh support ✨
+InstancedMesh support, using InstancedRigidBodies ✨
