@@ -1,5 +1,15 @@
 # @react-three/rapier
 
+## 0.6.0
+
+### Minor Changes
+
+- bb4788a: InstancedMesh support, using InstancedRigidBodies ✨
+
+### Patch Changes
+
+- bb4788a: Improved core with less operations during update loop
+
 ## 0.5.2
 
 ### Patch Changes
