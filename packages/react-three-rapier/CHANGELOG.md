@@ -1,5 +1,11 @@
 # @react-three/rapier
 
+## 0.6.2
+
+### Patch Changes
+
+- 616fdda: Add `scales` to `InstancedRigidBodies` for setting scales of the instances
+
 ## 0.6.1
 
 ### Patch Changes
