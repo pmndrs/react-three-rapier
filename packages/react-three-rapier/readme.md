@@ -1,4 +1,6 @@
-![@react-three/rapier](misc/hero.svg)
+<p align="center">
+  <img src="https://raw.githubusercontent.com/pmndrs/react-three-rapier/HEAD/packages/react-three-rapier/misc/hero.svg" alt="@react-three/rapier" />
+</p>
 
 <p align="center">⚠️ Under heavy development. All APIs are subject to change. ⚠️</p>
 
