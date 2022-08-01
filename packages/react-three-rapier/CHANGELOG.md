@@ -1,5 +1,11 @@
 # @react-three/rapier
 
+## 0.6.1
+
+### Patch Changes
+
+- 3133e42: Fix broken React import
+
 ## 0.6.0
 
 ### Minor Changes
