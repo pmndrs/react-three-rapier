@@ -1,5 +1,5 @@
 import { Collider } from "@dimforge/rapier3d-compat";
-import { ReactNode, useRef, useEffect } from "react";
+import React, { ReactNode, useRef, useEffect } from "react";
 import { Object3D } from "three";
 import { useRapier } from "./hooks";
 import { useRigidBodyContext } from "./RigidBody";

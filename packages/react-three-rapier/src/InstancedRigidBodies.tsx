@@ -1,5 +1,10 @@
 import { Collider, RigidBody } from "@dimforge/rapier3d-compat";
-import { useRef, useEffect, forwardRef, useImperativeHandle } from "react";
+import React, {
+  useRef,
+  useEffect,
+  forwardRef,
+  useImperativeHandle,
+} from "react";
 import {
   Object3D,
   InstancedMesh,

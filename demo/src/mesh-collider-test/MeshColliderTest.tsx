@@ -1,11 +1,6 @@
 import { Box, Sphere, Torus } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import {
-  Debug,
-  MeshCollider,
-  RigidBody,
-  RigidBodyApi,
-} from "@react-three/rapier";
+import { MeshCollider, RigidBody } from "@react-three/rapier";
 import { Demo } from "../App";
 
 export const MeshColliderTest: Demo = () => {
