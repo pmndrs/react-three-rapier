@@ -36,7 +36,11 @@ const Suzanne = () => {
   const { nodes } = useSuzanne();
 
   return (
-    <mesh geometry={nodes.Suzanne.geometry} material={nodes.Suzanne.material} />
+    <mesh
+      castShadow
+      geometry={nodes.Suzanne.geometry}
+      material={nodes.Suzanne.material}
+    />
   );
 };
 
@@ -44,7 +48,11 @@ const OffsetTorus = () => {
   const { nodes } = useOffsetTorus();
 
   return (
-    <mesh geometry={nodes.Torus.geometry} material={nodes.Torus.material} />
+    <mesh
+      castShadow
+      geometry={nodes.Torus.geometry}
+      material={nodes.Torus.material}
+    />
   );
 };
 

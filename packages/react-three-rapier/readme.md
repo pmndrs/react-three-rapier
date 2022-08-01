@@ -1,5 +1,5 @@
 <p align="center">
-<img src="misc/hero.svg" />
+  <img src="https://raw.githubusercontent.com/pmndrs/react-three-rapier/HEAD/packages/react-three-rapier/misc/hero.svg" alt="@react-three/rapier" />
 </p>
 
 <p align="center">⚠️ Under heavy development. All APIs are subject to change. ⚠️</p>
@@ -139,10 +139,17 @@ const Scene = () => {
     });
   }, []);
 
-  // We can set the initial positions, and rotations, of the instances by providing an array equal to the instance count
+  // We can set the initial positions, and rotations, and scales, of
+  // the instances by providing an array equal to the instance count
   const positions = Array.from({ length: COUNT }, (_, index) => [index, 0, 0]);
 
   const rotations = Array.from({ length: COUNT }, (_, index) => [
+    Math.random(),
+    Math.random(),
+    Math.random(),
+  ]);
+
+  const scales = Array.from({ length: COUNT }, (_, index) => [
     Math.random(),
     Math.random(),
     Math.random(),
@@ -153,6 +160,7 @@ const Scene = () => {
       ref={instancedApi}
       positions={positions}
       rotations={rotations}
+      scales={scales}
       colliders="ball"
     >
       <instancedMesh args={[undefined, undefined, COUNT]}>

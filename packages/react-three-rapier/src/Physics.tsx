@@ -23,7 +23,7 @@ import { InstancedMesh, Matrix, Matrix4, Mesh, Object3D, Vector3 } from "three";
 import {
   rapierQuaternionToQuaternion,
   rapierVector3ToVector3,
-  vectorArrayToObject,
+  vectorArrayToVector3,
 } from "./utils";
 import { createWorldApi } from "./api";
 import { _matrix4, _object3d, _vector3 } from "./shared-objects";
@@ -37,7 +37,8 @@ export interface RapierContext {
     {
       mesh: Object3D;
       isSleeping: boolean;
-      setMatrix: (mat: Matrix4) => void;
+      setMatrix(mat: Matrix4): void;
+      getMatrix(): Matrix4;
       worldScale: Vector3;
       invertedMatrixWorld: Matrix4;
     }
@@ -116,7 +117,7 @@ export const Physics: FC<RapierWorldProps> = ({
   const worldRef = useRef<World>();
   const getWorldRef = useRef(() => {
     if (!worldRef.current) {
-      const world = new rapier.World(vectorArrayToObject(gravity));
+      const world = new rapier.World(vectorArrayToVector3(gravity));
       worldRef.current = world;
     }
     return worldRef.current;
@@ -131,7 +132,8 @@ export const Physics: FC<RapierWorldProps> = ({
       {
         mesh: Object3D;
         isSleeping: boolean;
-        setMatrix: (mat: Matrix4) => void;
+        setMatrix(mat: Matrix4): void;
+        getMatrix(): Matrix4;
         worldScale: Vector3;
         invertedMatrixWorld: Matrix4;
       }
@@ -156,7 +158,7 @@ export const Physics: FC<RapierWorldProps> = ({
   useEffect(() => {
     const world = worldRef.current;
     if (world) {
-      world.gravity = vectorArrayToObject(gravity);
+      world.gravity = vectorArrayToVector3(gravity);
     }
   }, [gravity]);
 

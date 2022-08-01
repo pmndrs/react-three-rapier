@@ -25,7 +25,7 @@ import {
   decomposeMatrix4,
   rigidBodyDescFromOptions,
   vector3ToQuaternion,
-  vectorArrayToObject,
+  vectorArrayToVector3,
 } from "./utils";
 
 interface InstancedRigidBodiesProps
@@ -35,6 +35,7 @@ interface InstancedRigidBodiesProps
   > {
   positions?: Vector3Array[];
   rotations?: Vector3Array[];
+  scales?: Vector3Array[];
 }
 
 export const InstancedRigidBodies = forwardRef<
@@ -58,7 +59,7 @@ export const InstancedRigidBodies = forwardRef<
     const rigidBodies = instancesRefGetter.current();
 
     if (object.current) {
-      const scale = object.current.getWorldScale(new Vector3());
+      const worldScale = object.current.getWorldScale(new Vector3());
       let hasOneMesh = false;
 
       object.current.traverse((mesh) => {
@@ -72,15 +73,22 @@ export const InstancedRigidBodies = forwardRef<
           hasOneMesh = true;
           mesh.instanceMatrix.setUsage(DynamicDrawUsage);
 
-          const rigidBodyDesc = rigidBodyDescFromOptions(props);
-          const colliderDesc = colliderDescFromGeometry(
-            mesh.geometry,
-            props.colliders || physicsOptions.colliders,
-            scale,
-            false // Collisions currently not enabled for instances
-          );
-
           for (let index = 0; index < mesh.count; index++) {
+            const scale = worldScale.clone();
+            const rigidBodyDesc = rigidBodyDescFromOptions(props);
+
+            if (props.scales && props.scales[index]) {
+              const s = vectorArrayToVector3(props.scales[index]);
+              scale.multiply(s);
+            }
+
+            const colliderDesc = colliderDescFromGeometry(
+              mesh.geometry,
+              props.colliders || physicsOptions.colliders,
+              scale,
+              false // Collisions currently not enabled for instances
+            );
+
             const rigidBody = world.createRigidBody(rigidBodyDesc);
             const matrix = new Matrix4();
             mesh.getMatrixAt(index, matrix);
@@ -89,7 +97,7 @@ export const InstancedRigidBodies = forwardRef<
             // Set positions
             if (props.positions && props.positions[index]) {
               rigidBody.setTranslation(
-                vectorArrayToObject(props.positions[index]),
+                vectorArrayToVector3(props.positions[index]),
                 true
               );
             } else {
@@ -113,7 +121,14 @@ export const InstancedRigidBodies = forwardRef<
               isSleeping: false,
               invertedMatrixWorld: object.current!.matrixWorld.clone().invert(),
               setMatrix: (matrix: Matrix4) => mesh.setMatrixAt(index, matrix),
-              worldScale: object.current!.getWorldScale(new Vector3()),
+              getMatrix: () => {
+                const m = new Matrix4();
+                mesh.getMatrixAt(index, m);
+                return m;
+              },
+              // Setting the world scale to the scale here, because
+              // we want the scales to be reflected by instance
+              worldScale: scale,
             });
 
             const api = createRigidBodyApi({

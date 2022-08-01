@@ -8,7 +8,7 @@ import { useEffect, useRef } from "react";
 import { useSuzanne } from "../all-shapes/AllShapes";
 import { Demo } from "../App";
 
-const COUNT = 200;
+const COUNT = 300;
 
 export const InstancedMeshes: Demo = () => {
   const {
@@ -21,7 +21,7 @@ export const InstancedMeshes: Demo = () => {
     if (api.current) {
       api.current
         .at(evt.instanceId!)
-        .applyTorqueImpulse({ x: 0, y: 500, z: 0 });
+        .applyTorqueImpulse({ x: 0, y: 100, z: 0 });
     }
   };
 
@@ -29,16 +29,16 @@ export const InstancedMeshes: Demo = () => {
     if (api.current) {
       api.current.forEach((body) => {
         body.applyImpulse({
-          x: -Math.random() * 20,
-          y: Math.random() * 20,
-          z: -Math.random() * 20,
+          x: -Math.random() * 5,
+          y: Math.random() * 5,
+          z: -Math.random() * 5,
         });
       });
     }
   }, []);
 
   return (
-    <group>
+    <group scale={0.7}>
       <InstancedRigidBodies
         ref={api}
         colliders="hull"
@@ -51,6 +51,11 @@ export const InstancedMeshes: Demo = () => {
           Math.random() * Math.PI * 2,
           Math.random() * Math.PI * 2,
           Math.random() * Math.PI * 2,
+        ])}
+        scales={Array.from({ length: COUNT }, () => [
+          0.5 + Math.random(),
+          0.5 + Math.random(),
+          0.5 + Math.random(),
         ])}
       >
         <instancedMesh
