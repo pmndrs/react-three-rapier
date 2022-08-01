@@ -35,7 +35,7 @@ import {
   rigidBodyDescFromOptions,
   rigidBodyTypeFromString,
   vector3ToQuaternion,
-  vectorArrayToObject,
+  vectorArrayToVector3,
 } from "./utils";
 import { createJointApi, createRigidBodyApi } from "./api";
 import { _vector3 } from "./shared-objects";
@@ -126,6 +126,7 @@ export const useRigidBody = <O extends Object3D>(
       isSleeping: false,
       worldScale: ref.current.getWorldScale(_vector3).clone(),
       setMatrix: (mat) => ref.current!.matrix.copy(mat),
+      getMatrix: () => ref.current!.matrix
     });
 
     ref.current.matrixAutoUpdate = false;
@@ -227,10 +228,10 @@ export const useFixedJoint: UseImpulseJoint<FixedJointParams> = (
     body1,
     body2,
     rapier.JointData.fixed(
-      vectorArrayToObject(body1Anchor),
-      { ...vectorArrayToObject(body1LocalFrame), w: 1 },
-      vectorArrayToObject(body2Anchor),
-      { ...vectorArrayToObject(body2LocalFrame), w: 1 }
+      vectorArrayToVector3(body1Anchor),
+      { ...vectorArrayToVector3(body1LocalFrame), w: 1 },
+      vectorArrayToVector3(body2Anchor),
+      { ...vectorArrayToVector3(body2LocalFrame), w: 1 }
     )
   );
 };
@@ -252,8 +253,8 @@ export const useSphericalJoint: UseImpulseJoint<SphericalJointParams> = (
     body1,
     body2,
     rapier.JointData.spherical(
-      vectorArrayToObject(body1Anchor),
-      vectorArrayToObject(body2Anchor)
+      vectorArrayToVector3(body1Anchor),
+      vectorArrayToVector3(body2Anchor)
     )
   );
 };
@@ -274,9 +275,9 @@ export const useRevoluteJoint: UseImpulseJoint<RevoluteJointParams> = (
     body1,
     body2,
     rapier.JointData.revolute(
-      vectorArrayToObject(body1Anchor),
-      vectorArrayToObject(body2Anchor),
-      vectorArrayToObject(axis)
+      vectorArrayToVector3(body1Anchor),
+      vectorArrayToVector3(body2Anchor),
+      vectorArrayToVector3(axis)
     )
   );
 };
@@ -297,9 +298,9 @@ export const usePrismaticJoint: UseImpulseJoint<PrismaticJointParams> = (
     body1,
     body2,
     rapier.JointData.prismatic(
-      vectorArrayToObject(body1Anchor),
-      vectorArrayToObject(body2Anchor),
-      vectorArrayToObject(axis)
+      vectorArrayToVector3(body1Anchor),
+      vectorArrayToVector3(body2Anchor),
+      vectorArrayToVector3(axis)
     )
   );
 };

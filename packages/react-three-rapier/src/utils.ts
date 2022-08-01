@@ -32,9 +32,9 @@ import {
 } from "./types";
 import { _quaternion, _euler, _vector3 } from "./shared-objects";
 
-export const vectorArrayToObject = (arr: Vector3Array) => {
+export const vectorArrayToVector3 = (arr: Vector3Array) => {
   const [x, y, z] = arr;
-  return { x, y, z };
+  return new Vector3(x, y, z);
 };
 
 export const vector3ToQuaternion = (v: Vector3) => {
