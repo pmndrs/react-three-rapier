@@ -6,7 +6,7 @@ import {
   PrismaticImpulseJoint,
   RigidBody,
   RigidBodyDesc,
-  World,
+  World
 } from "@dimforge/rapier3d-compat";
 import { Quaternion, Vector3 } from "three";
 import { RefGetter } from "./types";
@@ -95,6 +95,25 @@ export interface RigidBodyApi {
    * Sets the angular velocity of this rigid-body.
    */
   setAngvel(velocity: Vector3Object): void;
+
+
+  /**
+   * The linear damping of this rigid-body.
+   */
+   linearDamping(): number;
+   /**
+    * Sets the linear damping factor applied to this rigid-body.
+    */
+  setLinearDamping(factor: number): void;
+ 
+   /**
+    * The angular damping of this rigid-body.
+    */
+   angularDamping(): number;
+   /**
+    * Sets the anugular damping factor applied to this rigid-body.
+    */
+   setAngularDamping(factor: number): void;
 
   /**
    * If this rigid body is kinematic, sets its future rotation after the next timestep integration.
@@ -192,6 +211,18 @@ export const createRigidBodyApi = (ref: RefGetter<RigidBody>): RigidBodyApi => {
       return new Vector3(x, y, z);
     },
     setAngvel: (velocity) => ref.current()!.setAngvel(velocity, true),
+
+    linearDamping() {
+      return ref.current()!.linearDamping()
+    },
+    
+    setLinearDamping: (factor) => ref.current()!.setLinearDamping(factor),
+  
+    angularDamping(){
+      return ref.current()!.angularDamping()
+    },
+    
+    setAngularDamping: (factor) => ref.current()!.setAngularDamping(factor),
 
     setNextKinematicRotation: ({ x, y, z }) => {
       const q = vector3ToQuaternion(new Vector3(x, y, z));
