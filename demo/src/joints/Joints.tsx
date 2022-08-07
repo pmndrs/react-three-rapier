@@ -85,12 +85,10 @@ const Rope = (props: { component: ReactNode; length: number }) => {
   );
 };
 
-const Joints: Demo = () => {
+export const Joints: Demo = () => {
   return (
     <group>
       <Rope length={40} component={<ShadowElement />} />
     </group>
   );
 };
-
-export default Joints;

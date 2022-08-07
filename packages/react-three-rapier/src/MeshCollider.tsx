@@ -23,15 +23,16 @@ export const MeshCollider = ({ children, type }: MeshColliderProps) => {
       const colliderSetting = type ?? physicsOptions.colliders ?? false;
       autoColliders =
         colliderSetting !== false
-          ? createCollidersFromChildren(
-              object.current,
-              api,
-              {
+          ? createCollidersFromChildren({
+              object: object.current,
+              rigidBody: api,
+              options: {
                 ...options,
                 colliders: colliderSetting,
               },
               world,
               false
+            }
             )
           : [];
     }

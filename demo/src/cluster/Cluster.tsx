@@ -1,5 +1,6 @@
 import { useFrame } from "@react-three/fiber";
 import {
+  CuboidCollider,
   InstancedRigidBodies,
   InstancedRigidBodyApi,
 } from "@react-three/rapier";
@@ -28,7 +29,7 @@ export const Cluster: Demo = () => {
           (i % 30) * 0.5,
           0,
         ])}
-        colliders="ball"
+        colliders={"ball"}
       >
         <instancedMesh args={[undefined, undefined, BALLS]} castShadow>
           <sphereBufferGeometry args={[0.2]} />

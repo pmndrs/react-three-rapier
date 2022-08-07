@@ -32,7 +32,8 @@ import { ComponentsExample } from "./components/Components";
 import { CradleExample } from "./cradle/Cradle";
 import { Damping } from "./damping/Damping";
 import { InstancedMeshes } from "./instanced-meshes/InstancedMeshes";
-import Joints from "./joints/Joints";
+import { InstancedMeshesCompound } from "./instances-meshes-compound/InstancedMeshesCompound";
+import { Joints } from "./joints/Joints";
 import { Kinematics } from "./kinematics/Kinematics";
 import { MeshColliderTest } from "./mesh-collider-test/MeshColliderTest";
 import Shapes from "./shapes/Shapes";
@@ -128,6 +129,10 @@ export const App = () => {
                     element={<InstancedMeshes />}
                   />
                   <Route path="damping" element={<Damping />} />
+                  <Route
+                    path="instanced-meshes-compound"
+                    element={<InstancedMeshesCompound />}
+                  />
                 </Routes>
               </demoContext.Provider>
 
@@ -164,7 +169,11 @@ export const App = () => {
         <Link to="mesh-collider-test">MeshCollider</Link>
         <Link to="colliders">Free Colliders</Link>
         <Link to="instanced-meshes">Instanced Meshes</Link>
+        <Link to="instanced-meshes-compound">
+          Instanced Meshes (compound shapes)
+        </Link>
         <Link to="damping">Damping</Link>
+
         <button
           style={{
             background: debug ? "red" : "transparent",

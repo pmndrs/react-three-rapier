@@ -1,14 +1,16 @@
-import React, { createContext, MutableRefObject } from "react";
+import React, { createContext, MutableRefObject, RefObject } from "react";
 import { forwardRef, ReactNode, useContext, useImperativeHandle } from "react";
 import { Object3D } from "three";
+import { InstancedRigidBodyApi } from "./api";
 import { useRigidBody } from "./hooks";
+import { InstancedRigidBodiesProps } from "./InstancedRigidBodies";
 import { RigidBodyApi, UseRigidBodyOptions } from "./types";
 
-const RigidBodyContext = createContext<{
-  ref: MutableRefObject<Object3D>;
-  api: RigidBodyApi;
+export const RigidBodyContext = createContext<{
+  ref: RefObject<Object3D> | MutableRefObject<Object3D>;
+  api: RigidBodyApi | InstancedRigidBodyApi;
   hasCollisionEvents: boolean;
-  options: UseRigidBodyOptions;
+  options: UseRigidBodyOptions | InstancedRigidBodiesProps;
 }>(undefined!);
 
 export const useRigidBodyContext = () => useContext(RigidBodyContext);
