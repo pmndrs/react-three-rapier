@@ -173,6 +173,8 @@ const Scene = () => {
       <instancedMesh args={[undefined, undefined, COUNT]}>
         <sphereBufferGeometry args={[0.2]} />
         <meshPhysicalGeometry color="blue" />
+
+        <CuboidCollider args={[0.1, 0.2, 0.1]} />
       </instancedMesh>
     </InstancedRigidBodies>
   );

@@ -46,6 +46,28 @@ const demoContext = createContext<{
 
 export const useDemo = () => useContext(demoContext);
 
+const ToggleButton = ({
+  label,
+  value,
+  onClick,
+}: {
+  label: string;
+  value: boolean;
+  onClick(): void;
+}) => (
+  <button
+    style={{
+      background: value ? "red" : "transparent",
+      border: "2px solid red",
+      color: value ? "white" : "red",
+      borderRadius: 4,
+    }}
+    onClick={onClick}
+  >
+    {label}
+  </button>
+);
+
 export interface Demo {
   (props: { children?: ReactNode }): JSX.Element;
 }
@@ -54,8 +76,8 @@ const Floor = () => {
   return (
     <RigidBody type="fixed" colliders="cuboid">
       <Box
-        position={[0, -12.55, 0]}
-        scale={[200, 0.1, 200]}
+        position={[0, -12.55 - 5, 0]}
+        scale={[200, 10, 200]}
         rotation={[0, 0, 0]}
         receiveShadow
       >
@@ -69,6 +91,7 @@ export const App = () => {
   const [ui, setUI] = useState<ReactNode>(null);
   const [debug, setDebug] = useState<boolean>(false);
   const [perf, setPerf] = useState<boolean>(false);
+  const [paused, setPaused] = useState<boolean>(false);
 
   const ContextBridge = useContextBridge(
     UNSAFE_LocationContext,
@@ -88,7 +111,7 @@ export const App = () => {
       <Canvas shadows>
         <Suspense fallback="Loading...">
           <ContextBridge>
-            <Physics>
+            <Physics paused={paused}>
               <directionalLight
                 castShadow
                 position={[10, 10, 10]}
@@ -174,28 +197,21 @@ export const App = () => {
         </Link>
         <Link to="damping">Damping</Link>
 
-        <button
-          style={{
-            background: debug ? "red" : "transparent",
-            border: "2px solid red",
-            color: debug ? "white" : "red",
-            borderRadius: 4,
-          }}
+        <ToggleButton
+          label="Debug"
+          value={debug}
           onClick={() => setDebug((v) => !v)}
-        >
-          Debug
-        </button>
-        <button
-          style={{
-            background: perf ? "red" : "transparent",
-            border: "2px solid red",
-            color: perf ? "white" : "red",
-            borderRadius: 4,
-          }}
+        />
+        <ToggleButton
+          label="Perf"
+          value={perf}
           onClick={() => setPerf((v) => !v)}
-        >
-          Perf
-        </button>
+        />
+        <ToggleButton
+          label="Paused"
+          value={paused}
+          onClick={() => setPaused((v) => !v)}
+        />
       </div>
 
       <div

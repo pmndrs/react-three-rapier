@@ -33,12 +33,23 @@ const AnyCollider = ({
     // If this is an InstancedRigidBody api
     if (rigidBodyContext && "at" in rigidBodyContext.api) {
       rigidBodyContext.api.forEach((body, index) => {
+        let instanceScale = scale.clone();
+
+        if (
+          "scales" in rigidBodyContext.options &&
+          rigidBodyContext?.options?.scales?.[index]
+        ) {
+          instanceScale.multiply(
+            vectorArrayToVector3(rigidBodyContext.options.scales[index])
+          );
+        }
+
         colliders.push(
           createColliderFromOptions({
             options: props,
             world,
             rigidBody: body.raw(),
-            scale,
+            scale: instanceScale,
             hasCollisionEvents: rigidBodyContext?.hasCollisionEvents,
           })
         );

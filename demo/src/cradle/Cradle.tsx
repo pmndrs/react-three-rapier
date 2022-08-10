@@ -15,7 +15,7 @@ const Rod = (props: UseRigidBodyOptions) => {
   const anchor = useRef<RigidBodyApi>(null);
   const rod = useRef<RigidBodyApi>(null);
 
-  const joint = useSphericalJoint(anchor, rod, [
+  useSphericalJoint(anchor, rod, [
     [0, 0, 0],
     [0, 0, 0],
   ]);
@@ -23,7 +23,7 @@ const Rod = (props: UseRigidBodyOptions) => {
   return (
     <group>
       <RigidBody ref={anchor} {...props} />
-      <RigidBody ref={rod} {...props}>
+      <RigidBody ref={rod} {...props} colliders={false}>
         <Cylinder
           scale={[0.05, 2, 0.05]}
           position={[0, -1, 0]}

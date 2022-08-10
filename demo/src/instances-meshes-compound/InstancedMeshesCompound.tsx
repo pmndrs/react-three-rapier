@@ -1,6 +1,7 @@
 import { ThreeEvent } from "@react-three/fiber";
 import {
   BallCollider,
+  CuboidCollider,
   Debug,
   InstancedRigidBodies,
   InstancedRigidBodyApi,
@@ -9,7 +10,7 @@ import { useEffect, useRef } from "react";
 import { useSuzanne } from "../all-shapes/AllShapes";
 import { Demo } from "../App";
 
-const COUNT = 300;
+const COUNT = 10;
 
 export const InstancedMeshesCompound: Demo = () => {
   const {
@@ -67,8 +68,8 @@ export const InstancedMeshesCompound: Demo = () => {
           <meshPhysicalMaterial color={"yellow"} />
         </instancedMesh>
         <BallCollider args={[1]} />
-        <BallCollider args={[0.5]} position={[1, 1, -1]} />
-        <BallCollider args={[0.5]} position={[-1, 1, -1]} />
+        <BallCollider args={[0.5]} position={[1, 0.3, -0.25]} />
+        <CuboidCollider args={[0.5, 0.2, 0.5]} position={[-1, 0.3, -0.25]} />
       </InstancedRigidBodies>
     </group>
   );
