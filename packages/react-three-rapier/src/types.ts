@@ -1,21 +1,18 @@
-import React, { MutableRefObject } from "react";
+import { MutableRefObject } from "react";
 
 import {
-  CoefficientCombineRule,
-  RigidBody as RapierRigidBody,
-  Collider as RapierCollider,
-  TempContactManifold,
+  CoefficientCombineRule, Collider as RapierCollider, RigidBody as RapierRigidBody, TempContactManifold
 } from "@dimforge/rapier3d-compat";
 import {
   createColliderApi,
   createJointApi,
   createRigidBodyApi,
-  createWorldApi,
+  createWorldApi
 } from "./api";
 
+export { CoefficientCombineRule as CoefficientCombineRule } from "@dimforge/rapier3d-compat";
 export { RapierRigidBody, RapierCollider };
 
-export { CoefficientCombineRule as CoefficientCombineRule } from "@dimforge/rapier3d-compat";
 
 export type RefGetter<T> = MutableRefObject<() => T | undefined>;
 
@@ -184,6 +181,12 @@ export interface UseRigidBodyOptions {
    * default: true
    */
   canSleep?: boolean;
+
+  /** The linear damping coefficient of this rigid-body.*/
+  linearDamping?: number;
+
+  /** The angular damping coefficient of this rigid-body.*/
+  angularDamping?: number;
 
   /** The linear velocity of this body.
    * default: zero velocity

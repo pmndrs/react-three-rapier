@@ -3,23 +3,21 @@ import {
   CoefficientCombineRule,
   Collider,
   ColliderDesc,
+  Quaternion as RapierQuaternion,
   RigidBody,
   RigidBodyDesc,
   Vector3 as RapierVector3,
-  Quaternion as RapierQuaternion,
 } from "@dimforge/rapier3d-compat";
 
 import {
-  BoxBufferGeometry,
   BufferGeometry,
   Matrix4,
   Mesh,
   Object3D,
   Quaternion,
-  Sphere,
-  SphereBufferGeometry,
   Vector3,
 } from "three";
+import { _euler, _quaternion, _vector3 } from "./shared-objects";
 import {
   RigidBodyApi,
   RigidBodyAutoCollider,
@@ -30,7 +28,6 @@ import {
   Vector3Array,
   WorldApi,
 } from "./types";
-import { _quaternion, _euler, _vector3 } from "./shared-objects";
 
 export const vectorArrayToVector3 = (arr: Vector3Array) => {
   const [x, y, z] = arr;
@@ -334,6 +331,9 @@ export const rigidBodyDescFromOptions = (options: UseRigidBodyOptions) => {
   const type = rigidBodyTypeFromString(options?.type || "dynamic");
   const [lvx, lvy, lvz] = options?.linearVelocity ?? [0, 0, 0];
   const [avx, avy, avz] = options?.angularVelocity ?? [0, 0, 0];
+  const angularDamping = options?.angularDamping ?? 0;
+  const linearDamping = options?.linearDamping ?? 0;
+
   const gravityScale = options?.gravityScale ?? 1;
   const canSleep = options?.canSleep ?? true;
   const ccdEnabled = options?.ccd ?? false;
@@ -343,6 +343,8 @@ export const rigidBodyDescFromOptions = (options: UseRigidBodyOptions) => {
   const desc = new RigidBodyDesc(type)
     .setLinvel(lvx, lvy, lvz)
     .setAngvel({ x: avx, y: avy, z: avz })
+    .setLinearDamping(linearDamping)
+    .setAngularDamping(angularDamping)
     .setGravityScale(gravityScale)
     .setCanSleep(canSleep)
     .setCcdEnabled(ccdEnabled)

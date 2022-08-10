@@ -5,23 +5,15 @@ import {
   useContextBridge,
 } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
+import { Debug, Physics, RigidBody } from "@react-three/rapier";
+import { Perf } from "r3f-perf";
 import {
   createContext,
-  FC,
   ReactNode,
   Suspense,
   useContext,
   useState,
 } from "react";
-import { Debug, Physics, RigidBody, useRapier } from "@react-three/rapier";
-import Joints from "./joints/Joints";
-import Shapes from "./shapes/Shapes";
-import { ComponentsExample } from "./components/Components";
-import { CradleExample } from "./cradle/Cradle";
-import { Transforms } from "./transforms/Transforms";
-import { Cluster } from "./cluster/Cluster";
-import { AllShapes } from "./all-shapes/AllShapes";
-import { Car } from "./car/Car";
 import {
   NavLink,
   NavLinkProps,
@@ -31,12 +23,20 @@ import {
   UNSAFE_NavigationContext,
   UNSAFE_RouteContext,
 } from "react-router-dom";
+import { AllShapes } from "./all-shapes/AllShapes";
 import { ApiUsage } from "./api-usage/ApiUsage";
+import { Car } from "./car/Car";
+import { Cluster } from "./cluster/Cluster";
+import { Colliders } from "./colliders/Colliders";
+import { ComponentsExample } from "./components/Components";
+import { CradleExample } from "./cradle/Cradle";
+import { Damping } from "./damping/Damping";
+import { InstancedMeshes } from "./instanced-meshes/InstancedMeshes";
+import Joints from "./joints/Joints";
 import { Kinematics } from "./kinematics/Kinematics";
 import { MeshColliderTest } from "./mesh-collider-test/MeshColliderTest";
-import { Colliders } from "./colliders/Colliders";
-import { InstancedMeshes } from "./instanced-meshes/InstancedMeshes";
-import { Perf } from "r3f-perf";
+import Shapes from "./shapes/Shapes";
+import { Transforms } from "./transforms/Transforms";
 
 const demoContext = createContext<{
   setDebug?(f: boolean): void;
@@ -127,6 +127,7 @@ export const App = () => {
                     path="instanced-meshes"
                     element={<InstancedMeshes />}
                   />
+                  <Route path="damping" element={<Damping />} />
                 </Routes>
               </demoContext.Provider>
 
@@ -163,6 +164,7 @@ export const App = () => {
         <Link to="mesh-collider-test">MeshCollider</Link>
         <Link to="colliders">Free Colliders</Link>
         <Link to="instanced-meshes">Instanced Meshes</Link>
+        <Link to="damping">Damping</Link>
         <button
           style={{
             background: debug ? "red" : "transparent",
