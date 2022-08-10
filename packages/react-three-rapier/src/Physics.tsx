@@ -110,7 +110,7 @@ interface RapierWorldProps {
    * 
    * @defaultValue false
    */
-  paused: boolean
+  paused?: boolean
 }
 
 export const Physics: FC<RapierWorldProps> = ({
