@@ -184,13 +184,22 @@ const isChildOfMeshCollider = (child: Mesh) => {
   return flag;
 };
 
-export const createCollidersFromChildren = (
-  object: Object3D,
-  rigidBody: RigidBodyApi | RigidBody,
-  options: UseRigidBodyOptions,
-  world: WorldApi,
-  ignoreMeshColliders = true
-) => {
+interface CreateCollidersFromChildren {
+  (options: {
+    object: Object3D;
+    rigidBody?: Pick<RigidBodyApi | RigidBody, "handle">;
+    options: UseRigidBodyOptions;
+    world: WorldApi;
+    ignoreMeshColliders: boolean;
+  }): Collider[];
+}
+export const createCollidersFromChildren: CreateCollidersFromChildren = ({
+  object,
+  rigidBody,
+  options,
+  world,
+  ignoreMeshColliders = true,
+}) => {
   const hasCollisionEvents = !!(
     options.onCollisionEnter || options.onCollisionExit
   );
@@ -199,7 +208,7 @@ export const createCollidersFromChildren = (
   let desc: ColliderDesc;
   let offset = new Vector3();
 
-  object.traverse((child: Object3D | Mesh) => {
+  object.traverseVisible((child: Object3D | Mesh) => {
     if ("isMesh" in child) {
       if (ignoreMeshColliders && isChildOfMeshCollider(child)) return;
 
@@ -244,7 +253,9 @@ export const createCollidersFromChildren = (
         )
         .setRotation({ x: rx, y: ry, z: rz, w: rw });
 
-      const actualRigidBody = world.getRigidBody(rigidBody?.handle)!;
+      const actualRigidBody = rigidBody
+        ? world.getRigidBody(rigidBody.handle)
+        : undefined;
       const collider = world.createCollider(desc, actualRigidBody);
       colliders.push(collider);
     }

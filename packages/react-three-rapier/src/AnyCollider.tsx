@@ -1,3 +1,4 @@
+import { Collider } from "@dimforge/rapier3d-compat";
 import React, { ReactNode, useRef, useEffect } from "react";
 import { Object3D, Vector3, InstancedMesh } from "three";
 import { useRapier } from "./hooks";
@@ -14,7 +15,7 @@ import {
   CylinderArgs,
   ConvexHullArgs,
 } from "./types";
-import { createColliderFromOptions } from "./utils";
+import { createColliderFromOptions, vectorArrayToVector3 } from "./utils";
 
 // Colliders
 const AnyCollider = ({
@@ -27,17 +28,50 @@ const AnyCollider = ({
 
   useEffect(() => {
     const scale = ref.current!.getWorldScale(new Vector3());
+    const colliders: Collider[] = [];
 
-    const collider = createColliderFromOptions({
-      options: props,
-      world,
-      rigidBody: rigidBodyContext?.api?.raw(),
-      scale,
-      hasCollisionEvents: rigidBodyContext?.hasCollisionEvents,
-    });
+    // If this is an InstancedRigidBody api
+    if (rigidBodyContext && "at" in rigidBodyContext.api) {
+      rigidBodyContext.api.forEach((body, index) => {
+        let instanceScale = scale.clone();
+
+        if (
+          "scales" in rigidBodyContext.options &&
+          rigidBodyContext?.options?.scales?.[index]
+        ) {
+          instanceScale.multiply(
+            vectorArrayToVector3(rigidBodyContext.options.scales[index])
+          );
+        }
+
+        colliders.push(
+          createColliderFromOptions({
+            options: props,
+            world,
+            rigidBody: body.raw(),
+            scale: instanceScale,
+            hasCollisionEvents: rigidBodyContext?.hasCollisionEvents,
+          })
+        );
+      });
+    } else {
+      colliders.push(
+        createColliderFromOptions({
+          options: props,
+          world,
+          // Initiate with a rigidbody, or undefined, because colliders can exist without a rigid body
+          rigidBody:
+            rigidBodyContext && "raw" in rigidBodyContext.api
+              ? rigidBodyContext.api.raw()
+              : undefined,
+          scale,
+          hasCollisionEvents: rigidBodyContext?.hasCollisionEvents,
+        })
+      );
+    }
 
     return () => {
-      world.removeCollider(collider);
+      colliders.forEach((collider) => world.removeCollider(collider));
     };
   }, []);
 

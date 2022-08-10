@@ -104,6 +104,13 @@ interface RapierWorldProps {
    * @defaultValue "vary"
    */
   timeStep?: number | "vary";
+
+  /**
+   * Pause the physics simulation
+   * 
+   * @defaultValue false
+   */
+  paused: boolean
 }
 
 export const Physics: FC<RapierWorldProps> = ({
@@ -111,6 +118,7 @@ export const Physics: FC<RapierWorldProps> = ({
   gravity = [0, -9.81, 0],
   children,
   timeStep = "vary",
+  paused = false
 }) => {
   const rapier = useAsset(importRapier);
 
@@ -179,7 +187,7 @@ export const Physics: FC<RapierWorldProps> = ({
       world.timestep = timeStep;
     }
 
-    world.step(eventQueue);
+    if (!paused) world.step(eventQueue);
 
     // Update meshes
     rigidBodyStates.forEach((state, handle) => {
