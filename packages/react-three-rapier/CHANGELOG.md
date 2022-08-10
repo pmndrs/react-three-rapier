@@ -1,5 +1,13 @@
 # @react-three/rapier
 
+## 0.6.3
+
+### Patch Changes
+
+- 8f635ea: Collider components allowed in <InstancedRigidBodies> which allows combound shape creation
+- 8f635ea: Add `paused` to <Physics /> to allow pausing
+- f1abe81: feat(RigidBody): add linear and angular damping methods to api and props to RigidBody
+
 ## 0.6.2
 
 ### Patch Changes
