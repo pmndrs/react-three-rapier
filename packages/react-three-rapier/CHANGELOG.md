@@ -1,5 +1,11 @@
 # @react-three/rapier
 
+## 0.6.4
+
+### Patch Changes
+
+- 49fd0a2: Make `paused` optional
+
 ## 0.6.3
 
 ### Patch Changes
