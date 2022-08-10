@@ -187,10 +187,10 @@ const isChildOfMeshCollider = (child: Mesh) => {
 interface CreateCollidersFromChildren {
   (options: {
     object: Object3D;
-    rigidBody?: RigidBodyApi;
+    rigidBody?: Pick<RigidBodyApi | RigidBody, "handle">;
     options: UseRigidBodyOptions;
     world: WorldApi;
-    ignoreMeshColliders: true;
+    ignoreMeshColliders: boolean;
   }): Collider[];
 }
 export const createCollidersFromChildren: CreateCollidersFromChildren = ({
@@ -198,7 +198,7 @@ export const createCollidersFromChildren: CreateCollidersFromChildren = ({
   rigidBody,
   options,
   world,
-  ignoreMeshColliders,
+  ignoreMeshColliders = true,
 }) => {
   const hasCollisionEvents = !!(
     options.onCollisionEnter || options.onCollisionExit
