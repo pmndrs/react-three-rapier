@@ -95,15 +95,10 @@ interface RapierWorldProps {
    * Set the timestep for the simulation.
    * Setting this to a number (eg. 1/60) will run the
    * simulation at that framerate.
-   *
-   * "vary" will run the simulation at a delta-value based
-   * on the users current framerate. This ensures simulations
-   * run at the same percieved speed at all framerates, but
-   * can also lead to instability.
-   *
-   * @defaultValue "vary"
+   * 
+   * @defaultValue 1/60
    */
-  timeStep?: number | "vary";
+  timeStep?: number;
 
   /**
    * Pause the physics simulation
@@ -117,7 +112,7 @@ export const Physics: FC<RapierWorldProps> = ({
   colliders = "cuboid",
   gravity = [0, -9.81, 0],
   children,
-  timeStep = "vary",
+  timeStep = 1/20,
   paused = false
 }) => {
   const rapier = useAsset(importRapier);
@@ -157,7 +152,6 @@ export const Physics: FC<RapierWorldProps> = ({
     return () => {
       if (world) {
         world.free();
-        worldRef.current = undefined;
       }
     };
   }, []);
@@ -170,24 +164,48 @@ export const Physics: FC<RapierWorldProps> = ({
     }
   }, [gravity]);
 
-  const time = useRef(performance.now());
+  const [steppingState] = useState({
+    lastTime: performance.now(),
+    accumulator: 0
+  })
 
-  useFrame((context) => {
+  useFrame(() => {
     const world = worldRef.current;
     if (!world) return;
 
-    // Set timestep to current delta, to allow for variable frame rates
-    // We cap the delta at 100, so that the physics simulation doesn't get wild
-    const now = performance.now();
-    const delta = Math.min(100, now - time.current);
+    world.timestep = timeStep;
 
-    if (timeStep === "vary") {
-      world.timestep = delta / 1000;
-    } else {
-      world.timestep = timeStep;
+    /**
+     * Fixed timeStep simulation progression
+     * @see https://gafferongames.com/post/fix_your_timestep/ 
+    */
+    let previousTranslations: Record<string, {
+      rotation: Rapier.Rotation,
+      translation: Rapier.Vector3
+    }> = {}
+
+    const nowTime = performance.now();
+    const timeStepMs = timeStep * 1000
+    const timeSinceLast = nowTime - steppingState.lastTime
+    steppingState.lastTime = nowTime
+    steppingState.accumulator += timeSinceLast
+
+    if (!paused) {
+      while (steppingState.accumulator >= timeStepMs) {
+        // Collect previous state
+        world.bodies.forEach(b => {
+          previousTranslations[b.handle] = {
+            rotation: b.rotation(),
+            translation: b.translation()
+          }
+        })
+
+        world.step(eventQueue)
+        steppingState.accumulator -= timeStepMs
+      }
     }
 
-    if (!paused) world.step(eventQueue);
+    const interpolationDelta = steppingState.accumulator / timeStepMs
 
     // Update meshes
     rigidBodyStates.forEach((state, handle) => {
@@ -213,11 +231,18 @@ export const Physics: FC<RapierWorldProps> = ({
         return;
       }
 
+      let oldState = previousTranslations[rigidBody.handle]
+      
+      let newTranslation = rapierVector3ToVector3(rigidBody.translation())
+      let newRotation = rapierQuaternionToQuaternion(rigidBody.rotation())
+      let interpolatedTranslation = oldState ? rapierVector3ToVector3(oldState.translation).lerp(newTranslation, interpolationDelta) : newTranslation
+      let interpolatedRotation = oldState ? rapierQuaternionToQuaternion(oldState.rotation).slerp(newRotation, interpolationDelta) : newRotation
+
       state.setMatrix(
         _matrix4
           .compose(
-            rapierVector3ToVector3(rigidBody.translation()),
-            rapierQuaternionToQuaternion(rigidBody.rotation()),
+            interpolatedTranslation,
+            interpolatedRotation,
             state.worldScale
           )
           .premultiply(state.invertedMatrixWorld)
@@ -264,8 +289,6 @@ export const Physics: FC<RapierWorldProps> = ({
         events2?.onCollisionExit?.({ target: rigidBody1 });
       }
     });
-
-    time.current = now;
   });
 
   const api = useMemo(() => createWorldApi(getWorldRef), []);
