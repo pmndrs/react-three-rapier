@@ -47,6 +47,7 @@ export interface RapierContext {
     colliders: RigidBodyAutoCollider;
   };
   rigidBodyEvents: EventMap;
+  isPaused: boolean;
 }
 
 export const RapierContext =
@@ -101,6 +102,13 @@ interface RapierWorldProps {
   timeStep?: number;
 
   /**
+   * Maximum number of fixed steps to take per function call.
+   * 
+   * @defaultValue 10
+   */
+  maxSubSteps?: number
+
+  /**
    * Pause the physics simulation
    * 
    * @defaultValue false
@@ -112,10 +120,16 @@ export const Physics: FC<RapierWorldProps> = ({
   colliders = "cuboid",
   gravity = [0, -9.81, 0],
   children,
-  timeStep = 1/20,
+  timeStep = 1/60,
+  maxSubSteps = 10,
   paused = false
 }) => {
   const rapier = useAsset(importRapier);
+
+  const [isPaused, setIsPaused] = useState(paused)
+  useEffect(() => {
+    setIsPaused(paused)
+  }, [paused])
 
   const worldRef = useRef<World>();
   const getWorldRef = useRef(() => {
@@ -165,11 +179,12 @@ export const Physics: FC<RapierWorldProps> = ({
   }, [gravity]);
 
   const [steppingState] = useState({
-    lastTime: performance.now(),
+    time: 0,
+    lastTime: 0,
     accumulator: 0
   })
 
-  useFrame(() => {
+  useFrame((_, delta) => {
     const world = worldRef.current;
     if (!world) return;
 
@@ -184,14 +199,16 @@ export const Physics: FC<RapierWorldProps> = ({
       translation: Rapier.Vector3
     }> = {}
 
-    const nowTime = performance.now();
+    // don't step time forwards if paused
+    const nowTime = steppingState.time += paused ? 0 : delta * 1000;
     const timeStepMs = timeStep * 1000
     const timeSinceLast = nowTime - steppingState.lastTime
     steppingState.lastTime = nowTime
     steppingState.accumulator += timeSinceLast
 
     if (!paused) {
-      while (steppingState.accumulator >= timeStepMs) {
+      let subSteps = 0
+      while (steppingState.accumulator >= timeStepMs && subSteps < maxSubSteps) {
         // Collect previous state
         world.bodies.forEach(b => {
           previousTranslations[b.handle] = {
@@ -201,11 +218,12 @@ export const Physics: FC<RapierWorldProps> = ({
         })
 
         world.step(eventQueue)
+        subSteps++
         steppingState.accumulator -= timeStepMs
       }
     }
 
-    const interpolationDelta = steppingState.accumulator / timeStepMs
+    const interpolationAlpha = (steppingState.accumulator % timeStepMs) / timeStepMs
 
     // Update meshes
     rigidBodyStates.forEach((state, handle) => {
@@ -235,8 +253,8 @@ export const Physics: FC<RapierWorldProps> = ({
       
       let newTranslation = rapierVector3ToVector3(rigidBody.translation())
       let newRotation = rapierQuaternionToQuaternion(rigidBody.rotation())
-      let interpolatedTranslation = oldState ? rapierVector3ToVector3(oldState.translation).lerp(newTranslation, interpolationDelta) : newTranslation
-      let interpolatedRotation = oldState ? rapierQuaternionToQuaternion(oldState.rotation).slerp(newRotation, interpolationDelta) : newRotation
+      let interpolatedTranslation = oldState ? rapierVector3ToVector3(oldState.translation).lerp(newTranslation, interpolationAlpha) : newTranslation
+      let interpolatedRotation = oldState ? rapierQuaternionToQuaternion(oldState.rotation).slerp(newRotation, interpolationAlpha) : newRotation
 
       state.setMatrix(
         _matrix4
@@ -304,8 +322,9 @@ export const Physics: FC<RapierWorldProps> = ({
       colliderMeshes,
       rigidBodyStates,
       rigidBodyEvents,
+      isPaused
     }),
-    []
+    [isPaused]
   );
 
   return (

@@ -3,6 +3,7 @@ import {
   CuboidCollider,
   InstancedRigidBodies,
   InstancedRigidBodyApi,
+  useRapier,
 } from "@react-three/rapier";
 import { createRef, useEffect, useRef } from "react";
 import { Demo } from "../App";
@@ -12,12 +13,18 @@ const BALLS = 1000;
 export const Cluster: Demo = () => {
   const api = useRef<InstancedRigidBodyApi>(null);
 
+  const { isPaused } = useRapier();
+
+  console.log(isPaused);
+
   useFrame(() => {
-    api.current!.forEach((body) => {
-      const p = body.translation();
-      p.normalize().multiplyScalar(-0.01);
-      body.applyImpulse(p);
-    });
+    if (!isPaused) {
+      api.current!.forEach((body) => {
+        const p = body.translation();
+        p.normalize().multiplyScalar(-0.01);
+        body.applyImpulse(p);
+      });
+    }
   });
 
   return (
