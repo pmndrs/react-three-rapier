@@ -47,6 +47,7 @@ export interface RapierContext {
     colliders: RigidBodyAutoCollider;
   };
   rigidBodyEvents: EventMap;
+  isPaused: boolean;
 }
 
 export const RapierContext =
@@ -95,15 +96,17 @@ interface RapierWorldProps {
    * Set the timestep for the simulation.
    * Setting this to a number (eg. 1/60) will run the
    * simulation at that framerate.
-   *
-   * "vary" will run the simulation at a delta-value based
-   * on the users current framerate. This ensures simulations
-   * run at the same percieved speed at all framerates, but
-   * can also lead to instability.
-   *
-   * @defaultValue "vary"
+   * 
+   * @defaultValue 1/60
    */
-  timeStep?: number | "vary";
+  timeStep?: number;
+
+  /**
+   * Maximum number of fixed steps to take per function call.
+   * 
+   * @defaultValue 10
+   */
+  maxSubSteps?: number
 
   /**
    * Pause the physics simulation
@@ -117,10 +120,16 @@ export const Physics: FC<RapierWorldProps> = ({
   colliders = "cuboid",
   gravity = [0, -9.81, 0],
   children,
-  timeStep = "vary",
+  timeStep = 1/60,
+  maxSubSteps = 10,
   paused = false
 }) => {
   const rapier = useAsset(importRapier);
+
+  const [isPaused, setIsPaused] = useState(paused)
+  useEffect(() => {
+    setIsPaused(paused)
+  }, [paused])
 
   const worldRef = useRef<World>();
   const getWorldRef = useRef(() => {
@@ -157,7 +166,6 @@ export const Physics: FC<RapierWorldProps> = ({
     return () => {
       if (world) {
         world.free();
-        worldRef.current = undefined;
       }
     };
   }, []);
@@ -170,24 +178,52 @@ export const Physics: FC<RapierWorldProps> = ({
     }
   }, [gravity]);
 
-  const time = useRef(performance.now());
+  const [steppingState] = useState({
+    time: 0,
+    lastTime: 0,
+    accumulator: 0
+  })
 
-  useFrame((context) => {
+  useFrame((_, delta) => {
     const world = worldRef.current;
     if (!world) return;
 
-    // Set timestep to current delta, to allow for variable frame rates
-    // We cap the delta at 100, so that the physics simulation doesn't get wild
-    const now = performance.now();
-    const delta = Math.min(100, now - time.current);
+    world.timestep = timeStep;
 
-    if (timeStep === "vary") {
-      world.timestep = delta / 1000;
-    } else {
-      world.timestep = timeStep;
+    /**
+     * Fixed timeStep simulation progression
+     * @see https://gafferongames.com/post/fix_your_timestep/ 
+    */
+    let previousTranslations: Record<string, {
+      rotation: Rapier.Rotation,
+      translation: Rapier.Vector3
+    }> = {}
+
+    // don't step time forwards if paused
+    const nowTime = steppingState.time += paused ? 0 : delta * 1000;
+    const timeStepMs = timeStep * 1000
+    const timeSinceLast = nowTime - steppingState.lastTime
+    steppingState.lastTime = nowTime
+    steppingState.accumulator += timeSinceLast
+
+    if (!paused) {
+      let subSteps = 0
+      while (steppingState.accumulator >= timeStepMs && subSteps < maxSubSteps) {
+        // Collect previous state
+        world.bodies.forEach(b => {
+          previousTranslations[b.handle] = {
+            rotation: b.rotation(),
+            translation: b.translation()
+          }
+        })
+
+        world.step(eventQueue)
+        subSteps++
+        steppingState.accumulator -= timeStepMs
+      }
     }
 
-    if (!paused) world.step(eventQueue);
+    const interpolationAlpha = (steppingState.accumulator % timeStepMs) / timeStepMs
 
     // Update meshes
     rigidBodyStates.forEach((state, handle) => {
@@ -213,11 +249,18 @@ export const Physics: FC<RapierWorldProps> = ({
         return;
       }
 
+      let oldState = previousTranslations[rigidBody.handle]
+      
+      let newTranslation = rapierVector3ToVector3(rigidBody.translation())
+      let newRotation = rapierQuaternionToQuaternion(rigidBody.rotation())
+      let interpolatedTranslation = oldState ? rapierVector3ToVector3(oldState.translation).lerp(newTranslation, interpolationAlpha) : newTranslation
+      let interpolatedRotation = oldState ? rapierQuaternionToQuaternion(oldState.rotation).slerp(newRotation, interpolationAlpha) : newRotation
+
       state.setMatrix(
         _matrix4
           .compose(
-            rapierVector3ToVector3(rigidBody.translation()),
-            rapierQuaternionToQuaternion(rigidBody.rotation()),
+            interpolatedTranslation,
+            interpolatedRotation,
             state.worldScale
           )
           .premultiply(state.invertedMatrixWorld)
@@ -264,8 +307,6 @@ export const Physics: FC<RapierWorldProps> = ({
         events2?.onCollisionExit?.({ target: rigidBody1 });
       }
     });
-
-    time.current = now;
   });
 
   const api = useMemo(() => createWorldApi(getWorldRef), []);
@@ -281,8 +322,9 @@ export const Physics: FC<RapierWorldProps> = ({
       colliderMeshes,
       rigidBodyStates,
       rigidBodyEvents,
+      isPaused
     }),
-    []
+    [isPaused]
   );
 
   return (

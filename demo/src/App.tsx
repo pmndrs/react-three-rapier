@@ -92,6 +92,11 @@ export const App = () => {
   const [debug, setDebug] = useState<boolean>(false);
   const [perf, setPerf] = useState<boolean>(false);
   const [paused, setPaused] = useState<boolean>(false);
+  const [physicsKey, setPhysicsKey] = useState<number>(0);
+
+  const updatePhysicsKey = () => {
+    setPhysicsKey((current) => current + 1);
+  };
 
   const ContextBridge = useContextBridge(
     UNSAFE_LocationContext,
@@ -111,7 +116,7 @@ export const App = () => {
       <Canvas shadows>
         <Suspense fallback="Loading...">
           <ContextBridge>
-            <Physics paused={paused}>
+            <Physics paused={paused} key={physicsKey}>
               <directionalLight
                 castShadow
                 position={[10, 10, 10]}
@@ -212,6 +217,7 @@ export const App = () => {
           value={paused}
           onClick={() => setPaused((v) => !v)}
         />
+        <ToggleButton label="Reset" value={false} onClick={updatePhysicsKey} />
       </div>
 
       <div

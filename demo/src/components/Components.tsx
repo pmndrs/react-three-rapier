@@ -39,12 +39,10 @@ const Pear = (props: GroupProps) => {
     };
   };
 
-  const scale = useMemo(() => 0.4 + Math.random() * 0.5, []);
-
   return (
     <group {...props} scale={1}>
       <RigidBody position={[0, 2, 0]} colliders="hull">
-        <Clone object={nodes.pear} castShadow receiveShadow scale={scale} />
+        <Clone object={nodes.pear} castShadow receiveShadow />
       </RigidBody>
     </group>
   );

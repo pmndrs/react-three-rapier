@@ -251,6 +251,7 @@ In order, but also not necessarily:
 - [x] Collision events
 - [x] Colliders outside RigidBodies
 - [x] InstancedMesh support
+- [x] Timestep improvements for determinism
 - [ ] Normalize and improve collision events (add events to single Colliders, InstancedRigidBodies, etc)
 - [ ] Docs
 - [ ] CodeSandbox examples
