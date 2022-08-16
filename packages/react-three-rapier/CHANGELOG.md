@@ -1,5 +1,12 @@
 # @react-three/rapier
 
+## 0.6.5
+
+### Patch Changes
+
+- e71ea11: World no longer crashes when `<Physics />` is reinitiated
+- e71ea11: Fixed timestep (inspired by cannon-es), with interpolation, for simulation determinism
+
 ## 0.6.4
 
 ### Patch Changes
