@@ -279,7 +279,7 @@ export const Physics: FC<RapierWorldProps> = ({
       const rigidBodyHandle1 = collider1.parent()?.handle;
       const rigidBodyHandle2 = collider2.parent()?.handle;
 
-      if (!collider1 || !collider2 || !rigidBodyHandle1 || !rigidBodyHandle2) {
+      if (!collider1 || !collider2 || !rigidBodyHandle1 == null || !rigidBodyHandle2 == null) {
         return;
       }
 
