@@ -9,6 +9,8 @@ import {
   Vector3 as RapierVector3,
 } from "@dimforge/rapier3d-compat";
 
+import { mergeVertices } from 'three/examples/jsm/utils/BufferGeometryUtils'
+
 import {
   BufferGeometry,
   Matrix4,
@@ -301,7 +303,8 @@ export const colliderDescFromGeometry = (
 
     case "trimesh":
       {
-        const g = geometry.clone().scale(scale.x, scale.y, scale.z);
+        const clonedGeometry = geometry.index ? geometry.clone() : mergeVertices(geometry);
+        const g = clonedGeometry.scale(scale.x, scale.y, scale.z);
 
         desc = ColliderDesc.trimesh(
           g.attributes.position.array as Float32Array,
