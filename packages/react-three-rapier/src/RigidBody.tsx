@@ -1,6 +1,7 @@
 import React, { createContext, MutableRefObject, RefObject } from "react";
 import { forwardRef, ReactNode, useContext, useImperativeHandle } from "react";
 import { Object3D } from "three";
+import { Object3DProps } from "@react-three/fiber";
 import { InstancedRigidBodyApi } from "./api";
 import { useRigidBody } from "./hooks";
 import { InstancedRigidBodiesProps } from "./InstancedRigidBodies";
@@ -15,13 +16,14 @@ export const RigidBodyContext = createContext<{
 
 export const useRigidBodyContext = () => useContext(RigidBodyContext);
 // RigidBody
-export interface RigidBodyProps extends UseRigidBodyOptions {
+export interface RigidBodyProps extends UseRigidBodyOptions, Omit<Object3DProps, 'type' | 'position' | 'rotation'> {
   children?: ReactNode;
 }
 
 export const RigidBody = forwardRef<RigidBodyApi, RigidBodyProps>(
   ({ children, ...props }, ref) => {
     const [object, api] = useRigidBody<Object3D>(props);
+    const { type, position, rotation, ...objectProps } = props;
 
     useImperativeHandle(ref, () => api);
 
@@ -36,7 +38,7 @@ export const RigidBody = forwardRef<RigidBodyApi, RigidBodyProps>(
           options: props,
         }}
       >
-        <object3D ref={object}>{children}</object3D>
+        <object3D ref={object} {...objectProps}>{children}</object3D>
       </RigidBodyContext.Provider>
     );
   }
