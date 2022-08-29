@@ -80,8 +80,8 @@ const Scene = () => (
     {/* Make a compound shape with two custom BallColliders */}
     <RigidBody position={[0, 10, 0]}>
       <Sphere />
-      <BallCollider args={0.5} />
-      <BallCollider args={0.5} position={[1, 0, 0]} />
+      <BallCollider args={[0.5]} />
+      <BallCollider args={[0.5]} position={[1, 0, 0]} />
     </RigidBody>
 
     {/* Make a compound shape with two custom BallColliders, an automatic BallCollider,
@@ -97,8 +97,8 @@ const Scene = () => (
 
       <Sphere />
 
-      <BallCollider args={0.5} />
-      <BallCollider args={0.5} position={[1, 0, 0]} />
+      <BallCollider args={[0.5]} />
+      <BallCollider args={[0.5]} position={[1, 0, 0]} />
     </RigidBody>
   </Physics>
 );
