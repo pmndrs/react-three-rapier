@@ -1,5 +1,13 @@
 # @react-three/rapier
 
+## 0.6.6
+
+### Patch Changes
+
+- 77635c4: feat: allow object3d props through RigidBody (@Glavin001)
+- e229bd2: Disable problematic translation interpolation for now
+- 31da80f: fix: fix crash for non-indexed trimeshes by applying `mergeVertices` from `BufferGeometryUtils` (@machado2)
+
 ## 0.6.5
 
 ### Patch Changes
