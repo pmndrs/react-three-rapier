@@ -19,7 +19,7 @@ import {
   TempContactManifold,
   World,
 } from "@dimforge/rapier3d-compat";
-import { InstancedMesh, Matrix, Matrix4, Mesh, Object3D, Vector3 } from "three";
+import { InstancedMesh, Matrix, Matrix4, Mesh, Object3D, Quaternion, Vector3 } from "three";
 import {
   rapierQuaternionToQuaternion,
   rapierVector3ToVector3,
@@ -195,8 +195,8 @@ export const Physics: FC<RapierWorldProps> = ({
      * @see https://gafferongames.com/post/fix_your_timestep/ 
     */
     let previousTranslations: Record<string, {
-      rotation: Rapier.Rotation,
-      translation: Rapier.Vector3
+      rotation: Quaternion,
+      translation: Vector3
     }> = {}
 
     // don't step time forwards if paused
@@ -212,8 +212,8 @@ export const Physics: FC<RapierWorldProps> = ({
         // Collect previous state
         world.bodies.forEach(b => {
           previousTranslations[b.handle] = {
-            rotation: b.rotation(),
-            translation: b.translation()
+            rotation: rapierQuaternionToQuaternion(b.rotation()).normalize(),
+            translation: rapierVector3ToVector3(b.translation())
           }
         })
 
@@ -253,8 +253,8 @@ export const Physics: FC<RapierWorldProps> = ({
       
       let newTranslation = rapierVector3ToVector3(rigidBody.translation())
       let newRotation = rapierQuaternionToQuaternion(rigidBody.rotation())
-      let interpolatedTranslation = oldState ? rapierVector3ToVector3(oldState.translation).lerp(newTranslation, interpolationAlpha) : newTranslation
-      let interpolatedRotation = oldState ? rapierQuaternionToQuaternion(oldState.rotation).slerp(newRotation, interpolationAlpha) : newRotation
+      let interpolatedTranslation = oldState ? oldState.translation.lerp(newTranslation, 1) : newTranslation
+      let interpolatedRotation = oldState ? oldState.rotation.slerp(newRotation, interpolationAlpha) : newRotation
 
       state.setMatrix(
         _matrix4

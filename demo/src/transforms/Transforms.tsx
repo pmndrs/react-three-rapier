@@ -67,6 +67,24 @@ export const Transforms: Demo = () => {
           />
         </RigidBody>
       </group>
+
+      <group rotation={[0, 3, 0]}>
+        <RigidBody colliders="ball">
+          <Sphere position={[2, 2, 2]} />
+        </RigidBody>
+
+        <RigidBody colliders="ball">
+          <Sphere position={[2, 10, 2]} scale={0.3} castShadow receiveShadow>
+            <meshPhysicalMaterial />
+          </Sphere>
+        </RigidBody>
+
+        <RigidBody colliders="ball">
+          <Sphere position={[-2, 10, 2]} scale={0.3} castShadow receiveShadow>
+            <meshPhysicalMaterial />
+          </Sphere>
+        </RigidBody>
+      </group>
     </group>
   );
 };
