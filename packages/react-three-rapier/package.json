@@ -12,7 +12,7 @@
     "@react-three/drei": "^9.6.2",
     "@react-three/fiber": "^8.0.12",
     "@types/react-dom": "^18.0.2",
-    "@types/three": "^0.139.0",
+    "@types/three": "^0.143.2",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
     "three": "^0.139.2"
