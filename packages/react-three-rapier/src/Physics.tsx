@@ -243,7 +243,6 @@ export const Physics: FC<RapierWorldProps> = ({
       if (
         !rigidBody ||
         rigidBody.isSleeping() ||
-        rigidBody.isFixed() ||
         !state.setMatrix
       ) {
         return;
