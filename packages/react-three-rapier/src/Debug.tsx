@@ -186,7 +186,13 @@ const DebugShape = memo<DebugShapeProps>(
 );
 
 interface DebugProps {
+  /**
+   * The color of the wireframe representing an active collider that is affected by forces and not sleeping.
+   */
   color?: string;
+  /**
+   * The color of the wireframe representing a static (fixed or kinematic) or sleeping collider.
+   */
   sleepColor?: string;
 }
 export const Debug: FC<DebugProps> = ({
