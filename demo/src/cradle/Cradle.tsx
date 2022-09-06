@@ -36,7 +36,7 @@ const Rod = (props: UseRigidBodyOptions) => {
           <meshStandardMaterial metalness={1} roughness={0.3} />
         </Sphere>
 
-        <CylinderCollider args={[2, 0.05]} position={[0, -1, 0]} />
+        <CylinderCollider args={[1, 0.05]} position={[0, -1, 0]} />
         <BallCollider args={[0.2]} position={[0, -2, 0]} restitution={1.2} />
       </RigidBody>
     </group>

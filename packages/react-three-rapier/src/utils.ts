@@ -9,7 +9,7 @@ import {
   Vector3 as RapierVector3,
 } from "@dimforge/rapier3d-compat";
 
-import { mergeVertices } from 'three/examples/jsm/utils/BufferGeometryUtils'
+import { mergeVertices } from "three/examples/jsm/utils/BufferGeometryUtils";
 
 import {
   BufferGeometry,
@@ -95,7 +95,8 @@ export const scaleColliderArgs = (
     return newArgs;
   }
 
-  const scaleArray = [scale.x, scale.y, scale.z];
+  // Prepfill with some extra
+  const scaleArray = [scale.x, scale.y, scale.z, scale.x, scale.x];
   return newArgs.map((arg, index) => scaleArray[index] * (arg as number));
 };
 
@@ -303,7 +304,9 @@ export const colliderDescFromGeometry = (
 
     case "trimesh":
       {
-        const clonedGeometry = geometry.index ? geometry.clone() : mergeVertices(geometry);
+        const clonedGeometry = geometry.index
+          ? geometry.clone()
+          : mergeVertices(geometry);
         const g = clonedGeometry.scale(scale.x, scale.y, scale.z);
 
         desc = ColliderDesc.trimesh(
@@ -314,9 +317,9 @@ export const colliderDescFromGeometry = (
       break;
 
     case "hull":
-      const g = geometry.clone().scale(scale.x, scale.y, scale.z);
-
       {
+        const g = geometry.clone().scale(scale.x, scale.y, scale.z);
+
         desc = ColliderDesc.convexHull(
           g.attributes.position.array as Float32Array
         ) as ColliderDesc;
