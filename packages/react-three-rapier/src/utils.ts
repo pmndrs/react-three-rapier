@@ -78,14 +78,18 @@ export const decomposeMatrix4 = (m: Matrix4) => {
 
 export const scaleColliderArgs = (
   shape: RigidBodyShape,
-  args: (number | ArrayLike<number>)[],
+  args: (number | ArrayLike<number> | { x: number; y: number; z: number })[],
   scale: Vector3
 ) => {
-  // Heightfield only scales the last arg
   const newArgs = args.slice();
 
+  // Heightfield uses a vector
   if (shape === "heightfield") {
-    (newArgs[3] as number) *= scale.x;
+    const s = newArgs[3] as { x: number; y: number; z: number };
+    s.x *= scale.x;
+    s.x *= scale.y;
+    s.x *= scale.z;
+
     return newArgs;
   }
 
@@ -152,6 +156,10 @@ export const createColliderFromOptions: CreateColliderFromOptions = ({
     .setFrictionCombineRule(
       options?.frictionCombineRule ?? CoefficientCombineRule.Average
     );
+
+  if (colliderShape === "heightfield") {
+    console.log(colliderDesc);
+  }
 
   if (hasCollisionEvents) {
     colliderDesc = colliderDesc.setActiveEvents(ActiveEvents.COLLISION_EVENTS);

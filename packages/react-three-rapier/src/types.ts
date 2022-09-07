@@ -40,7 +40,7 @@ export type HeightfieldArgs = [
   width: number,
   height: number,
   heights: number[],
-  scale: number
+  scale: {x: number, y: number, z: number}
 ];
 export type TrimeshArgs = [
   vertices: ArrayLike<number>,

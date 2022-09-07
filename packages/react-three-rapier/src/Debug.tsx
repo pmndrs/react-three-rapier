@@ -17,6 +17,7 @@ import {
   ConvexPolyhedron,
   Cuboid,
   Cylinder,
+  Heightfield,
   RoundCuboid,
   ShapeType,
   TriMesh,
@@ -31,6 +32,7 @@ import {
   CylinderBufferGeometry,
   Mesh,
   MeshBasicMaterial,
+  PlaneGeometry,
   Quaternion,
   SphereBufferGeometry,
 } from "three";
@@ -122,6 +124,28 @@ const geometryFromCollider = (collider: Collider) => {
       const h = (collider.shape as Cone).halfHeight;
 
       const g = new ConeBufferGeometry(r, h * 2, 16);
+
+      return g;
+
+      break;
+    }
+
+    case ShapeType.HeightField: {
+      const rows = (collider.shape as Heightfield).nrows;
+      const cols = (collider.shape as Heightfield).ncols;
+      const heights = (collider.shape as Heightfield).heights;
+      const scale = (collider.shape as Heightfield).scale;
+
+      const g = new PlaneGeometry(scale.x, scale.z, cols, rows);
+
+      const verts = g.attributes.position.array as number[];
+      verts.forEach(
+        (v, index) => (verts[index * 3 + 2] = heights[index] * scale.y)
+      );
+
+      g.scale(1, -1, 1);
+      g.rotateX(-Math.PI / 2);
+      g.rotateY(-Math.PI / 2);
 
       return g;
 
