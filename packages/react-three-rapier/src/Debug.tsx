@@ -1,5 +1,6 @@
 import React, {
   createRef,
+  FC,
   memo,
   RefObject,
   useMemo,
@@ -12,9 +13,12 @@ import {
   Ball,
   Collider,
   ColliderHandle,
+  Cone,
   ConvexPolyhedron,
   Cuboid,
   Cylinder,
+  Heightfield,
+  RoundCuboid,
   ShapeType,
   TriMesh,
 } from "@dimforge/rapier3d-compat";
@@ -22,17 +26,37 @@ import {
   BoxBufferGeometry,
   BufferAttribute,
   BufferGeometry,
+  CapsuleBufferGeometry,
+  Color,
+  ConeBufferGeometry,
   CylinderBufferGeometry,
   Mesh,
+  MeshBasicMaterial,
+  PlaneGeometry,
   Quaternion,
   SphereBufferGeometry,
 } from "three";
+import { RoundedBoxGeometry } from "three-stdlib";
 
 const geometryFromCollider = (collider: Collider) => {
   switch (collider.shape.type) {
     case ShapeType.Cuboid: {
       const { x, y, z } = (collider.shape as Cuboid).halfExtents;
       return new BoxBufferGeometry(x * 2 + 0.01, y * 2 + 0.01, z * 2 + 0.01);
+
+      break;
+    }
+
+    case ShapeType.RoundCuboid: {
+      const { x, y, z } = (collider.shape as RoundCuboid).halfExtents;
+      const radius = (collider.shape as RoundCuboid).borderRadius;
+      return new RoundedBoxGeometry(
+        x * 2 + radius * 2,
+        y * 2 + radius * 2,
+        z * 2 + radius * 2,
+        8,
+        radius
+      );
 
       break;
     }
@@ -77,7 +101,51 @@ const geometryFromCollider = (collider: Collider) => {
       const r = (collider.shape as Cylinder).radius;
       const h = (collider.shape as Cylinder).halfHeight;
 
-      const g = new CylinderBufferGeometry(r, r, h);
+      const g = new CylinderBufferGeometry(r, r, h * 2);
+
+      return g;
+
+      break;
+    }
+
+    case ShapeType.Capsule: {
+      const r = (collider.shape as Cylinder).radius;
+      const h = (collider.shape as Cylinder).halfHeight;
+
+      const g = new CapsuleBufferGeometry(r, h * 2, 4, 8);
+
+      return g;
+
+      break;
+    }
+
+    case ShapeType.Cone: {
+      const r = (collider.shape as Cone).radius;
+      const h = (collider.shape as Cone).halfHeight;
+
+      const g = new ConeBufferGeometry(r, h * 2, 16);
+
+      return g;
+
+      break;
+    }
+
+    case ShapeType.HeightField: {
+      const rows = (collider.shape as Heightfield).nrows;
+      const cols = (collider.shape as Heightfield).ncols;
+      const heights = (collider.shape as Heightfield).heights;
+      const scale = (collider.shape as Heightfield).scale;
+
+      const g = new PlaneGeometry(scale.x, scale.z, cols, rows);
+
+      const verts = g.attributes.position.array as number[];
+      verts.forEach(
+        (v, index) => (verts[index * 3 + 2] = heights[index] * scale.y)
+      );
+
+      g.scale(1, -1, 1);
+      g.rotateX(-Math.PI / 2);
+      g.rotateY(-Math.PI / 2);
 
       return g;
 
@@ -88,36 +156,73 @@ const geometryFromCollider = (collider: Collider) => {
   return new BoxBufferGeometry(1, 1, 1);
 };
 
-const DebugShape = memo<{ colliderHandle: number }>(({ colliderHandle }) => {
-  const { world } = useRapier();
-  const ref = useRef<Mesh>(null);
+interface DebugShapeProps extends DebugProps {
+  colliderHandle: number;
+}
 
-  useFrame(() => {
-    const collider = world.getCollider(colliderHandle);
+const DebugShape = memo<DebugShapeProps>(
+  ({ colliderHandle, color, sleepColor }) => {
+    const { world } = useRapier();
+    const ref = useRef<Mesh>(null);
 
-    if (ref.current && collider) {
-      const { x: rx, y: ry, z: rz, w: rw } = collider.rotation();
-      const { x, y, z } = collider.translation();
+    const [material] = useState(
+      new MeshBasicMaterial({
+        color,
+        wireframe: true,
+      })
+    );
 
-      ref.current.position.set(x, y, z);
-      ref.current.rotation.setFromQuaternion(new Quaternion(rx, ry, rz, rw));
-    }
-  });
+    useFrame(() => {
+      const collider = world.getCollider(colliderHandle);
 
-  const geometry = useMemo(() => {
-    const collider = world.getCollider(colliderHandle);
-    return geometryFromCollider(collider!);
-  }, [colliderHandle]);
+      if (ref.current && collider) {
+        const { x: rx, y: ry, z: rz, w: rw } = collider.rotation();
+        const { x, y, z } = collider.translation();
 
-  return (
-    <mesh ref={ref}>
-      <primitive object={geometry} attach="geometry" />
-      <meshBasicMaterial color={"red"} wireframe />
-    </mesh>
-  );
-});
+        const parent = collider.parent();
 
-export const Debug = () => {
+        if (
+          parent?.isSleeping() ||
+          parent?.isFixed() ||
+          parent?.isKinematic()
+        ) {
+          material.color = new Color(sleepColor);
+        } else {
+          material.color = new Color(color);
+        }
+
+        ref.current.position.set(x, y, z);
+        ref.current.rotation.setFromQuaternion(new Quaternion(rx, ry, rz, rw));
+      }
+    });
+
+    const geometry = useMemo(() => {
+      const collider = world.getCollider(colliderHandle);
+      return geometryFromCollider(collider!);
+    }, [colliderHandle]);
+
+    return (
+      <mesh ref={ref} material={material}>
+        <primitive object={geometry} attach="geometry" />
+      </mesh>
+    );
+  }
+);
+
+interface DebugProps {
+  /**
+   * The color of the wireframe representing an active collider that is affected by forces and not sleeping.
+   */
+  color?: string;
+  /**
+   * The color of the wireframe representing a static (fixed or kinematic) or sleeping collider.
+   */
+  sleepColor?: string;
+}
+export const Debug: FC<DebugProps> = ({
+  color = "red",
+  sleepColor = "blue",
+}) => {
   const { world } = useRapier();
   const [colliders, setColliders] = useState<number[]>([]);
   const refs = useRef<Record<number, RefObject<Mesh>>>({});
@@ -142,7 +247,12 @@ export const Debug = () => {
   return (
     <group>
       {colliders.map((handle) => (
-        <DebugShape key={handle} colliderHandle={handle} />
+        <DebugShape
+          key={handle}
+          colliderHandle={handle}
+          color={color}
+          sleepColor={sleepColor}
+        />
       ))}
     </group>
   );

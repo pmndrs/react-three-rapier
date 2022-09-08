@@ -9,7 +9,7 @@ import {
   Vector3 as RapierVector3,
 } from "@dimforge/rapier3d-compat";
 
-import { mergeVertices } from 'three/examples/jsm/utils/BufferGeometryUtils'
+import { mergeVertices } from "three/examples/jsm/utils/BufferGeometryUtils";
 
 import {
   BufferGeometry,
@@ -78,14 +78,18 @@ export const decomposeMatrix4 = (m: Matrix4) => {
 
 export const scaleColliderArgs = (
   shape: RigidBodyShape,
-  args: (number | ArrayLike<number>)[],
+  args: (number | ArrayLike<number> | { x: number; y: number; z: number })[],
   scale: Vector3
 ) => {
-  // Heightfield only scales the last arg
   const newArgs = args.slice();
 
+  // Heightfield uses a vector
   if (shape === "heightfield") {
-    (newArgs[3] as number) *= scale.x;
+    const s = newArgs[3] as { x: number; y: number; z: number };
+    s.x *= scale.x;
+    s.x *= scale.y;
+    s.x *= scale.z;
+
     return newArgs;
   }
 
@@ -95,7 +99,8 @@ export const scaleColliderArgs = (
     return newArgs;
   }
 
-  const scaleArray = [scale.x, scale.y, scale.z];
+  // Prepfill with some extra
+  const scaleArray = [scale.x, scale.y, scale.z, scale.x, scale.x];
   return newArgs.map((arg, index) => scaleArray[index] * (arg as number));
 };
 
@@ -151,6 +156,10 @@ export const createColliderFromOptions: CreateColliderFromOptions = ({
     .setFrictionCombineRule(
       options?.frictionCombineRule ?? CoefficientCombineRule.Average
     );
+
+  if (colliderShape === "heightfield") {
+    console.log(colliderDesc);
+  }
 
   if (hasCollisionEvents) {
     colliderDesc = colliderDesc.setActiveEvents(ActiveEvents.COLLISION_EVENTS);
@@ -303,7 +312,9 @@ export const colliderDescFromGeometry = (
 
     case "trimesh":
       {
-        const clonedGeometry = geometry.index ? geometry.clone() : mergeVertices(geometry);
+        const clonedGeometry = geometry.index
+          ? geometry.clone()
+          : mergeVertices(geometry);
         const g = clonedGeometry.scale(scale.x, scale.y, scale.z);
 
         desc = ColliderDesc.trimesh(
@@ -314,9 +325,9 @@ export const colliderDescFromGeometry = (
       break;
 
     case "hull":
-      const g = geometry.clone().scale(scale.x, scale.y, scale.z);
-
       {
+        const g = geometry.clone().scale(scale.x, scale.y, scale.z);
+
         desc = ColliderDesc.convexHull(
           g.attributes.position.array as Float32Array
         ) as ColliderDesc;

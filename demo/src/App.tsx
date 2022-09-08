@@ -23,6 +23,7 @@ import {
   UNSAFE_NavigationContext,
   UNSAFE_RouteContext,
 } from "react-router-dom";
+import { AllCollidersExample } from "./all-colliders/AllCollidersExample";
 import { AllShapes } from "./all-shapes/AllShapes";
 import { ApiUsage } from "./api-usage/ApiUsage";
 import { Car } from "./car/Car";
@@ -87,6 +88,25 @@ const Floor = () => {
   );
 };
 
+const routes: Record<string, ReactNode> = {
+  "": <Shapes />,
+  joints: <Joints />,
+  components: <ComponentsExample />,
+  cradle: <CradleExample />,
+  transforms: <Transforms />,
+  cluster: <Cluster />,
+  "all-shapes": <AllShapes />,
+  car: <Car />,
+  "api-usage": <ApiUsage />,
+  kinematics: <Kinematics />,
+  "mesh-collider-test": <MeshColliderTest />,
+  colliders: <Colliders />,
+  "instanced-meshes": <InstancedMeshes />,
+  damping: <Damping />,
+  "instanced-meshes-compound": <InstancedMeshesCompound />,
+  "all-colliders": <AllCollidersExample />,
+};
+
 export const App = () => {
   const [ui, setUI] = useState<ReactNode>(null);
   const [debug, setDebug] = useState<boolean>(false);
@@ -137,36 +157,15 @@ export const App = () => {
                 }}
               >
                 <Routes>
-                  <Route path="" element={<Shapes />} />
-                  <Route path="joints" element={<Joints />} />
-                  <Route path="components" element={<ComponentsExample />} />
-                  <Route path="cradle" element={<CradleExample />} />
-                  <Route path="transforms" element={<Transforms />} />
-                  <Route path="cluster" element={<Cluster />} />
-                  <Route path="all-shapes" element={<AllShapes />} />
-                  <Route path="car" element={<Car />} />
-                  <Route path="api-usage" element={<ApiUsage />} />
-                  <Route path="kinematics" element={<Kinematics />} />
-                  <Route
-                    path="mesh-collider-test"
-                    element={<MeshColliderTest />}
-                  />
-                  <Route path="colliders" element={<Colliders />} />
-                  <Route
-                    path="instanced-meshes"
-                    element={<InstancedMeshes />}
-                  />
-                  <Route path="damping" element={<Damping />} />
-                  <Route
-                    path="instanced-meshes-compound"
-                    element={<InstancedMeshesCompound />}
-                  />
+                  {Object.keys(routes).map((key, index, array) => (
+                    <Route path={key} key={key} element={routes[key]} />
+                  ))}
                 </Routes>
               </demoContext.Provider>
 
               <Floor />
 
-              {debug && <Debug />}
+              {debug && <Debug color="green" sleepColor="red" />}
               {perf && <Perf />}
             </Physics>
           </ContextBridge>
@@ -184,23 +183,11 @@ export const App = () => {
           maxWidth: 600,
         }}
       >
-        <Link to="/">Shapes</Link>
-        <Link to="joints">Joints</Link>
-        <Link to="components">Components</Link>
-        <Link to="cradle">Cradle</Link>
-        <Link to="cluster">Cluster</Link>
-        <Link to="car">Simple Car</Link>
-        <Link to="all-shapes">All Shapes</Link>
-        <Link to="transforms">Inherited Transforms</Link>
-        <Link to="api-usage">API usage</Link>
-        <Link to="kinematics">Kinematics</Link>
-        <Link to="mesh-collider-test">MeshCollider</Link>
-        <Link to="colliders">Free Colliders</Link>
-        <Link to="instanced-meshes">Instanced Meshes</Link>
-        <Link to="instanced-meshes-compound">
-          Instanced Meshes (compound shapes)
-        </Link>
-        <Link to="damping">Damping</Link>
+        {Object.keys(routes).map((key) => (
+          <Link key={key} to={key}>
+            {key.replace(/-/g, " ") || "Shapes"}
+          </Link>
+        ))}
 
         <ToggleButton
           label="Debug"
@@ -239,6 +226,7 @@ const Link = (props: NavLinkProps) => {
       {...props}
       style={({ isActive }) => ({
         border: "2px solid blue",
+        textTransform: "capitalize",
         borderRadius: 4,
         padding: 4,
         background: isActive ? "blue" : "transparent",
