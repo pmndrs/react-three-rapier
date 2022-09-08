@@ -1,5 +1,15 @@
 # @react-three/rapier
 
+## 0.6.7
+
+### Patch Changes
+
+- 4ec57f6: Fixed rigidbodies should still update the position of their meshes
+- 84aa8bc: Fix HeighfieldCollider
+- 84aa8bc: Fix RoundCuboidCollider
+- 84aa8bc: All colliders have more accurate debug shapes
+- 84aa8bc: You can now set the wireframe active and sleep color for Debug
+
 ## 0.6.6
 
 ### Patch Changes
