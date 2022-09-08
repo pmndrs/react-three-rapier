@@ -29,6 +29,7 @@ import { ApiUsage } from "./api-usage/ApiUsage";
 import { Car } from "./car/Car";
 import { Cluster } from "./cluster/Cluster";
 import { Colliders } from "./colliders/Colliders";
+import { CollisionEventsExample } from "./collision-events/CollisionEventsExample";
 import { ComponentsExample } from "./components/Components";
 import { CradleExample } from "./cradle/Cradle";
 import { Damping } from "./damping/Damping";
@@ -105,6 +106,7 @@ const routes: Record<string, ReactNode> = {
   damping: <Damping />,
   "instanced-meshes-compound": <InstancedMeshesCompound />,
   "all-colliders": <AllCollidersExample />,
+  "collision-events": <CollisionEventsExample />,
 };
 
 export const App = () => {

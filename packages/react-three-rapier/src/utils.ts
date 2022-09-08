@@ -157,10 +157,6 @@ export const createColliderFromOptions: CreateColliderFromOptions = ({
       options?.frictionCombineRule ?? CoefficientCombineRule.Average
     );
 
-  if (colliderShape === "heightfield") {
-    console.log(colliderDesc);
-  }
-
   if (hasCollisionEvents) {
     colliderDesc = colliderDesc.setActiveEvents(ActiveEvents.COLLISION_EVENTS);
   }
@@ -215,9 +211,6 @@ export const createCollidersFromChildren: CreateCollidersFromChildren = ({
     options.onCollisionEnter || options.onCollisionExit
   );
   const colliders: Collider[] = [];
-
-  let desc: ColliderDesc;
-  let offset = new Vector3();
 
   object.traverseVisible((child: Object3D | Mesh) => {
     if ("isMesh" in child) {
