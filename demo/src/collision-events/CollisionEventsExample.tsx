@@ -89,7 +89,6 @@ const Collisioner = ({
         <Explosion position={[contact.x, contact.y, contact.z]} />,
       ]);
     }
-    //
   };
 
   const handleCollsionExit = () => {
