@@ -10,7 +10,7 @@ import {
 } from "@dimforge/rapier3d-compat";
 import { Quaternion, Vector3 } from "three";
 import { RefGetter } from "./types";
-import { vector3ToQuaternion } from "./utils";
+import { rapierVector3ToVector3 } from "./utils";
 
 type Vector3Object = { x: number; y: number; z: number };
 
@@ -188,8 +188,7 @@ export const createRigidBodyApi = (ref: RefGetter<RigidBody>): RigidBodyApi => {
     addTorque: (torque) => ref.current()!.addTorque(torque, true),
 
     translation() {
-      const { x, y, z } = ref.current()!.translation();
-      return new Vector3(x, y, z);
+      return rapierVector3ToVector3(ref.current()!.translation());
     },
     setTranslation: (translation) =>
       ref.current()!.setTranslation(translation, true),
@@ -197,9 +196,8 @@ export const createRigidBodyApi = (ref: RefGetter<RigidBody>): RigidBodyApi => {
       const { x, y, z, w } = ref.current()!.rotation();
       return new Quaternion(x, y, z, w);
     },
-    setRotation: ({ x, y, z }) => {
-      const q = vector3ToQuaternion(new Vector3(x, y, z));
-      ref.current()!.setRotation({ x: q.x, y: q.y, z: q.z, w: q.w }, true);
+    setRotation: (rotation: Quaternion) => {
+      ref.current()!.setRotation(rotation, true);
     },
     linvel() {
       const { x, y, z } = ref.current()!.linvel();
@@ -224,11 +222,10 @@ export const createRigidBodyApi = (ref: RefGetter<RigidBody>): RigidBodyApi => {
     
     setAngularDamping: (factor) => ref.current()!.setAngularDamping(factor),
 
-    setNextKinematicRotation: ({ x, y, z }) => {
-      const q = vector3ToQuaternion(new Vector3(x, y, z));
+    setNextKinematicRotation: (rotation: Quaternion) => {
       ref
         .current()!
-        .setNextKinematicRotation({ x: q.x, y: q.y, z: q.z, w: q.w });
+        .setNextKinematicRotation(rotation);
     },
     setNextKinematicTranslation: (translation) =>
       ref.current()!.setNextKinematicTranslation(translation),
