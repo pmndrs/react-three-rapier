@@ -11,6 +11,7 @@ import {
 import { useImperativeHandle } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Demo } from "../App";
+import { Quaternion } from "three";
 
 const ShadowElement = forwardRef((_, ref) => (
   <Sphere castShadow ref={ref} args={[0.5]}>
@@ -57,11 +58,9 @@ const Rope = (props: { component: ReactNode; length: number }) => {
 
   useFrame(() => {
     const now = performance.now();
-    refs.current[0].current!.setNextKinematicRotation({
-      x: 0,
-      y: Math.sin(now / 500) * 3,
-      z: 0,
-    });
+    refs.current[0].current!.setNextKinematicRotation(
+      new Quaternion(0, Math.sin(now / 500) * 3, 0)
+    );
   });
 
   return (

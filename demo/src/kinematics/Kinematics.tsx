@@ -2,6 +2,7 @@ import { Box, Sphere, Torus } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { RigidBody, RigidBodyApi } from "@react-three/rapier";
 import { useEffect, useRef } from "react";
+import { Euler, Quaternion } from "three";
 import { Demo } from "../App";
 
 const Ball = () => {
@@ -31,12 +32,12 @@ export const Kinematics: Demo = () => {
 
   useFrame(() => {
     const now = performance.now();
+
     if (torus.current) {
-      torus.current.setNextKinematicRotation({
-        x: now / 1000,
-        y: 0,
-        z: now / 500,
-      });
+      const euler = new Euler(now / 1000, 0, 0);
+      torus.current.setNextKinematicRotation(
+        new Quaternion().setFromEuler(euler)
+      );
     }
 
     if (platform.current) {

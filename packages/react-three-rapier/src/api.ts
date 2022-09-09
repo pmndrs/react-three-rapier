@@ -76,7 +76,7 @@ export interface RigidBodyApi {
   /**
    * Sets the rotation quaternion of this rigid-body.
    */
-  setRotation(rotation: Vector3Object): void;
+  setRotation(rotation: Quaternion): void;
 
   /**
    * The linear velocity of this rigid-body.
@@ -123,7 +123,7 @@ export interface RigidBodyApi {
    * rigid-body from its current position and its next kinematic position. This velocity will be used
    * to compute forces on dynamic bodies interacting with this body.
    */
-  setNextKinematicRotation(rotation: Vector3Object): void;
+  setNextKinematicRotation(rotation: Quaternion): void;
   /**
    * If this rigid body is kinematic, sets its future rotation after the next timestep integration.
    *
@@ -196,7 +196,7 @@ export const createRigidBodyApi = (ref: RefGetter<RigidBody>): RigidBodyApi => {
       const { x, y, z, w } = ref.current()!.rotation();
       return new Quaternion(x, y, z, w);
     },
-    setRotation: (rotation: Quaternion) => {
+    setRotation: (rotation) => {
       ref.current()!.setRotation(rotation, true);
     },
     linvel() {
@@ -222,7 +222,7 @@ export const createRigidBodyApi = (ref: RefGetter<RigidBody>): RigidBodyApi => {
     
     setAngularDamping: (factor) => ref.current()!.setAngularDamping(factor),
 
-    setNextKinematicRotation: (rotation: Quaternion) => {
+    setNextKinematicRotation: (rotation) => {
       ref
         .current()!
         .setNextKinematicRotation(rotation);
