@@ -31,7 +31,6 @@ import { _matrix4, _object3d, _vector3 } from "./shared-objects";
 export interface RapierContext {
   rapier: typeof Rapier;
   world: WorldApi;
-  colliderMeshes: Map<ColliderHandle, Object3D>;
   rigidBodyStates: Map<
     RigidBodyHandle,
     {
@@ -140,9 +139,6 @@ export const Physics: FC<RapierWorldProps> = ({
     return worldRef.current;
   });
 
-  const [colliderMeshes] = useState<Map<ColliderHandle, Object3D>>(
-    () => new Map()
-  );
   const [rigidBodyStates] = useState<
     Map<
       RigidBodyHandle,
@@ -278,7 +274,7 @@ export const Physics: FC<RapierWorldProps> = ({
       const rigidBodyHandle1 = collider1.parent()?.handle;
       const rigidBodyHandle2 = collider2.parent()?.handle;
 
-      if (!collider1 || !collider2 || !rigidBodyHandle1 || !rigidBodyHandle2) {
+      if (!collider1 || !collider2 || rigidBodyHandle1 === undefined || rigidBodyHandle2 === undefined) {
         return;
       }
 
@@ -318,7 +314,6 @@ export const Physics: FC<RapierWorldProps> = ({
         colliders,
         gravity,
       },
-      colliderMeshes,
       rigidBodyStates,
       rigidBodyEvents,
       isPaused
