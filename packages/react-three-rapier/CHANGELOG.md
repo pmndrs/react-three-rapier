@@ -1,5 +1,12 @@
 # @react-three/rapier
 
+## 0.6.8
+
+### Patch Changes
+
+- 1aa19da: Fix collision events ignoring the first created RigidBody
+- 7529b96: `api.setRotation()` and `api.setNextKinematicRotation()` now expects a Quaternion argument, to equal the return from `api.rotation()` and coincide with `rapier`s base api
+
 ## 0.6.7
 
 ### Patch Changes
