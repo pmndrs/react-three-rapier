@@ -113,6 +113,13 @@ interface RapierWorldProps {
    * @defaultValue false
    */
   paused?: boolean
+
+  /**
+   * The update priority at which the physics simulation should run.
+   * 
+   * @defaultValue undefined
+   */
+   updatePriority?: number
 }
 
 export const Physics: FC<RapierWorldProps> = ({
@@ -121,7 +128,8 @@ export const Physics: FC<RapierWorldProps> = ({
   children,
   timeStep = 1/60,
   maxSubSteps = 10,
-  paused = false
+  paused = false,
+  updatePriority,
 }) => {
   const rapier = useAsset(importRapier);
 
@@ -302,7 +310,7 @@ export const Physics: FC<RapierWorldProps> = ({
         events2?.onCollisionExit?.({ target: rigidBody1 });
       }
     });
-  });
+  }, updatePriority);
 
   const api = useMemo(() => createWorldApi(getWorldRef), []);
 
