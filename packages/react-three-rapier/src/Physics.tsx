@@ -162,6 +162,7 @@ export const Physics: FC<RapierWorldProps> = ({
     >
   >(() => new Map());
   const [rigidBodyEvents] = useState<EventMap>(() => new Map());
+  const [colliderEvents] = useState<EventMap>(() => new Map());
   const [eventQueue] = useState(() => new EventQueue(false));
 
   // Init world
@@ -290,25 +291,45 @@ export const Physics: FC<RapierWorldProps> = ({
       const rigidBody1 = world.getRigidBody(rigidBodyHandle1);
       const rigidBody2 = world.getRigidBody(rigidBodyHandle2);
 
-      const events1 = rigidBodyEvents.get(rigidBodyHandle1);
-      const events2 = rigidBodyEvents.get(rigidBodyHandle2);
+      const rigidBody1Events = rigidBodyEvents.get(rigidBodyHandle1);
+      const rigidBoyd2Events = rigidBodyEvents.get(rigidBodyHandle2);
+
+      const collider1Events = colliderEvents.get(collider1.handle);
+      const collider2Events = colliderEvents.get(collider2.handle);
 
       if (started) {
         world.contactPair(collider1, collider2, (manifold, flipped) => {
-          events1?.onCollisionEnter?.({
+          /* RigidBody events */
+          rigidBody1Events?.onCollisionEnter?.({
             target: rigidBody2,
             manifold,
-            flipped,
+            flipped
           });
-          events2?.onCollisionEnter?.({
+
+          rigidBoyd2Events?.onCollisionEnter?.({
             target: rigidBody1,
             manifold,
             flipped,
           });
+
+          /* Collider events */
+          collider1Events?.onCollisionEnter?.({
+            target: rigidBody2, // TODO: We should also pass the other collider
+            manifold,
+            flipped
+          })
+
+          collider2Events?.onCollisionEnter?.({
+            target: rigidBody1, // TODO: We should also pass the other collider
+            manifold,
+            flipped
+          })
         });
       } else {
-        events1?.onCollisionExit?.({ target: rigidBody2 });
-        events2?.onCollisionExit?.({ target: rigidBody1 });
+        rigidBody1Events?.onCollisionExit?.({ target: rigidBody2 });
+        rigidBoyd2Events?.onCollisionExit?.({ target: rigidBody1 });
+        collider1Events?.onCollisionExit?.({ target: rigidBody2 });
+        collider2Events?.onCollisionExit?.({ target: rigidBody1 });
       }
     });
   }, updatePriority);
