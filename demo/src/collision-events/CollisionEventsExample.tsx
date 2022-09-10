@@ -1,6 +1,7 @@
 import { Box, Sphere } from "@react-three/drei";
 import {
   CapsuleCollider,
+  collide,
   CollisionEnterCallback,
   HeightfieldCollider,
   RigidBody,
@@ -148,6 +149,7 @@ export const CollisionEventsExample = () => {
                 <meshPhysicalMaterial color={color} />
               </mesh>
               <CapsuleCollider args={[1, 1]}
+                collisionGroups={collide(1, 2, 3).with(2, 3, 4)}
                 onCollisionEnter={({ collider }) => console.log("ENTER collider / collider", collider)}
                 onCollisionExit={({ collider }) => console.log("EXIT collider / collider", collider)}
               />
