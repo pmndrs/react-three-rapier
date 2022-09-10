@@ -179,6 +179,16 @@ export interface UseColliderOptions<ColliderArgs> {
    * Callback when this collider stops colliding with another collider.
    */
   onCollisionExit?: CollisionExitCallback;
+
+  /**
+   * The bit mask configuring the groups and mask for collision handling.
+   */
+  collisionGroups?: number;
+
+  /**
+   * The bit mask configuring the groups and mask for solver handling.
+   */
+  solverGroups?: number;
 }
 
 export type CollisionEnterPayload = {

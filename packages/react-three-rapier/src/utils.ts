@@ -157,6 +157,14 @@ export const createColliderFromOptions: CreateColliderFromOptions = ({
       options?.frictionCombineRule ?? CoefficientCombineRule.Average
     );
 
+  if (options.collisionGroups !== undefined) {
+    colliderDesc.setCollisionGroups(options.collisionGroups);
+  }
+
+  if (options.solverGroups !== undefined) {
+    colliderDesc.setSolverGroups(options.solverGroups);
+  }
+
   if (hasCollisionEvents) {
     colliderDesc = colliderDesc.setActiveEvents(ActiveEvents.COLLISION_EVENTS);
   }
@@ -374,3 +382,7 @@ export const rigidBodyDescFromOptions = (options: UseRigidBodyOptions) => {
 
   return desc;
 };
+
+// TODO: make this nicer
+export const collisions = (group: number, collideWithGroup: number) =>
+  (group << 16) + collideWithGroup
