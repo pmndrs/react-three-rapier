@@ -31,7 +31,7 @@ const AnyCollider = ({
   useEffect(() => {
     const scale = ref.current!.getWorldScale(new Vector3());
     const colliders: Collider[] = [];
-
+    const hasCollisionEvents = rigidBodyContext?.hasCollisionEvents || !!onCollisionEnter || !!onCollisionExit
     // If this is an InstancedRigidBody api
     if (rigidBodyContext && "at" in rigidBodyContext.api) {
       rigidBodyContext.api.forEach((body, index) => {
@@ -52,7 +52,7 @@ const AnyCollider = ({
             world,
             rigidBody: body.raw(),
             scale: instanceScale,
-            hasCollisionEvents: rigidBodyContext?.hasCollisionEvents,
+            hasCollisionEvents,
           })
         );
       });
@@ -67,7 +67,7 @@ const AnyCollider = ({
               ? rigidBodyContext.api.raw()
               : undefined,
           scale,
-          hasCollisionEvents: rigidBodyContext?.hasCollisionEvents,
+          hasCollisionEvents
         })
       );
     }
