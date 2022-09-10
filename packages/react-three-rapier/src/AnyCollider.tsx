@@ -20,9 +20,11 @@ import { createColliderFromOptions, vectorArrayToVector3 } from "./utils";
 // Colliders
 const AnyCollider = ({
   children,
+  onCollisionEnter,
+  onCollisionExit,
   ...props
 }: UseColliderOptions<any> & { children?: ReactNode }) => {
-  const { world } = useRapier();
+  const { world, colliderEvents } = useRapier();
   const rigidBodyContext = useRigidBodyContext();
   const ref = useRef<Object3D>(null);
 
@@ -70,8 +72,17 @@ const AnyCollider = ({
       );
     }
 
+    /* Register collision events. */
+    colliders.forEach((collider) => colliderEvents.set(collider.handle, {
+      onCollisionEnter,
+      onCollisionExit,
+    }));
+
     return () => {
-      colliders.forEach((collider) => world.removeCollider(collider));
+      colliders.forEach((collider) => {
+        colliderEvents.delete(collider.handle);
+        world.removeCollider(collider)
+      });
     };
   }, []);
 

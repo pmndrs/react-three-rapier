@@ -147,7 +147,9 @@ export const CollisionEventsExample = () => {
                 <capsuleGeometry args={[1, 2, 16, 16]} />
                 <meshPhysicalMaterial color={color} />
               </mesh>
-              <CapsuleCollider args={[1, 1]} />
+              <CapsuleCollider args={[1, 1]}
+                onCollisionEnter={() => console.log("This collider collided, nice!")}
+              />
             </>
           )}
         </Collisioner>

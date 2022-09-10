@@ -47,6 +47,7 @@ export interface RapierContext {
     colliders: RigidBodyAutoCollider;
   };
   rigidBodyEvents: EventMap;
+  colliderEvents: EventMap;
   isPaused: boolean;
 }
 
@@ -338,6 +339,7 @@ export const Physics: FC<RapierWorldProps> = ({
       },
       rigidBodyStates,
       rigidBodyEvents,
+      colliderEvents,
       isPaused
     }),
     [isPaused]

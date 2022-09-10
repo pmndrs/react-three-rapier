@@ -40,7 +40,7 @@ export type HeightfieldArgs = [
   width: number,
   height: number,
   heights: number[],
-  scale: {x: number, y: number, z: number}
+  scale: { x: number, y: number, z: number }
 ];
 export type TrimeshArgs = [
   vertices: ArrayLike<number>,
@@ -169,6 +169,16 @@ export interface UseColliderOptions<ColliderArgs> {
    * The rotation of this collider relative to the rigid body
    */
   rotation?: Vector3Array;
+
+  /**
+   * Callback when this collider collides with another collider.
+   */
+  onCollisionEnter?: CollisionEnterCallback;
+
+  /**
+   * Callback when this collider stops colliding with another collider.
+   */
+  onCollisionExit?: CollisionExitCallback;
 }
 
 // TODO: add support for colliders
@@ -178,7 +188,7 @@ export type CollisionEnterPayload = {
   flipped: boolean;
 }
 
-export type CollisionExitPayload = { 
+export type CollisionExitPayload = {
   target: RapierRigidBody
 }
 
