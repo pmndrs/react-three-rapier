@@ -49,7 +49,11 @@ const AnyCollider = ({
 
         colliders.push(
           createColliderFromOptions({
-            options: props,
+            options: {
+              solverGroups: rigidBodyContext.options.solverGroups,
+              collisionGroups: rigidBodyContext.options.collisionGroups,
+              ...props
+            },
             world,
             rigidBody: body.raw(),
             scale: instanceScale,
@@ -60,7 +64,11 @@ const AnyCollider = ({
     } else {
       colliders.push(
         createColliderFromOptions({
-          options: props,
+          options: {
+            solverGroups: rigidBodyContext.options.solverGroups,
+            collisionGroups: rigidBodyContext.options.collisionGroups,
+            ...props
+          },
           world,
           // Initiate with a rigidbody, or undefined, because colliders can exist without a rigid body
           rigidBody:

@@ -141,7 +141,7 @@ export const CollisionEventsExample = () => {
           {(color) => <Suzanne color={color} />}
         </Collisioner>
 
-        <Collisioner colliders={false}>
+        <Collisioner colliders={false} collisionGroups={collide(1, 2, 3).withNothing()}>
           {(color) => (
             <>
               <mesh>
@@ -149,7 +149,7 @@ export const CollisionEventsExample = () => {
                 <meshPhysicalMaterial color={color} />
               </mesh>
               <CapsuleCollider args={[1, 1]}
-                collisionGroups={collide(1, 2, 3).with(2, 3, 4)}
+                collisionGroups={collide(1, 2, 3).withEverything()}
                 onCollisionEnter={({ collider }) => console.log("ENTER collider / collider", collider)}
                 onCollisionExit={({ collider }) => console.log("EXIT collider / collider", collider)}
               />

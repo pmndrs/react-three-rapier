@@ -1,7 +1,7 @@
 import { MutableRefObject } from "react";
 
 import {
-  CoefficientCombineRule, Collider as RapierCollider, RigidBody as RapierRigidBody, TempContactManifold
+  CoefficientCombineRule, Collider as RapierCollider, InteractionGroups, RigidBody as RapierRigidBody, TempContactManifold
 } from "@dimforge/rapier3d-compat";
 import {
   createColliderApi,
@@ -183,12 +183,12 @@ export interface UseColliderOptions<ColliderArgs> {
   /**
    * The bit mask configuring the groups and mask for collision handling.
    */
-  collisionGroups?: number;
+  collisionGroups?: InteractionGroups;
 
   /**
    * The bit mask configuring the groups and mask for solver handling.
    */
-  solverGroups?: number;
+  solverGroups?: InteractionGroups;
 }
 
 export type CollisionEnterPayload = {
@@ -289,6 +289,18 @@ export interface UseRigidBodyOptions {
    * Callback when this rigidbody stops colliding with another rigidbody
    */
   onCollisionExit?: CollisionExitCallback;
+
+  /**
+   * The default collision groups bitmask for all colliders in this rigid body.
+   * Can be customized per-collider.
+   */
+  collisionGroups?: InteractionGroups;
+
+  /**
+  * The default solver groups bitmask for all colliders in this rigid body.
+  * Can be customized per-collider.
+   */
+  solverGroups?: InteractionGroups;
 
   onSleep?(): void;
 
