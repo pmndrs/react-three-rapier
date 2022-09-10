@@ -181,15 +181,16 @@ export interface UseColliderOptions<ColliderArgs> {
   onCollisionExit?: CollisionExitCallback;
 }
 
-// TODO: add support for colliders
 export type CollisionEnterPayload = {
   target: RapierRigidBody;
+  collider: RapierCollider;
   manifold: TempContactManifold;
   flipped: boolean;
 }
 
 export type CollisionExitPayload = {
-  target: RapierRigidBody
+  target: RapierRigidBody;
+  collider: RapierCollider;
 }
 
 export type CollisionEnterCallback = (payload: CollisionEnterPayload) => void;

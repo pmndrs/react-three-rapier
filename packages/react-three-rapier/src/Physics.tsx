@@ -295,34 +295,38 @@ export const Physics: FC<RapierWorldProps> = ({
           /* RigidBody events */
           rigidBody1Events?.onCollisionEnter?.({
             target: rigidBody2,
+            collider: collider2,
             manifold,
             flipped
           });
 
           rigidBoyd2Events?.onCollisionEnter?.({
             target: rigidBody1,
+            collider: collider1,
             manifold,
             flipped,
           });
 
           /* Collider events */
           collider1Events?.onCollisionEnter?.({
-            target: rigidBody2, // TODO: We should also pass the other collider
+            target: rigidBody2,
+            collider: collider2,
             manifold,
             flipped
           })
 
           collider2Events?.onCollisionEnter?.({
-            target: rigidBody1, // TODO: We should also pass the other collider
+            target: rigidBody1,
+            collider: collider1,
             manifold,
             flipped
           })
         });
       } else {
-        rigidBody1Events?.onCollisionExit?.({ target: rigidBody2 });
-        rigidBoyd2Events?.onCollisionExit?.({ target: rigidBody1 });
-        collider1Events?.onCollisionExit?.({ target: rigidBody2 });
-        collider2Events?.onCollisionExit?.({ target: rigidBody1 });
+        rigidBody1Events?.onCollisionExit?.({ target: rigidBody2, collider: collider2 });
+        rigidBoyd2Events?.onCollisionExit?.({ target: rigidBody1, collider: collider1 });
+        collider1Events?.onCollisionExit?.({ target: rigidBody2, collider: collider2 });
+        collider2Events?.onCollisionExit?.({ target: rigidBody1, collider: collider1 });
       }
     });
   }, updatePriority);

@@ -148,8 +148,8 @@ export const CollisionEventsExample = () => {
                 <meshPhysicalMaterial color={color} />
               </mesh>
               <CapsuleCollider args={[1, 1]}
-                onCollisionEnter={() => console.log("ENTER collider / collider")}
-                onCollisionExit={() => console.log("EXIT collider / collider")}
+                onCollisionEnter={({ collider }) => console.log("ENTER collider / collider", collider)}
+                onCollisionExit={({ collider }) => console.log("EXIT collider / collider", collider)}
               />
             </>
           )}
