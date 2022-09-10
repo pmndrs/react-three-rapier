@@ -10,7 +10,7 @@ import React, {
 import { useAsset } from "use-asset";
 import type Rapier from "@dimforge/rapier3d-compat";
 import { useFrame } from "@react-three/fiber";
-import { RigidBodyAutoCollider, Vector3Array, WorldApi } from "./types";
+import { CollisionEnterCallback, CollisionExitCallback, RigidBodyAutoCollider, Vector3Array, WorldApi } from "./types";
 import {
   ColliderHandle,
   EventQueue,
@@ -64,16 +64,8 @@ type EventMap = Map<
   {
     onSleep?(): void;
     onWake?(): void;
-    onCollisionEnter?({
-      target,
-      manifold,
-      flipped,
-    }: {
-      target: RigidBody;
-      manifold: TempContactManifold;
-      flipped: boolean;
-    }): void;
-    onCollisionExit?({ target }: { target: RigidBody }): void;
+    onCollisionEnter?: CollisionEnterCallback;
+    onCollisionExit?: CollisionExitCallback;
   }
 >;
 

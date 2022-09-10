@@ -171,6 +171,21 @@ export interface UseColliderOptions<ColliderArgs> {
   rotation?: Vector3Array;
 }
 
+// TODO: add support for colliders
+export type CollisionEnterPayload = {
+  target: RapierRigidBody;
+  manifold: TempContactManifold;
+  flipped: boolean;
+}
+
+export type CollisionExitPayload = { 
+  target: RapierRigidBody
+}
+
+export type CollisionEnterCallback = (payload: CollisionEnterPayload) => void;
+
+export type CollisionExitCallback = (payload: CollisionExitPayload) => void;
+
 export interface UseRigidBodyOptions {
   /**
    * Specify the type of this rigid body
@@ -247,16 +262,12 @@ export interface UseRigidBodyOptions {
   /**
    * Callback when this rigidbody collides with another rigidbody
    */
-  onCollisionEnter?({}: {
-    target: RapierRigidBody;
-    manifold: TempContactManifold;
-    flipped: boolean;
-  }): void;
+  onCollisionEnter?: CollisionEnterCallback;
 
   /**
    * Callback when this rigidbody stops colliding with another rigidbody
    */
-  onCollisionExit?({}: { target: RapierRigidBody }): void;
+  onCollisionExit?: CollisionExitCallback;
 
   onSleep?(): void;
 

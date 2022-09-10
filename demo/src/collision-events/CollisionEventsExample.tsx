@@ -1,20 +1,21 @@
-import { Box, Cone, Cylinder, Html, Sphere } from "@react-three/drei";
+import { Box, Sphere } from "@react-three/drei";
 import {
   CapsuleCollider,
+  CollisionEnterCallback,
   HeightfieldCollider,
   RigidBody,
-  UseRigidBodyOptions,
+  UseRigidBodyOptions
 } from "@react-three/rapier";
-import { useSuzanne } from "../all-shapes/AllShapes";
-import { PlaneGeometry } from "three";
-import React, {
+import {
   createContext,
   Dispatch,
   ReactNode,
   SetStateAction,
   useContext,
-  useState,
+  useState
 } from "react";
+import { PlaneGeometry } from "three";
+import { useSuzanne } from "../all-shapes/AllShapes";
 
 const Suzanne = ({ color }: { color: string }) => {
   const { nodes: suzanne } = useSuzanne();
@@ -72,7 +73,7 @@ const Collisioner = ({
     setExplosions: Dispatch<SetStateAction<ReactNode[]>>;
   };
 
-  const handleCollisionEnter = ({ manifold }: any) => {
+  const handleCollisionEnter: CollisionEnterCallback = ({ manifold }) => {
     setColor("red");
 
     console.log("enter", manifold?.solverContactPoint(0));
