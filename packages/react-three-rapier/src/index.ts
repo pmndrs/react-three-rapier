@@ -22,5 +22,4 @@ export { InstancedRigidBodies } from "./InstancedRigidBodies";
 export * from "./AnyCollider";
 
 export * from "./hooks";
-
-export { collide } from "./utils";
+export * from "./bitmasks";
