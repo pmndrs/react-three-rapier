@@ -16,7 +16,7 @@ export const RigidBodyContext = createContext<{
 
 export const useRigidBodyContext = () => useContext(RigidBodyContext);
 // RigidBody
-export interface RigidBodyProps extends UseRigidBodyOptions, Omit<Object3DProps, 'type' | 'position' | 'rotation'> {
+export interface RigidBodyProps extends UseRigidBodyOptions {
   children?: ReactNode;
 }
 
@@ -38,7 +38,9 @@ export const RigidBody = forwardRef<RigidBodyApi, RigidBodyProps>(
           options: props,
         }}
       >
-        <object3D ref={object} {...objectProps}>{children}</object3D>
+        <object3D ref={object} {...objectProps}>
+          {children}
+        </object3D>
       </RigidBodyContext.Provider>
     );
   }

@@ -10,6 +10,7 @@ import {
   RoundCuboidCollider,
   ConeCollider,
   useRapier,
+  RigidBodyProps,
 } from "@react-three/rapier";
 import { useSuzanne } from "../all-shapes/AllShapes";
 import { RoundedBoxGeometry } from "three-stdlib";
@@ -20,6 +21,16 @@ const CuteBox = (props: Omit<MeshProps, "args">) => (
     <meshPhysicalMaterial color="orange" />
   </Box>
 );
+
+const RigidBodyBox = (props: RigidBodyProps) => {
+  return (
+    <RigidBody {...props}>
+      <Box castShadow receiveShadow>
+        <meshPhysicalMaterial color="orange" />
+      </Box>
+    </RigidBody>
+  );
+};
 
 const Suzanne = () => {
   const { nodes: suzanne } = useSuzanne();
@@ -34,7 +45,6 @@ const heightField = Array.from({
   length: heightFieldHeight * heightFieldWidth,
 }).map((_, index) => {
   return Math.random();
-  // return Math.floor(index / 20) * 0.8;
 });
 
 const heightFieldGeometry = new PlaneGeometry(
@@ -139,6 +149,8 @@ export const AllCollidersExample = () => {
         />
         <Html>HeightfieldCollider</Html>
       </RigidBody>
+
+      <RigidBodyBox position={[4, 10, 2]} />
     </group>
   );
 };
