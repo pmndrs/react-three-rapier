@@ -2,13 +2,11 @@ import { Box, Sphere, Torus } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import {
   BallCollider,
-  ConeCollider,
   CuboidCollider,
-  Debug,
   RigidBody,
   RigidBodyApi,
 } from "@react-three/rapier";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { Demo } from "../App";
 
 const Ball = () => {

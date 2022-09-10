@@ -83,56 +83,56 @@ type UseColliderOptionsRequiredArgs<T> = Omit<UseColliderOptions<T>, "args"> & {
   children?: ReactNode;
 };
 
-export const CuboidCollider = (
-  props: UseColliderOptionsRequiredArgs<CuboidArgs>
-) => {
+export type CuboidColliderProps = UseColliderOptionsRequiredArgs<CuboidArgs>;
+export type RoundCuboidColliderProps = UseColliderOptionsRequiredArgs<
+  RoundCuboidArgs
+>;
+export type BallColliderProps = UseColliderOptionsRequiredArgs<BallArgs>;
+export type CapsuleColliderProps = UseColliderOptionsRequiredArgs<CapsuleArgs>;
+export type HeightfieldColliderProps = UseColliderOptionsRequiredArgs<
+  HeightfieldArgs
+>;
+export type TrimeshColliderProps = UseColliderOptionsRequiredArgs<TrimeshArgs>;
+export type ConeColliderProps = UseColliderOptionsRequiredArgs<ConeArgs>;
+export type CylinderColliderProps = UseColliderOptionsRequiredArgs<
+  CylinderArgs
+>;
+export type ConvexHullColliderProps = UseColliderOptionsRequiredArgs<
+  ConvexHullArgs
+>;
+
+export const CuboidCollider = (props: CuboidColliderProps) => {
   return <AnyCollider {...props} shape="cuboid" />;
 };
 
-export const RoundCuboidCollider = (
-  props: UseColliderOptionsRequiredArgs<RoundCuboidArgs>
-) => {
+export const RoundCuboidCollider = (props: RoundCuboidColliderProps) => {
   return <AnyCollider {...props} shape="roundCuboid" />;
 };
 
-export const BallCollider = (
-  props: UseColliderOptionsRequiredArgs<BallArgs>
-) => {
+export const BallCollider = (props: BallColliderProps) => {
   return <AnyCollider {...props} shape="ball" />;
 };
 
-export const CapsuleCollider = (
-  props: UseColliderOptionsRequiredArgs<CapsuleArgs>
-) => {
+export const CapsuleCollider = (props: CapsuleColliderProps) => {
   return <AnyCollider {...props} shape="capsule" />;
 };
 
-export const HeightfieldCollider = (
-  props: UseColliderOptionsRequiredArgs<HeightfieldArgs>
-) => {
+export const HeightfieldCollider = (props: HeightfieldColliderProps) => {
   return <AnyCollider {...props} shape="heightfield" />;
 };
 
-export const TrimeshCollider = (
-  props: UseColliderOptionsRequiredArgs<TrimeshArgs>
-) => {
+export const TrimeshCollider = (props: TrimeshColliderProps) => {
   return <AnyCollider {...props} shape="trimesh" />;
 };
 
-export const ConeCollider = (
-  props: UseColliderOptionsRequiredArgs<ConeArgs>
-) => {
+export const ConeCollider = (props: ConeColliderProps) => {
   return <AnyCollider {...props} shape="cone" />;
 };
 
-export const CylinderCollider = (
-  props: UseColliderOptionsRequiredArgs<CylinderArgs>
-) => {
+export const CylinderCollider = (props: CylinderColliderProps) => {
   return <AnyCollider {...props} shape="cylinder" />;
 };
 
-export const ConvexHullCollider = (
-  props: UseColliderOptionsRequiredArgs<ConvexHullArgs>
-) => {
+export const ConvexHullCollider = (props: ConvexHullColliderProps) => {
   return <AnyCollider {...props} shape="convexHull" />;
 };
