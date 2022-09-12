@@ -37,4 +37,4 @@ export const interactionGroups =
     (bitmask(...memberships) << 16) + (filters !== undefined ? bitmask(...filters) : 0b1111_1111_1111_1111)
 
 const bitmask = (...layers: number[]): InteractionGroups =>
-  layers.reduce((acc, layer) => acc | (1 << layer), 0);
+  layers.reduce((acc, layer) => acc | (1 << (layer - 1)), 0);
