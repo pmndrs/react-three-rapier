@@ -27,6 +27,7 @@ import {
 } from "./utils";
 import { createWorldApi } from "./api";
 import { _matrix4, _object3d, _vector3 } from "./shared-objects";
+import { clamp } from "three/src/math/MathUtils";
 
 export interface RapierContext {
   rapier: typeof Rapier;
@@ -119,14 +120,14 @@ interface RapierWorldProps {
    * 
    * @defaultValue undefined
    */
-   updatePriority?: number
+  updatePriority?: number
 }
 
 export const Physics: FC<RapierWorldProps> = ({
   colliders = "cuboid",
   gravity = [0, -9.81, 0],
   children,
-  timeStep = 1/60,
+  timeStep = 1 / 60,
   maxSubSteps = 10,
   paused = false,
   updatePriority,
@@ -204,7 +205,7 @@ export const Physics: FC<RapierWorldProps> = ({
     }> = {}
 
     // don't step time forwards if paused
-    const nowTime = steppingState.time += paused ? 0 : delta * 1000;
+    const nowTime = steppingState.time += paused ? 0 : clamp(delta, 0, 1) * 1000;
     const timeStepMs = timeStep * 1000
     const timeSinceLast = nowTime - steppingState.lastTime
     steppingState.lastTime = nowTime
@@ -253,7 +254,7 @@ export const Physics: FC<RapierWorldProps> = ({
       }
 
       let oldState = previousTranslations[rigidBody.handle]
-      
+
       let newTranslation = rapierVector3ToVector3(rigidBody.translation())
       let newRotation = rapierQuaternionToQuaternion(rigidBody.rotation())
       let interpolatedTranslation = oldState ? oldState.translation.lerp(newTranslation, 1) : newTranslation
