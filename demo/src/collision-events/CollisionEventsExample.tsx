@@ -1,9 +1,9 @@
 import { Box, Sphere } from "@react-three/drei";
 import {
   CapsuleCollider,
-  collide,
   CollisionEnterCallback,
   HeightfieldCollider,
+  interactionGroups,
   RigidBody,
   UseRigidBodyOptions
 } from "@react-three/rapier";
@@ -141,7 +141,7 @@ export const CollisionEventsExample = () => {
           {(color) => <Suzanne color={color} />}
         </Collisioner>
 
-        <Collisioner colliders={false} collisionGroups={collide(1, 2, 3).withNothing()}>
+        <Collisioner colliders={false} collisionGroups={interactionGroups([1])}>
           {(color) => (
             <>
               <mesh>
@@ -149,7 +149,7 @@ export const CollisionEventsExample = () => {
                 <meshPhysicalMaterial color={color} />
               </mesh>
               <CapsuleCollider args={[1, 1]}
-                collisionGroups={collide(1, 2, 3).withEverything()}
+                collisionGroups={interactionGroups([2])}
                 onCollisionEnter={({ collider }) => console.log("ENTER collider / collider", collider)}
                 onCollisionExit={({ collider }) => console.log("EXIT collider / collider", collider)}
               />

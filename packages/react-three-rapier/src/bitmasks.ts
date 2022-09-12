@@ -1,57 +1,40 @@
 import { InteractionGroups } from "@dimforge/rapier3d-compat";
 
 /**
- * Start creating a collision bitmask, starting with the groups
- * the object is in.
+ * Calculates an InteractionGroup bitmask for use in the `collisionGroups` or `solverGroups`
+ * properties of RigidBody or Collider components. The first argument represents a list of
+ * groups the entity is in (expressed as numbers from 1 to 16). The second argument is a list
+ * of groups that will be filtered against. When it is omitted, all groups are filtered against.
  *
- * @param groupLayers One or more numerical layer identifiers.
- * @returns A builder object with additional methods for configuring collisions.
- */
-export const collide = (...groupLayers: number[]) => ({
-  /**
-   * Collide the object with other groups.
-   *
-   * @param maskLayers One or more numerical layer identifiers.
-   * @returns A bitmask representing the collision configuration.
-   */
-  with: (...maskLayers: number[]) => group(...groupLayers) + mask(...maskLayers),
-
-  /**
-   * Collide the object with all other groups.
-   *
-   * @returns A bitmask representing the collision configuration.
-   */
-  withEverything: () => group(...groupLayers) + 0b11111111,
-
-  /**
-   * Collide the object with nothing.
-   *
-   * @returns A bitmask representing the collision configuration.
-   */
-  withNothing: () => group(...groupLayers)
-})
-
-/**
- * Creates a bitmask from a list of numerical layer identifiers.
+ * @example
+ * A RigidBody that is member of group 1 and will collide with everything from groups 1 and 2:
  *
- * @param layers One or more numerical layer identifiers.
- * @returns A bitmask representing the given layers.
+ * ```tsx
+ * <RigidBody collisionGroups={interactionGroups([1], [1, 2])} />
+ * ```
+ *
+ * A RigidBody that is member of groups 1 and 2 and will collide with everything else:
+ *
+ * ```tsx
+ * <RigidBody collisionGroups={interactionGroups([1, 2])} />
+ * ```
+ *
+ * A RigidBody that is member of groups 1 and 2 and will not collide with anything:
+ *
+ * ```tsx
+ * <RigidBody collisionGroups={interactionGroups([1, 2], [])} />
+ * ```
+ *
+ * Please note that Rapier needs interaction filters to evaluate to true between _both_ colliding
+ * entities for collision events to trigger.
+ *
+ * @param memberships Groups the collider is a member of. (Values can range from 1 to 16.)
+ * @param filters Groups the interaction group should filter against. (Values can range from 1 to 16.)
+ * @returns An InteractionGroup bitmask.
  */
-export const bitmask = (...layers: number[]): InteractionGroups =>
+export const interactionGroups =
+  (memberships: number[], filters?: number[]): InteractionGroups =>
+    (bitmask(...memberships) << 16) + (filters !== undefined ? bitmask(...filters) : 0b1111_1111_1111_1111)
+
+const bitmask = (...layers: number[]): InteractionGroups =>
   layers.reduce((acc, layer) => acc | (1 << layer), 0);
-
-/**
- * Convert the specified numerical layers into a bitmask representing the
- * group association part in Rapier's collision and solver groups properties.
- *
- * @param layers One or more numerical layer identifiers.
- */
-export const group = (...layers: number[]): InteractionGroups => bitmask(...layers) << 16;
-
-/**
- * Convert the specified numerical layers into a bitmask representing the
- * mask part in Rapier's collision and solver groups properties.
- *
- * @param layers One or more numerical layer identifiers.
- */
-export const mask = (...layers: number[]): InteractionGroups => bitmask(...layers);
