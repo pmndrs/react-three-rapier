@@ -271,6 +271,9 @@ export const createCollidersFromChildren: CreateCollidersFromChildren = ({
         ? world.getRigidBody(rigidBody.handle)
         : undefined;
       const collider = world.createCollider(desc, actualRigidBody);
+
+      applyColliderOptions(collider, options)
+
       colliders.push(collider);
     }
   });
