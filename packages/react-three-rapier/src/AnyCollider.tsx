@@ -13,7 +13,7 @@ import {
   TrimeshArgs,
   ConeArgs,
   CylinderArgs,
-  ConvexHullArgs,
+  ConvexHullArgs
 } from "./types";
 import { createColliderFromOptions, vectorArrayToVector3 } from "./utils";
 
@@ -31,7 +31,10 @@ const AnyCollider = ({
   useEffect(() => {
     const scale = ref.current!.getWorldScale(new Vector3());
     const colliders: Collider[] = [];
-    const hasCollisionEvents = rigidBodyContext?.hasCollisionEvents || !!onCollisionEnter || !!onCollisionExit
+    const hasCollisionEvents =
+      rigidBodyContext?.hasCollisionEvents ||
+      !!onCollisionEnter ||
+      !!onCollisionExit;
 
     // If this is an InstancedRigidBody api
     if (rigidBodyContext && "at" in rigidBodyContext.api) {
@@ -57,7 +60,7 @@ const AnyCollider = ({
             world,
             rigidBody: body.raw(),
             scale: instanceScale,
-            hasCollisionEvents,
+            hasCollisionEvents
           })
         );
       });
@@ -65,8 +68,11 @@ const AnyCollider = ({
       colliders.push(
         createColliderFromOptions({
           options: {
-            solverGroups: rigidBodyContext.options.solverGroups,
-            collisionGroups: rigidBodyContext.options.collisionGroups,
+            solverGroups:
+              rigidBodyContext?.options.solverGroups || props.solverGroups,
+            collisionGroups:
+              rigidBodyContext?.options.collisionGroups ||
+              props.collisionGroups,
             ...props
           },
           world,
@@ -82,15 +88,17 @@ const AnyCollider = ({
     }
 
     /* Register collision events. */
-    colliders.forEach((collider) => colliderEvents.set(collider.handle, {
-      onCollisionEnter,
-      onCollisionExit,
-    }));
+    colliders.forEach(collider =>
+      colliderEvents.set(collider.handle, {
+        onCollisionEnter,
+        onCollisionExit
+      })
+    );
 
     return () => {
-      colliders.forEach((collider) => {
+      colliders.forEach(collider => {
         colliderEvents.delete(collider.handle);
-        world.removeCollider(collider)
+        world.removeCollider(collider);
       });
     };
   }, []);
