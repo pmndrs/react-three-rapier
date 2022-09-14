@@ -9,6 +9,8 @@
 
 <p align="center">⚠️ Under heavy development. All APIs are subject to change. ⚠️</p>
 
+For contributions, please read the [contributing guide](https://github.com/pmndrs/react-three-rapier/blob/main/packages/react-three-rapier/CONTRIBUTING.md).
+
 ## Usage
 
 ```tsx
