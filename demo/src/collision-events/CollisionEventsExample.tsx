@@ -1,7 +1,7 @@
 import { Box, Sphere } from "@react-three/drei";
 import {
   CapsuleCollider,
-  CollisionEnterCallback,
+  CollisionEnterHandler,
   HeightfieldCollider,
   interactionGroups,
   RigidBody,
@@ -74,7 +74,7 @@ const Collisioner = ({
     setExplosions: Dispatch<SetStateAction<ReactNode[]>>;
   };
 
-  const handleCollisionEnter: CollisionEnterCallback = ({ manifold }) => {
+  const handleCollisionEnter: CollisionEnterHandler = ({ manifold }) => {
     setColor("red");
 
     console.log("enter", manifold?.solverContactPoint(0));

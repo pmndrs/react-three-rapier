@@ -173,12 +173,12 @@ export interface UseColliderOptions<ColliderArgs> {
   /**
    * Callback when this collider collides with another collider.
    */
-  onCollisionEnter?: CollisionEnterCallback;
+  onCollisionEnter?: CollisionEnterHandler;
 
   /**
    * Callback when this collider stops colliding with another collider.
    */
-  onCollisionExit?: CollisionExitCallback;
+  onCollisionExit?: CollisionExitHandler;
 
   /**
    * The bit mask configuring the groups and mask for collision handling.
@@ -203,9 +203,9 @@ export type CollisionExitPayload = {
   collider: RapierCollider;
 }
 
-export type CollisionEnterCallback = (payload: CollisionEnterPayload) => void;
+export type CollisionEnterHandler = (payload: CollisionEnterPayload) => void;
 
-export type CollisionExitCallback = (payload: CollisionExitPayload) => void;
+export type CollisionExitHandler = (payload: CollisionExitPayload) => void;
 
 export interface UseRigidBodyOptions {
   /**
@@ -283,12 +283,12 @@ export interface UseRigidBodyOptions {
   /**
    * Callback when this rigidbody collides with another rigidbody
    */
-  onCollisionEnter?: CollisionEnterCallback;
+  onCollisionEnter?: CollisionEnterHandler;
 
   /**
    * Callback when this rigidbody stops colliding with another rigidbody
    */
-  onCollisionExit?: CollisionExitCallback;
+  onCollisionExit?: CollisionExitHandler;
 
   /**
    * The default collision groups bitmask for all colliders in this rigid body.

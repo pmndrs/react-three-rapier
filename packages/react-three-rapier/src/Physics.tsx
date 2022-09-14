@@ -10,7 +10,7 @@ import React, {
 import { useAsset } from "use-asset";
 import type Rapier from "@dimforge/rapier3d-compat";
 import { useFrame } from "@react-three/fiber";
-import { CollisionEnterCallback, CollisionExitCallback, RigidBodyAutoCollider, Vector3Array, WorldApi } from "./types";
+import { CollisionEnterHandler, CollisionExitHandler, RigidBodyAutoCollider, Vector3Array, WorldApi } from "./types";
 import {
   ColliderHandle,
   EventQueue,
@@ -65,8 +65,8 @@ type EventMap = Map<
   {
     onSleep?(): void;
     onWake?(): void;
-    onCollisionEnter?: CollisionEnterCallback;
-    onCollisionExit?: CollisionExitCallback;
+    onCollisionEnter?: CollisionEnterHandler;
+    onCollisionExit?: CollisionExitHandler;
   }
 >;
 
@@ -89,28 +89,28 @@ interface RapierWorldProps {
    * Set the timestep for the simulation.
    * Setting this to a number (eg. 1/60) will run the
    * simulation at that framerate.
-   * 
+   *
    * @defaultValue 1/60
    */
   timeStep?: number;
 
   /**
    * Maximum number of fixed steps to take per function call.
-   * 
+   *
    * @defaultValue 10
    */
   maxSubSteps?: number
 
   /**
    * Pause the physics simulation
-   * 
+   *
    * @defaultValue false
    */
   paused?: boolean
 
   /**
    * The update priority at which the physics simulation should run.
-   * 
+   *
    * @defaultValue undefined
    */
   updatePriority?: number
@@ -191,7 +191,7 @@ export const Physics: FC<RapierWorldProps> = ({
 
     /**
      * Fixed timeStep simulation progression
-     * @see https://gafferongames.com/post/fix_your_timestep/ 
+     * @see https://gafferongames.com/post/fix_your_timestep/
     */
     let previousTranslations: Record<string, {
       rotation: Quaternion,
