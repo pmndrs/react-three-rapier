@@ -22,7 +22,7 @@
   resolved "https://registry.yarnpkg.com/@babel/compat-data/-/compat-data-7.17.10.tgz#711dc726a492dfc8be8220028b1b92482362baab"
   integrity sha512-GZt/TCsG70Ms19gfZO1tM4CVnXsPgEPBCpJu+Qz3L0LUDsY5nZqFZglIoPC1kIYOtNBZlrnFT+klg12vFGZXrw==
 
-"@babel/core@^7.17.10", "@babel/core@^7.7.7":
+"@babel/core@7.17.10", "@babel/core@^7.17.10", "@babel/core@^7.7.7":
   version "7.17.10"
   resolved "https://registry.yarnpkg.com/@babel/core/-/core-7.17.10.tgz#74ef0fbf56b7dfc3f198fc2d927f4f03e12f4b05"
   integrity sha512-liKoppandF3ZcBnIYFjfSDHZLKdLHGJRkoWtG8zQyGJBQfIYobpnVGI5+pLBNtS6psFLDzyq8+h5HiVljW9PNA==
@@ -827,7 +827,7 @@
     "@babel/helper-create-regexp-features-plugin" "^7.16.7"
     "@babel/helper-plugin-utils" "^7.16.7"
 
-"@babel/preset-env@^7.17.10":
+"@babel/preset-env@7.17.10":
   version "7.17.10"
   resolved "https://registry.yarnpkg.com/@babel/preset-env/-/preset-env-7.17.10.tgz#a81b093669e3eb6541bb81a23173c5963c5de69c"
   integrity sha512-YNgyBHZQpeoBSRBg0xixsZzfT58Ze1iZrajvv0lJc70qDDGuGfonEnMGfWeSY0mQ3JTuCWFbMkzFRVafOyJx4g==
@@ -918,7 +918,7 @@
     "@babel/types" "^7.4.4"
     esutils "^2.0.2"
 
-"@babel/preset-react@^7.16.7":
+"@babel/preset-react@7.16.7":
   version "7.16.7"
   resolved "https://registry.yarnpkg.com/@babel/preset-react/-/preset-react-7.16.7.tgz#4c18150491edc69c183ff818f9f2aecbe5d93852"
   integrity sha512-fWpyI8UM/HE6DfPBzD8LnhQ/OcH8AgTaqcqP2nGOXEUV+VKBR5JRN9hCk9ai+zQQ57vtm9oWeXguBCPNUjytgA==
@@ -930,7 +930,7 @@
     "@babel/plugin-transform-react-jsx-development" "^7.16.7"
     "@babel/plugin-transform-react-pure-annotations" "^7.16.7"
 
-"@babel/preset-typescript@^7.16.7":
+"@babel/preset-typescript@7.16.7":
   version "7.16.7"
   resolved "https://registry.yarnpkg.com/@babel/preset-typescript/-/preset-typescript-7.16.7.tgz#ab114d68bb2020afc069cd51b37ff98a046a70b9"
   integrity sha512-WbVEmgXdIyvzB77AQjGBEyYPZx+8tTsO50XtfozQrkW8QB2rLJpH2lgx0TRw5EJrBxOZQ+wCcyPVQvS8tjEHpQ==
@@ -1024,7 +1024,7 @@
   dependencies:
     "@changesets/types" "^5.0.0"
 
-"@changesets/cli@^2.22.0":
+"@changesets/cli@2.22.0":
   version "2.22.0"
   resolved "https://registry.yarnpkg.com/@changesets/cli/-/cli-2.22.0.tgz#3bdbfb4a7a81ef37f63114e77da84e23f906b763"
   integrity sha512-4bA3YoBkd5cm5WUxmrR2N9WYE7EeQcM+R3bVYMUj2NvffkQVpU3ckAI+z8UICoojq+HRl2OEwtz+S5UBmYY4zw==
@@ -1216,7 +1216,7 @@
   resolved "https://registry.yarnpkg.com/@chevrotain/utils/-/utils-10.1.2.tgz#d2fb7b968141139e5c2419553e5295382c265e7d"
   integrity sha512-bbZIpW6fdyf7FMaeDmw3cBbkTqsecxEkwlVKgVfqqXWBPLH6azxhPA2V9F7OhoZSVrsnMYw7QuyK6qutXPjEew==
 
-"@commitlint/cli@^17.1.2":
+"@commitlint/cli@17.1.2":
   version "17.1.2"
   resolved "https://registry.yarnpkg.com/@commitlint/cli/-/cli-17.1.2.tgz#38240f84936df5216f749f06f838dc50cc85a43d"
   integrity sha512-h/4Hlka3bvCLbnxf0Er2ri5A44VMlbMSkdTRp8Adv2tRiklSTRIoPGs7OEXDv3EoDs2AAzILiPookgM4Gi7LOw==
@@ -1232,7 +1232,7 @@
     resolve-global "1.0.0"
     yargs "^17.0.0"
 
-"@commitlint/config-conventional@^17.1.0":
+"@commitlint/config-conventional@17.1.0":
   version "17.1.0"
   resolved "https://registry.yarnpkg.com/@commitlint/config-conventional/-/config-conventional-17.1.0.tgz#9bd852766e08842bfe0fe4deb40e152eb718ec1b"
   integrity sha512-WU2p0c9/jLi8k2q2YrDV96Y8XVswQOceIQ/wyJvQxawJSCasLdRB3kUIYdNjOCJsxkpoUlV/b90ZPxp1MYZDiA==
@@ -1414,7 +1414,7 @@
     "@jridgewell/resolve-uri" "^3.0.3"
     "@jridgewell/sourcemap-codec" "^1.4.10"
 
-"@manypkg/cli@^0.19.1":
+"@manypkg/cli@0.19.1":
   version "0.19.1"
   resolved "https://registry.yarnpkg.com/@manypkg/cli/-/cli-0.19.1.tgz#2dec45d340e1265276625c4b6c9b284d3376bd10"
   integrity sha512-EXBPPh6wYSKmSD5DdUjNG2rc55C2G/poIJ0D3O8tnk83o3nZh8g94JwN5/AumbSsDZ0yagmkS+DChNlRhIUG7w==
@@ -1491,7 +1491,7 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@preconstruct/cli@^2.1.5":
+"@preconstruct/cli@2.1.5":
   version "2.1.5"
   resolved "https://registry.yarnpkg.com/@preconstruct/cli/-/cli-2.1.5.tgz#f7f6d06809f382521589af15f67b87009b240c58"
   integrity sha512-bMnGTkaotxq+xoOkXoUOfTFvxBX/ZUxukcacf3mx3G7Iz5m/T4ZGzSOU12pxl64e+rVWGTKlUsgaDSgyFkup0A==
@@ -2270,7 +2270,7 @@ buffer-from@^1.0.0:
   resolved "https://registry.yarnpkg.com/buffer-from/-/buffer-from-1.1.2.tgz#2b146a6fd72e80b4f55d255f35ed59a3a9a41bd5"
   integrity sha512-E+XQCRwSbaaiChtv6k6Dwgc+bx+Bs6vuKJHHl5kox/BaKbhiXzqQOwK4cO22yElGp2OCmjwVhT3HmxgyPGnJfQ==
 
-buffer@^6.0.3:
+buffer@6.0.3:
   version "6.0.3"
   resolved "https://registry.yarnpkg.com/buffer/-/buffer-6.0.3.tgz#2ace578459cc8fbe2a70aaa8f52ee63b6a74c6c6"
   integrity sha512-FTiCpNxtwiZZHEZbcbTIcZjERVICn9yq/pDFkTl95/AxzD1naBctN7YO68riM/gLSDY7sdrMby8hofADYuuqOA==
@@ -4796,7 +4796,7 @@ normalize-url@^6.0.1:
   resolved "https://registry.yarnpkg.com/normalize-url/-/normalize-url-6.1.0.tgz#40d0885b535deffe3f3147bec877d05fe4c5668a"
   integrity sha512-DlL+XwOy3NxAQ8xuC0okPgK46iuVNAK01YN7RueYBqqFeGsBjV9XmCAzAdgt+667bCl5kPh9EqKKDwnaPG1I7A==
 
-np@^7.6.1:
+np@7.6.1:
   version "7.6.1"
   resolved "https://registry.yarnpkg.com/np/-/np-7.6.1.tgz#b1cd70a0941d03779f4c7e9036ec67b227aee604"
   integrity sha512-EHr5PtMPzNmkM/trnWQWTKAogJnVP1RzTFfIyvPK2COvLN6Vqut4gFXuWNng15xuqnTgmUPzKYbpQAZsYR+Dkw==
@@ -5814,7 +5814,7 @@ signal-exit@^3.0.2, signal-exit@^3.0.3:
   resolved "https://registry.yarnpkg.com/signal-exit/-/signal-exit-3.0.7.tgz#a9a1767f8af84155114eaabd73f99273c8f59ad9"
   integrity sha512-wnD2ZE+l+SPC/uoS0vXeE9L1+0wuaMqKlfz9AMUo38JsyLSBWSFcHR1Rri62LZc12vLr1gb3jl7iwQhgwpAbGQ==
 
-simple-git-hooks@^2.8.0:
+simple-git-hooks@2.8.0:
   version "2.8.0"
   resolved "https://registry.yarnpkg.com/simple-git-hooks/-/simple-git-hooks-2.8.0.tgz#291558785af6e17ca0c7a4f9d3d91e8635965a64"
   integrity sha512-ocmZQORwa6x9mxg+gVIAp5o4wXiWOHGXyrDBA0+UxGKIEKOyFtL4LWNKkP/2ornQPdlnlDGDteVeYP5FjhIoWA==
@@ -6380,6 +6380,11 @@ typedarray-to-buffer@^3.1.5:
   integrity sha512-zdu8XMNEDepKKR+XYOXAVPtWui0ly0NtohUscw+UmaHiAWT8hrV1rr//H6V+0DvJ3OQ19S979M0laLfX8rm82Q==
   dependencies:
     is-typedarray "^1.0.0"
+
+typescript@4.6.3:
+  version "4.6.3"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.6.3.tgz#eefeafa6afdd31d725584c67a0eaba80f6fc6c6c"
+  integrity sha512-yNIatDa5iaofVozS/uQJEl3JRWLKKGJKh6Yaiv0GLGSuhpFJe7P3SbHZ8/yjAHRQwKRoA6YZqlfjXWmVzoVSMw==
 
 typescript@^4.6.3:
   version "4.6.4"
