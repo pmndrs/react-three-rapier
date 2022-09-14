@@ -255,6 +255,34 @@ The `payload` object for all collision callbacks contains the following properti
 - `flipped` (enter only)  
   `true` if the data in the `manifold` [is flipped](https://rapier.rs/javascript3d/classes/World.html#contactPair).
 
+### Configuring collision and solver groups
+
+Both `<RigidBody>` as well as all collider components allow you to configure `collisionsGroups` and `solverGroups` properties that configures which groups the colliders are in, and what other groups they should interact with in potential collision and solving events (you will find more details on this in the [Rapier documentation](https://rapier.rs/docs/user_guides/javascript/colliders/#collision-groups-and-solver-groups).)
+
+Since these are set as bitmasks and bitmasks can get a bit unwieldy to generate, this library provides a helper called `interactionGroups` that can be used to generate bitmasks from numbers and arrays of groups, where groups are identified using numbers from 1 to 16.
+
+The first argument is the group, or an array of groups, that the collider is a member of; the second argument is the group, or an array of groups, that the collider should interact with.
+
+Here the collider is in group 1, and interacts with colliders from groups 1, 2 and 3:
+
+```tsx
+<CapsuleCollider collisionGroups={interactionGroups(1, [1, 2, 3])} />
+```
+
+This collider is in multiple groups, but only interacts with colliders from a single group:
+
+```tsx
+<CapsuleCollider collisionGroups={interactionGroups([1, 5], 7)} />
+```
+
+When the second argument is omitted, the collider will interact with all groups:
+
+```tsx
+<CapsuleCollider collisionGroups={interactionGroups(12)} />
+```
+
+> **Note** Please remember that in Rapier, for a collision (or solving) event to occur, both colliders involved in the event must match the related interaction groups -- a one-way match will be ignored.
+
 ## Joints
 
 WIP
