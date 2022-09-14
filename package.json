@@ -16,10 +16,13 @@
     "@babel/preset-react": "^7.16.7",
     "@babel/preset-typescript": "^7.16.7",
     "@changesets/cli": "^2.22.0",
+    "@commitlint/cli": "^17.1.2",
+    "@commitlint/config-conventional": "^17.1.0",
     "@manypkg/cli": "^0.19.1",
     "@preconstruct/cli": "^2.1.5",
     "buffer": "^6.0.3",
     "np": "^7.6.1",
+    "simple-git-hooks": "^2.8.0",
     "typescript": "^4.6.3"
   },
   "scripts": {
@@ -30,6 +33,9 @@
     "watch": "preconstruct watch",
     "demo": "cd demo && yarn dev",
     "release": "yarn build && changeset publish"
+  },
+  "simple-git-hooks": {
+    "commit-msg": "npx --no -- commitlint --edit ${1}"
   },
   "private": true,
   "workspaces": [
