@@ -114,6 +114,14 @@ interface CreateColliderFromOptions {
   }): Collider;
 }
 
+const applyColliderOptions = (collider: Collider, options: UseColliderOptions<any>) => {
+  if (options.collisionGroups !== undefined)
+    collider.setCollisionGroups(options.collisionGroups);
+
+  if (options.solverGroups !== undefined)
+    collider.setSolverGroups(options.solverGroups);
+}
+
 export const createColliderFromOptions: CreateColliderFromOptions = ({
   options,
   world,
@@ -179,6 +187,8 @@ export const createColliderFromOptions: CreateColliderFromOptions = ({
   }
 
   const collider = world.createCollider(colliderDesc, rigidBody);
+
+  applyColliderOptions(collider, options)
 
   return collider;
 };
@@ -261,6 +271,9 @@ export const createCollidersFromChildren: CreateCollidersFromChildren = ({
         ? world.getRigidBody(rigidBody.handle)
         : undefined;
       const collider = world.createCollider(desc, actualRigidBody);
+
+      applyColliderOptions(collider, options)
+
       colliders.push(collider);
     }
   });

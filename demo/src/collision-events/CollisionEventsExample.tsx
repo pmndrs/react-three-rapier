@@ -1,20 +1,22 @@
-import { Box, Cone, Cylinder, Html, Sphere } from "@react-three/drei";
+import { Box, Sphere } from "@react-three/drei";
 import {
   CapsuleCollider,
+  CollisionEnterHandler,
   HeightfieldCollider,
+  interactionGroups,
   RigidBody,
-  UseRigidBodyOptions,
+  UseRigidBodyOptions
 } from "@react-three/rapier";
-import { useSuzanne } from "../all-shapes/AllShapes";
-import { PlaneGeometry } from "three";
-import React, {
+import {
   createContext,
   Dispatch,
   ReactNode,
   SetStateAction,
   useContext,
-  useState,
+  useState
 } from "react";
+import { PlaneGeometry } from "three";
+import { useSuzanne } from "../all-shapes/AllShapes";
 
 const Suzanne = ({ color }: { color: string }) => {
   const { nodes: suzanne } = useSuzanne();
@@ -72,7 +74,7 @@ const Collisioner = ({
     setExplosions: Dispatch<SetStateAction<ReactNode[]>>;
   };
 
-  const handleCollisionEnter = ({ manifold }: any) => {
+  const handleCollisionEnter: CollisionEnterHandler = ({ manifold }) => {
     setColor("red");
 
     console.log("enter", manifold?.solverContactPoint(0));
@@ -139,14 +141,18 @@ export const CollisionEventsExample = () => {
           {(color) => <Suzanne color={color} />}
         </Collisioner>
 
-        <Collisioner colliders={false}>
+        <Collisioner colliders={false} collisionGroups={interactionGroups([1])}>
           {(color) => (
             <>
               <mesh>
                 <capsuleGeometry args={[1, 2, 16, 16]} />
                 <meshPhysicalMaterial color={color} />
               </mesh>
-              <CapsuleCollider args={[1, 1]} />
+              <CapsuleCollider args={[1, 1]}
+                collisionGroups={interactionGroups([2])}
+                onCollisionEnter={({ collider }) => console.log("ENTER collider / collider", collider)}
+                onCollisionExit={({ collider }) => console.log("EXIT collider / collider", collider)}
+              />
             </>
           )}
         </Collisioner>

@@ -113,13 +113,13 @@ export const useRigidBody = <O extends Object3D>(
     const autoColliders =
       colliderSetting !== false
         ? createCollidersFromChildren({
-              object: ref.current,
-              rigidBody,
-              options: { ...options, colliders: colliderSetting },
-              world,
-              ignoreMeshColliders: true
-            }
-          )
+          object: ref.current,
+          rigidBody,
+          options: { ...options, colliders: colliderSetting },
+          world,
+          ignoreMeshColliders: true
+        }
+        )
         : [];
 
     rigidBodyStates.set(rigidBody.handle, {

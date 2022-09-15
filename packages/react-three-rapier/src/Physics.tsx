@@ -10,7 +10,7 @@ import React, {
 import { useAsset } from "use-asset";
 import type Rapier from "@dimforge/rapier3d-compat";
 import { useFrame } from "@react-three/fiber";
-import { RigidBodyAutoCollider, Vector3Array, WorldApi } from "./types";
+import { CollisionEnterHandler, CollisionExitHandler, RigidBodyAutoCollider, Vector3Array, WorldApi } from "./types";
 import {
   ColliderHandle,
   EventQueue,
@@ -47,6 +47,7 @@ export interface RapierContext {
     colliders: RigidBodyAutoCollider;
   };
   rigidBodyEvents: EventMap;
+  colliderEvents: EventMap;
   isPaused: boolean;
 }
 
@@ -64,16 +65,8 @@ type EventMap = Map<
   {
     onSleep?(): void;
     onWake?(): void;
-    onCollisionEnter?({
-      target,
-      manifold,
-      flipped,
-    }: {
-      target: RigidBody;
-      manifold: TempContactManifold;
-      flipped: boolean;
-    }): void;
-    onCollisionExit?({ target }: { target: RigidBody }): void;
+    onCollisionEnter?: CollisionEnterHandler;
+    onCollisionExit?: CollisionExitHandler;
   }
 >;
 
@@ -96,28 +89,28 @@ interface RapierWorldProps {
    * Set the timestep for the simulation.
    * Setting this to a number (eg. 1/60) will run the
    * simulation at that framerate.
-   * 
+   *
    * @defaultValue 1/60
    */
   timeStep?: number;
 
   /**
    * Maximum number of fixed steps to take per function call.
-   * 
+   *
    * @defaultValue 10
    */
   maxSubSteps?: number
 
   /**
    * Pause the physics simulation
-   * 
+   *
    * @defaultValue false
    */
   paused?: boolean
 
   /**
    * The update priority at which the physics simulation should run.
-   * 
+   *
    * @defaultValue undefined
    */
   updatePriority?: number
@@ -162,6 +155,7 @@ export const Physics: FC<RapierWorldProps> = ({
     >
   >(() => new Map());
   const [rigidBodyEvents] = useState<EventMap>(() => new Map());
+  const [colliderEvents] = useState<EventMap>(() => new Map());
   const [eventQueue] = useState(() => new EventQueue(false));
 
   // Init world
@@ -197,7 +191,7 @@ export const Physics: FC<RapierWorldProps> = ({
 
     /**
      * Fixed timeStep simulation progression
-     * @see https://gafferongames.com/post/fix_your_timestep/ 
+     * @see https://gafferongames.com/post/fix_your_timestep/
     */
     let previousTranslations: Record<string, {
       rotation: Quaternion,
@@ -290,25 +284,49 @@ export const Physics: FC<RapierWorldProps> = ({
       const rigidBody1 = world.getRigidBody(rigidBodyHandle1);
       const rigidBody2 = world.getRigidBody(rigidBodyHandle2);
 
-      const events1 = rigidBodyEvents.get(rigidBodyHandle1);
-      const events2 = rigidBodyEvents.get(rigidBodyHandle2);
+      const rigidBody1Events = rigidBodyEvents.get(rigidBodyHandle1);
+      const rigidBoyd2Events = rigidBodyEvents.get(rigidBodyHandle2);
+
+      const collider1Events = colliderEvents.get(collider1.handle);
+      const collider2Events = colliderEvents.get(collider2.handle);
 
       if (started) {
         world.contactPair(collider1, collider2, (manifold, flipped) => {
-          events1?.onCollisionEnter?.({
+          /* RigidBody events */
+          rigidBody1Events?.onCollisionEnter?.({
             target: rigidBody2,
+            collider: collider2,
             manifold,
-            flipped,
+            flipped
           });
-          events2?.onCollisionEnter?.({
+
+          rigidBoyd2Events?.onCollisionEnter?.({
             target: rigidBody1,
+            collider: collider1,
             manifold,
             flipped,
           });
+
+          /* Collider events */
+          collider1Events?.onCollisionEnter?.({
+            target: rigidBody2,
+            collider: collider2,
+            manifold,
+            flipped
+          })
+
+          collider2Events?.onCollisionEnter?.({
+            target: rigidBody1,
+            collider: collider1,
+            manifold,
+            flipped
+          })
         });
       } else {
-        events1?.onCollisionExit?.({ target: rigidBody2 });
-        events2?.onCollisionExit?.({ target: rigidBody1 });
+        rigidBody1Events?.onCollisionExit?.({ target: rigidBody2, collider: collider2 });
+        rigidBoyd2Events?.onCollisionExit?.({ target: rigidBody1, collider: collider1 });
+        collider1Events?.onCollisionExit?.({ target: rigidBody2, collider: collider2 });
+        collider2Events?.onCollisionExit?.({ target: rigidBody1, collider: collider1 });
       }
     });
   }, updatePriority);
@@ -325,6 +343,7 @@ export const Physics: FC<RapierWorldProps> = ({
       },
       rigidBodyStates,
       rigidBodyEvents,
+      colliderEvents,
       isPaused
     }),
     [isPaused]

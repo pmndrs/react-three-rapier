@@ -1,7 +1,7 @@
 import { MutableRefObject } from "react";
 
 import {
-  CoefficientCombineRule, Collider as RapierCollider, RigidBody as RapierRigidBody, TempContactManifold
+  CoefficientCombineRule, Collider as RapierCollider, InteractionGroups, RigidBody as RapierRigidBody, TempContactManifold
 } from "@dimforge/rapier3d-compat";
 import {
   createColliderApi,
@@ -40,7 +40,7 @@ export type HeightfieldArgs = [
   width: number,
   height: number,
   heights: number[],
-  scale: {x: number, y: number, z: number}
+  scale: { x: number, y: number, z: number }
 ];
 export type TrimeshArgs = [
   vertices: ArrayLike<number>,
@@ -169,7 +169,43 @@ export interface UseColliderOptions<ColliderArgs> {
    * The rotation of this collider relative to the rigid body
    */
   rotation?: Vector3Array;
+
+  /**
+   * Callback when this collider collides with another collider.
+   */
+  onCollisionEnter?: CollisionEnterHandler;
+
+  /**
+   * Callback when this collider stops colliding with another collider.
+   */
+  onCollisionExit?: CollisionExitHandler;
+
+  /**
+   * The bit mask configuring the groups and mask for collision handling.
+   */
+  collisionGroups?: InteractionGroups;
+
+  /**
+   * The bit mask configuring the groups and mask for solver handling.
+   */
+  solverGroups?: InteractionGroups;
 }
+
+export type CollisionEnterPayload = {
+  target: RapierRigidBody;
+  collider: RapierCollider;
+  manifold: TempContactManifold;
+  flipped: boolean;
+}
+
+export type CollisionExitPayload = {
+  target: RapierRigidBody;
+  collider: RapierCollider;
+}
+
+export type CollisionEnterHandler = (payload: CollisionEnterPayload) => void;
+
+export type CollisionExitHandler = (payload: CollisionExitPayload) => void;
 
 export interface UseRigidBodyOptions {
   /**
@@ -247,16 +283,24 @@ export interface UseRigidBodyOptions {
   /**
    * Callback when this rigidbody collides with another rigidbody
    */
-  onCollisionEnter?({}: {
-    target: RapierRigidBody;
-    manifold: TempContactManifold;
-    flipped: boolean;
-  }): void;
+  onCollisionEnter?: CollisionEnterHandler;
 
   /**
    * Callback when this rigidbody stops colliding with another rigidbody
    */
-  onCollisionExit?({}: { target: RapierRigidBody }): void;
+  onCollisionExit?: CollisionExitHandler;
+
+  /**
+   * The default collision groups bitmask for all colliders in this rigid body.
+   * Can be customized per-collider.
+   */
+  collisionGroups?: InteractionGroups;
+
+  /**
+  * The default solver groups bitmask for all colliders in this rigid body.
+  * Can be customized per-collider.
+   */
+  solverGroups?: InteractionGroups;
 
   onSleep?(): void;
 
