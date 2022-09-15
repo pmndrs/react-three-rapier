@@ -141,7 +141,7 @@ const Scene = () => {
     instancedApi.at(40).applyImpulse({ x: 0, y: 10, z: 0 });
 
     // Or update all instances as if they were in an array
-    instancedApi.forEach((api) => {
+    instancedApi.forEach(api => {
       api.applyImpulse({ x: 0, y: 10, z: 0 });
     });
   }, []);
@@ -153,13 +153,13 @@ const Scene = () => {
   const rotations = Array.from({ length: COUNT }, (_, index) => [
     Math.random(),
     Math.random(),
-    Math.random(),
+    Math.random()
   ]);
 
   const scales = Array.from({ length: COUNT }, (_, index) => [
     Math.random(),
     Math.random(),
-    Math.random(),
+    Math.random()
   ]);
 
   return (
@@ -239,8 +239,12 @@ You may also subscribe to collision events on individual colliders:
 
 ```tsx
 <CuboidCollider
-  onCollisionEnter={(payload) => { /* ... */ }} 
-  onCollisionExit={(payload) => { /* ... */ }} 
+  onCollisionEnter={payload => {
+    /* ... */
+  }}
+  onCollisionExit={payload => {
+    /* ... */
+  }}
 />
 ```
 
@@ -303,7 +307,7 @@ In order, but also not necessarily:
 - [x] Colliders outside RigidBodies
 - [x] InstancedMesh support
 - [x] Timestep improvements for determinism
-- [ ] Normalize and improve collision events (add events to single Colliders, InstancedRigidBodies, etc)
+- [x] Normalize and improve collision events (add events to single Colliders)
+- [ ] Add collision events to InstancedRigidBodies
 - [ ] Docs
 - [ ] CodeSandbox examples
-- [ ] Helpers, for things like Vehicle, Rope, Player, etc
