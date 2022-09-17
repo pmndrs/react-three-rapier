@@ -274,54 +274,79 @@ export const Physics: FC<RapierWorldProps> = ({
       const collider1 = world.getCollider(handle1);
       const collider2 = world.getCollider(handle2);
 
-      const rigidBodyHandle1 = collider1.parent()?.handle;
-      const rigidBodyHandle2 = collider2.parent()?.handle;
-
-      if (!collider1 || !collider2 || rigidBodyHandle1 === undefined || rigidBodyHandle2 === undefined) {
+      if (!collider1 || !collider2) {
         return;
       }
 
-      const rigidBody1 = world.getRigidBody(rigidBodyHandle1);
-      const rigidBody2 = world.getRigidBody(rigidBodyHandle2);
+      const rigidBodyHandle1 = collider1.parent()?.handle;
+      const rigidBodyHandle2 = collider2.parent()?.handle;
 
-      const rigidBody1Events = rigidBodyEvents.get(rigidBodyHandle1);
-      const rigidBoyd2Events = rigidBodyEvents.get(rigidBodyHandle2);
+      const rigidBody1 = rigidBodyHandle1 ? world.getRigidBody(rigidBodyHandle1) : undefined;
+      const rigidBody2 = rigidBodyHandle2 ? world.getRigidBody(rigidBodyHandle2) : undefined;
+
+      const rigidBody1Events = rigidBodyHandle1 ? rigidBodyEvents.get(rigidBodyHandle1) : undefined;
+      const rigidBoyd2Events = rigidBodyHandle2 ? rigidBodyEvents.get(rigidBodyHandle2) : undefined;
 
       const collider1Events = colliderEvents.get(collider1.handle);
       const collider2Events = colliderEvents.get(collider2.handle);
 
       if (started) {
-        world.contactPair(collider1, collider2, (manifold, flipped) => {
-          /* RigidBody events */
+        const intersections = world.intersectionPair(collider1, collider2);
+        if (intersections) {
           rigidBody1Events?.onCollisionEnter?.({
             target: rigidBody2,
             collider: collider2,
-            manifold,
-            flipped
-          });
+          })
 
           rigidBoyd2Events?.onCollisionEnter?.({
             target: rigidBody1,
             collider: collider1,
-            manifold,
-            flipped,
           });
 
           /* Collider events */
           collider1Events?.onCollisionEnter?.({
             target: rigidBody2,
             collider: collider2,
-            manifold,
-            flipped
           })
 
           collider2Events?.onCollisionEnter?.({
             target: rigidBody1,
             collider: collider1,
-            manifold,
-            flipped
           })
-        });
+        } else {
+          world.contactPair(collider1, collider2, (manifold, flipped) => {
+            /* RigidBody events */
+            rigidBody1Events?.onCollisionEnter?.({
+              target: rigidBody2,
+              collider: collider2,
+              manifold,
+              flipped
+            });
+
+            rigidBoyd2Events?.onCollisionEnter?.({
+              target: rigidBody1,
+              collider: collider1,
+              manifold,
+              flipped,
+            });
+
+            /* Collider events */
+            collider1Events?.onCollisionEnter?.({
+              target: rigidBody2,
+              collider: collider2,
+              manifold,
+              flipped
+            })
+
+            collider2Events?.onCollisionEnter?.({
+              target: rigidBody1,
+              collider: collider1,
+              manifold,
+              flipped
+            })
+          });
+        }
+
       } else {
         rigidBody1Events?.onCollisionExit?.({ target: rigidBody2, collider: collider2 });
         rigidBoyd2Events?.onCollisionExit?.({ target: rigidBody1, collider: collider1 });

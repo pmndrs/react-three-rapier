@@ -105,6 +105,8 @@ export type RigidBodyShape =
   | "roundConvexHull"
   | "roundConvexMesh";
 
+type ColliderType = 'solid' | 'sensor';
+
 export type Vector3Array = [x: number, y: number, z: number];
 export type Boolean3Array = [x: boolean, y: boolean, z: boolean];
 
@@ -118,6 +120,14 @@ export interface UseColliderOptions<ColliderArgs> {
    * Arguments to pass to the collider
    */
   args?: ColliderArgs;
+
+  /**
+   * The solid collider will generate contact forces to prevent colliders from penetrating
+   * each other, whereas sensor colliders will generate events when another collider starts
+   * or stops touching it
+   * @see https://rapier.rs/docs/user_guides/javascript/colliders#collider-type
+   */
+  type?: ColliderType;
 
   /**
    * The mass of this rigid body.
@@ -192,14 +202,14 @@ export interface UseColliderOptions<ColliderArgs> {
 }
 
 export type CollisionEnterPayload = {
-  target: RapierRigidBody;
+  target: RapierRigidBody | undefined;
   collider: RapierCollider;
-  manifold: TempContactManifold;
-  flipped: boolean;
+  manifold?: TempContactManifold;
+  flipped?: boolean;
 }
 
 export type CollisionExitPayload = {
-  target: RapierRigidBody;
+  target: RapierRigidBody | undefined;
   collider: RapierCollider;
 }
 
@@ -267,6 +277,12 @@ export interface UseRigidBodyOptions {
    * Setting this to false will disable automatic colliders.
    */
   colliders?: RigidBodyAutoCollider | false;
+
+  /**
+   * Automatically sets all colliders within this rigid body to this type
+   * unless specified.
+   */
+  colliderType?: ColliderType;
 
   /**
    * Set the friction of auto-generated colliders.

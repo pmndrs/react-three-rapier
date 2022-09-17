@@ -120,7 +120,9 @@ const applyColliderOptions = (collider: Collider, options: UseColliderOptions<an
 
   if (options.solverGroups !== undefined)
     collider.setSolverGroups(options.solverGroups);
-}
+
+  collider.setSensor(options.type === "sensor");
+};
 
 export const createColliderFromOptions: CreateColliderFromOptions = ({
   options,
@@ -272,7 +274,10 @@ export const createCollidersFromChildren: CreateCollidersFromChildren = ({
         : undefined;
       const collider = world.createCollider(desc, actualRigidBody);
 
-      applyColliderOptions(collider, options)
+      applyColliderOptions(collider, {
+        ...options,
+        type: options.colliderType
+      });
 
       colliders.push(collider);
     }
