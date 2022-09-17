@@ -28,7 +28,7 @@ import { AllShapes } from "./all-shapes/AllShapes";
 import { ApiUsage } from "./api-usage/ApiUsage";
 import { Car } from "./car/Car";
 import { Cluster } from "./cluster/Cluster";
-import { ColliderSensor } from "./collider-sensors/ColliderSensor";
+import { ColliderSensorDemo } from "./collider-sensors/ColliderSensor";
 import { Colliders } from "./colliders/Colliders";
 import { CollisionEventsExample } from "./collision-events/CollisionEventsExample";
 import { ComponentsExample } from "./components/Components";
@@ -103,7 +103,7 @@ const routes: Record<string, ReactNode> = {
   kinematics: <Kinematics />,
   "mesh-collider-test": <MeshColliderTest />,
   colliders: <Colliders />,
-  "collider-sensor": <ColliderSensor />,
+  "collider-sensor": <ColliderSensorDemo />,
   "instanced-meshes": <InstancedMeshes />,
   damping: <Damping />,
   "instanced-meshes-compound": <InstancedMeshesCompound />,
