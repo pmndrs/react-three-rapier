@@ -24,6 +24,7 @@ import {
   UNSAFE_RouteContext,
 } from "react-router-dom";
 import { AllCollidersExample } from "./all-colliders/AllCollidersExample";
+import { AttractorExample } from "./attractor/AttractorExample";
 import { AllShapes } from "./all-shapes/AllShapes";
 import { ApiUsage } from "./api-usage/ApiUsage";
 import { Car } from "./car/Car";
@@ -107,6 +108,7 @@ const routes: Record<string, ReactNode> = {
   "instanced-meshes-compound": <InstancedMeshesCompound />,
   "all-colliders": <AllCollidersExample />,
   "collision-events": <CollisionEventsExample />,
+  attractor: <AttractorExample />,
 };
 
 export const App = () => {

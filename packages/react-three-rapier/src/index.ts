@@ -19,6 +19,7 @@ export { RigidBody } from "./RigidBody";
 export { MeshCollider } from "./MeshCollider";
 export { Debug } from "./Debug";
 export { InstancedRigidBodies } from "./InstancedRigidBodies";
+export { Attractor } from "./Attractor";
 export * from "./AnyCollider";
 
 export * from "./hooks";
