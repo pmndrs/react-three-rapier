@@ -1,8 +1,8 @@
-import { useFrame } from '@react-three/fiber'
-import { useRapier, Vector3Array } from '@react-three/rapier'
-import { Sphere } from '@react-three/drei'
 import * as THREE from 'three'
+import { useFrame } from "@react-three/fiber";
 import { RigidBody } from '@dimforge/rapier3d-compat';
+import { Vector3Array } from './types';
+import { useRapier } from './hooks';
 type GravityType = "static" | "linear" | "newtonian";
 interface AttractorProps {
   position?: Vector3Array;
@@ -49,12 +49,14 @@ export const Attractor = ({
 
   return showHelper ? (
     <>
-      <Sphere scale={0.25} position={position}>
+      <mesh scale={0.25} position={position} >
+        <sphereGeometry />
         <meshBasicMaterial color="darkgrey" />
-      </Sphere>
-      <Sphere scale={range} position={position}>
+      </mesh>
+      <mesh scale={range} position={position}>
+        <sphereGeometry />
         <meshBasicMaterial color="cyan" wireframe transparent opacity={0.1} />
-      </Sphere>
+      </mesh>
     </>
   ) : null
 }
