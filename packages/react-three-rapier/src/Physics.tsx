@@ -249,7 +249,7 @@ export const Physics: FC<RapierWorldProps> = ({
 
       let oldState = previousTranslations[rigidBody.handle]
 
-      let newTranslation = rapierVector3ToVector3(rigidBody.translation())
+      let newTranslation = rigidBody.translation() as Vector3
       let newRotation = rapierQuaternionToQuaternion(rigidBody.rotation())
       let interpolatedTranslation = oldState ? oldState.translation.lerp(newTranslation, 1) : newTranslation
       let interpolatedRotation = oldState ? oldState.rotation.slerp(newRotation, interpolationAlpha) : newRotation

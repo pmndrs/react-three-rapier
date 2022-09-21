@@ -15,18 +15,17 @@
     "@types/three": "^0.139.0",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
-    "three": "^0.139.2",
-    "three-stdlib": "^2.15.0"
+    "three": "^0.139.2"
   },
   "peerDependencies": {
     "@react-three/fiber": "^8.0.12",
     "react": "^18.0.0",
-    "three": ">=0.139.2",
-    "three-stdlib": "^2.15.0"
+    "three": ">=0.139.2"
   },
   "dependencies": {
     "@dimforge/rapier3d-compat": "0.9.0",
-    "use-asset": "^1.0.4"
+    "use-asset": "^1.0.4",
+    "three-stdlib": "^2.15.0"
   },
   "repository": "https://github.com/pmndrs/react-three-rapier/tree/master/packages/react-three-rapier"
 }

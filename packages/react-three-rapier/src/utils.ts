@@ -6,7 +6,7 @@ import {
   Quaternion as RapierQuaternion,
   RigidBody,
   RigidBodyDesc,
-  Vector3 as RapierVector3,
+  Vector3 as RapierVector3
 } from "@dimforge/rapier3d-compat";
 
 import { mergeVertices } from "three/examples/jsm/utils/BufferGeometryUtils";
@@ -17,7 +17,7 @@ import {
   Mesh,
   Object3D,
   Quaternion,
-  Vector3,
+  Vector3
 } from "three";
 import { _euler, _quaternion, _vector3 } from "./shared-objects";
 import {
@@ -28,7 +28,7 @@ import {
   UseColliderOptions,
   UseRigidBodyOptions,
   Vector3Array,
-  WorldApi,
+  WorldApi
 } from "./types";
 
 export const vectorArrayToVector3 = (arr: Vector3Array) => {
@@ -41,13 +41,13 @@ export const vector3ToQuaternion = (v: Vector3) => {
 };
 
 export const rapierVector3ToVector3 = ({ x, y, z }: RapierVector3) =>
-  _vector3.set(x, y, z).clone();
+  _vector3.set(x, y, z);
 
 export const rapierQuaternionToQuaternion = ({
   x,
   y,
   z,
-  w,
+  w
 }: RapierQuaternion) => _quaternion.set(x, y, z, w);
 
 const rigidBodyTypeMap: {
@@ -56,7 +56,7 @@ const rigidBodyTypeMap: {
   fixed: 1,
   dynamic: 0,
   kinematicPosition: 2,
-  kinematicVelocity: 3,
+  kinematicVelocity: 3
 };
 
 export const rigidBodyTypeFromString = (type: RigidBodyTypeString) =>
@@ -72,7 +72,7 @@ export const decomposeMatrix4 = (m: Matrix4) => {
   return {
     position,
     rotation,
-    scale,
+    scale
   };
 };
 
@@ -114,20 +114,23 @@ interface CreateColliderFromOptions {
   }): Collider;
 }
 
-const applyColliderOptions = (collider: Collider, options: UseColliderOptions<any>) => {
+const applyColliderOptions = (
+  collider: Collider,
+  options: UseColliderOptions<any>
+) => {
   if (options.collisionGroups !== undefined)
     collider.setCollisionGroups(options.collisionGroups);
 
   if (options.solverGroups !== undefined)
     collider.setSolverGroups(options.solverGroups);
-}
+};
 
 export const createColliderFromOptions: CreateColliderFromOptions = ({
   options,
   world,
   rigidBody,
   scale,
-  hasCollisionEvents,
+  hasCollisionEvents
 }) => {
   const mass = options?.mass || 1;
   const colliderShape = options?.shape ?? "cuboid";
@@ -136,7 +139,7 @@ export const createColliderFromOptions: CreateColliderFromOptions = ({
   const [pix, piy, piz] = options?.principalAngularInertia || [
     mass * 0.2,
     mass * 0.2,
-    mass * 0.2,
+    mass * 0.2
   ];
   const [x, y, z] = options?.position || [0, 0, 0];
   const [rx, ry, rz] = options?.rotation || [0, 0, 0];
@@ -154,7 +157,7 @@ export const createColliderFromOptions: CreateColliderFromOptions = ({
       x: qRotation.x,
       y: qRotation.y,
       z: qRotation.z,
-      w: qRotation.w,
+      w: qRotation.w
     })
     .setRestitution(options?.restitution ?? 0)
     .setRestitutionCombineRule(
@@ -188,14 +191,14 @@ export const createColliderFromOptions: CreateColliderFromOptions = ({
 
   const collider = world.createCollider(colliderDesc, rigidBody);
 
-  applyColliderOptions(collider, options)
+  applyColliderOptions(collider, options);
 
   return collider;
 };
 
 const isChildOfMeshCollider = (child: Mesh) => {
   let flag = false;
-  child.traverseAncestors((a) => {
+  child.traverseAncestors(a => {
     if (a.userData.r3RapierType === "MeshCollider") flag = true;
   });
   return flag;
@@ -215,7 +218,7 @@ export const createCollidersFromChildren: CreateCollidersFromChildren = ({
   rigidBody,
   options,
   world,
-  ignoreMeshColliders = true,
+  ignoreMeshColliders = true
 }) => {
   const hasCollisionEvents = !!(
     options.onCollisionEnter || options.onCollisionExit
@@ -272,7 +275,7 @@ export const createCollidersFromChildren: CreateCollidersFromChildren = ({
         : undefined;
       const collider = world.createCollider(desc, actualRigidBody);
 
-      applyColliderOptions(collider, options)
+      applyColliderOptions(collider, options);
 
       colliders.push(collider);
     }

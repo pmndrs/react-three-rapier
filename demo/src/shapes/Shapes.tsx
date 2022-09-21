@@ -5,7 +5,7 @@ import {
   ReactNode,
   useEffect,
   useRef,
-  useState,
+  useState
 } from "react";
 
 import { Box, Html, Plane, Sphere, useGLTF } from "@react-three/drei";
@@ -16,7 +16,7 @@ import {
   Material,
   Mesh,
   MeshPhysicalMaterial,
-  Vector3,
+  Vector3
 } from "three";
 import { useDemo } from "../App";
 
@@ -36,7 +36,7 @@ const Label = ({ label }: { label: string }) => {
           background: "#fff",
           border: "2px solid #000",
           padding: 8,
-          transform: "translate(100%, -100%)",
+          transform: "translate(100%, -100%)"
         }}
       >
         <span
@@ -47,7 +47,7 @@ const Label = ({ label }: { label: string }) => {
             top: "calc(100% - 5px)",
             left: -16,
             borderLeft: "2px solid black",
-            transform: "rotate(45deg)",
+            transform: "rotate(45deg)"
           }}
         ></span>
         {label}
@@ -92,7 +92,7 @@ const RigidCylinder = memo(() => {
         <cylinderBufferGeometry args={[0.4, 0.4, 0.4, 16]} />
         <meshPhysicalMaterial color={color} />
       </mesh>
-      <CylinderCollider args={[0.4, 0.4]} />
+      <CylinderCollider args={[0.2, 0.4]} />
     </RigidBody>
   );
 });
@@ -162,7 +162,7 @@ const itemMap: Record<string, FC> = {
   cylinder: RigidCylinder,
   ball: RigidBall,
   convexHull: HullPear,
-  convexMesh: MeshBoat,
+  convexMesh: MeshBoat
 };
 
 const Thing = ({ item }: { item: string }) => {
@@ -175,7 +175,7 @@ const Scene: FC = () => {
   const { setUI } = useDemo();
 
   const addItem = (str: string) => {
-    setItems((curr) => [...curr, str]);
+    setItems(curr => [...curr, str]);
   };
 
   useEffect(() => {
