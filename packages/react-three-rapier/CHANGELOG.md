@@ -1,5 +1,14 @@
 # @react-three/rapier
 
+## 0.6.9
+
+### Patch Changes
+
+- 720b03d: Add collision events to individual Colliders (@hmans)
+- 6109dcf: Export RigidBodyProps and XXXColliderProps
+- 980a53d: Adds the `<Physics updatePriority={...}>` prop, allowing the user to configure the update priority at which to run the components update loop. (@hmans)
+- 5de1f77: The physics world stepping would needlessly catch up all the time missed while the host application was suspended in a background tab. This has been fixed. (@hmans)
+
 ## 0.6.8
 
 ### Patch Changes
