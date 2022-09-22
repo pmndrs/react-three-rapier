@@ -120,8 +120,14 @@ export interface UseColliderOptions<ColliderArgs> {
   args?: ColliderArgs;
 
   /**
+   * The density of the collider. This is used to calculate the collider's
+   * (and its owning rigidbody's) mass.
+   */
+  density?: number;
+
+  /**
    * The mass of this rigid body.
-   * The mass and density is automatically calculated based on the shape of the collider.
+   * The mass is automatically calculated based on the shape and density of the collider.
    * Generally, it's not recommended to adjust the mass properties as it could lead to
    * unexpected behaviors.
    * More info https://rapier.rs/docs/user_guides/javascript/colliders#mass-properties

@@ -123,6 +123,9 @@ const applyColliderOptions = (
 
   if (options.solverGroups !== undefined)
     collider.setSolverGroups(options.solverGroups);
+
+  if (options.density !== undefined)
+    collider.setDensity(options.density);
 };
 
 export const createColliderFromOptions: CreateColliderFromOptions = ({
