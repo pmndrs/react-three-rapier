@@ -4,7 +4,6 @@ import { Object3D } from "three";
 import { useRapier } from "./hooks";
 import { useRigidBodyContext } from "./RigidBody";
 import { RigidBodyAutoCollider } from "./types";
-import { createCollidersFromChildren } from "./utils";
 
 interface MeshColliderProps {
   children: ReactNode;
@@ -23,21 +22,21 @@ export const MeshCollider = ({ children, type }: MeshColliderProps) => {
       const colliderSetting = type ?? physicsOptions.colliders ?? false;
 
       if ("raw" in api) {
-        autoColliders = createCollidersFromChildren({
-          object: object.current,
-          rigidBody: api,
-          options: {
-            ...options,
-            colliders: colliderSetting,
-          },
-          world,
-          ignoreMeshColliders: false,
-        });
+        // autoColliders = createCollidersFromChildren({
+        //   object: object.current,
+        //   rigidBody: api,
+        //   options: {
+        //     ...options,
+        //     colliders: colliderSetting,
+        //   },
+        //   world,
+        //   ignoreMeshColliders: false,
+        // });
       }
     }
 
     return () => {
-      autoColliders.forEach((collider) => {
+      autoColliders.forEach(collider => {
         world.removeCollider(collider);
       });
     };
@@ -47,7 +46,7 @@ export const MeshCollider = ({ children, type }: MeshColliderProps) => {
     <object3D
       ref={object}
       userData={{
-        r3RapierType: "MeshCollider",
+        r3RapierType: "MeshCollider"
       }}
     >
       {children}

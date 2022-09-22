@@ -9,6 +9,7 @@ import {
   createRigidBodyApi,
   createWorldApi
 } from "./api";
+import { ColliderProps } from ".";
 
 export { CoefficientCombineRule as CoefficientCombineRule } from "@dimforge/rapier3d-compat";
 export { RapierRigidBody, RapierCollider };
@@ -207,7 +208,7 @@ export type CollisionEnterHandler = (payload: CollisionEnterPayload) => void;
 
 export type CollisionExitHandler = (payload: CollisionExitPayload) => void;
 
-export interface UseRigidBodyOptions {
+export interface UseRigidBodyOptions extends ColliderProps {
   /**
    * Specify the type of this rigid body
    */

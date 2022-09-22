@@ -6,6 +6,7 @@ import { InstancedRigidBodyApi } from "./api";
 import { useRigidBody } from "./hooks";
 import { InstancedRigidBodiesProps } from "./InstancedRigidBodies";
 import { RigidBodyApi, UseRigidBodyOptions } from "./types";
+import { AnyCollider } from "./AnyCollider";
 
 export const RigidBodyContext = createContext<{
   ref: RefObject<Object3D> | MutableRefObject<Object3D>;
@@ -15,14 +16,14 @@ export const RigidBodyContext = createContext<{
 }>(undefined!);
 
 export const useRigidBodyContext = () => useContext(RigidBodyContext);
-// RigidBody
+
 export interface RigidBodyProps extends UseRigidBodyOptions {
   children?: ReactNode;
 }
 
 export const RigidBody = forwardRef<RigidBodyApi, RigidBodyProps>(
   ({ children, ...props }, ref) => {
-    const [object, api, childColliders] = useRigidBody<Object3D>(props);
+    const [object, api, childColliderProps] = useRigidBody<Object3D>(props);
     const { type, position, rotation, ...objectProps } = props;
 
     useImperativeHandle(ref, () => api);
@@ -45,7 +46,9 @@ export const RigidBody = forwardRef<RigidBodyApi, RigidBodyProps>(
           {...objectProps}
         >
           {children}
-          {childColliders}
+          {childColliderProps.map((colliderProps, index) => (
+            <AnyCollider key={index} {...colliderProps} />
+          ))}
         </object3D>
       </RigidBodyContext.Provider>
     );

@@ -31,21 +31,30 @@ import {
 } from "@dimforge/rapier3d-compat";
 
 import {
-  createCollidersFromChildren,
-  rigidBodyDescFromOptions,
   rigidBodyTypeFromString,
   vector3ToQuaternion,
   vectorArrayToVector3,
 } from "./utils";
 import { createJointApi, createRigidBodyApi } from "./api";
 import { _position, _rotation, _scale, _vector3 } from "./shared-objects";
+import { createRigidBodyState, rigidBodyDescFromOptions } from "./utils-rigidbody";
+import { ColliderProps } from ".";
+import { createColliderPropsFromChildren } from "./utils-collider";
 
 export const useRigidBody = <O extends Object3D>(
   options: UseRigidBodyOptions = {}
-): [MutableRefObject<O>, RigidBodyApi] => {
+): [MutableRefObject<O>, RigidBodyApi, ColliderProps[]] => {
   const { world, rigidBodyStates, physicsOptions, rigidBodyEvents } =
     useRapier();
   const ref = useRef<O>();
+  const [childColliderProps, setChildColliderProps] = useState<ColliderProps[]>([])
+  
+  const mergedOptions = useMemo(() => {
+    return {
+      ...physicsOptions,
+      ...options,
+    };
+  }, [physicsOptions, options]);
 
   // Create rigidbody
   const rigidBodyRef = useRef<RigidBody>();
@@ -76,71 +85,44 @@ export const useRigidBody = <O extends Object3D>(
     ref.current.updateWorldMatrix(true, false);
     ref.current.matrixWorld.decompose(_position, _rotation, _scale);
 
-    // Transforms from options
-    const [x, y, z] = options?.position || [0, 0, 0];
-    const [rx, ry, rz] = options?.rotation || [0, 0, 0];
-
     // Set initial transforms based on world transforms
-    rigidBody.setTranslation(
-      {
-        x: _position.x,
-        y: _position.y,
-        z: _position.z
-      },
-      false
-    );
-
+    rigidBody.setTranslation(_position, false);
     rigidBody.setRotation(_rotation, false);
 
-    const colliderSetting =
-      options?.colliders ?? physicsOptions.colliders ?? false;
-
-    const autoColliders =
-      colliderSetting !== false
-        ? createCollidersFromChildren({
-          object: ref.current,
-          rigidBody,
-          options: { ...options, colliders: colliderSetting },
-          world,
-          ignoreMeshColliders: true
-        }
-        )
-        : [];
-
-    rigidBodyStates.set(rigidBody.handle, {
-      mesh: ref.current!,
-      invertedMatrixWorld: ref.current.parent!.matrixWorld.clone().invert(),
-      isSleeping: false,
-      worldScale: ref.current.getWorldScale(_vector3).clone(),
-      setMatrix: (mat) => ref.current!.matrix.copy(mat),
-      getMatrix: () => ref.current!.matrix
-    });
+    rigidBodyStates.set(rigidBody.handle, createRigidBodyState(rigidBody, ref.current));
 
     ref.current.matrixAutoUpdate = false;
 
+    if (mergedOptions.colliders !== false) {
+      setChildColliderProps(createColliderPropsFromChildren({
+        object: ref.current!,
+        options: mergedOptions,
+        ignoreMeshColliders: true,
+      }))
+    }
+
     return () => {
       world.removeRigidBody(rigidBody);
-      autoColliders.forEach((collider) => world.removeCollider(collider));
       rigidBodyRef.current = undefined;
       rigidBodyStates.delete(rigidBody.handle);
     };
   }, []);
 
   // Events
-  useEffect(() => {
-    const rigidBody = getRigidBodyRef.current() as RigidBody;
+  // useEffect(() => {
+  //   const rigidBody = getRigidBodyRef.current() as RigidBody;
 
-    rigidBodyEvents.set(rigidBody.handle, {
-      onCollisionEnter: options?.onCollisionEnter,
-      onCollisionExit: options?.onCollisionExit,
-      onSleep: options?.onSleep,
-      onWake: options?.onWake,
-    });
+  //   rigidBodyEvents.set(rigidBody.handle, {
+  //     onCollisionEnter: options?.onCollisionEnter,
+  //     onCollisionExit: options?.onCollisionExit,
+  //     onSleep: options?.onSleep,
+  //     onWake: options?.onWake,
+  //   });
 
-    return () => {
-      rigidBodyEvents.delete(rigidBody.handle);
-    };
-  }, [options.onCollisionEnter, options.onCollisionExit]);
+  //   return () => {
+  //     rigidBodyEvents.delete(rigidBody.handle);
+  //   };
+  // }, [options.onCollisionEnter, options.onCollisionExit]);
 
   const api = useMemo(() => createRigidBodyApi(getRigidBodyRef), []);
 

@@ -16,18 +16,20 @@ import {
   CylinderArgs,
   ConvexHullArgs
 } from "./types";
-import { createColliderFromOptions, vectorArrayToVector3 } from "./utils";
+import { vectorArrayToVector3 } from "./utils";
+
+export interface ColliderProps extends UseColliderOptions<any> {
+  children?: ReactNode;
+}
 
 // Colliders
-const AnyCollider = ({
+export const AnyCollider = ({
   children,
-  onCollisionEnter,
-  onCollisionExit,
   position,
   rotation,
   ...props
-}: UseColliderOptions<any> & { children?: ReactNode }) => {
-  const { world, colliderEvents } = useRapier();
+}: ColliderProps) => {
+  const { world, colliderEvents, colliderStates } = useRapier();
   const rigidBodyContext = useRigidBodyContext();
   const ref = useRef<Object3D>(null);
 
@@ -36,7 +38,6 @@ const AnyCollider = ({
     object.updateWorldMatrix(true, false);
     const objectMatrix = object.matrixWorld.clone();
 
-    // Scale is still based on the world scale of the collider
     const scale = object.getWorldScale(new Vector3());
 
     // If we have a ridig body parent, we premultiply that objects inverted worldMatrix
@@ -51,15 +52,11 @@ const AnyCollider = ({
     const eulerRotation = _euler.setFromQuaternion(_rotation);
 
     const colliders: Collider[] = [];
-    const hasCollisionEvents =
-      rigidBodyContext?.hasCollisionEvents ||
-      !!onCollisionEnter ||
-      !!onCollisionExit;
 
     // If this is an InstancedRigidBody api
     if (rigidBodyContext && "at" in rigidBodyContext.api) {
       rigidBodyContext.api.forEach((body, index) => {
-        let instanceScale = scale;
+        let instanceScale = _scale;
 
         if (
           "scales" in rigidBodyContext.options &&
@@ -72,52 +69,52 @@ const AnyCollider = ({
             );
         }
 
-        colliders.push(
-          createColliderFromOptions({
-            options: {
-              solverGroups: rigidBodyContext.options.solverGroups,
-              collisionGroups: rigidBodyContext.options.collisionGroups,
-              ...props
-            },
-            world,
-            rigidBody: body.raw(),
-            scale: instanceScale,
-            hasCollisionEvents
-          })
-        );
+        colliders
+          .push
+          //   createColliderFromOptions({
+          //     options: {
+          //       solverGroups: rigidBodyContext.options.solverGroups,
+          //       collisionGroups: rigidBodyContext.options.collisionGroups,
+          //       ...props
+          //     },
+          //     world,
+          //     rigidBody: body.raw(),
+          //     scale: instanceScale,
+          //   })
+          ();
       });
     } else {
-      colliders.push(
-        createColliderFromOptions({
-          options: {
-            solverGroups:
-              rigidBodyContext?.options.solverGroups || props.solverGroups,
-            collisionGroups:
-              rigidBodyContext?.options.collisionGroups ||
-              props.collisionGroups,
-            ...props,
-            position: [_position.x, _position.y, _position.z],
-            rotation: [eulerRotation.x, eulerRotation.y, eulerRotation.z]
-          },
-          world,
-          // Initiate with a rigidbody, or undefined, because colliders can exist without a rigid body
-          rigidBody:
-            rigidBodyContext && "raw" in rigidBodyContext.api
-              ? rigidBodyContext.api.raw()
-              : undefined,
-          scale: scale,
-          hasCollisionEvents
-        })
-      );
+      colliders
+        .push
+        // createColliderFromOptions({
+        //   options: {
+        //     solverGroups:
+        //       rigidBodyContext?.options.solverGroups || props.solverGroups,
+        //     collisionGroups:
+        //       rigidBodyContext?.options.collisionGroups ||
+        //       props.collisionGroups,
+        //     ...props,
+        //     position: [_position.x, _position.y, _position.z],
+        //     rotation: [eulerRotation.x, eulerRotation.y, eulerRotation.z]
+        //   },
+        //   world,
+        //   // Initiate with a rigidbody, or undefined, because colliders can exist without a rigid body
+        //   rigidBody:
+        //     rigidBodyContext && "raw" in rigidBodyContext.api
+        //       ? rigidBodyContext.api.raw()
+        //       : undefined,
+        //   scale: _scale,
+        // })
+        ();
     }
 
     /* Register collision events. */
-    colliders.forEach(collider =>
-      colliderEvents.set(collider.handle, {
-        onCollisionEnter,
-        onCollisionExit
-      })
-    );
+    // colliders.forEach(collider =>
+    //   colliderEvents.set(collider.handle, {
+    //     onCollisionEnter,
+    //     onCollisionExit
+    //   })
+    // );
 
     return () => {
       colliders.forEach(collider => {

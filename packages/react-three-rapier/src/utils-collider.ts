@@ -5,9 +5,26 @@ import {
   ActiveEvents,
   RigidBody
 } from "@dimforge/rapier3d-compat";
-import { Vector3, Mesh, Object3D, Quaternion, BufferGeometry } from "three";
+import { useEffect } from "react";
+import {
+  Vector3,
+  Mesh,
+  Object3D,
+  Quaternion,
+  BufferGeometry,
+  Matrix4
+} from "three";
 import { mergeVertices } from "three-stdlib";
+import { ColliderProps, RigidBodyProps } from ".";
 import { WorldApi, RigidBodyApi } from "./api";
+import { ColliderState, ColliderStateMap } from "./Physics";
+import {
+  _matrix4,
+  _position,
+  _rotation,
+  _scale,
+  _vector3
+} from "./shared-objects";
 import {
   RigidBodyShape,
   UseColliderOptions,
@@ -44,96 +61,40 @@ export const scaleColliderArgs = (
   return newArgs.map((arg, index) => scaleArray[index] * (arg as number));
 };
 
-interface CreateColliderFromOptions {
-  <ColliderArgs>(options: {
-    options: UseColliderOptions<ColliderArgs>;
-    world: WorldApi;
-    rigidBody?: RigidBody;
-    scale: { x: number; y: number; z: number };
-    hasCollisionEvents: boolean;
-  }): Collider;
-}
-
-const setColliderOptions = (
+export const setColliderOptions = (
   collider: Collider,
-  options: UseColliderOptions<any>
+  options: UseColliderOptions<any>,
+  states: ColliderStateMap
 ) => {
+  const state = states.get(collider.handle);
+
   if (options.collisionGroups !== undefined)
     collider.setCollisionGroups(options.collisionGroups);
 
   if (options.solverGroups !== undefined)
     collider.setSolverGroups(options.solverGroups);
+
+  if (state) {
+    // Update collider position based on the object's position
+    state.object.updateWorldMatrix(true, false);
+    _matrix4
+      .copy(state.object.matrixWorld)
+      .premultiply(state.invertedWorldMatrix)
+      .decompose(_position, _rotation, _scale);
+
+    collider.setTranslationWrtParent(_position);
+    collider.setRotationWrtParent(_rotation);
+  }
 };
 
-export const createColliderFromOptions: CreateColliderFromOptions = ({
-  options,
-  world,
-  rigidBody,
-  scale,
-  hasCollisionEvents
-}) => {
-  const mass = options?.mass || 1;
-  const colliderShape = options?.shape ?? "cuboid";
-  const colliderArgs = options?.args ?? [];
-  const [cmx, cmy, cmz] = options?.centerOfMass || [0, 0, 0];
-  const [pix, piy, piz] = options?.principalAngularInertia || [
-    mass * 0.2,
-    mass * 0.2,
-    mass * 0.2
-  ];
-  const [x, y, z] = options?.position || [0, 0, 0];
-  const [rx, ry, rz] = options?.rotation || [0, 0, 0];
-  const qRotation = vector3ToQuaternion(new Vector3(rx, ry, rz));
-
-  // @ts-ignore
-  const scaledArgs = scaleColliderArgs(options.shape, colliderArgs, scale);
-
-  let colliderDesc = (ColliderDesc[colliderShape](
-    // @ts-ignore
-    ...scaledArgs
-  ) as ColliderDesc)
-    .setTranslation(x * scale.x, y * scale.y, z * scale.z)
-    .setRotation({
-      x: qRotation.x,
-      y: qRotation.y,
-      z: qRotation.z,
-      w: qRotation.w
-    })
-    .setRestitution(options?.restitution ?? 0)
-    .setRestitutionCombineRule(
-      options?.restitutionCombineRule ?? CoefficientCombineRule.Average
-    )
-    .setFriction(options?.friction ?? 0.7)
-    .setFrictionCombineRule(
-      options?.frictionCombineRule ?? CoefficientCombineRule.Average
-    );
-
-  if (hasCollisionEvents) {
-    colliderDesc = colliderDesc.setActiveEvents(ActiveEvents.COLLISION_EVENTS);
-  }
-
-  // If any of the mass properties are specified, add mass properties
-  const qMassRot = vector3ToQuaternion(new Vector3(0, 0, 0));
-
-  if (
-    options?.mass ||
-    options?.centerOfMass ||
-    options?.principalAngularInertia
-  ) {
-    colliderDesc.setDensity(0);
-    colliderDesc.setMassProperties(
-      mass,
-      { x: cmx, y: cmy, z: cmz },
-      { x: pix, y: piy, z: piz },
-      { x: qMassRot.x, y: qMassRot.y, z: qMassRot.z, w: qMassRot.w }
-    );
-  }
-
-  const collider = world.createCollider(colliderDesc, rigidBody);
-
-  setColliderOptions(collider, options);
-
-  return collider;
+export const useUpdateColliderOptions = (
+  collider: Collider,
+  props: ColliderProps,
+  states: ColliderStateMap
+) => {
+  useEffect(() => {
+    setColliderOptions(collider, props, states);
+  }, [props]);
 };
 
 const isChildOfMeshCollider = (child: Mesh) => {
@@ -144,93 +105,81 @@ const isChildOfMeshCollider = (child: Mesh) => {
   return flag;
 };
 
-interface CreateCollidersFromChildren {
+export const createColliderState = (
+  collider: Collider,
+  object: Object3D,
+  rigidBodyObject?: Object3D
+): ColliderState => {
+  object.updateWorldMatrix(true, false);
+
+  let invertedWorldMatrix: Matrix4;
+
+  if (rigidBodyObject) {
+    invertedWorldMatrix = rigidBodyObject.matrixWorld.clone().invert();
+  } else {
+    invertedWorldMatrix = object.parent!.matrixWorld.clone().invert();
+  }
+
+  return {
+    collider,
+    invertedWorldMatrix,
+    object
+  };
+};
+
+const autoColliderMap: Record<string, string> = {
+  cuboid: "cuboid",
+  ball: "ball",
+  hull: "convexHull",
+  trimesh: "trimesh"
+};
+
+interface CreateColliderPropsFromChildren {
   (options: {
     object: Object3D;
-    rigidBody?: Pick<RigidBodyApi | RigidBody, "handle">;
-    options: UseRigidBodyOptions;
-    world: WorldApi;
     ignoreMeshColliders: boolean;
-  }): Collider[];
+    options: RigidBodyProps;
+  }): ColliderProps[];
 }
-export const createCollidersFromChildren: CreateCollidersFromChildren = ({
+
+export const createColliderPropsFromChildren: CreateColliderPropsFromChildren = ({
   object,
-  rigidBody,
-  options,
-  world,
-  ignoreMeshColliders = true
-}) => {
-  const hasCollisionEvents = !!(
-    options.onCollisionEnter || options.onCollisionExit
-  );
-  const colliders: Collider[] = [];
+  ignoreMeshColliders = true,
+  options
+}): ColliderProps[] => {
+  const colliderProps: ColliderProps[] = [];
 
-  object.traverseVisible((child: Object3D | Mesh) => {
+  object.traverseVisible(child => {
     if ("isMesh" in child) {
-      if (ignoreMeshColliders && isChildOfMeshCollider(child)) return;
+      if (ignoreMeshColliders && isChildOfMeshCollider(child as Mesh)) return;
 
-      const { geometry } = child;
-      const { x, y, z } = child.position;
-      const { x: rx, y: ry, z: rz, w: rw } = new Quaternion().setFromEuler(
-        child.rotation
-      );
-      const scale = child.getWorldScale(new Vector3());
-
-      // We translate the colliders based on the parent's world scale
-      const parentWorldScale = child.parent!.getWorldScale(new Vector3());
-
-      const desc = colliderDescFromGeometry(
+      const scale = child.getWorldScale(_scale);
+      const { geometry, position, rotation } = child as Mesh;
+      const args = getColliderArgsFromGeometry(
         geometry,
-        options.colliders!,
-        scale,
-        hasCollisionEvents
+        options.colliders || "cuboid",
+        scale
       );
 
-      const offset = new Vector3(0, 0, 0);
-
-      if (options.colliders === "cuboid") {
-        geometry.computeBoundingBox();
-        geometry.boundingBox?.getCenter(offset);
-      }
-      if (options.colliders === "ball") {
-        geometry.computeBoundingSphere();
-        offset.copy(geometry.boundingSphere!.center);
-      }
-
-      if (Number.isFinite(options.friction))
-        desc.setFriction(options.friction as number);
-      if (Number.isFinite(options.restitution))
-        desc.setRestitution(options.restitution as number);
-
-      desc
-        .setTranslation(
-          (x + offset.x) * parentWorldScale.x,
-          (y + offset.y) * parentWorldScale.y,
-          (z + offset.z) * parentWorldScale.z
-        )
-        .setRotation({ x: rx, y: ry, z: rz, w: rw });
-
-      const actualRigidBody = rigidBody
-        ? world.getRigidBody(rigidBody.handle)
-        : undefined;
-      const collider = world.createCollider(desc, actualRigidBody);
-
-      setColliderOptions(collider, options);
-
-      colliders.push(collider);
+      return {
+        ...options,
+        args,
+        shape: autoColliderMap[options.colliders || "cuboid"],
+        rotation,
+        position
+      };
     }
   });
 
-  return colliders;
+  return colliderProps;
 };
 
-export const colliderDescFromGeometry = (
+export const getColliderArgsFromGeometry = (
   geometry: BufferGeometry,
   colliders: RigidBodyAutoCollider,
-  scale: Vector3,
-  hasCollisionEvents: boolean
+  scale: Vector3
 ) => {
-  let desc: ColliderDesc;
+  let desc: [];
 
   switch (colliders) {
     case "cuboid":
@@ -240,11 +189,11 @@ export const colliderDescFromGeometry = (
 
         const size = boundingBox!.getSize(new Vector3());
 
-        desc = ColliderDesc.cuboid(
+        return [
           (size.x / 2) * scale.x,
           (size.y / 2) * scale.y,
           (size.z / 2) * scale.z
-        );
+        ];
       }
       break;
 
@@ -255,7 +204,7 @@ export const colliderDescFromGeometry = (
 
         const radius = boundingSphere!.radius * scale.x;
 
-        desc = ColliderDesc.ball(radius);
+        return [radius];
       }
       break;
 
@@ -266,10 +215,10 @@ export const colliderDescFromGeometry = (
           : mergeVertices(geometry);
         const g = clonedGeometry.scale(scale.x, scale.y, scale.z);
 
-        desc = ColliderDesc.trimesh(
+        return [
           g.attributes.position.array as Float32Array,
           g.index?.array as Uint32Array
-        );
+        ];
       }
       break;
 
@@ -277,14 +226,10 @@ export const colliderDescFromGeometry = (
       {
         const g = geometry.clone().scale(scale.x, scale.y, scale.z);
 
-        desc = ColliderDesc.convexHull(
-          g.attributes.position.array as Float32Array
-        ) as ColliderDesc;
+        return [g.attributes.position.array as Float32Array];
       }
       break;
   }
-
-  if (hasCollisionEvents) desc!.setActiveEvents(ActiveEvents.COLLISION_EVENTS);
 
   return desc!;
 };
