@@ -3,6 +3,7 @@ import React, { ReactNode, useRef, useEffect } from "react";
 import { Object3D, Vector3, InstancedMesh } from "three";
 import { useRapier } from "./hooks";
 import { useRigidBodyContext, RigidBodyProps } from "./RigidBody";
+import { _euler, _position, _rotation, _scale } from "./shared-objects";
 import {
   UseColliderOptions,
   CuboidArgs,
@@ -22,6 +23,8 @@ const AnyCollider = ({
   children,
   onCollisionEnter,
   onCollisionExit,
+  position,
+  rotation,
   ...props
 }: UseColliderOptions<any> & { children?: ReactNode }) => {
   const { world, colliderEvents } = useRapier();
@@ -29,7 +32,24 @@ const AnyCollider = ({
   const ref = useRef<Object3D>(null);
 
   useEffect(() => {
-    const scale = ref.current!.getWorldScale(new Vector3());
+    const object = ref.current!;
+    object.updateWorldMatrix(true, false);
+    const objectMatrix = object.matrixWorld.clone();
+
+    // Scale is still based on the world scale of the collider
+    const scale = object.getWorldScale(new Vector3());
+
+    // If we have a ridig body parent, we premultiply that objects inverted worldMatrix
+    const parent = rigidBodyContext?.ref.current;
+    const rigidBodyOffset = parent?.matrixWorld.clone().invert();
+
+    if (rigidBodyOffset) {
+      objectMatrix.premultiply(rigidBodyOffset);
+    }
+
+    objectMatrix.decompose(_position, _rotation, _scale);
+    const eulerRotation = _euler.setFromQuaternion(_rotation);
+
     const colliders: Collider[] = [];
     const hasCollisionEvents =
       rigidBodyContext?.hasCollisionEvents ||
@@ -39,15 +59,17 @@ const AnyCollider = ({
     // If this is an InstancedRigidBody api
     if (rigidBodyContext && "at" in rigidBodyContext.api) {
       rigidBodyContext.api.forEach((body, index) => {
-        let instanceScale = scale.clone();
+        let instanceScale = scale;
 
         if (
           "scales" in rigidBodyContext.options &&
           rigidBodyContext?.options?.scales?.[index]
         ) {
-          instanceScale.multiply(
-            vectorArrayToVector3(rigidBodyContext.options.scales[index])
-          );
+          instanceScale = instanceScale
+            .clone()
+            .multiply(
+              vectorArrayToVector3(rigidBodyContext.options.scales[index])
+            );
         }
 
         colliders.push(
@@ -73,7 +95,9 @@ const AnyCollider = ({
             collisionGroups:
               rigidBodyContext?.options.collisionGroups ||
               props.collisionGroups,
-            ...props
+            ...props,
+            position: [_position.x, _position.y, _position.z],
+            rotation: [eulerRotation.x, eulerRotation.y, eulerRotation.z]
           },
           world,
           // Initiate with a rigidbody, or undefined, because colliders can exist without a rigid body
@@ -81,7 +105,7 @@ const AnyCollider = ({
             rigidBodyContext && "raw" in rigidBodyContext.api
               ? rigidBodyContext.api.raw()
               : undefined,
-          scale,
+          scale: scale,
           hasCollisionEvents
         })
       );
@@ -103,7 +127,11 @@ const AnyCollider = ({
     };
   }, []);
 
-  return <object3D ref={ref}>{children}</object3D>;
+  return (
+    <object3D position={position} rotation={rotation} ref={ref}>
+      {children}
+    </object3D>
+  );
 };
 
 type UseColliderOptionsRequiredArgs<T> = Omit<UseColliderOptions<T>, "args"> & {

@@ -1,4 +1,4 @@
-import React, { MutableRefObject, useContext, useEffect, useMemo } from "react";
+import React, { MutableRefObject, useContext, useEffect, useMemo, useState } from "react";
 import { RapierContext } from "./Physics";
 import { useRef } from "react";
 import { Object3D, Quaternion, Vector3 } from "three";
@@ -38,7 +38,7 @@ import {
   vectorArrayToVector3,
 } from "./utils";
 import { createJointApi, createRigidBodyApi } from "./api";
-import { _vector3 } from "./shared-objects";
+import { _position, _rotation, _scale, _vector3 } from "./shared-objects";
 
 export const useRigidBody = <O extends Object3D>(
   options: UseRigidBodyOptions = {}
@@ -73,13 +73,8 @@ export const useRigidBody = <O extends Object3D>(
     ref.current.userData.isSleeping = false;
 
     // Get intitial world transforms
-    const worldPosition = ref.current.getWorldPosition(new Vector3());
-    const worldRotation = ref.current.getWorldQuaternion(new Quaternion());
-    const scale = ref.current.parent?.getWorldScale(new Vector3()) || {
-      x: 1,
-      y: 1,
-      z: 1,
-    };
+    ref.current.updateWorldMatrix(true, false);
+    ref.current.matrixWorld.decompose(_position, _rotation, _scale);
 
     // Transforms from options
     const [x, y, z] = options?.position || [0, 0, 0];
@@ -88,24 +83,14 @@ export const useRigidBody = <O extends Object3D>(
     // Set initial transforms based on world transforms
     rigidBody.setTranslation(
       {
-        x: worldPosition.x + x * scale.x,
-        y: worldPosition.y + y * scale.y,
-        z: worldPosition.z + z * scale.z,
+        x: _position.x,
+        y: _position.y,
+        z: _position.z
       },
       false
     );
 
-    const rotation = vector3ToQuaternion(new Vector3(rx, ry, rz)).multiply(
-      worldRotation
-    );
-
-    rigidBody.setRotation(
-      { x: rotation.x, y: rotation.y, z: rotation.z, w: rotation.w },
-      false
-    );
-
-    rigidBody.resetForces(false);
-    rigidBody.resetTorques(false);
+    rigidBody.setRotation(_rotation, false);
 
     const colliderSetting =
       options?.colliders ?? physicsOptions.colliders ?? false;
@@ -159,7 +144,7 @@ export const useRigidBody = <O extends Object3D>(
 
   const api = useMemo(() => createRigidBodyApi(getRigidBodyRef), []);
 
-  return [ref as MutableRefObject<O>, api];
+  return [ref as MutableRefObject<O>, api, childColliderProps];
 };
 
 // Joints
