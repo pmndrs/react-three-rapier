@@ -48,6 +48,7 @@ export const MeshCollider = ({ children, type }: MeshColliderProps) => {
       userData={{
         r3RapierType: "MeshCollider"
       }}
+      matrixAutoUpdate={false}
     >
       {children}
     </object3D>

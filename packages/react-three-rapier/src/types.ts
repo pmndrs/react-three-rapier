@@ -109,7 +109,7 @@ export type RigidBodyShape =
 export type Vector3Array = [x: number, y: number, z: number];
 export type Boolean3Array = [x: boolean, y: boolean, z: boolean];
 
-export interface UseColliderOptions<ColliderArgs> {
+export interface UseColliderOptions<ColliderArgs extends Array<unknown>> {
   /**
    * The shape of your collider
    */
@@ -170,6 +170,11 @@ export interface UseColliderOptions<ColliderArgs> {
    * The rotation of this collider relative to the rigid body
    */
   rotation?: Vector3Array;
+
+  /**
+   * The scale of this collider
+   */
+   scale?: Vector3Array;
 
   /**
    * Callback when this collider collides with another collider.

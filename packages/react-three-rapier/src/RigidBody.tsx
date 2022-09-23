@@ -1,4 +1,9 @@
-import React, { createContext, MutableRefObject, RefObject } from "react";
+import React, {
+  createContext,
+  MutableRefObject,
+  RefObject,
+  useMemo
+} from "react";
 import { forwardRef, ReactNode, useContext, useImperativeHandle } from "react";
 import { Object3D } from "three";
 import { Object3DProps } from "@react-three/fiber";
@@ -11,7 +16,6 @@ import { AnyCollider } from "./AnyCollider";
 export const RigidBodyContext = createContext<{
   ref: RefObject<Object3D> | MutableRefObject<Object3D>;
   api: RigidBodyApi | InstancedRigidBodyApi;
-  hasCollisionEvents: boolean;
   options: UseRigidBodyOptions | InstancedRigidBodiesProps;
 }>(undefined!);
 
@@ -23,8 +27,8 @@ export interface RigidBodyProps extends UseRigidBodyOptions {
 
 export const RigidBody = forwardRef<RigidBodyApi, RigidBodyProps>(
   ({ children, ...props }, ref) => {
-    const [object, api, childColliderProps] = useRigidBody<Object3D>(props);
     const { type, position, rotation, ...objectProps } = props;
+    const [object, api, childColliderProps] = useRigidBody<Object3D>(props);
 
     useImperativeHandle(ref, () => api);
 
@@ -33,9 +37,6 @@ export const RigidBody = forwardRef<RigidBodyApi, RigidBodyProps>(
         value={{
           ref: object,
           api,
-          hasCollisionEvents: !!(
-            props.onCollisionEnter || props.onCollisionExit
-          ),
           options: props
         }}
       >

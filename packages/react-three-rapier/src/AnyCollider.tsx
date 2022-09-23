@@ -1,4 +1,4 @@
-import { Collider } from "@dimforge/rapier3d-compat";
+import { Collider, ColliderDesc } from "@dimforge/rapier3d-compat";
 import React, { ReactNode, useRef, useEffect } from "react";
 import { Object3D, Vector3, InstancedMesh } from "three";
 import { useRapier } from "./hooks";
@@ -17,6 +17,11 @@ import {
   ConvexHullArgs
 } from "./types";
 import { vectorArrayToVector3 } from "./utils";
+import {
+  createColliderFromOptions,
+  createColliderState,
+  setColliderOptions
+} from "./utils-collider";
 
 export interface ColliderProps extends UseColliderOptions<any> {
   children?: ReactNode;
@@ -27,6 +32,7 @@ export const AnyCollider = ({
   children,
   position,
   rotation,
+  scale,
   ...props
 }: ColliderProps) => {
   const { world, colliderEvents, colliderStates } = useRapier();
@@ -38,18 +44,19 @@ export const AnyCollider = ({
     object.updateWorldMatrix(true, false);
     const objectMatrix = object.matrixWorld.clone();
 
-    const scale = object.getWorldScale(new Vector3());
-
     // If we have a ridig body parent, we premultiply that objects inverted worldMatrix
     const parent = rigidBodyContext?.ref.current;
     const rigidBodyOffset = parent?.matrixWorld.clone().invert();
+
+    const worldScale = object.getWorldScale(new Vector3());
+
+    console.log(worldScale);
 
     if (rigidBodyOffset) {
       objectMatrix.premultiply(rigidBodyOffset);
     }
 
     objectMatrix.decompose(_position, _rotation, _scale);
-    const eulerRotation = _euler.setFromQuaternion(_rotation);
 
     const colliders: Collider[] = [];
 
@@ -84,28 +91,18 @@ export const AnyCollider = ({
           ();
       });
     } else {
-      colliders
-        .push
-        // createColliderFromOptions({
-        //   options: {
-        //     solverGroups:
-        //       rigidBodyContext?.options.solverGroups || props.solverGroups,
-        //     collisionGroups:
-        //       rigidBodyContext?.options.collisionGroups ||
-        //       props.collisionGroups,
-        //     ...props,
-        //     position: [_position.x, _position.y, _position.z],
-        //     rotation: [eulerRotation.x, eulerRotation.y, eulerRotation.z]
-        //   },
-        //   world,
-        //   // Initiate with a rigidbody, or undefined, because colliders can exist without a rigid body
-        //   rigidBody:
-        //     rigidBodyContext && "raw" in rigidBodyContext.api
-        //       ? rigidBodyContext.api.raw()
-        //       : undefined,
-        //   scale: _scale,
-        // })
-        ();
+      const collider = createColliderFromOptions(
+        props,
+        world,
+        worldScale,
+        rigidBodyContext?.api?.raw()
+      );
+      colliderStates.set(
+        collider.handle,
+        createColliderState(collider, object, rigidBodyContext?.ref.current)
+      );
+      setColliderOptions(collider, props, colliderStates);
+      colliders.push(collider);
     }
 
     /* Register collision events. */
@@ -125,7 +122,7 @@ export const AnyCollider = ({
   }, []);
 
   return (
-    <object3D position={position} rotation={rotation} ref={ref}>
+    <object3D position={position} rotation={rotation} scale={scale} ref={ref}>
       {children}
     </object3D>
   );

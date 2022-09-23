@@ -239,15 +239,16 @@ export const Physics: FC<RapierWorldProps> = ({
         return;
       }
 
-      let newTranslation = rigidBody.translation() as Vector3
-      let newRotation = rapierQuaternionToQuaternion(rigidBody.rotation())
+      let t = rigidBody.translation() as Vector3
+      let r = rapierQuaternionToQuaternion(rigidBody.rotation())
 
       // TODO: Fix interpolation and matrix updates
-      // _matrix4.
+      _object3d.position.set(t.x, t.y, t.z)
+      _object3d.quaternion.set(r.x, r.y, r.z, r.w)
+      _object3d.applyMatrix4(state.invertedWorldMatrix)
 
-      state.setMatrix(
-        _matrix4
-      );
+      state.object.position.lerp(_object3d.position, interpolationAlpha)
+      state.object.quaternion.slerp(_object3d.quaternion, interpolationAlpha)
 
       if (state.object instanceof InstancedMesh) {
         state.object.instanceMatrix.needsUpdate = true;

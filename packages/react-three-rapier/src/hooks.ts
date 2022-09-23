@@ -37,7 +37,7 @@ import {
 } from "./utils";
 import { createJointApi, createRigidBodyApi } from "./api";
 import { _position, _rotation, _scale, _vector3 } from "./shared-objects";
-import { createRigidBodyState, rigidBodyDescFromOptions } from "./utils-rigidbody";
+import { createRigidBodyState, rigidBodyDescFromOptions, setRigidBodyOptions } from "./utils-rigidbody";
 import { ColliderProps } from ".";
 import { createColliderPropsFromChildren } from "./utils-collider";
 
@@ -91,7 +91,7 @@ export const useRigidBody = <O extends Object3D>(
 
     rigidBodyStates.set(rigidBody.handle, createRigidBodyState(rigidBody, ref.current));
 
-    ref.current.matrixAutoUpdate = false;
+    // setRigidBodyOptions(rigidBody, mergedOptions, rigidBodyStates);
 
     if (mergedOptions.colliders !== false) {
       setChildColliderProps(createColliderPropsFromChildren({

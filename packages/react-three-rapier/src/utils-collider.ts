@@ -5,7 +5,7 @@ import {
   ActiveEvents,
   RigidBody
 } from "@dimforge/rapier3d-compat";
-import { useEffect } from "react";
+import { MutableRefObject, useEffect } from "react";
 import {
   Vector3,
   Mesh,
@@ -61,6 +61,18 @@ export const scaleColliderArgs = (
   return newArgs.map((arg, index) => scaleArray[index] * (arg as number));
 };
 
+export const createColliderFromOptions = (
+  options: ColliderProps,
+  world: WorldApi,
+  scale: Vector3,
+  rigidBody?: RigidBody
+) => {
+  const scaledArgs = scaleColliderArgs(options.shape!, options.args, scale);
+  // @ts-ignore
+  const desc = ColliderDesc[options.shape!](...scaledArgs);
+  return world.createCollider(desc!, rigidBody);
+};
+
 export const setColliderOptions = (
   collider: Collider,
   options: UseColliderOptions<any>,
@@ -88,12 +100,14 @@ export const setColliderOptions = (
 };
 
 export const useUpdateColliderOptions = (
-  collider: Collider,
+  collidersRef: MutableRefObject<Collider[]>,
   props: ColliderProps,
   states: ColliderStateMap
 ) => {
   useEffect(() => {
-    setColliderOptions(collider, props, states);
+    collidersRef.current.forEach(collider => {
+      setColliderOptions(collider, props, states);
+    });
   }, [props]);
 };
 
@@ -108,7 +122,7 @@ const isChildOfMeshCollider = (child: Mesh) => {
 export const createColliderState = (
   collider: Collider,
   object: Object3D,
-  rigidBodyObject?: Object3D
+  rigidBodyObject?: Object3D | null
 ): ColliderState => {
   object.updateWorldMatrix(true, false);
 
@@ -153,21 +167,22 @@ export const createColliderPropsFromChildren: CreateColliderPropsFromChildren = 
     if ("isMesh" in child) {
       if (ignoreMeshColliders && isChildOfMeshCollider(child as Mesh)) return;
 
-      const scale = child.getWorldScale(_scale);
+      const worldScale = child.getWorldScale(_scale);
+
       const { geometry, position, rotation } = child as Mesh;
       const args = getColliderArgsFromGeometry(
         geometry,
-        options.colliders || "cuboid",
-        scale
+        options.colliders || "cuboid"
       );
 
-      return {
+      colliderProps.push({
         ...options,
         args,
-        shape: autoColliderMap[options.colliders || "cuboid"],
-        rotation,
-        position
-      };
+        shape: autoColliderMap[options.colliders || "cuboid"] as RigidBodyShape,
+        rotation: [rotation.x, rotation.y, rotation.z],
+        position: [position.x, position.y, position.z],
+        scale: [worldScale.x, worldScale.y, worldScale.z]
+      });
     }
   });
 
@@ -176,8 +191,7 @@ export const createColliderPropsFromChildren: CreateColliderPropsFromChildren = 
 
 export const getColliderArgsFromGeometry = (
   geometry: BufferGeometry,
-  colliders: RigidBodyAutoCollider,
-  scale: Vector3
+  colliders: RigidBodyAutoCollider
 ) => {
   let desc: [];
 
@@ -189,11 +203,7 @@ export const getColliderArgsFromGeometry = (
 
         const size = boundingBox!.getSize(new Vector3());
 
-        return [
-          (size.x / 2) * scale.x,
-          (size.y / 2) * scale.y,
-          (size.z / 2) * scale.z
-        ];
+        return [size.x / 2, size.y / 2, size.z / 2];
       }
       break;
 
@@ -202,7 +212,7 @@ export const getColliderArgsFromGeometry = (
         geometry.computeBoundingSphere();
         const { boundingSphere } = geometry;
 
-        const radius = boundingSphere!.radius * scale.x;
+        const radius = boundingSphere!.radius;
 
         return [radius];
       }
@@ -213,18 +223,17 @@ export const getColliderArgsFromGeometry = (
         const clonedGeometry = geometry.index
           ? geometry.clone()
           : mergeVertices(geometry);
-        const g = clonedGeometry.scale(scale.x, scale.y, scale.z);
 
         return [
-          g.attributes.position.array as Float32Array,
-          g.index?.array as Uint32Array
+          clonedGeometry.attributes.position.array as Float32Array,
+          clonedGeometry.index?.array as Uint32Array
         ];
       }
       break;
 
     case "hull":
       {
-        const g = geometry.clone().scale(scale.x, scale.y, scale.z);
+        const g = geometry.clone();
 
         return [g.attributes.position.array as Float32Array];
       }
