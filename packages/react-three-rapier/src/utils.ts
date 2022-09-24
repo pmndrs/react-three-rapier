@@ -9,7 +9,7 @@ import {
   Vector3 as RapierVector3
 } from "@dimforge/rapier3d-compat";
 
-import { mergeVertices } from "three/examples/jsm/utils/BufferGeometryUtils";
+import { mergeVertices } from "three-stdlib";
 
 import {
   BufferGeometry,
