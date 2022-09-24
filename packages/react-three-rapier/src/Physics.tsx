@@ -197,7 +197,7 @@ export const Physics: FC<RapierWorldProps> = ({
     }> = {}
 
     // Increase accumulator
-    steppingState.accumulator += paused ? 0 : clamp(dt, 0, 1)
+    steppingState.accumulator += paused ? 0 : clamp(dt, 0, 0.2)
 
     if (!paused) {
       let subSteps = 0
