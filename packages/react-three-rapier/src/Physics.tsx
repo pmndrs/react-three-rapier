@@ -179,7 +179,6 @@ export const Physics: FC<RapierWorldProps> = ({
 
   const [steppingState] = useState({
     time: 0,
-    lastTime: 0,
     accumulator: 0
   })
 
