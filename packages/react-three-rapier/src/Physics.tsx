@@ -199,11 +199,11 @@ export const Physics: FC<RapierWorldProps> = ({
     }> = {}
 
     // don't step time forwards if paused
-    const nowTime = steppingState.time += paused ? 0 : clamp(delta, 0, 1) * 1000;
+    const deltaMs = paused ? 0 : clamp(delta, 0, 1) * 1000;
     const timeStepMs = timeStep * 1000
-    const timeSinceLast = nowTime - steppingState.lastTime
-    steppingState.lastTime = nowTime
-    steppingState.accumulator += timeSinceLast
+
+    steppingState.time += deltaMs
+    steppingState.accumulator += timeStepMs
 
     if (!paused) {
       let subSteps = 0
