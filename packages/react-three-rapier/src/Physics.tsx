@@ -196,10 +196,8 @@ export const Physics: FC<RapierWorldProps> = ({
       translation: Vector3
     }> = {}
 
-    // don't step time forwards if paused
-    const deltaMs = paused ? 0 : clamp(dt, 0, 1);
-
-    steppingState.accumulator += deltaMs
+    // Increase accumulator
+    steppingState.accumulator += paused ? 0 : clamp(dt, 0, 1)
 
     if (!paused) {
       let subSteps = 0
