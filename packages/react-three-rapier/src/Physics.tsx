@@ -178,7 +178,6 @@ export const Physics: FC<RapierWorldProps> = ({
   }, [gravity]);
 
   const [steppingState] = useState({
-    time: 0,
     accumulator: 0
   })
 
@@ -201,8 +200,7 @@ export const Physics: FC<RapierWorldProps> = ({
     const deltaMs = paused ? 0 : clamp(delta, 0, 1) * 1000;
     const timeStepMs = timeStep * 1000
 
-    steppingState.time += deltaMs
-    steppingState.accumulator += timeStepMs
+    steppingState.accumulator += deltaMs
 
     if (!paused) {
       let subSteps = 0
