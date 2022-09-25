@@ -10,7 +10,8 @@ interface MeshColliderProps {
   type: RigidBodyAutoCollider;
 }
 
-export const MeshCollider = ({ children, type }: MeshColliderProps) => {
+export const MeshCollider = (props: MeshColliderProps) => {
+  const { children, type } = props;
   const { physicsOptions, world } = useRapier();
   const object = useRef<Object3D>(null);
   const { options } = useRigidBodyContext();
@@ -19,11 +20,16 @@ export const MeshCollider = ({ children, type }: MeshColliderProps) => {
     return {
       ...physicsOptions,
       ...options,
+      children: undefined,
       colliders: type
     };
   }, [physicsOptions, options]);
 
-  const childColliderProps = useChildColliderProps(object, mergedOptions);
+  const childColliderProps = useChildColliderProps(
+    object,
+    mergedOptions,
+    false
+  );
 
   return (
     <object3D

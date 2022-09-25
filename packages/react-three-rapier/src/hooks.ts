@@ -41,7 +41,7 @@ import { createRigidBodyState, rigidBodyDescFromOptions, setRigidBodyOptions } f
 import { ColliderProps, RigidBodyProps } from ".";
 import { createColliderPropsFromChildren } from "./utils-collider";
 
-export const useChildColliderProps = <O extends Object3D>(ref:MutableRefObject<O | undefined | null>, options: RigidBodyProps) => {
+export const useChildColliderProps = <O extends Object3D>(ref:MutableRefObject<O | undefined | null>, options: RigidBodyProps, ignoreMeshColliders = true) => {
   const [colliderProps, setColliderProps] = useState<ColliderProps[]>([]);
 
   useEffect(() => {
@@ -51,7 +51,7 @@ export const useChildColliderProps = <O extends Object3D>(ref:MutableRefObject<O
       setColliderProps(createColliderPropsFromChildren({
         object: ref.current!,
         options,
-        ignoreMeshColliders: true,
+        ignoreMeshColliders,
       }))
     }
   }, [options]);
