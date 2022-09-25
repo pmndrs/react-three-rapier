@@ -38,8 +38,26 @@ import {
 import { createJointApi, createRigidBodyApi } from "./api";
 import { _position, _rotation, _scale, _vector3 } from "./shared-objects";
 import { createRigidBodyState, rigidBodyDescFromOptions, setRigidBodyOptions } from "./utils-rigidbody";
-import { ColliderProps } from ".";
+import { ColliderProps, RigidBodyProps } from ".";
 import { createColliderPropsFromChildren } from "./utils-collider";
+
+export const useChildColliderProps = <O extends Object3D>(ref:MutableRefObject<O | undefined | null>, options: RigidBodyProps) => {
+  const [colliderProps, setColliderProps] = useState<ColliderProps[]>([]);
+
+  useEffect(() => {
+    const object = ref.current;
+
+    if (object && options.colliders !== false) {
+      setColliderProps(createColliderPropsFromChildren({
+        object: ref.current!,
+        options,
+        ignoreMeshColliders: false,
+      }))
+    }
+  }, [options]);
+
+  return colliderProps;
+}
 
 export const useRigidBody = <O extends Object3D>(
   options: UseRigidBodyOptions = {}
@@ -47,8 +65,7 @@ export const useRigidBody = <O extends Object3D>(
   const { world, rigidBodyStates, physicsOptions, rigidBodyEvents } =
     useRapier();
   const ref = useRef<O>();
-  const [childColliderProps, setChildColliderProps] = useState<ColliderProps[]>([])
-  
+
   const mergedOptions = useMemo(() => {
     return {
       ...physicsOptions,
@@ -56,6 +73,8 @@ export const useRigidBody = <O extends Object3D>(
     };
   }, [physicsOptions, options]);
 
+  const childColliderProps = useChildColliderProps(ref, mergedOptions)
+  
   // Create rigidbody
   const rigidBodyRef = useRef<RigidBody>();
   const getRigidBodyRef = useRef(() => {
@@ -94,20 +113,14 @@ export const useRigidBody = <O extends Object3D>(
 
     // setRigidBodyOptions(rigidBody, mergedOptions, rigidBodyStates);
 
-    if (mergedOptions.colliders !== false) {
-      setChildColliderProps(createColliderPropsFromChildren({
-        object: ref.current!,
-        options: mergedOptions,
-        ignoreMeshColliders: true,
-      }))
-    }
-
     return () => {
       world.removeRigidBody(rigidBody);
       rigidBodyRef.current = undefined;
       rigidBodyStates.delete(rigidBody.handle);
     };
   }, []);
+
+  
 
   // Events
   // useEffect(() => {

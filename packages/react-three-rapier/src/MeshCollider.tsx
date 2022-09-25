@@ -1,7 +1,8 @@
 import { Collider } from "@dimforge/rapier3d-compat";
-import React, { ReactNode, useRef, useEffect } from "react";
+import React, { ReactNode, useRef, useEffect, useMemo } from "react";
 import { Object3D } from "three";
-import { useRapier } from "./hooks";
+import { AnyCollider } from ".";
+import { useChildColliderProps, useRapier } from "./hooks";
 import { useRigidBodyContext } from "./RigidBody";
 import { RigidBodyAutoCollider } from "./types";
 
@@ -13,34 +14,17 @@ interface MeshColliderProps {
 export const MeshCollider = ({ children, type }: MeshColliderProps) => {
   const { physicsOptions, world } = useRapier();
   const object = useRef<Object3D>(null);
-  const { api, options } = useRigidBodyContext();
+  const { options } = useRigidBodyContext();
 
-  useEffect(() => {
-    let autoColliders: Collider[] = [];
-
-    if (object.current) {
-      const colliderSetting = type ?? physicsOptions.colliders ?? false;
-
-      if ("raw" in api) {
-        // autoColliders = createCollidersFromChildren({
-        //   object: object.current,
-        //   rigidBody: api,
-        //   options: {
-        //     ...options,
-        //     colliders: colliderSetting,
-        //   },
-        //   world,
-        //   ignoreMeshColliders: false,
-        // });
-      }
-    }
-
-    return () => {
-      autoColliders.forEach(collider => {
-        world.removeCollider(collider);
-      });
+  const mergedOptions = useMemo(() => {
+    return {
+      ...physicsOptions,
+      ...options,
+      colliders: type
     };
-  }, []);
+  }, [physicsOptions, options]);
+
+  const childColliderProps = useChildColliderProps(object, mergedOptions);
 
   return (
     <object3D
@@ -48,9 +32,11 @@ export const MeshCollider = ({ children, type }: MeshColliderProps) => {
       userData={{
         r3RapierType: "MeshCollider"
       }}
-      matrixAutoUpdate={false}
     >
       {children}
+      {childColliderProps.map((colliderProps, index) => (
+        <AnyCollider key={index} {...colliderProps} />
+      ))}
     </object3D>
   );
 };

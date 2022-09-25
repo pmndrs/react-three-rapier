@@ -111,7 +111,7 @@ const RigidBall = memo(() => {
 
 useGLTF.preload(new URL("objects.glb", import.meta.url).toString());
 
-const HullPear = () => {
+const HullPear = memo(() => {
   const { nodes } = (useGLTF(
     new URL("objects.glb", import.meta.url).toString()
   ) as unknown) as {
@@ -131,9 +131,9 @@ const HullPear = () => {
       />
     </RigidBody>
   );
-};
+});
 
-const MeshBoat = () => {
+const MeshBoat = memo(() => {
   const { nodes } = (useGLTF(
     new URL("objects.glb", import.meta.url).toString()
   ) as unknown) as {
@@ -155,7 +155,7 @@ const MeshBoat = () => {
       </group>
     </RigidBody>
   );
-};
+});
 
 const itemMap: Record<string, FC> = {
   box: RigidBox,
