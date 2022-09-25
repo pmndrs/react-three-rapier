@@ -35,6 +35,10 @@ export interface RigidBodyState {
   object: Object3D;
   invertedWorldMatrix: Matrix4
   setMatrix: (matrix: Matrix4) => void;
+  /**
+   * Required for instanced rigid bodies.
+   */
+  scale: Vector3;
   isSleeping: boolean
 }
 
@@ -231,23 +235,21 @@ export const Physics: FC<RapierWorldProps> = ({
       let t = rigidBody.translation() as Vector3
       let r = rigidBody.rotation() as Quaternion
 
-      _scale.set(1,1,1)
-
       _matrix4.compose(
         t,
         rapierQuaternionToQuaternion(r),
-        _scale
+        state.scale
       )
-      .premultiply(state.invertedWorldMatrix)
-      .decompose(_position, _rotation, _scale)
+        .premultiply(state.invertedWorldMatrix)
+        .decompose(_position, _rotation, _scale)
 
-      state.object.position.lerp(_position, interpolationAlpha)
-      state.object.quaternion.slerp(_rotation, interpolationAlpha)
-
-      // if (state.object instanceof InstancedMesh) {
-      //   state.setMatrix(_matrix4)
-      //   state.object.instanceMatrix.needsUpdate = true;
-      // }
+      if (state.object instanceof InstancedMesh) {
+        state.setMatrix(_matrix4)
+        state.object.instanceMatrix.needsUpdate = true;
+      } else {
+        state.object.position.lerp(_position, interpolationAlpha)
+        state.object.quaternion.slerp(_rotation, interpolationAlpha)
+      }
     });
 
   // Collision events

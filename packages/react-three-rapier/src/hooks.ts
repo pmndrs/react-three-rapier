@@ -51,7 +51,7 @@ export const useChildColliderProps = <O extends Object3D>(ref:MutableRefObject<O
       setColliderProps(createColliderPropsFromChildren({
         object: ref.current!,
         options,
-        ignoreMeshColliders: false,
+        ignoreMeshColliders: true,
       }))
     }
   }, [options]);
@@ -70,6 +70,7 @@ export const useRigidBody = <O extends Object3D>(
     return {
       ...physicsOptions,
       ...options,
+      children: undefined,
     };
   }, [physicsOptions, options]);
 
@@ -109,7 +110,12 @@ export const useRigidBody = <O extends Object3D>(
     rigidBody.setTranslation(_position, false);
     rigidBody.setRotation(_rotation, false);
 
-    rigidBodyStates.set(rigidBody.handle, createRigidBodyState(rigidBody, ref.current));
+    rigidBodyStates.set(
+      rigidBody.handle, 
+      createRigidBodyState({
+        rigidBody, 
+        object: ref.current
+      }));
 
     // setRigidBodyOptions(rigidBody, mergedOptions, rigidBodyStates);
 

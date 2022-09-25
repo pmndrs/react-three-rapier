@@ -26,8 +26,8 @@ export interface RigidBodyProps extends UseRigidBodyOptions {
 }
 
 export const RigidBody = forwardRef<RigidBodyApi, RigidBodyProps>(
-  ({ children, ...props }, ref) => {
-    const { type, position, rotation, ...objectProps } = props;
+  (props, ref) => {
+    const { children, type, position, rotation, ...objectProps } = props;
     const [object, api, childColliderProps] = useRigidBody<Object3D>(props);
 
     useImperativeHandle(ref, () => api);
@@ -42,11 +42,12 @@ export const RigidBody = forwardRef<RigidBodyApi, RigidBodyProps>(
       >
         <object3D
           ref={object}
+          {...objectProps}
           position={position}
           rotation={rotation}
-          {...objectProps}
         >
           {children}
+
           {childColliderProps.map((colliderProps, index) => (
             <AnyCollider key={index} {...colliderProps} />
           ))}

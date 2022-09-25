@@ -1,11 +1,15 @@
-import { Collider, RigidBody } from "@dimforge/rapier3d-compat";
+import {
+  Collider,
+  RigidBody as RapierRigidBody
+} from "@dimforge/rapier3d-compat";
 import React, {
   useRef,
   useEffect,
   forwardRef,
   useImperativeHandle,
   useMemo,
-  useLayoutEffect
+  useLayoutEffect,
+  useState
 } from "react";
 import {
   Object3D,
@@ -14,15 +18,28 @@ import {
   Vector3,
   DynamicDrawUsage
 } from "three";
+import { AnyCollider } from ".";
 import {
   createInstancedRigidBodiesApi,
   createRigidBodyApi,
   InstancedRigidBodyApi
 } from "./api";
-import { useRapier } from "./hooks";
-import { RigidBodyContext, RigidBodyProps } from "./RigidBody";
+import { useChildColliderProps, useRapier } from "./hooks";
+import { RigidBody, RigidBodyContext, RigidBodyProps } from "./RigidBody";
+import {
+  _matrix4,
+  _object3d,
+  _position,
+  _rotation,
+  _scale
+} from "./shared-objects";
 import { RigidBodyApi, Vector3Array } from "./types";
 import { vector3ToQuaternion, vectorArrayToVector3 } from "./utils";
+import {
+  createRigidBodyState,
+  rigidBodyDescFromOptions,
+  setRigidBodyOptions
+} from "./utils-rigidbody";
 
 export interface InstancedRigidBodiesProps
   extends Omit<
@@ -40,8 +57,11 @@ export const InstancedRigidBodies = forwardRef<
 >((props: InstancedRigidBodiesProps, ref) => {
   const { world, rigidBodyStates, physicsOptions } = useRapier();
   const object = useRef<Object3D>(null);
+  const { positions, rotations, children, ...options } = props;
 
-  const instancesRef = useRef<{ rigidBody: RigidBody; api: RigidBodyApi }[]>();
+  const instancesRef = useRef<
+    { rigidBody: RapierRigidBody; api: RigidBodyApi }[]
+  >();
   const instancesRefGetter = useRef(() => {
     if (!instancesRef.current) {
       instancesRef.current = [];
@@ -50,111 +70,74 @@ export const InstancedRigidBodies = forwardRef<
     return instancesRef.current;
   });
 
-  // useLayoutEffect(() => {
-  //   const colliders: Collider[] = [];
-  //   const rigidBodies = instancesRefGetter.current();
+  const mergedOptions = useMemo(() => {
+    return {
+      ...physicsOptions,
+      ...options
+    };
+  }, [physicsOptions, options]);
 
-  //   if (object.current) {
-  //     const worldScale = object.current.getWorldScale(new Vector3());
-  //     let hasOneMesh = false;
+  const childColliderProps = useChildColliderProps(object, mergedOptions);
 
-  //     object.current.traverse((mesh) => {
-  //       if (mesh instanceof InstancedMesh) {
-  //         if (hasOneMesh) {
-  //           console.warn(
-  //             "Can only use a single InstancedMesh inside <InstancedRigidBodies />, more InstancedMeshes will be ignored."
-  //           );
-  //           return;
-  //         }
-  //         hasOneMesh = true;
-  //         mesh.instanceMatrix.setUsage(DynamicDrawUsage);
+  useEffect(() => {
+    object.current!.updateWorldMatrix(true, false);
+    const rigidBodies = instancesRefGetter.current();
+    const invertedWorld = object.current!.matrixWorld.clone().invert();
 
-  //         for (let index = 0; index < mesh.count; index++) {
-  //           const scale = worldScale.clone();
-  //           const rigidBodyDesc = rigidBodyDescFromOptions(props);
+    object.current!.traverseVisible(mesh => {
+      if (mesh instanceof InstancedMesh) {
+        mesh.instanceMatrix.setUsage(DynamicDrawUsage);
+        const worldScale = mesh.getWorldScale(_scale);
 
-  //           if (props.scales && props.scales[index]) {
-  //             const s = vectorArrayToVector3(props.scales[index]);
-  //             scale.multiply(s);
-  //           }
+        for (let index = 0; index < mesh.count; index++) {
+          const desc = rigidBodyDescFromOptions(props);
+          const rigidBody = world.createRigidBody(desc);
 
-  //           const rigidBody = world.createRigidBody(rigidBodyDesc);
-  //           const matrix = new Matrix4();
-  //           mesh.getMatrixAt(index, matrix);
-  //           const { position, rotation } = decomposeMatrix4(matrix);
+          const scale = options.scales?.[index] || [1, 1, 1];
+          const instanceScale = worldScale
+            .clone()
+            .multiply(vectorArrayToVector3(scale));
 
-  //           if (props.colliders !== false) {
-  //             const colliderDesc = colliderDescFromGeometry(
-  //               mesh.geometry,
-  //               props.colliders !== undefined
-  //                 ? props.colliders
-  //                 : physicsOptions.colliders,
-  //               scale,
-  //               false // Collisions currently not enabled for instances
-  //             );
-  //             const collider = world.createCollider(colliderDesc, rigidBody);
-  //             colliders.push(collider);
-  //           }
+          rigidBodyStates.set(
+            rigidBody.handle,
+            createRigidBodyState({
+              rigidBody,
+              object: mesh,
+              setMatrix: (matrix: Matrix4) => mesh.setMatrixAt(index, matrix),
+              worldScale: instanceScale
+            })
+          );
 
-  //           // Set positions
-  //           if (props.positions && props.positions[index]) {
-  //             rigidBody.setTranslation(
-  //               vectorArrayToVector3(props.positions[index]),
-  //               true
-  //             );
-  //           } else {
-  //             rigidBody.setTranslation(position, true);
-  //           }
+          const [x, y, z] = positions?.[index] || [0, 0, 0];
+          const [rx, ry, rz] = rotations?.[index] || [0, 0, 0];
 
-  //           // Set rotations
-  //           if (props.rotations && props.rotations[index]) {
-  //             const [x, y, z] = props.rotations[index];
-  //             rigidBody.setRotation(
-  //               vector3ToQuaternion(new Vector3(x, y, z)),
-  //               true
-  //             );
-  //           } else {
-  //             rigidBody.setRotation(rotation, true);
-  //           }
+          _object3d.position.set(x, y, z);
+          _object3d.rotation.set(rx, ry, rz);
+          _object3d.applyMatrix4(invertedWorld);
 
-  //           rigidBodyStates.set(rigidBody.handle, {
-  //             mesh: mesh,
-  //             isSleeping: false,
-  //             invertedMatrixWorld: object.current!.matrixWorld.clone().invert(),
-  //             setMatrix: (matrix: Matrix4) => mesh.setMatrixAt(index, matrix),
-  //             getMatrix: () => {
-  //               const m = new Matrix4();
-  //               mesh.getMatrixAt(index, m);
-  //               return m;
-  //             },
-  //             // Setting the world scale to the scale here, because
-  //             // we want the scales to be reflected by instance
-  //             worldScale: scale,
-  //           });
+          // Set initial transforms based on world transforms
+          // will be replaced by the setRigidBodyOption below
+          rigidBody.setTranslation(_object3d.position, false);
+          rigidBody.setRotation(_object3d.quaternion, false);
 
-  //           const api = createRigidBodyApi({
-  //             current() {
-  //               return rigidBody;
-  //             },
-  //           });
-  //           rigidBodies.push({ rigidBody, api });
-  //         }
-  //       }
+          const api = createRigidBodyApi({
+            current() {
+              return rigidBody;
+            }
+          });
+          rigidBodies.push({ rigidBody, api });
+        }
+      }
+    });
 
-  //       if (mesh.type === "Mesh" && !("isInstancedMesh" in mesh)) {
-  //         console.warn(
-  //           "Can only use InstancedMesh inside <InstancedRigidBodies />, Mesh will be ignored."
-  //         );
-  //       }
-  //     });
-
-  //     return () => {
-  //       rigidBodies.forEach((rb) => world.removeRigidBody(rb.rigidBody));
-  //       colliders.forEach((coll) => world.removeCollider(coll));
-  //       instancesRef.current = undefined;
-  //     };
-  //   }
-  // }, []);
+    return () => {
+      rigidBodies.forEach(rb => {
+        world.removeRigidBody(rb.rigidBody);
+        rigidBodyStates.delete(rb.rigidBody.handle);
+      });
+      instancesRef.current = undefined;
+    };
+  }, []);
 
   const api = useMemo(
     () =>
@@ -166,18 +149,21 @@ export const InstancedRigidBodies = forwardRef<
 
   useImperativeHandle(ref, () => api);
 
-  // console.log(api);
-
   return (
     <RigidBodyContext.Provider
       value={{
         ref: object,
         api,
-        hasCollisionEvents: false,
         options: props
       }}
     >
-      <object3D ref={object}>{props.children}</object3D>
+      <object3D ref={object}>
+        {props.children}
+
+        {childColliderProps.map((colliderProps, index) => (
+          <AnyCollider key={index} {...colliderProps} />
+        ))}
+      </object3D>
     </RigidBodyContext.Provider>
   );
 });

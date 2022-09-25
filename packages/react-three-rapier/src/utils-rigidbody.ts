@@ -1,9 +1,15 @@
 import { RigidBody, RigidBodyDesc } from "@dimforge/rapier3d-compat";
 import { useEffect } from "react";
-import { Matrix4, Object3D } from "three";
+import { Matrix4, Object3D, Vector3 } from "three";
 import { RigidBodyState, RigidBodyStateMap } from "./Physics";
 import { RigidBodyProps } from "./RigidBody";
-import { _matrix4, _position, _rotation, _scale } from "./shared-objects";
+import {
+  _matrix4,
+  _position,
+  _rotation,
+  _scale,
+  _vector3
+} from "./shared-objects";
 import { rigidBodyTypeFromString } from "./utils";
 
 export const rigidBodyDescFromOptions = (options: RigidBodyProps) => {
@@ -14,10 +20,19 @@ export const rigidBodyDescFromOptions = (options: RigidBodyProps) => {
   return desc;
 };
 
-export const createRigidBodyState = (
-  rigidBody: RigidBody,
-  object: Object3D
-): RigidBodyState => {
+interface CreateRigidBodyStateOptions {
+  object: Object3D;
+  rigidBody: RigidBody;
+  setMatrix?: (matrix: Matrix4) => void;
+  worldScale?: Vector3;
+}
+
+export const createRigidBodyState = ({
+  rigidBody,
+  object,
+  setMatrix,
+  worldScale
+}: CreateRigidBodyStateOptions): RigidBodyState => {
   object.updateWorldMatrix(true, false);
   const invertedWorldMatrix = object.parent!.matrixWorld.clone().invert();
 
@@ -25,9 +40,12 @@ export const createRigidBodyState = (
     object,
     rigidBody,
     invertedWorldMatrix,
-    setMatrix: (matrix: Matrix4) => {
-      object.matrix.copy(matrix);
-    },
+    setMatrix: setMatrix
+      ? setMatrix
+      : (matrix: Matrix4) => {
+          object.matrix.copy(matrix);
+        },
+    scale: worldScale || object.getWorldScale(_scale).clone(),
     isSleeping: false
   };
 };

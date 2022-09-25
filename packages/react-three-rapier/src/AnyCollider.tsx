@@ -1,5 +1,5 @@
 import { Collider, ColliderDesc } from "@dimforge/rapier3d-compat";
-import React, { ReactNode, useRef, useEffect } from "react";
+import React, { ReactNode, useRef, useEffect, memo } from "react";
 import { Object3D, Vector3, InstancedMesh } from "three";
 import { useRapier } from "./hooks";
 import { useRigidBodyContext, RigidBodyProps } from "./RigidBody";
@@ -15,7 +15,8 @@ import {
   ConeArgs,
   CylinderArgs,
   ConvexHullArgs,
-  RigidBodyApi
+  RigidBodyApi,
+  Vector3Array
 } from "./types";
 import { vectorArrayToVector3 } from "./utils";
 import {
@@ -26,16 +27,12 @@ import {
 
 export interface ColliderProps extends UseColliderOptions<any> {
   children?: ReactNode;
+  scale?: Vector3Array;
 }
 
 // Colliders
-export const AnyCollider = ({
-  children,
-  position,
-  rotation,
-  scale,
-  ...props
-}: ColliderProps) => {
+export const AnyCollider = memo((props: ColliderProps) => {
+  const { children, position, rotation, scale } = props;
   const { world, colliderEvents, colliderStates } = useRapier();
   const rigidBodyContext = useRigidBodyContext();
   const ref = useRef<Object3D>(null);
@@ -50,7 +47,7 @@ export const AnyCollider = ({
     // If this is an InstancedRigidBody api
     if (rigidBodyContext && "at" in rigidBodyContext.api) {
       rigidBodyContext.api.forEach((body, index) => {
-        let instanceScale = _scale;
+        let instanceScale = worldScale;
 
         if (
           "scales" in rigidBodyContext.options &&
@@ -63,19 +60,18 @@ export const AnyCollider = ({
             );
         }
 
-        colliders
-          .push
-          //   createColliderFromOptions({
-          //     options: {
-          //       solverGroups: rigidBodyContext.options.solverGroups,
-          //       collisionGroups: rigidBodyContext.options.collisionGroups,
-          //       ...props
-          //     },
-          //     world,
-          //     rigidBody: body.raw(),
-          //     scale: instanceScale,
-          //   })
-          ();
+        const collider = createColliderFromOptions(
+          props,
+          world,
+          instanceScale,
+          body.raw()
+        );
+        colliderStates.set(
+          collider.handle,
+          createColliderState(collider, object, rigidBodyContext?.ref.current)
+        );
+        setColliderOptions(collider, props, colliderStates);
+        colliders.push(collider);
       });
     } else {
       const collider = createColliderFromOptions(
@@ -113,7 +109,7 @@ export const AnyCollider = ({
       {children}
     </object3D>
   );
-};
+});
 
 type UseColliderOptionsRequiredArgs<T extends unknown[]> = Omit<
   UseColliderOptions<T>,
