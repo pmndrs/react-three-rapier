@@ -6,7 +6,7 @@ import {
   RigidBody,
   RigidBodyApi,
   UseRigidBodyOptions,
-  useSphericalJoint,
+  useSphericalJoint
 } from "@react-three/rapier";
 import { useRef } from "react";
 import { Demo } from "../App";
@@ -17,7 +17,7 @@ const Rod = (props: UseRigidBodyOptions) => {
 
   useSphericalJoint(anchor, rod, [
     [0, 0, 0],
-    [0, 0, 0],
+    [0, 0, 0]
   ]);
 
   return (
@@ -37,7 +37,12 @@ const Rod = (props: UseRigidBodyOptions) => {
         </Sphere>
 
         <CylinderCollider args={[1, 0.05]} position={[0, -1, 0]} />
-        <BallCollider args={[0.2]} position={[0, -2, 0]} restitution={1.2} />
+        <BallCollider
+          args={[0.2]}
+          position={[0, -2, 0]}
+          restitution={1.2}
+          scale={1}
+        />
       </RigidBody>
     </group>
   );
@@ -45,7 +50,7 @@ const Rod = (props: UseRigidBodyOptions) => {
 
 export const CradleExample: Demo = () => {
   return (
-    <group rotation={[2, 0, 0]} scale={2}>
+    <group rotation={[1, 0, 0]} scale={3}>
       <Rod position={[0, 0, 0]} />
       <Rod position={[0.5, 0, 0]} />
       <Rod position={[1, 0, 0]} />

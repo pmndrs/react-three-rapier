@@ -1,5 +1,4 @@
 import { Box, Sphere } from "@react-three/drei";
-import { useFrame } from "@react-three/fiber";
 import {
   CuboidCollider,
   Debug,

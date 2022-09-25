@@ -14,7 +14,8 @@ import {
   TrimeshArgs,
   ConeArgs,
   CylinderArgs,
-  ConvexHullArgs
+  ConvexHullArgs,
+  RigidBodyApi
 } from "./types";
 import { vectorArrayToVector3 } from "./utils";
 import {
@@ -41,22 +42,8 @@ export const AnyCollider = ({
 
   useEffect(() => {
     const object = ref.current!;
-    object.updateWorldMatrix(true, false);
-    const objectMatrix = object.matrixWorld.clone();
-
-    // If we have a ridig body parent, we premultiply that objects inverted worldMatrix
-    const parent = rigidBodyContext?.ref.current;
-    const rigidBodyOffset = parent?.matrixWorld.clone().invert();
 
     const worldScale = object.getWorldScale(new Vector3());
-
-    console.log(worldScale);
-
-    if (rigidBodyOffset) {
-      objectMatrix.premultiply(rigidBodyOffset);
-    }
-
-    objectMatrix.decompose(_position, _rotation, _scale);
 
     const colliders: Collider[] = [];
 
@@ -95,7 +82,7 @@ export const AnyCollider = ({
         props,
         world,
         worldScale,
-        rigidBodyContext?.api?.raw()
+        rigidBodyContext && (rigidBodyContext?.api as RigidBodyApi).raw()
       );
       colliderStates.set(
         collider.handle,
@@ -128,7 +115,10 @@ export const AnyCollider = ({
   );
 };
 
-type UseColliderOptionsRequiredArgs<T> = Omit<UseColliderOptions<T>, "args"> & {
+type UseColliderOptionsRequiredArgs<T extends unknown[]> = Omit<
+  UseColliderOptions<T>,
+  "args"
+> & {
   args: T;
   children?: ReactNode;
 };

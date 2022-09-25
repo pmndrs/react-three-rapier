@@ -27,7 +27,7 @@ import {
   vectorArrayToVector3,
 } from "./utils";
 import { createWorldApi } from "./api";
-import { _matrix4, _object3d, _vector3 } from "./shared-objects";
+import { _matrix4, _object3d, _position, _quaternion, _rotation, _scale, _vector3 } from "./shared-objects";
 import { clamp } from "three/src/math/MathUtils";
 
 export interface RigidBodyState {
@@ -109,13 +109,6 @@ interface RapierWorldProps {
   timeStep?: number;
 
   /**
-   * Maximum number of fixed steps to take per function call.
-   *
-   * @defaultValue 10
-   */
-  maxSubSteps?: number
-
-  /**
    * Pause the physics simulation
    *
    * @defaultValue false
@@ -135,7 +128,6 @@ export const Physics: FC<RapierWorldProps> = ({
   gravity = [0, -9.81, 0],
   children,
   timeStep = 1 / 60,
-  maxSubSteps = 10,
   paused = false,
   updatePriority,
 }) => {
@@ -205,11 +197,8 @@ export const Physics: FC<RapierWorldProps> = ({
     steppingState.accumulator += timeSinceLast
 
     if (!paused) {
-      let subSteps = 0
-      while (steppingState.accumulator >= timeStepMs && subSteps < maxSubSteps) {
-
+      while (steppingState.accumulator >= timeStepMs) {
         world.step(eventQueue)
-        subSteps++
         steppingState.accumulator -= timeStepMs
       }
     }
@@ -238,21 +227,27 @@ export const Physics: FC<RapierWorldProps> = ({
       ) {
         return;
       }
-
+ 
       let t = rigidBody.translation() as Vector3
-      let r = rapierQuaternionToQuaternion(rigidBody.rotation())
+      let r = rigidBody.rotation() as Quaternion
 
-      // TODO: Fix interpolation and matrix updates
-      _object3d.position.set(t.x, t.y, t.z)
-      _object3d.quaternion.set(r.x, r.y, r.z, r.w)
-      _object3d.applyMatrix4(state.invertedWorldMatrix)
+      _scale.set(1,1,1)
 
-      state.object.position.lerp(_object3d.position, interpolationAlpha)
-      state.object.quaternion.slerp(_object3d.quaternion, interpolationAlpha)
+      _matrix4.compose(
+        t,
+        rapierQuaternionToQuaternion(r),
+        _scale
+      )
+      .premultiply(state.invertedWorldMatrix)
+      .decompose(_position, _rotation, _scale)
 
-      if (state.object instanceof InstancedMesh) {
-        state.object.instanceMatrix.needsUpdate = true;
-      }
+      state.object.position.lerp(_position, interpolationAlpha)
+      state.object.quaternion.slerp(_rotation, interpolationAlpha)
+
+      // if (state.object instanceof InstancedMesh) {
+      //   state.setMatrix(_matrix4)
+      //   state.object.instanceMatrix.needsUpdate = true;
+      // }
     });
 
   // Collision events

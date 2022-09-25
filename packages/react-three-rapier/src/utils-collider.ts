@@ -12,7 +12,8 @@ import {
   Object3D,
   Quaternion,
   BufferGeometry,
-  Matrix4
+  Matrix4,
+  Euler
 } from "three";
 import { mergeVertices } from "three-stdlib";
 import { ColliderProps, RigidBodyProps } from ".";
@@ -88,13 +89,20 @@ export const setColliderOptions = (
 
   if (state) {
     // Update collider position based on the object's position
+    const worldScale = state.object.parent!.getWorldScale(_vector3);
+
     state.object.updateWorldMatrix(true, false);
     _matrix4
       .copy(state.object.matrixWorld)
       .premultiply(state.invertedWorldMatrix)
       .decompose(_position, _rotation, _scale);
 
-    collider.setTranslationWrtParent(_position);
+    collider.setTranslationWrtParent({
+      x: _position.x * worldScale.x,
+      y: _position.y * worldScale.y,
+      z: _position.z * worldScale.z
+    });
+
     collider.setRotationWrtParent(_rotation);
   }
 };
@@ -163,24 +171,42 @@ export const createColliderPropsFromChildren: CreateColliderPropsFromChildren = 
 }): ColliderProps[] => {
   const colliderProps: ColliderProps[] = [];
 
+  object.updateWorldMatrix(true, false);
+  const invertedParentMatrixWorld = object.matrixWorld.clone().invert();
+
   object.traverseVisible(child => {
     if ("isMesh" in child) {
       if (ignoreMeshColliders && isChildOfMeshCollider(child as Mesh)) return;
 
       const worldScale = child.getWorldScale(_scale);
+      const shape = autoColliderMap[
+        options.colliders || "cuboid"
+      ] as RigidBodyShape;
 
-      const { geometry, position, rotation } = child as Mesh;
-      const args = getColliderArgsFromGeometry(
+      child.updateWorldMatrix(true, false);
+      _matrix4
+        .copy(child.matrixWorld)
+        .premultiply(invertedParentMatrixWorld)
+        .decompose(_position, _rotation, _scale);
+
+      const rotationEuler = new Euler().setFromQuaternion(_rotation, "XYZ");
+
+      const { geometry } = child as Mesh;
+      const { args, offset } = getColliderArgsFromGeometry(
         geometry,
         options.colliders || "cuboid"
       );
 
       colliderProps.push({
         ...options,
-        args,
-        shape: autoColliderMap[options.colliders || "cuboid"] as RigidBodyShape,
-        rotation: [rotation.x, rotation.y, rotation.z],
-        position: [position.x, position.y, position.z],
+        args: args,
+        shape: shape,
+        rotation: [rotationEuler.x, rotationEuler.y, rotationEuler.z],
+        position: [
+          _position.x + offset.x * worldScale.x,
+          _position.y + offset.y * worldScale.y,
+          _position.z + offset.z * worldScale.z
+        ],
         scale: [worldScale.x, worldScale.y, worldScale.z]
       });
     }
@@ -192,9 +218,7 @@ export const createColliderPropsFromChildren: CreateColliderPropsFromChildren = 
 export const getColliderArgsFromGeometry = (
   geometry: BufferGeometry,
   colliders: RigidBodyAutoCollider
-) => {
-  let desc: [];
-
+): { args: unknown[]; offset: Vector3 } => {
   switch (colliders) {
     case "cuboid":
       {
@@ -203,7 +227,10 @@ export const getColliderArgsFromGeometry = (
 
         const size = boundingBox!.getSize(new Vector3());
 
-        return [size.x / 2, size.y / 2, size.z / 2];
+        return {
+          args: [size.x / 2, size.y / 2, size.z / 2],
+          offset: boundingBox!.getCenter(new Vector3())
+        };
       }
       break;
 
@@ -214,7 +241,10 @@ export const getColliderArgsFromGeometry = (
 
         const radius = boundingSphere!.radius;
 
-        return [radius];
+        return {
+          args: [radius],
+          offset: boundingSphere!.center
+        };
       }
       break;
 
@@ -224,10 +254,13 @@ export const getColliderArgsFromGeometry = (
           ? geometry.clone()
           : mergeVertices(geometry);
 
-        return [
-          clonedGeometry.attributes.position.array as Float32Array,
-          clonedGeometry.index?.array as Uint32Array
-        ];
+        return {
+          args: [
+            clonedGeometry.attributes.position.array as Float32Array,
+            clonedGeometry.index?.array as Uint32Array
+          ],
+          offset: new Vector3()
+        };
       }
       break;
 
@@ -235,10 +268,13 @@ export const getColliderArgsFromGeometry = (
       {
         const g = geometry.clone();
 
-        return [g.attributes.position.array as Float32Array];
+        return {
+          args: [g.attributes.position.array as Float32Array],
+          offset: new Vector3()
+        };
       }
       break;
   }
 
-  return desc!;
+  return { args: [], offset: new Vector3() };
 };

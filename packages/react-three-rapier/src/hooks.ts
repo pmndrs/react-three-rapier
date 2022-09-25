@@ -81,11 +81,12 @@ export const useRigidBody = <O extends Object3D>(
     // isSleeping used for onSleep and onWake events
     ref.current.userData.isSleeping = false;
 
-    // Get intitial world transforms
+    // Get intitial world transforms of the object
     ref.current.updateWorldMatrix(true, false);
     ref.current.matrixWorld.decompose(_position, _rotation, _scale);
 
     // Set initial transforms based on world transforms
+    // will be replaced by the setRigidBodyOption below
     rigidBody.setTranslation(_position, false);
     rigidBody.setRotation(_rotation, false);
 
