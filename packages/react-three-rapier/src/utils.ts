@@ -1,34 +1,16 @@
 import {
-  ActiveEvents,
-  CoefficientCombineRule,
-  Collider,
-  ColliderDesc,
   Quaternion as RapierQuaternion,
-  RigidBody,
-  RigidBodyDesc,
   Vector3 as RapierVector3
 } from "@dimforge/rapier3d-compat";
 
-import { mergeVertices } from "three/examples/jsm/utils/BufferGeometryUtils";
-
 import {
-  BufferGeometry,
-  Matrix4,
-  Mesh,
-  Object3D,
-  Quaternion,
+
   Vector3
 } from "three";
 import { _euler, _quaternion, _vector3 } from "./shared-objects";
 import {
-  RigidBodyApi,
-  RigidBodyAutoCollider,
-  RigidBodyShape,
   RigidBodyTypeString,
-  UseColliderOptions,
-  UseRigidBodyOptions,
   Vector3Array,
-  WorldApi
 } from "./types";
 
 export const vectorArrayToVector3 = (arr: Vector3Array) => {
