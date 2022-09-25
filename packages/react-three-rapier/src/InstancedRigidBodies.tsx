@@ -79,7 +79,7 @@ export const InstancedRigidBodies = forwardRef<
 
   const childColliderProps = useChildColliderProps(object, mergedOptions);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     object.current!.updateWorldMatrix(true, false);
     const rigidBodies = instancesRefGetter.current();
     const invertedWorld = object.current!.matrixWorld.clone().invert();
