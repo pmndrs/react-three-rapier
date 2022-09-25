@@ -37,7 +37,7 @@ import {
 } from "./utils";
 import { createJointApi, createRigidBodyApi } from "./api";
 import { _position, _rotation, _scale, _vector3 } from "./shared-objects";
-import { createRigidBodyState, rigidBodyDescFromOptions, setRigidBodyOptions } from "./utils-rigidbody";
+import { createRigidBodyState, rigidBodyDescFromOptions, setRigidBodyOptions, useUpdateRigidBodyOptions } from "./utils-rigidbody";
 import { ColliderProps, RigidBodyProps } from ".";
 import { createColliderPropsFromChildren } from "./utils-collider";
 
@@ -101,23 +101,12 @@ export const useRigidBody = <O extends Object3D>(
     // isSleeping used for onSleep and onWake events
     ref.current.userData.isSleeping = false;
 
-    // Get intitial world transforms of the object
-    ref.current.updateWorldMatrix(true, false);
-    ref.current.matrixWorld.decompose(_position, _rotation, _scale);
-
-    // Set initial transforms based on world transforms
-    // will be replaced by the setRigidBodyOption below
-    rigidBody.setTranslation(_position, false);
-    rigidBody.setRotation(_rotation, false);
-
     rigidBodyStates.set(
       rigidBody.handle, 
       createRigidBodyState({
         rigidBody, 
         object: ref.current
       }));
-
-    // setRigidBodyOptions(rigidBody, mergedOptions, rigidBodyStates);
 
     return () => {
       world.removeRigidBody(rigidBody);
@@ -126,23 +115,7 @@ export const useRigidBody = <O extends Object3D>(
     };
   }, []);
 
-  
-
-  // Events
-  // useEffect(() => {
-  //   const rigidBody = getRigidBodyRef.current() as RigidBody;
-
-  //   rigidBodyEvents.set(rigidBody.handle, {
-  //     onCollisionEnter: options?.onCollisionEnter,
-  //     onCollisionExit: options?.onCollisionExit,
-  //     onSleep: options?.onSleep,
-  //     onWake: options?.onWake,
-  //   });
-
-  //   return () => {
-  //     rigidBodyEvents.delete(rigidBody.handle);
-  //   };
-  // }, [options.onCollisionEnter, options.onCollisionExit]);
+  useUpdateRigidBodyOptions(rigidBodyRef, mergedOptions, rigidBodyStates);
 
   const api = useMemo(() => createRigidBodyApi(getRigidBodyRef), []);
 
