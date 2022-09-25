@@ -22,7 +22,9 @@ import { vectorArrayToVector3 } from "./utils";
 import {
   createColliderFromOptions,
   createColliderState,
-  setColliderOptions
+  setColliderOptions,
+  useColliderEvents,
+  useUpdateColliderOptions
 } from "./utils-collider";
 
 export interface ColliderProps extends UseColliderOptions<any> {
@@ -36,6 +38,7 @@ export const AnyCollider = memo((props: ColliderProps) => {
   const { world, colliderEvents, colliderStates } = useRapier();
   const rigidBodyContext = useRigidBodyContext();
   const ref = useRef<Object3D>(null);
+  const collidersRef = useRef<Collider[]>([]);
 
   useEffect(() => {
     const object = ref.current!;
@@ -70,7 +73,6 @@ export const AnyCollider = memo((props: ColliderProps) => {
           collider.handle,
           createColliderState(collider, object, rigidBodyContext?.ref.current)
         );
-        setColliderOptions(collider, props, colliderStates);
         colliders.push(collider);
       });
     } else {
@@ -84,25 +86,20 @@ export const AnyCollider = memo((props: ColliderProps) => {
         collider.handle,
         createColliderState(collider, object, rigidBodyContext?.ref.current)
       );
-      setColliderOptions(collider, props, colliderStates);
       colliders.push(collider);
     }
 
-    /* Register collision events. */
-    // colliders.forEach(collider =>
-    //   colliderEvents.set(collider.handle, {
-    //     onCollisionEnter,
-    //     onCollisionExit
-    //   })
-    // );
+    collidersRef.current = colliders;
 
     return () => {
       colliders.forEach(collider => {
-        colliderEvents.delete(collider.handle);
         world.removeCollider(collider);
       });
     };
   }, []);
+
+  useUpdateColliderOptions(collidersRef, props, colliderStates);
+  useColliderEvents(collidersRef, props, colliderEvents);
 
   return (
     <object3D position={position} rotation={rotation} scale={scale} ref={ref}>

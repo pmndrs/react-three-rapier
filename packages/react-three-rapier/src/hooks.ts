@@ -37,7 +37,7 @@ import {
 } from "./utils";
 import { createJointApi, createRigidBodyApi } from "./api";
 import { _position, _rotation, _scale, _vector3 } from "./shared-objects";
-import { createRigidBodyState, rigidBodyDescFromOptions, setRigidBodyOptions, useUpdateRigidBodyOptions } from "./utils-rigidbody";
+import { createRigidBodyState, rigidBodyDescFromOptions, setRigidBodyOptions, useRigidBodyEvents, useUpdateRigidBodyOptions } from "./utils-rigidbody";
 import { ColliderProps, RigidBodyProps } from ".";
 import { createColliderPropsFromChildren } from "./utils-collider";
 
@@ -110,12 +110,12 @@ export const useRigidBody = <O extends Object3D>(
 
     return () => {
       world.removeRigidBody(rigidBody);
-      rigidBodyRef.current = undefined;
       rigidBodyStates.delete(rigidBody.handle);
     };
   }, []);
 
   useUpdateRigidBodyOptions(rigidBodyRef, mergedOptions, rigidBodyStates);
+  useRigidBodyEvents(rigidBodyRef, mergedOptions, rigidBodyEvents);
 
   const api = useMemo(() => createRigidBodyApi(getRigidBodyRef), []);
 

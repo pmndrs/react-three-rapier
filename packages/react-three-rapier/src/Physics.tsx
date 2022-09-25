@@ -47,7 +47,11 @@ export type RigidBodyStateMap = Map<RigidBody['handle'], RigidBodyState>
 export interface ColliderState {
   collider: Collider;
   object: Object3D;
-  invertedWorldMatrix: Matrix4
+  /**
+   * The parent of which this collider needs to base its
+   * world position on
+   */
+  worldParent: Object3D
 }
 
 export type ColliderStateMap = Map<Collider['handle'], ColliderState>
@@ -78,7 +82,7 @@ const importRapier = async () => {
   return r;
 };
 
-type EventMap = Map<
+export type EventMap = Map<
   ColliderHandle | RigidBodyHandle,
   {
     onSleep?(): void;

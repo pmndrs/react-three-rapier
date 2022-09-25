@@ -35,7 +35,7 @@ const explosionContext = createContext<{
 const heightFieldHeight = 50;
 const heightFieldWidth = 50;
 const heightField = Array.from({
-  length: heightFieldHeight * heightFieldWidth,
+  length: heightFieldHeight * heightFieldWidth
 }).map((_, index) => {
   return Math.random();
 });
@@ -88,7 +88,7 @@ const Collisioner = ({
     if (contact) {
       setExplosions((curr: ReactNode[]) => [
         ...curr,
-        <Explosion position={[contact.x, contact.y, contact.z]} />,
+        <Explosion position={[contact.x, contact.y, contact.z]} />
       ]);
     }
   };
@@ -115,14 +115,14 @@ export const CollisionEventsExample = () => {
     <explosionContext.Provider value={{ explosions, setExplosions }}>
       <group>
         <Collisioner position={[1, 5, 0]} colliders={"cuboid"}>
-          {(color) => (
+          {color => (
             <Box>
               <meshPhysicalMaterial color={color} />
             </Box>
           )}
         </Collisioner>
         <Collisioner position={[-1, 5, 0]} colliders={"cuboid"}>
-          {(color) => (
+          {color => (
             <Box>
               <meshPhysicalMaterial color={color} />
             </Box>
@@ -130,7 +130,7 @@ export const CollisionEventsExample = () => {
         </Collisioner>
 
         <Collisioner colliders="ball" position={[0, 8, 0]}>
-          {(color) => (
+          {color => (
             <Sphere>
               <meshPhysicalMaterial color={color} />
             </Sphere>
@@ -138,27 +138,32 @@ export const CollisionEventsExample = () => {
         </Collisioner>
 
         <Collisioner colliders="hull" position={[-4, 2, 0]}>
-          {(color) => <Suzanne color={color} />}
+          {color => <Suzanne color={color} />}
         </Collisioner>
 
         <Collisioner colliders={false} collisionGroups={interactionGroups([1])}>
-          {(color) => (
+          {color => (
             <>
               <mesh>
                 <capsuleGeometry args={[1, 2, 16, 16]} />
                 <meshPhysicalMaterial color={color} />
               </mesh>
-              <CapsuleCollider args={[1, 1]}
+              <CapsuleCollider
+                args={[1, 1]}
                 collisionGroups={interactionGroups([2])}
-                onCollisionEnter={({ collider }) => console.log("ENTER collider / collider", collider)}
-                onCollisionExit={({ collider }) => console.log("EXIT collider / collider", collider)}
+                onCollisionEnter={({ collider }) =>
+                  console.log("ENTER collider / collider", collider)
+                }
+                onCollisionExit={({ collider }) =>
+                  console.log("EXIT collider / collider", collider)
+                }
               />
             </>
           )}
         </Collisioner>
 
         <Collisioner type={"fixed"} position={[0, -8, 0]} colliders={false}>
-          {(color) => (
+          {color => (
             <>
               <mesh geometry={heightFieldGeometry} receiveShadow>
                 <meshPhysicalMaterial side={2} color={color} />
@@ -172,14 +177,15 @@ export const CollisionEventsExample = () => {
                   {
                     x: heightFieldWidth,
                     y: 1,
-                    z: heightFieldWidth,
-                  },
+                    z: heightFieldWidth
+                  }
                 ]}
               />
             </>
           )}
         </Collisioner>
       </group>
+
       {explosions.map((explosion, index) => (
         <group key={index}>{explosion}</group>
       ))}

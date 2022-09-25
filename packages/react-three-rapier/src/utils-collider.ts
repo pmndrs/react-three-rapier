@@ -18,7 +18,7 @@ import {
 import { mergeVertices } from "three-stdlib";
 import { ColliderProps, RigidBodyProps } from ".";
 import { WorldApi, RigidBodyApi } from "./api";
-import { ColliderState, ColliderStateMap } from "./Physics";
+import { ColliderState, ColliderStateMap, EventMap } from "./Physics";
 import {
   _matrix4,
   _position,
@@ -74,36 +74,66 @@ export const createColliderFromOptions = (
   return world.createCollider(desc!, rigidBody);
 };
 
+type MutableColliderOptions = {
+  [key in keyof ColliderProps]: (collider: Collider, value: any) => void;
+};
+
+const mutableColliderOptions: MutableColliderOptions = {
+  sensor: (collider, value: boolean) => {
+    collider.setSensor(value);
+  },
+  collisionGroups: (collider, value: number) => {
+    collider.setCollisionGroups(value);
+  },
+  solverGroups: (collider, value: number) => {
+    collider.setSolverGroups(value);
+  },
+  friction: (collider, value: number) => {
+    collider.setFriction(value);
+  },
+  restitution: (collider, value: number) => {
+    collider.setRestitution(value);
+  },
+  density: (collider, value: number) => {
+    collider.setDensity(value);
+  }
+};
+
+const mutableColliderOptionKeys = Object.keys(mutableColliderOptions);
+
 export const setColliderOptions = (
   collider: Collider,
-  options: UseColliderOptions<any>,
+  options: ColliderProps,
   states: ColliderStateMap
 ) => {
   const state = states.get(collider.handle);
 
-  if (options.collisionGroups !== undefined)
-    collider.setCollisionGroups(options.collisionGroups);
-
-  if (options.solverGroups !== undefined)
-    collider.setSolverGroups(options.solverGroups);
-
   if (state) {
     // Update collider position based on the object's position
-    const worldScale = state.object.parent!.getWorldScale(_vector3);
+    const parentWorldScale = state.object.parent!.getWorldScale(_vector3);
 
     state.object.updateWorldMatrix(true, false);
+
     _matrix4
       .copy(state.object.matrixWorld)
-      .premultiply(state.invertedWorldMatrix)
+      .premultiply(state.worldParent.matrixWorld.clone().invert())
       .decompose(_position, _rotation, _scale);
 
     collider.setTranslationWrtParent({
-      x: _position.x * worldScale.x,
-      y: _position.y * worldScale.y,
-      z: _position.z * worldScale.z
+      x: _position.x * parentWorldScale.x,
+      y: _position.y * parentWorldScale.y,
+      z: _position.z * parentWorldScale.z
     });
-
     collider.setRotationWrtParent(_rotation);
+
+    mutableColliderOptionKeys.forEach(key => {
+      if (key in options) {
+        mutableColliderOptions[key as keyof ColliderProps]!(
+          collider,
+          options[key as keyof ColliderProps]
+        );
+      }
+    });
   }
 };
 
@@ -132,19 +162,9 @@ export const createColliderState = (
   object: Object3D,
   rigidBodyObject?: Object3D | null
 ): ColliderState => {
-  object.updateWorldMatrix(true, false);
-
-  let invertedWorldMatrix: Matrix4;
-
-  if (rigidBodyObject) {
-    invertedWorldMatrix = rigidBodyObject.matrixWorld.clone().invert();
-  } else {
-    invertedWorldMatrix = object.parent!.matrixWorld.clone().invert();
-  }
-
   return {
     collider,
-    invertedWorldMatrix,
+    worldParent: rigidBodyObject || object.parent!,
     object
   };
 };
@@ -277,4 +297,29 @@ export const getColliderArgsFromGeometry = (
   }
 
   return { args: [], offset: new Vector3() };
+};
+
+export const useColliderEvents = (
+  collidersRef: MutableRefObject<Collider[] | undefined>,
+  props: ColliderProps,
+  events: EventMap
+) => {
+  const { onCollisionEnter, onCollisionExit } = props;
+
+  useEffect(() => {
+    collidersRef.current?.forEach(collider => {
+      if (onCollisionEnter || onCollisionExit) {
+        collider.setActiveEvents(ActiveEvents.COLLISION_EVENTS);
+      }
+
+      events.set(collider.handle, {
+        onCollisionEnter,
+        onCollisionExit
+      });
+    });
+
+    return () => {
+      collidersRef.current?.forEach(collider => events.delete(collider.handle));
+    };
+  }, [onCollisionEnter, onCollisionExit]);
 };

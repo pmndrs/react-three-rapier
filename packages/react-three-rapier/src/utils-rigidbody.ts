@@ -2,7 +2,7 @@ import { RigidBody, RigidBodyDesc } from "@dimforge/rapier3d-compat";
 import { MutableRefObject, useEffect } from "react";
 import { Matrix4, Object3D, Vector3 } from "three";
 import { Boolean3Array, RigidBodyProps, Vector3Array } from ".";
-import { RigidBodyState, RigidBodyStateMap } from "./Physics";
+import { EventMap, RigidBodyState, RigidBodyStateMap } from "./Physics";
 import {
   _matrix4,
   _position,
@@ -51,36 +51,24 @@ export const createRigidBodyState = ({
 };
 
 type MutableRigidBodyOptions = {
-  [Prop in keyof RigidBodyProps]: {
-    handler: (rb: RigidBody, value: any) => void;
-  };
+  [Prop in keyof RigidBodyProps]: (rb: RigidBody, value: any) => void;
 };
 
 const mutableRigidBodyOptions: MutableRigidBodyOptions = {
-  gravityScale: {
-    handler: (rb: RigidBody, value: number) => {
-      rb.setGravityScale(value, true);
-    }
+  gravityScale: (rb: RigidBody, value: number) => {
+    rb.setGravityScale(value, true);
   },
-  linearDamping: {
-    handler: (rb: RigidBody, value: number) => {
-      rb.setLinearDamping(value);
-    }
+  linearDamping: (rb: RigidBody, value: number) => {
+    rb.setLinearDamping(value);
   },
-  angularDamping: {
-    handler: (rb: RigidBody, value: number) => {
-      rb.setAngularDamping(value);
-    }
+  angularDamping: (rb: RigidBody, value: number) => {
+    rb.setAngularDamping(value);
   },
-  enabledRotations: {
-    handler: (rb: RigidBody, [x, y, z]: Boolean3Array) => {
-      rb.setEnabledRotations(x, y, z, true);
-    }
+  enabledRotations: (rb: RigidBody, [x, y, z]: Boolean3Array) => {
+    rb.setEnabledRotations(x, y, z, true);
   },
-  enabledTranslations: {
-    handler: (rb: RigidBody, [x, y, z]: Boolean3Array) => {
-      rb.setEnabledTranslations(x, y, z, true);
-    }
+  enabledTranslations: (rb: RigidBody, [x, y, z]: Boolean3Array) => {
+    rb.setEnabledTranslations(x, y, z, true);
   }
 };
 
@@ -109,7 +97,7 @@ export const setRigidBodyOptions = (
 
     mutableRigidBodyOptionKeys.forEach(key => {
       if (key in options) {
-        mutableRigidBodyOptions[key as keyof RigidBodyProps]!.handler(
+        mutableRigidBodyOptions[key as keyof RigidBodyProps]!(
           rigidBody,
           options[key as keyof RigidBodyProps]
         );
@@ -119,11 +107,32 @@ export const setRigidBodyOptions = (
 };
 
 export const useUpdateRigidBodyOptions = (
-  rigidBody: MutableRefObject<RigidBody | undefined>,
+  rigidBodyRef: MutableRefObject<RigidBody | undefined>,
   props: RigidBodyProps,
   states: RigidBodyStateMap
 ) => {
   useEffect(() => {
-    setRigidBodyOptions(rigidBody.current!, props, states);
+    setRigidBodyOptions(rigidBodyRef.current!, props, states);
   }, [props]);
+};
+
+export const useRigidBodyEvents = (
+  rigidBodyRef: MutableRefObject<RigidBody | undefined>,
+  props: RigidBodyProps,
+  events: EventMap
+) => {
+  const { onWake, onSleep, onCollisionEnter, onCollisionExit } = props;
+
+  useEffect(() => {
+    events.set(rigidBodyRef.current!.handle, {
+      onWake,
+      onSleep,
+      onCollisionEnter,
+      onCollisionExit
+    });
+
+    return () => {
+      events.delete(rigidBodyRef.current!.handle);
+    };
+  }, [onWake, onSleep, onCollisionEnter, onCollisionExit]);
 };

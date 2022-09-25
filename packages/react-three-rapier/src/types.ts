@@ -174,7 +174,7 @@ export interface UseColliderOptions<ColliderArgs extends Array<unknown>> {
   /**
    * The scale of this collider
    */
-   scale?: Vector3Array;
+  scale?: Vector3Array;
 
   /**
    * Callback when this collider collides with another collider.
@@ -195,6 +195,16 @@ export interface UseColliderOptions<ColliderArgs extends Array<unknown>> {
    * The bit mask configuring the groups and mask for solver handling.
    */
   solverGroups?: InteractionGroups;
+
+  /**
+   * Sets the uniform density of this collider.
+   */
+  density?: number;
+
+  /**
+   * Sets whether or not this collider is a sensor.
+   */
+  sensor?: number;
 }
 
 export type CollisionEnterPayload = {
