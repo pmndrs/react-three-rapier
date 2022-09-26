@@ -181,12 +181,10 @@ export const Physics: FC<RapierWorldProps> = ({
   }, [gravity]);
 
   const [steppingState] = useState({
-    time: 0,
-    lastTime: 0,
     accumulator: 0
   })
 
-  useFrame((_, delta) => {
+  useFrame((_, dt) => {
     const world = worldRef.current;
     if (!world) return;
 
@@ -198,20 +196,17 @@ export const Physics: FC<RapierWorldProps> = ({
     */
 
     // don't step time forwards if paused
-    const nowTime = steppingState.time += paused ? 0 : clamp(delta, 0, 1) * 1000;
-    const timeStepMs = timeStep * 1000
-    const timeSinceLast = nowTime - steppingState.lastTime
-    steppingState.lastTime = nowTime
-    steppingState.accumulator += timeSinceLast
+    // Increase accumulator
+    steppingState.accumulator += paused ? 0 : clamp(dt, 0, 0.2)
 
     if (!paused) {
-      while (steppingState.accumulator >= timeStepMs) {
+      while (steppingState.accumulator >= timeStep) {
         world.step(eventQueue)
-        steppingState.accumulator -= timeStepMs
+        steppingState.accumulator -= timeStep
       }
     }
 
-    const interpolationAlpha = (steppingState.accumulator % timeStepMs) / timeStepMs
+    const interpolationAlpha = (steppingState.accumulator % timeStep) / timeStep
 
     // Update meshes
     rigidBodyStates.forEach((state, handle) => {
