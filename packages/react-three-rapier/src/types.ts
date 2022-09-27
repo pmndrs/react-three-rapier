@@ -120,6 +120,11 @@ export interface UseColliderOptions<ColliderArgs> {
   args?: ColliderArgs;
 
   /**
+   * The density of this rigid body
+   */
+  density?: number;
+
+  /**
    * The mass of this rigid body.
    * The mass and density is automatically calculated based on the shape of the collider.
    * Generally, it's not recommended to adjust the mass properties as it could lead to

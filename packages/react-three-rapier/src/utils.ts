@@ -172,6 +172,10 @@ export const createColliderFromOptions: CreateColliderFromOptions = ({
     colliderDesc = colliderDesc.setActiveEvents(ActiveEvents.COLLISION_EVENTS);
   }
 
+  if(options?.density !== undefined) {
+    colliderDesc.setDensity(options.density);
+  }
+
   // If any of the mass properties are specified, add mass properties
   const qMassRot = vector3ToQuaternion(new Vector3(0, 0, 0));
 
@@ -180,7 +184,9 @@ export const createColliderFromOptions: CreateColliderFromOptions = ({
     options?.centerOfMass ||
     options?.principalAngularInertia
   ) {
-    colliderDesc.setDensity(0);
+    if(options?.density === undefined) {
+      colliderDesc.setDensity(0);
+    }
     colliderDesc.setMassProperties(
       mass,
       { x: cmx, y: cmy, z: cmz },
