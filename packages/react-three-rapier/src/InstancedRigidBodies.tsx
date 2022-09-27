@@ -42,10 +42,7 @@ import {
 } from "./utils-rigidbody";
 
 export interface InstancedRigidBodiesProps
-  extends Omit<
-    RigidBodyProps,
-    "position" | "rotation" | "onCollisionEnter" | "onCollisionExit"
-  > {
+  extends Omit<RigidBodyProps, "position" | "rotation"> {
   positions?: Vector3Array[];
   rotations?: Vector3Array[];
   scales?: Vector3Array[];
