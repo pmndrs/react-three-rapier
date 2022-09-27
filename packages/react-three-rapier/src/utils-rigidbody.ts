@@ -24,6 +24,7 @@ interface CreateRigidBodyStateOptions {
   object: Object3D;
   rigidBody: RigidBody;
   setMatrix?: (matrix: Matrix4) => void;
+  getMatrix?: (matrix: Matrix4) => Matrix4;
   worldScale?: Vector3;
 }
 
@@ -31,6 +32,7 @@ export const createRigidBodyState = ({
   rigidBody,
   object,
   setMatrix,
+  getMatrix,
   worldScale
 }: CreateRigidBodyStateOptions): RigidBodyState => {
   object.updateWorldMatrix(true, false);
@@ -45,6 +47,9 @@ export const createRigidBodyState = ({
       : (matrix: Matrix4) => {
           object.matrix.copy(matrix);
         },
+    getMatrix: getMatrix
+      ? getMatrix
+      : (matrix: Matrix4) => matrix.copy(object.matrix),
     scale: worldScale || object.getWorldScale(_scale).clone(),
     isSleeping: false
   };

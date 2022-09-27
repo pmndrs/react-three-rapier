@@ -104,6 +104,10 @@ export const InstancedRigidBodies = forwardRef<
               rigidBody,
               object: mesh,
               setMatrix: (matrix: Matrix4) => mesh.setMatrixAt(index, matrix),
+              getMatrix: (matrix: Matrix4) => {
+                mesh.getMatrixAt(index, matrix);
+                return matrix;
+              },
               worldScale: instanceScale
             })
           );

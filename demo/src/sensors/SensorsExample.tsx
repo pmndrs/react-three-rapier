@@ -1,6 +1,11 @@
 import { Box, Sphere, Text } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import { CuboidCollider, RigidBody, RigidBodyProps } from "@react-three/rapier";
+import {
+  CuboidCollider,
+  interactionGroups,
+  RigidBody,
+  RigidBodyProps
+} from "@react-three/rapier";
 import { RigidBodyApi } from "@react-three/rapier/dist/declarations/src/types";
 import { useEffect, useRef, useState } from "react";
 import { MeshPhysicalMaterial } from "three";

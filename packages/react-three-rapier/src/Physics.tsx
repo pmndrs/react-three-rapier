@@ -35,6 +35,7 @@ export interface RigidBodyState {
   object: Object3D;
   invertedWorldMatrix: Matrix4
   setMatrix: (matrix: Matrix4) => void;
+  getMatrix: (matrix: Matrix4) => Matrix4;
   /**
    * Required for instanced rigid bodies.
    */
@@ -236,6 +237,7 @@ export const Physics: FC<RapierWorldProps> = ({
       let t = rigidBody.translation() as Vector3
       let r = rigidBody.rotation() as Quaternion
 
+      // Get new position
       _matrix4.compose(
         t,
         rapierQuaternionToQuaternion(r),
@@ -248,6 +250,7 @@ export const Physics: FC<RapierWorldProps> = ({
         state.setMatrix(_matrix4)
         state.object.instanceMatrix.needsUpdate = true;
       } else {
+        // Interpolate from last position
         state.object.position.lerp(_position, interpolationAlpha)
         state.object.quaternion.slerp(_rotation, interpolationAlpha)
       }
