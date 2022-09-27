@@ -326,7 +326,6 @@ export const Physics: FC<RapierWorldProps> = ({
             collider: collider1,
           });
 
-          /* Collider events */
           collider1Events?.onIntersectionEnter?.({
             rigidBody: rigidBody2,
             collider: collider2,

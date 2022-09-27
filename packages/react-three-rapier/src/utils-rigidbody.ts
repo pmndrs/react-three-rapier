@@ -69,6 +69,12 @@ const mutableRigidBodyOptions: MutableRigidBodyOptions = {
   },
   enabledTranslations: (rb: RigidBody, [x, y, z]: Boolean3Array) => {
     rb.setEnabledTranslations(x, y, z, true);
+  },
+  angularVelocity: (rb: RigidBody, [x, y, z]: Vector3Array) => {
+    rb.setAngvel({ x, y, z }, true);
+  },
+  linearVelocity: (rb: RigidBody, [x, y, z]: Vector3Array) => {
+    rb.setLinvel({ x, y, z }, true);
   }
 };
 

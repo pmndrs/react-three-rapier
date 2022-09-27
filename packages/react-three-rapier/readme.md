@@ -210,9 +210,9 @@ const Scene = () => {
 };
 ```
 
-## Events
+## Collision Events
 
-You can subscribe to collision and state events on the RigidBody:
+You can subscribe to collision and state events on a RigidBody:
 
 ```tsx
 const RigidBottle = () => {
@@ -235,7 +235,7 @@ return (
 }
 ```
 
-You may also subscribe to collision events on individual colliders:
+You may also subscribe to collision events on individual Colliders:
 
 ```tsx
 <CuboidCollider
@@ -288,6 +288,22 @@ When the second argument is omitted, the collider will interact with all groups:
 > **Note** Please remember that in Rapier, for a collision (or solving) event to occur, both colliders involved in the event must match the related interaction groups -- a one-way match will be ignored.
 
 > **Note** By default, colliders are members of all groups, and will interact with all other groups.
+
+## Sensors
+
+A Collider can be set to be a sensor, which means that it will not generate any contact points, and will not be affected by forces. This is useful for detecting when a collider enters or leaves another collider, without affecting the other collider.
+
+```tsx
+<RigidBody>
+  <GoalPosts />
+
+  <CuboidCollider
+    args={[5, 5, 1]}
+    sensor
+    onIntersectionEnter={() => console.log("Goal!")}
+  />
+</RigidBody>
+```
 
 ## Joints
 

@@ -249,12 +249,12 @@ export interface UseRigidBodyOptions extends ColliderProps {
   /** The angular damping coefficient of this rigid-body.*/
   angularDamping?: number;
 
-  /** The linear velocity of this body.
+  /** The initial linear velocity of this body.
    * default: zero velocity
    */
   linearVelocity?: Vector3Array;
 
-  /** The angular velocity of this body.
+  /** The initial angular velocity of this body.
    * Default: zero velocity.
    */
   angularVelocity?: Vector3Array;
@@ -304,26 +304,6 @@ export interface UseRigidBodyOptions extends ColliderProps {
    * This does not affect any non-automatic child collider-components.
    */
   restitution?: number;
-
-  /**
-   * Callback when this rigidbody collides with another rigidbody
-   */
-  onCollisionEnter?: CollisionEnterHandler;
-
-  /**
-   * Callback when this rigidbody stops colliding with another rigidbody
-   */
-  onCollisionExit?: CollisionExitHandler;
-
-  /**
-   * Callback when this rigidbody collides with another rigidbody
-   */
-  onIntersectionEnter?: IntersectionEnterHandler;
-
-  /**
-    * Callback when this rigidbody stops colliding with another rigidbody
-    */
-  onIntersectionExit?: IntersectionExitHandler;
 
   /**
    * The default collision groups bitmask for all colliders in this rigid body.
