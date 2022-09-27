@@ -10,7 +10,7 @@ import React, {
 import { useAsset } from "use-asset";
 import type Rapier from "@dimforge/rapier3d-compat";
 import { useFrame } from "@react-three/fiber";
-import { CollisionEnterHandler, CollisionExitHandler, RigidBodyAutoCollider, Vector3Array, WorldApi } from "./types";
+import { CollisionEnterHandler, CollisionExitHandler, IntersectionEnterHandler, IntersectionExitHandler, RigidBodyAutoCollider, Vector3Array, WorldApi } from "./types";
 import {
   Collider,
   ColliderHandle,
@@ -89,6 +89,8 @@ export type EventMap = Map<
     onWake?(): void;
     onCollisionEnter?: CollisionEnterHandler;
     onCollisionExit?: CollisionExitHandler;
+    onIntersectionEnter?: IntersectionEnterHandler;
+    onIntersectionExit?: IntersectionExitHandler;
   }
 >;
 
@@ -251,66 +253,97 @@ export const Physics: FC<RapierWorldProps> = ({
       }
     });
 
-  // Collision events
-  eventQueue.drainCollisionEvents((handle1, handle2, started) => {
-    const collider1 = world.getCollider(handle1);
-    const collider2 = world.getCollider(handle2);
+    eventQueue.drainCollisionEvents((handle1, handle2, started) => {
+      const collider1 = world.getCollider(handle1);
+      const collider2 = world.getCollider(handle2);
 
-    const rigidBodyHandle1 = collider1.parent()?.handle;
-    const rigidBodyHandle2 = collider2.parent()?.handle;
+      const rigidBodyHandle1 = collider1.parent()?.handle;
+      const rigidBodyHandle2 = collider2.parent()?.handle;
 
-    if (!collider1 || !collider2 || rigidBodyHandle1 === undefined || rigidBodyHandle2 === undefined) {
-      return;
-    }
+      // Collision Events
+      if (!collider1 || !collider2) {
+        return;
+      }
 
-    const rigidBody1 = world.getRigidBody(rigidBodyHandle1);
-    const rigidBody2 = world.getRigidBody(rigidBodyHandle2);
+      const collider1Events = colliderEvents.get(collider1.handle);
+      const collider2Events = colliderEvents.get(collider2.handle);
 
-    const rigidBody1Events = rigidBodyEvents.get(rigidBodyHandle1);
-    const rigidBoyd2Events = rigidBodyEvents.get(rigidBodyHandle2);
+      const rigidBody1 = rigidBodyHandle1 ? world.getRigidBody(rigidBodyHandle1) : undefined;
+      const rigidBody2 = rigidBodyHandle2 ? world.getRigidBody(rigidBodyHandle2) : undefined;
 
-    const collider1Events = colliderEvents.get(collider1.handle);
-    const collider2Events = colliderEvents.get(collider2.handle);
+      const rigidBody1Events = rigidBodyHandle1 ? rigidBodyEvents.get(rigidBodyHandle1) : undefined;
+      const rigidBody2Events = rigidBodyHandle2 ? rigidBodyEvents.get(rigidBodyHandle2) : undefined;
 
-    if (started) {
-      world.contactPair(collider1, collider2, (manifold, flipped) => {
-        /* RigidBody events */
-        rigidBody1Events?.onCollisionEnter?.({
-          target: rigidBody2,
-          collider: collider2,
-          manifold,
-          flipped
+      if (started) {
+        world.contactPair(collider1, collider2, (manifold, flipped) => {
+          /* RigidBody events */
+          rigidBody1Events?.onCollisionEnter?.({
+            rigidBody: rigidBody2,
+            collider: collider2,
+            manifold,
+            flipped
+          });
+
+          rigidBody2Events?.onCollisionEnter?.({
+            rigidBody: rigidBody1,
+            collider: collider1,
+            manifold,
+            flipped,
+          });
+
+          /* Collider events */
+          collider1Events?.onCollisionEnter?.({
+            rigidBody: rigidBody2,
+            collider: collider2,
+            manifold,
+            flipped
+          })
+
+          collider2Events?.onCollisionEnter?.({
+            rigidBody: rigidBody1,
+            collider: collider1,
+            manifold,
+            flipped
+          })
         });
+      } else {
+        rigidBody1Events?.onCollisionExit?.({ rigidBody: rigidBody2, collider: collider2 });
+        rigidBody2Events?.onCollisionExit?.({ rigidBody: rigidBody1, collider: collider1 });
+        collider1Events?.onCollisionExit?.({ rigidBody: rigidBody2, collider: collider2 });
+        collider2Events?.onCollisionExit?.({ rigidBody: rigidBody1, collider: collider1 });
+      }
 
-        rigidBoyd2Events?.onCollisionEnter?.({
-          target: rigidBody1,
-          collider: collider1,
-          manifold,
-          flipped,
-        });
+      // Sensor Intersections
+      if (started) {
+        if (world.intersectionPair(collider1, collider2)) {
+          rigidBody1Events?.onIntersectionEnter?.({
+            rigidBody: rigidBody2,
+            collider: collider2,
+          });
 
-        /* Collider events */
-        collider1Events?.onCollisionEnter?.({
-          target: rigidBody2,
-          collider: collider2,
-          manifold,
-          flipped
-        })
+          rigidBody2Events?.onIntersectionEnter?.({
+            rigidBody: rigidBody1,
+            collider: collider1,
+          });
 
-        collider2Events?.onCollisionEnter?.({
-          target: rigidBody1,
-          collider: collider1,
-          manifold,
-          flipped
-        })
-      });
-    } else {
-      rigidBody1Events?.onCollisionExit?.({ target: rigidBody2, collider: collider2 });
-      rigidBoyd2Events?.onCollisionExit?.({ target: rigidBody1, collider: collider1 });
-      collider1Events?.onCollisionExit?.({ target: rigidBody2, collider: collider2 });
-      collider2Events?.onCollisionExit?.({ target: rigidBody1, collider: collider1 });
-    }
-  });
+          /* Collider events */
+          collider1Events?.onIntersectionEnter?.({
+            rigidBody: rigidBody2,
+            collider: collider2,
+          })
+
+          collider2Events?.onIntersectionEnter?.({
+            rigidBody: rigidBody1,
+            collider: collider1,
+          })
+        }
+      } else {
+        rigidBody1Events?.onIntersectionExit?.({ rigidBody: rigidBody2, collider: collider2 });
+        rigidBody2Events?.onIntersectionExit?.({ rigidBody: rigidBody1, collider: collider1 });
+        collider1Events?.onIntersectionExit?.({ rigidBody: rigidBody2, collider: collider2 });
+        collider2Events?.onIntersectionExit?.({ rigidBody: rigidBody1, collider: collider1 });
+      }
+    });
   }, updatePriority); 
 
   const api = useMemo(() => createWorldApi(getWorldRef), []);

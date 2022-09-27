@@ -24,7 +24,7 @@ import {
   UNSAFE_RouteContext
 } from "react-router-dom";
 import { AllCollidersExample } from "./all-colliders/AllCollidersExample";
-import { AllShapes } from "./all-shapes/AllShapes";
+import { AllShapesExample } from "./all-shapes/AllShapesExample";
 import { ApiUsage } from "./api-usage/ApiUsage";
 import { Car } from "./car/Car";
 import { Cluster } from "./cluster/Cluster";
@@ -38,6 +38,7 @@ import { InstancedMeshesCompound } from "./instances-meshes-compound/InstancedMe
 import { Joints } from "./joints/Joints";
 import { Kinematics } from "./kinematics/Kinematics";
 import { MeshColliderTest } from "./mesh-collider-test/MeshColliderTest";
+import { SensorsExample } from "./sensors/SensorsExample";
 import Shapes from "./shapes/Shapes";
 import { Transforms } from "./transforms/Transforms";
 
@@ -96,7 +97,7 @@ const routes: Record<string, ReactNode> = {
   cradle: <CradleExample />,
   transforms: <Transforms />,
   cluster: <Cluster />,
-  "all-shapes": <AllShapes />,
+  "all-shapes": <AllShapesExample />,
   car: <Car />,
   "api-usage": <ApiUsage />,
   kinematics: <Kinematics />,
@@ -106,7 +107,8 @@ const routes: Record<string, ReactNode> = {
   damping: <Damping />,
   "instanced-meshes-compound": <InstancedMeshesCompound />,
   "all-colliders": <AllCollidersExample />,
-  "collision-events": <CollisionEventsExample />
+  "collision-events": <CollisionEventsExample />,
+  sensors: <SensorsExample />
 };
 
 export const App = () => {

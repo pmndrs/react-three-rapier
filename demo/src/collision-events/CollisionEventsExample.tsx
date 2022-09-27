@@ -16,7 +16,7 @@ import {
   useState
 } from "react";
 import { PlaneGeometry } from "three";
-import { useSuzanne } from "../all-shapes/AllShapes";
+import { useSuzanne } from "../all-shapes/AllShapesExample";
 
 const Suzanne = ({ color }: { color: string }) => {
   const { nodes: suzanne } = useSuzanne();

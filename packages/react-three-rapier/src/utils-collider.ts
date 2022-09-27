@@ -304,17 +304,29 @@ export const useColliderEvents = (
   props: ColliderProps,
   events: EventMap
 ) => {
-  const { onCollisionEnter, onCollisionExit } = props;
+  const {
+    onCollisionEnter,
+    onCollisionExit,
+    onIntersectionEnter,
+    onIntersectionExit
+  } = props;
 
   useEffect(() => {
     collidersRef.current?.forEach(collider => {
-      if (onCollisionEnter || onCollisionExit) {
+      if (
+        onCollisionEnter ||
+        onCollisionExit ||
+        onIntersectionEnter ||
+        onIntersectionExit
+      ) {
         collider.setActiveEvents(ActiveEvents.COLLISION_EVENTS);
       }
 
       events.set(collider.handle, {
         onCollisionEnter,
-        onCollisionExit
+        onCollisionExit,
+        onIntersectionEnter,
+        onIntersectionExit
       });
     });
 

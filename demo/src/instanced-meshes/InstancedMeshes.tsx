@@ -13,7 +13,7 @@ import {
   Vector3
 } from "three";
 import { randFloat } from "three/src/math/MathUtils";
-import { useSuzanne } from "../all-shapes/AllShapes";
+import { useSuzanne } from "../all-shapes/AllShapesExample";
 import { Demo } from "../App";
 
 const COUNT = 300;

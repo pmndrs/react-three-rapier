@@ -7,7 +7,7 @@ import {
   InstancedRigidBodyApi
 } from "@react-three/rapier";
 import { useEffect, useRef } from "react";
-import { useSuzanne } from "../all-shapes/AllShapes";
+import { useSuzanne } from "../all-shapes/AllShapesExample";
 import { Demo } from "../App";
 
 const COUNT = 10;

@@ -121,14 +121,23 @@ export const useRigidBodyEvents = (
   props: RigidBodyProps,
   events: EventMap
 ) => {
-  const { onWake, onSleep, onCollisionEnter, onCollisionExit } = props;
+  const {
+    onWake,
+    onSleep,
+    onCollisionEnter,
+    onCollisionExit,
+    onIntersectionEnter,
+    onIntersectionExit
+  } = props;
 
   useEffect(() => {
     events.set(rigidBodyRef.current!.handle, {
       onWake,
       onSleep,
       onCollisionEnter,
-      onCollisionExit
+      onCollisionExit,
+      onIntersectionEnter,
+      onIntersectionExit
     });
 
     return () => {

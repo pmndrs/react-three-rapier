@@ -56,7 +56,7 @@ const OffsetTorus = () => {
   );
 };
 
-export const AllShapes: Demo = () => {
+export const AllShapesExample: Demo = () => {
   const { nodes } = useSuzanne();
 
   return (

@@ -186,6 +186,9 @@ export interface UseColliderOptions<ColliderArgs extends Array<unknown>> {
    */
   onCollisionExit?: CollisionExitHandler;
 
+  onIntersectionEnter?: IntersectionEnterHandler;
+  onIntersectionExit?: IntersectionExitHandler;
+
   /**
    * The bit mask configuring the groups and mask for collision handling.
    */
@@ -204,24 +207,30 @@ export interface UseColliderOptions<ColliderArgs extends Array<unknown>> {
   /**
    * Sets whether or not this collider is a sensor.
    */
-  sensor?: number;
+  sensor?: boolean;
 }
 
 export type CollisionEnterPayload = {
-  target: RapierRigidBody;
+  rigidBody?: RapierRigidBody;
   collider: RapierCollider;
   manifold: TempContactManifold;
   flipped: boolean;
 }
 
 export type CollisionExitPayload = {
-  target: RapierRigidBody;
+  rigidBody?: RapierRigidBody;
   collider: RapierCollider;
 }
+
+export type IntersectionEnterPayload = CollisionExitPayload
 
 export type CollisionEnterHandler = (payload: CollisionEnterPayload) => void;
 
 export type CollisionExitHandler = (payload: CollisionExitPayload) => void;
+
+export type IntersectionEnterHandler = (payload: IntersectionEnterPayload) => void;
+
+export type IntersectionExitHandler = (payload: IntersectionEnterPayload) => void;
 
 export interface UseRigidBodyOptions extends ColliderProps {
   /**
@@ -305,6 +314,16 @@ export interface UseRigidBodyOptions extends ColliderProps {
    * Callback when this rigidbody stops colliding with another rigidbody
    */
   onCollisionExit?: CollisionExitHandler;
+
+  /**
+   * Callback when this rigidbody collides with another rigidbody
+   */
+  onIntersectionEnter?: IntersectionEnterHandler;
+
+  /**
+    * Callback when this rigidbody stops colliding with another rigidbody
+    */
+  onIntersectionExit?: IntersectionExitHandler;
 
   /**
    * The default collision groups bitmask for all colliders in this rigid body.
