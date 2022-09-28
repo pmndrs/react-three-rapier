@@ -17,13 +17,11 @@ import {
   EventQueue,
   RigidBody,
   RigidBodyHandle,
-  TempContactManifold,
   World,
 } from "@dimforge/rapier3d-compat";
 import { InstancedMesh, Matrix, Matrix4, Mesh, Object3D, Quaternion, Vector3 } from "three";
 import {
   rapierQuaternionToQuaternion,
-  rapierVector3ToVector3,
   vectorArrayToVector3,
 } from "./utils";
 import { createWorldApi } from "./api";

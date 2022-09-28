@@ -101,7 +101,11 @@ const RigidBall = memo(() => {
   const color = useRandomColor();
 
   return (
-    <RigidBody colliders="ball" position={[-4 + Math.random() * 8, 10, 0]}>
+    <RigidBody
+      colliders="ball"
+      position={[-4 + Math.random() * 8, 10, 0]}
+      scale={1}
+    >
       <Sphere scale={0.2} castShadow receiveShadow>
         <meshPhysicalMaterial color={color} />
       </Sphere>
@@ -179,7 +183,7 @@ const Scene: FC = () => {
   };
 
   useEffect(() => {
-    setUI!(
+    setUI?.(
       <>
         <button onClick={() => addItem("box")}>Box</button>
         <button onClick={() => addItem("cylinder")}>Cylinder</button>
