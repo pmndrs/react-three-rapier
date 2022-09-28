@@ -10,6 +10,7 @@ import {
 import {
   createContext,
   Dispatch,
+  memo,
   ReactNode,
   SetStateAction,
   useContext,
@@ -65,48 +66,47 @@ const Explosion = ({ position }: { position: [number, number, number] }) => {
   );
 };
 
-const Collisioner = ({
-  children,
-  ...props
-}: UseRigidBodyOptions & { children(color: string): ReactNode }) => {
-  const [color, setColor] = useState("blue");
-  const { setExplosions } = useContext(explosionContext) as {
-    setExplosions: Dispatch<SetStateAction<ReactNode[]>>;
-  };
-
-  const handleCollisionEnter: CollisionEnterHandler = ({ manifold }) => {
-    setColor("red");
-
-    console.log("enter", manifold?.solverContactPoint(0));
-
-    const contact = manifold?.solverContactPoint(0) as {
-      x: number;
-      y: number;
-      z: number;
+const Collisioner = memo(
+  (props: UseRigidBodyOptions & { children(color: string): ReactNode }) => {
+    const [color, setColor] = useState("blue");
+    const { setExplosions } = useContext(explosionContext) as {
+      setExplosions: Dispatch<SetStateAction<ReactNode[]>>;
     };
 
-    if (contact) {
-      setExplosions((curr: ReactNode[]) => [
-        ...curr,
-        <Explosion position={[contact.x, contact.y, contact.z]} />
-      ]);
-    }
-  };
+    const { children, ...rest } = props;
 
-  const handleCollsionExit = () => {
-    setColor("blue");
-  };
+    const handleCollisionEnter: CollisionEnterHandler = ({ manifold }) => {
+      setColor("red");
 
-  return (
-    <RigidBody
-      {...props}
-      onCollisionEnter={handleCollisionEnter}
-      onCollisionExit={handleCollsionExit}
-    >
-      {children(color)}
-    </RigidBody>
-  );
-};
+      const contact = manifold?.solverContactPoint(0) as {
+        x: number;
+        y: number;
+        z: number;
+      };
+
+      if (contact) {
+        setExplosions((curr: ReactNode[]) => [
+          ...curr,
+          <Explosion position={[contact.x, contact.y, contact.z]} />
+        ]);
+      }
+    };
+
+    const handleCollsionExit = () => {
+      setColor("blue");
+    };
+
+    return (
+      <RigidBody
+        {...rest}
+        onCollisionEnter={handleCollisionEnter}
+        onCollisionExit={handleCollsionExit}
+      >
+        {children(color)}
+      </RigidBody>
+    );
+  }
+);
 
 export const CollisionEventsExample = () => {
   const [explosions, setExplosions] = useState<ReactNode[]>([]);

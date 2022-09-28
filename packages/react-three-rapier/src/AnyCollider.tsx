@@ -15,26 +15,23 @@ import {
   ConeArgs,
   CylinderArgs,
   ConvexHullArgs,
-  RigidBodyApi,
-  Vector3Array
+  RigidBodyApi
 } from "./types";
 import { vectorArrayToVector3 } from "./utils";
 import {
   createColliderFromOptions,
   createColliderState,
-  setColliderOptions,
   useColliderEvents,
   useUpdateColliderOptions
 } from "./utils-collider";
 
 export interface ColliderProps extends UseColliderOptions<any> {
   children?: ReactNode;
-  scale?: Vector3Array;
 }
 
 // Colliders
 export const AnyCollider = memo((props: ColliderProps) => {
-  const { children, position, rotation, scale } = props;
+  const { children, position, rotation, quaternion, scale } = props;
   const { world, colliderEvents, colliderStates } = useRapier();
   const rigidBodyContext = useRigidBodyContext();
   const ref = useRef<Object3D>(null);
@@ -102,7 +99,13 @@ export const AnyCollider = memo((props: ColliderProps) => {
   useColliderEvents(collidersRef, props, colliderEvents);
 
   return (
-    <object3D position={position} rotation={rotation} scale={scale} ref={ref}>
+    <object3D
+      position={position}
+      rotation={rotation}
+      quaternion={quaternion}
+      scale={scale}
+      ref={ref}
+    >
       {children}
     </object3D>
   );

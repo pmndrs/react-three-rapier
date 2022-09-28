@@ -4,9 +4,9 @@ import {
   CuboidCollider,
   interactionGroups,
   RigidBody,
+  RigidBodyApi,
   RigidBodyProps
 } from "@react-three/rapier";
-import { RigidBodyApi } from "@react-three/rapier/dist/declarations/src/types";
 import { useEffect, useRef, useState } from "react";
 import { MeshPhysicalMaterial } from "three";
 

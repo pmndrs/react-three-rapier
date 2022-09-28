@@ -55,6 +55,14 @@ export const createRigidBodyState = ({
   };
 };
 
+type ImmutableRigidBodyOptions = (keyof RigidBodyProps)[];
+
+export const immutableRigidBodyOptions: ImmutableRigidBodyOptions = [
+  "args",
+  "colliders",
+  "type"
+];
+
 type MutableRigidBodyOptions = {
   [Prop in keyof RigidBodyProps]: (rb: RigidBody, value: any) => void;
 };
@@ -80,6 +88,9 @@ const mutableRigidBodyOptions: MutableRigidBodyOptions = {
   },
   linearVelocity: (rb: RigidBody, [x, y, z]: Vector3Array) => {
     rb.setLinvel({ x, y, z }, true);
+  },
+  ccd: (rb: RigidBody, value: boolean) => {
+    rb.enableCcd(value);
   }
 };
 

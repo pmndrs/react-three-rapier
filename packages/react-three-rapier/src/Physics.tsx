@@ -277,12 +277,19 @@ export const Physics: FC<RapierWorldProps> = ({
       const rigidBody1Events = rigidBodyHandle1 ? rigidBodyEvents.get(rigidBodyHandle1) : undefined;
       const rigidBody2Events = rigidBodyHandle2 ? rigidBodyEvents.get(rigidBodyHandle2) : undefined;
 
+      const collider1State = colliderStates.get(collider1.handle);
+      const collider2State = colliderStates.get(collider2.handle);
+      const rigidBody1State = rigidBodyHandle1 ? rigidBodyStates.get(rigidBodyHandle1) : undefined;
+      const rigidBody2State = rigidBodyHandle2 ? rigidBodyStates.get(rigidBodyHandle2) : undefined;
+
       if (started) {
         world.contactPair(collider1, collider2, (manifold, flipped) => {
           /* RigidBody events */
           rigidBody1Events?.onCollisionEnter?.({
             rigidBody: rigidBody2,
             collider: collider2,
+            colliderObject: collider2State?.object,
+            rigidBodyObject: rigidBody2State?.object,
             manifold,
             flipped
           });
@@ -290,6 +297,8 @@ export const Physics: FC<RapierWorldProps> = ({
           rigidBody2Events?.onCollisionEnter?.({
             rigidBody: rigidBody1,
             collider: collider1,
+            colliderObject: collider1State?.object,
+            rigidBodyObject: rigidBody1State?.object,
             manifold,
             flipped,
           });
@@ -298,6 +307,8 @@ export const Physics: FC<RapierWorldProps> = ({
           collider1Events?.onCollisionEnter?.({
             rigidBody: rigidBody2,
             collider: collider2,
+            colliderObject: collider2State?.object,
+            rigidBodyObject: rigidBody2State?.object,
             manifold,
             flipped
           })
@@ -305,6 +316,8 @@ export const Physics: FC<RapierWorldProps> = ({
           collider2Events?.onCollisionEnter?.({
             rigidBody: rigidBody1,
             collider: collider1,
+            colliderObject: collider1State?.object,
+            rigidBodyObject: rigidBody1State?.object,
             manifold,
             flipped
           })
@@ -322,21 +335,29 @@ export const Physics: FC<RapierWorldProps> = ({
           rigidBody1Events?.onIntersectionEnter?.({
             rigidBody: rigidBody2,
             collider: collider2,
+            colliderObject: collider2State?.object,
+            rigidBodyObject: rigidBody2State?.object,
           });
 
           rigidBody2Events?.onIntersectionEnter?.({
             rigidBody: rigidBody1,
             collider: collider1,
+            colliderObject: collider1State?.object,
+            rigidBodyObject: rigidBody1State?.object,
           });
 
           collider1Events?.onIntersectionEnter?.({
             rigidBody: rigidBody2,
             collider: collider2,
+            colliderObject: collider2State?.object,
+            rigidBodyObject: rigidBody2State?.object,
           })
 
           collider2Events?.onIntersectionEnter?.({
             rigidBody: rigidBody1,
             collider: collider1,
+            colliderObject: collider1State?.object,
+            rigidBodyObject: rigidBody1State?.object,
           })
         }
       } else {

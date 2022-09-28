@@ -37,7 +37,7 @@ import {
 } from "./utils";
 import { createJointApi, createRigidBodyApi } from "./api";
 import { _position, _rotation, _scale, _vector3 } from "./shared-objects";
-import { createRigidBodyState, rigidBodyDescFromOptions, setRigidBodyOptions, useRigidBodyEvents, useUpdateRigidBodyOptions } from "./utils-rigidbody";
+import { createRigidBodyState, immutableRigidBodyOptions, rigidBodyDescFromOptions, setRigidBodyOptions, useRigidBodyEvents, useUpdateRigidBodyOptions } from "./utils-rigidbody";
 import { ColliderProps, RigidBodyProps } from ".";
 import { createColliderPropsFromChildren } from "./utils-collider";
 

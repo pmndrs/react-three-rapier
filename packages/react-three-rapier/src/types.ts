@@ -10,6 +10,8 @@ import {
   createWorldApi
 } from "./api";
 import { ColliderProps } from ".";
+import { Object3DProps } from "@react-three/fiber";
+import { Object3D } from "three";
 
 export { CoefficientCombineRule as CoefficientCombineRule } from "@dimforge/rapier3d-compat";
 export { RapierRigidBody, RapierCollider };
@@ -89,7 +91,7 @@ export type RigidBodyTypeString =
   | "kinematicPosition"
   | "kinematicVelocity";
 
-export type RigidBodyShape =
+export type ColliderShape =
   | "cuboid"
   | "trimesh"
   | "ball"
@@ -113,7 +115,7 @@ export interface UseColliderOptions<ColliderArgs extends Array<unknown>> {
   /**
    * The shape of your collider
    */
-  shape?: RigidBodyShape;
+  shape?: ColliderShape;
 
   /**
    * Arguments to pass to the collider
@@ -121,7 +123,7 @@ export interface UseColliderOptions<ColliderArgs extends Array<unknown>> {
   args?: ColliderArgs;
 
   /**
-   * The mass of this rigid body.
+   * The mass of this collider.
    * The mass and density is automatically calculated based on the shape of the collider.
    * Generally, it's not recommended to adjust the mass properties as it could lead to
    * unexpected behaviors.
@@ -172,9 +174,14 @@ export interface UseColliderOptions<ColliderArgs extends Array<unknown>> {
   rotation?: Vector3Array;
 
   /**
-   * The scale of this collider
+   * The rotation, as a Quaternion, of this collider relative to the rigid body
    */
-  scale?: Vector3Array;
+  quaternion?: Object3DProps['quaternion']
+
+  /**
+   * The scale of this collider relative to the rigid body
+   */
+  scale?: Object3DProps['scale']
 
   /**
    * Callback when this collider collides with another collider.
@@ -186,7 +193,14 @@ export interface UseColliderOptions<ColliderArgs extends Array<unknown>> {
    */
   onCollisionExit?: CollisionExitHandler;
 
+  /**
+   * Callback when this collider, or another collider starts intersecting, and at least one of them is a `sensor`.
+   */
   onIntersectionEnter?: IntersectionEnterHandler;
+
+  /**
+   * Callback when this, or another collider stops intersecting, and at least one of them is a `sensor`.
+   */
   onIntersectionExit?: IntersectionExitHandler;
 
   /**
@@ -215,14 +229,20 @@ export type CollisionEnterPayload = {
   collider: RapierCollider;
   manifold: TempContactManifold;
   flipped: boolean;
+  rigidBodyObject?: Object3D;
+  colliderObject?: Object3D;
 }
 
 export type CollisionExitPayload = {
   rigidBody?: RapierRigidBody;
   collider: RapierCollider;
+  rigidBodyObject?: Object3D;
+  colliderObject?: Object3D;
 }
 
 export type IntersectionEnterPayload = CollisionExitPayload
+
+export type IntersectionExitPayload = CollisionExitPayload
 
 export type CollisionEnterHandler = (payload: CollisionEnterPayload) => void;
 
@@ -230,7 +250,7 @@ export type CollisionExitHandler = (payload: CollisionExitPayload) => void;
 
 export type IntersectionEnterHandler = (payload: IntersectionEnterPayload) => void;
 
-export type IntersectionExitHandler = (payload: IntersectionEnterPayload) => void;
+export type IntersectionExitHandler = (payload: IntersectionExitPayload) => void;
 
 export interface UseRigidBodyOptions extends ColliderProps {
   /**
@@ -340,6 +360,11 @@ export interface UseRigidBodyOptions extends ColliderProps {
    * Allow rotation of this rigid-body only along specific axes.
    */
   enabledTranslations?: Boolean3Array;
+
+  /**
+   * Passed down to the object3d representing this collider.
+   */
+  userData?: Object3DProps['userData'];
 }
 
 // Joints

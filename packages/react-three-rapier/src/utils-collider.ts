@@ -27,7 +27,7 @@ import {
   _vector3
 } from "./shared-objects";
 import {
-  RigidBodyShape,
+  ColliderShape,
   UseColliderOptions,
   UseRigidBodyOptions,
   RigidBodyAutoCollider
@@ -35,7 +35,7 @@ import {
 import { scaleVertices, vector3ToQuaternion } from "./utils";
 
 export const scaleColliderArgs = (
-  shape: RigidBodyShape,
+  shape: ColliderShape,
   args: (number | ArrayLike<number> | { x: number; y: number; z: number })[],
   scale: Vector3
 ) => {
@@ -74,6 +74,13 @@ export const createColliderFromOptions = (
   return world.createCollider(desc!, rigidBody);
 };
 
+type ImmutableColliderOptions = (keyof ColliderProps)[];
+
+export const immutableColliderOptions: ImmutableColliderOptions = [
+  "shape",
+  "args"
+];
+
 type MutableColliderOptions = {
   [key in keyof ColliderProps]: (collider: Collider, value: any) => void;
 };
@@ -96,6 +103,9 @@ const mutableColliderOptions: MutableColliderOptions = {
   },
   density: (collider, value: number) => {
     collider.setDensity(value);
+  },
+  mass: (collider, value: number) => {
+    collider.setMass(value);
   }
 };
 
@@ -201,7 +211,7 @@ export const createColliderPropsFromChildren: CreateColliderPropsFromChildren = 
       const worldScale = child.getWorldScale(_scale);
       const shape = autoColliderMap[
         options.colliders || "cuboid"
-      ] as RigidBodyShape;
+      ] as ColliderShape;
 
       child.updateWorldMatrix(true, false);
       _matrix4
