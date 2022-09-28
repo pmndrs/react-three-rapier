@@ -1,5 +1,20 @@
 # @react-three/rapier
 
+## 0.7.0
+
+### Minor Changes
+
+- 7cf2f59: Refactor of entire component structure for more control and maintainability
+
+### Patch Changes
+
+- 7cf2f59: Nested transforms are now accurately converted to RigidBody localspace
+- 7cf2f59: Add support for `density` and `sensor` props on Collider and RigidBody
+- 7cf2f59: Import `mergeVertices` from `three-stdlib` for better support
+- 7cf2f59: Mutable component props now propagate without needing a refresh, adding support for HMR, and removing the need to use API when doing simple setups and updates
+- 7cf2f59: Updates to main loop, simplifying and reducing call overhead
+- 7cf2f59: RigidBody transform interpolation now works as expected
+
 ## 0.6.9
 
 ### Patch Changes
