@@ -6,7 +6,7 @@ import {
   RigidBodyAutoCollider
 } from "@react-three/rapier";
 import { useEffect, useRef } from "react";
-import { Group } from "Three";
+import { Group } from "three";
 import { Demo } from "../App";
 
 export const Transforms: Demo = () => {

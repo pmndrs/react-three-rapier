@@ -25,22 +25,22 @@ import {
 } from "react-router-dom";
 import { AllCollidersExample } from "./all-colliders/AllCollidersExample";
 import { AllShapesExample } from "./all-shapes/AllShapesExample";
-import { ApiUsage } from "./api-usage/ApiUsage";
-import { Car } from "./car/Car";
-import { Cluster } from "./cluster/Cluster";
-import { Colliders } from "./colliders/Colliders";
+import { ApiUsage } from "./api-usage/ApiUsageExample";
+import { Car } from "./car/CarExample";
+import { Cluster } from "./cluster/ClusterExample";
+import { Colliders } from "./colliders/CollidersExample";
 import { CollisionEventsExample } from "./collision-events/CollisionEventsExample";
-import { ComponentsExample } from "./components/Components";
-import { CradleExample } from "./cradle/Cradle";
-import { Damping } from "./damping/Damping";
-import { InstancedMeshes } from "./instanced-meshes/InstancedMeshes";
-import { InstancedMeshesCompound } from "./instances-meshes-compound/InstancedMeshesCompound";
-import { Joints } from "./joints/Joints";
-import { Kinematics } from "./kinematics/Kinematics";
-import { MeshColliderTest } from "./mesh-collider-test/MeshColliderTest";
+import { ComponentsExample } from "./components/ComponentsExample";
+import { CradleExample } from "./cradle/CradleExample";
+import { Damping } from "./damping/DampingExample";
+import { InstancedMeshes } from "./instanced-meshes/InstancedMeshesExample";
+import { InstancedMeshesCompound } from "./instances-meshes-compound/InstancedMeshesCompoundExample";
+import { Joints } from "./joints/JointsExample";
+import { Kinematics } from "./kinematics/KinematicsExample";
+import { MeshColliderTest } from "./mesh-collider-test/MeshColliderExample";
 import { SensorsExample } from "./sensors/SensorsExample";
-import Shapes from "./shapes/Shapes";
-import { Transforms } from "./transforms/Transforms";
+import Shapes from "./shapes/ShapesExample";
+import { Transforms } from "./transforms/TransformsExample";
 
 const demoContext = createContext<{
   setDebug?(f: boolean): void;
