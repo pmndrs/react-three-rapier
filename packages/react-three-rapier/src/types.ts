@@ -9,6 +9,9 @@ import {
   createRigidBodyApi,
   createWorldApi
 } from "./api";
+import { ColliderProps } from ".";
+import { Object3DProps } from "@react-three/fiber";
+import { Object3D } from "three";
 
 export { CoefficientCombineRule as CoefficientCombineRule } from "@dimforge/rapier3d-compat";
 export { RapierRigidBody, RapierCollider };
@@ -88,7 +91,7 @@ export type RigidBodyTypeString =
   | "kinematicPosition"
   | "kinematicVelocity";
 
-export type RigidBodyShape =
+export type ColliderShape =
   | "cuboid"
   | "trimesh"
   | "ball"
@@ -108,11 +111,11 @@ export type RigidBodyShape =
 export type Vector3Array = [x: number, y: number, z: number];
 export type Boolean3Array = [x: boolean, y: boolean, z: boolean];
 
-export interface UseColliderOptions<ColliderArgs> {
+export interface UseColliderOptions<ColliderArgs extends Array<unknown>> {
   /**
    * The shape of your collider
    */
-  shape?: RigidBodyShape;
+  shape?: ColliderShape;
 
   /**
    * Arguments to pass to the collider
@@ -120,7 +123,7 @@ export interface UseColliderOptions<ColliderArgs> {
   args?: ColliderArgs;
 
   /**
-   * The mass of this rigid body.
+   * The mass of this collider.
    * The mass and density is automatically calculated based on the shape of the collider.
    * Generally, it's not recommended to adjust the mass properties as it could lead to
    * unexpected behaviors.
@@ -171,6 +174,16 @@ export interface UseColliderOptions<ColliderArgs> {
   rotation?: Vector3Array;
 
   /**
+   * The rotation, as a Quaternion, of this collider relative to the rigid body
+   */
+  quaternion?: Object3DProps['quaternion']
+
+  /**
+   * The scale of this collider relative to the rigid body
+   */
+  scale?: Object3DProps['scale']
+
+  /**
    * Callback when this collider collides with another collider.
    */
   onCollisionEnter?: CollisionEnterHandler;
@@ -181,6 +194,16 @@ export interface UseColliderOptions<ColliderArgs> {
   onCollisionExit?: CollisionExitHandler;
 
   /**
+   * Callback when this collider, or another collider starts intersecting, and at least one of them is a `sensor`.
+   */
+  onIntersectionEnter?: IntersectionEnterHandler;
+
+  /**
+   * Callback when this, or another collider stops intersecting, and at least one of them is a `sensor`.
+   */
+  onIntersectionExit?: IntersectionExitHandler;
+
+  /**
    * The bit mask configuring the groups and mask for collision handling.
    */
   collisionGroups?: InteractionGroups;
@@ -189,25 +212,47 @@ export interface UseColliderOptions<ColliderArgs> {
    * The bit mask configuring the groups and mask for solver handling.
    */
   solverGroups?: InteractionGroups;
+
+  /**
+   * Sets the uniform density of this collider.
+   */
+  density?: number;
+
+  /**
+   * Sets whether or not this collider is a sensor.
+   */
+  sensor?: boolean;
 }
 
 export type CollisionEnterPayload = {
-  target: RapierRigidBody;
+  rigidBody?: RapierRigidBody;
   collider: RapierCollider;
   manifold: TempContactManifold;
   flipped: boolean;
+  rigidBodyObject?: Object3D;
+  colliderObject?: Object3D;
 }
 
 export type CollisionExitPayload = {
-  target: RapierRigidBody;
+  rigidBody?: RapierRigidBody;
   collider: RapierCollider;
+  rigidBodyObject?: Object3D;
+  colliderObject?: Object3D;
 }
+
+export type IntersectionEnterPayload = CollisionExitPayload
+
+export type IntersectionExitPayload = CollisionExitPayload
 
 export type CollisionEnterHandler = (payload: CollisionEnterPayload) => void;
 
 export type CollisionExitHandler = (payload: CollisionExitPayload) => void;
 
-export interface UseRigidBodyOptions {
+export type IntersectionEnterHandler = (payload: IntersectionEnterPayload) => void;
+
+export type IntersectionExitHandler = (payload: IntersectionExitPayload) => void;
+
+export interface UseRigidBodyOptions extends ColliderProps {
   /**
    * Specify the type of this rigid body
    */
@@ -224,12 +269,12 @@ export interface UseRigidBodyOptions {
   /** The angular damping coefficient of this rigid-body.*/
   angularDamping?: number;
 
-  /** The linear velocity of this body.
+  /** The initial linear velocity of this body.
    * default: zero velocity
    */
   linearVelocity?: Vector3Array;
 
-  /** The angular velocity of this body.
+  /** The initial angular velocity of this body.
    * Default: zero velocity.
    */
   angularVelocity?: Vector3Array;
@@ -281,16 +326,6 @@ export interface UseRigidBodyOptions {
   restitution?: number;
 
   /**
-   * Callback when this rigidbody collides with another rigidbody
-   */
-  onCollisionEnter?: CollisionEnterHandler;
-
-  /**
-   * Callback when this rigidbody stops colliding with another rigidbody
-   */
-  onCollisionExit?: CollisionExitHandler;
-
-  /**
    * The default collision groups bitmask for all colliders in this rigid body.
    * Can be customized per-collider.
    */
@@ -325,6 +360,11 @@ export interface UseRigidBodyOptions {
    * Allow rotation of this rigid-body only along specific axes.
    */
   enabledTranslations?: Boolean3Array;
+
+  /**
+   * Passed down to the object3d representing this collider.
+   */
+  userData?: Object3DProps['userData'];
 }
 
 // Joints

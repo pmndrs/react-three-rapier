@@ -32,17 +32,19 @@ export default function Plinko({ ...props }: JSX.IntrinsicElements["group"]) {
 
 
   return (
-    <group ref={group} {...props} dispose={null} rotation={[0, -1, 0]}>
-      <RigidBody type="fixed" colliders="trimesh">
+    <group ref={group} {...props} dispose={null} rotation={[0, -1, 0]} scale={1}>
+      <RigidBody type="fixed" colliders="trimesh" position={[0,1,0]}>
+        <group scale={1}>
           <mesh
             geometry={nodes.plinko.geometry}
             material={materials.blue}
             material-color="blue"
             castShadow
             receiveShadow
-            rotation={[0, 0, .2]}
+            rotation={[0, 0, .4]}
             position={[0, 7.58, -1.06]}
           />
+        </group>
       </RigidBody>
       <RigidBody type="fixed" colliders={'trimesh'}>
         <mesh

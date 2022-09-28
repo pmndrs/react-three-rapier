@@ -2,7 +2,7 @@ import {
   Box,
   Environment,
   OrbitControls,
-  useContextBridge,
+  useContextBridge
 } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { Debug, Physics, RigidBody } from "@react-three/rapier";
@@ -12,7 +12,7 @@ import {
   ReactNode,
   Suspense,
   useContext,
-  useState,
+  useState
 } from "react";
 import {
   NavLink,
@@ -21,25 +21,26 @@ import {
   Routes,
   UNSAFE_LocationContext,
   UNSAFE_NavigationContext,
-  UNSAFE_RouteContext,
+  UNSAFE_RouteContext
 } from "react-router-dom";
 import { AllCollidersExample } from "./all-colliders/AllCollidersExample";
-import { AllShapes } from "./all-shapes/AllShapes";
-import { ApiUsage } from "./api-usage/ApiUsage";
-import { Car } from "./car/Car";
-import { Cluster } from "./cluster/Cluster";
-import { Colliders } from "./colliders/Colliders";
+import { AllShapesExample } from "./all-shapes/AllShapesExample";
+import { ApiUsage } from "./api-usage/ApiUsageExample";
+import { Car } from "./car/CarExample";
+import { Cluster } from "./cluster/ClusterExample";
+import { Colliders } from "./colliders/CollidersExample";
 import { CollisionEventsExample } from "./collision-events/CollisionEventsExample";
-import { ComponentsExample } from "./components/Components";
-import { CradleExample } from "./cradle/Cradle";
-import { Damping } from "./damping/Damping";
-import { InstancedMeshes } from "./instanced-meshes/InstancedMeshes";
-import { InstancedMeshesCompound } from "./instances-meshes-compound/InstancedMeshesCompound";
-import { Joints } from "./joints/Joints";
-import { Kinematics } from "./kinematics/Kinematics";
-import { MeshColliderTest } from "./mesh-collider-test/MeshColliderTest";
-import Shapes from "./shapes/Shapes";
-import { Transforms } from "./transforms/Transforms";
+import { ComponentsExample } from "./components/ComponentsExample";
+import { CradleExample } from "./cradle/CradleExample";
+import { Damping } from "./damping/DampingExample";
+import { InstancedMeshes } from "./instanced-meshes/InstancedMeshesExample";
+import { InstancedMeshesCompound } from "./instances-meshes-compound/InstancedMeshesCompoundExample";
+import { Joints } from "./joints/JointsExample";
+import { Kinematics } from "./kinematics/KinematicsExample";
+import { MeshColliderTest } from "./mesh-collider-test/MeshColliderExample";
+import { SensorsExample } from "./sensors/SensorsExample";
+import Shapes from "./shapes/ShapesExample";
+import { Transforms } from "./transforms/TransformsExample";
 
 const demoContext = createContext<{
   setDebug?(f: boolean): void;
@@ -51,7 +52,7 @@ export const useDemo = () => useContext(demoContext);
 const ToggleButton = ({
   label,
   value,
-  onClick,
+  onClick
 }: {
   label: string;
   value: boolean;
@@ -62,7 +63,7 @@ const ToggleButton = ({
       background: value ? "red" : "transparent",
       border: "2px solid red",
       color: value ? "white" : "red",
-      borderRadius: 4,
+      borderRadius: 4
     }}
     onClick={onClick}
   >
@@ -96,7 +97,7 @@ const routes: Record<string, ReactNode> = {
   cradle: <CradleExample />,
   transforms: <Transforms />,
   cluster: <Cluster />,
-  "all-shapes": <AllShapes />,
+  "all-shapes": <AllShapesExample />,
   car: <Car />,
   "api-usage": <ApiUsage />,
   kinematics: <Kinematics />,
@@ -107,6 +108,7 @@ const routes: Record<string, ReactNode> = {
   "instanced-meshes-compound": <InstancedMeshesCompound />,
   "all-colliders": <AllCollidersExample />,
   "collision-events": <CollisionEventsExample />,
+  sensors: <SensorsExample />
 };
 
 export const App = () => {
@@ -117,7 +119,7 @@ export const App = () => {
   const [physicsKey, setPhysicsKey] = useState<number>(0);
 
   const updatePhysicsKey = () => {
-    setPhysicsKey((current) => current + 1);
+    setPhysicsKey(current => current + 1);
   };
 
   const ContextBridge = useContextBridge(
@@ -132,7 +134,7 @@ export const App = () => {
         position: "fixed",
         inset: 0,
         background: "linear-gradient(blue, white)",
-        fontFamily: "sans-serif",
+        fontFamily: "sans-serif"
       }}
     >
       <Canvas shadows>
@@ -155,7 +157,7 @@ export const App = () => {
               <demoContext.Provider
                 value={{
                   setUI,
-                  setDebug,
+                  setDebug
                 }}
               >
                 <Routes>
@@ -182,10 +184,10 @@ export const App = () => {
           display: "flex",
           flexWrap: "wrap",
           gap: 12,
-          maxWidth: 600,
+          maxWidth: 600
         }}
       >
-        {Object.keys(routes).map((key) => (
+        {Object.keys(routes).map(key => (
           <Link key={key} to={key}>
             {key.replace(/-/g, " ") || "Shapes"}
           </Link>
@@ -194,17 +196,17 @@ export const App = () => {
         <ToggleButton
           label="Debug"
           value={debug}
-          onClick={() => setDebug((v) => !v)}
+          onClick={() => setDebug(v => !v)}
         />
         <ToggleButton
           label="Perf"
           value={perf}
-          onClick={() => setPerf((v) => !v)}
+          onClick={() => setPerf(v => !v)}
         />
         <ToggleButton
           label="Paused"
           value={paused}
-          onClick={() => setPaused((v) => !v)}
+          onClick={() => setPaused(v => !v)}
         />
         <ToggleButton label="Reset" value={false} onClick={updatePhysicsKey} />
       </div>
@@ -213,7 +215,7 @@ export const App = () => {
         style={{
           position: "absolute",
           top: 24,
-          left: 24,
+          left: 24
         }}
       >
         {ui}
@@ -233,7 +235,7 @@ const Link = (props: NavLinkProps) => {
         padding: 4,
         background: isActive ? "blue" : "transparent",
         textDecoration: "none",
-        color: isActive ? "white" : "blue",
+        color: isActive ? "white" : "blue"
       })}
     />
   );

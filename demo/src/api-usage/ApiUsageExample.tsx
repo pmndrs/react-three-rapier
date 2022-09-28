@@ -11,16 +11,14 @@ export const ApiUsage: Demo = () => {
       torus.current.applyTorqueImpulse({
         x: 1,
         y: 3,
-        z: 0,
+        z: 0
       });
     }
 
     const timer = setInterval(() => {
       if (torus.current) {
-        if (torus.current.translation().y < -4) {
-          torus.current.setTranslation({ x: 0, y: 0, z: 0 });
-          torus.current.setLinvel({ x: 0, y: 5, z: 0 });
-        }
+        torus.current.setTranslation({ x: 0, y: 0, z: 0 });
+        torus.current.setLinvel({ x: 0, y: 5, z: 0 });
       }
     }, 3000);
 

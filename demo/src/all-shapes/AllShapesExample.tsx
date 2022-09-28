@@ -8,7 +8,7 @@ import {
   CuboidCollider,
   Debug,
   RigidBody,
-  TrimeshCollider,
+  TrimeshCollider
 } from "@react-three/rapier";
 
 import { Demo } from "../App";
@@ -56,7 +56,7 @@ const OffsetTorus = () => {
   );
 };
 
-export const AllShapes: Demo = () => {
+export const AllShapesExample: Demo = () => {
   const { nodes } = useSuzanne();
 
   return (
@@ -105,7 +105,7 @@ export const AllShapes: Demo = () => {
           <TrimeshCollider
             args={[
               nodes.Suzanne.geometry.attributes.position.array,
-              nodes.Suzanne.geometry.index?.array || [],
+              nodes.Suzanne.geometry.index?.array || []
             ]}
             mass={1}
           />
@@ -138,7 +138,9 @@ export const AllShapes: Demo = () => {
 
         <group scale={1.5} position={[5, 10, 0]}>
           <RigidBody colliders="ball">
-            <OffsetTorus />
+            <group position={[-2, -2, -2]} scale={1.2}>
+              <OffsetTorus />
+            </group>
             <Html>Mesh with offset geometry</Html>
           </RigidBody>
         </group>

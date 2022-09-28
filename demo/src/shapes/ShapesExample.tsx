@@ -101,7 +101,11 @@ const RigidBall = memo(() => {
   const color = useRandomColor();
 
   return (
-    <RigidBody colliders="ball" position={[-4 + Math.random() * 8, 10, 0]}>
+    <RigidBody
+      colliders="ball"
+      position={[-4 + Math.random() * 8, 10, 0]}
+      scale={1}
+    >
       <Sphere scale={0.2} castShadow receiveShadow>
         <meshPhysicalMaterial color={color} />
       </Sphere>
@@ -111,7 +115,7 @@ const RigidBall = memo(() => {
 
 useGLTF.preload(new URL("objects.glb", import.meta.url).toString());
 
-const HullPear = () => {
+const HullPear = memo(() => {
   const { nodes } = (useGLTF(
     new URL("objects.glb", import.meta.url).toString()
   ) as unknown) as {
@@ -131,9 +135,9 @@ const HullPear = () => {
       />
     </RigidBody>
   );
-};
+});
 
-const MeshBoat = () => {
+const MeshBoat = memo(() => {
   const { nodes } = (useGLTF(
     new URL("objects.glb", import.meta.url).toString()
   ) as unknown) as {
@@ -155,7 +159,7 @@ const MeshBoat = () => {
       </group>
     </RigidBody>
   );
-};
+});
 
 const itemMap: Record<string, FC> = {
   box: RigidBox,
@@ -179,7 +183,7 @@ const Scene: FC = () => {
   };
 
   useEffect(() => {
-    setUI!(
+    setUI?.(
       <>
         <button onClick={() => addItem("box")}>Box</button>
         <button onClick={() => addItem("cylinder")}>Cylinder</button>

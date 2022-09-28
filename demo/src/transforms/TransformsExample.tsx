@@ -1,13 +1,12 @@
 import { Box, Sphere } from "@react-three/drei";
-import { useFrame } from "@react-three/fiber";
 import {
   CuboidCollider,
   Debug,
   RigidBody,
-  RigidBodyAutoCollider,
+  RigidBodyAutoCollider
 } from "@react-three/rapier";
 import { useEffect, useRef } from "react";
-import { Group } from "Three";
+import { Group } from "three";
 import { Demo } from "../App";
 
 export const Transforms: Demo = () => {
@@ -46,25 +45,18 @@ export const Transforms: Demo = () => {
         </RigidBody>
       </group>
 
-      <group scale={1.3} rotation={[2, 0, 1]}>
+      <group rotation={[1, 1, 1]} scale={1.1}>
         <RigidBody>
-          <Box
-            castShadow
-            receiveShadow
-            material-color="blue"
-            scale={[1, 1, 8]}
-          />
+          <group scale={1} rotation={[2, 0, 1]} position={[1, 4, 1]}>
+            <Box
+              castShadow
+              receiveShadow
+              material-color="blue"
+              scale={[1, 1, 8]}
+            />
 
-          <Box material-color="blue" position={[1, 2, 3]} />
-
-          <CuboidCollider args={[0.5, 0.5, 4]} />
-          <CuboidCollider args={[0.5, 0.5, 0.5]} position={[1, 2, 3]} />
-
-          <CuboidCollider
-            args={[0.5, 0.5, 0.5]}
-            position={[-1, -1, -1]}
-            rotation={[2, 2, 2]}
-          />
+            <Box material-color="blue" position={[1, 2, 3]} />
+          </group>
         </RigidBody>
       </group>
 

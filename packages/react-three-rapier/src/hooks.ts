@@ -1,4 +1,4 @@
-import React, { MutableRefObject, useContext, useEffect, useMemo } from "react";
+import React, { MutableRefObject, useContext, useEffect, useMemo, useState } from "react";
 import { RapierContext } from "./Physics";
 import { useRef } from "react";
 import { Object3D, Quaternion, Vector3 } from "three";
@@ -31,22 +31,51 @@ import {
 } from "@dimforge/rapier3d-compat";
 
 import {
-  createCollidersFromChildren,
-  rigidBodyDescFromOptions,
   rigidBodyTypeFromString,
   vector3ToQuaternion,
   vectorArrayToVector3,
 } from "./utils";
 import { createJointApi, createRigidBodyApi } from "./api";
-import { _vector3 } from "./shared-objects";
+import { _position, _rotation, _scale, _vector3 } from "./shared-objects";
+import { createRigidBodyState, immutableRigidBodyOptions, rigidBodyDescFromOptions, setRigidBodyOptions, useRigidBodyEvents, useUpdateRigidBodyOptions } from "./utils-rigidbody";
+import { ColliderProps, RigidBodyProps } from ".";
+import { createColliderPropsFromChildren } from "./utils-collider";
+
+export const useChildColliderProps = <O extends Object3D>(ref:MutableRefObject<O | undefined | null>, options: RigidBodyProps, ignoreMeshColliders = true) => {
+  const [colliderProps, setColliderProps] = useState<ColliderProps[]>([]);
+
+  useEffect(() => {
+    const object = ref.current;
+
+    if (object && options.colliders !== false) {
+      setColliderProps(createColliderPropsFromChildren({
+        object: ref.current!,
+        options,
+        ignoreMeshColliders,
+      }))
+    }
+  }, [options]);
+
+  return colliderProps;
+}
 
 export const useRigidBody = <O extends Object3D>(
   options: UseRigidBodyOptions = {}
-): [MutableRefObject<O>, RigidBodyApi] => {
+): [MutableRefObject<O>, RigidBodyApi, ColliderProps[]] => {
   const { world, rigidBodyStates, physicsOptions, rigidBodyEvents } =
     useRapier();
   const ref = useRef<O>();
 
+  const mergedOptions = useMemo(() => {
+    return {
+      ...physicsOptions,
+      ...options,
+      children: undefined,
+    };
+  }, [physicsOptions, options]);
+
+  const childColliderProps = useChildColliderProps(ref, mergedOptions)
+  
   // Create rigidbody
   const rigidBodyRef = useRef<RigidBody>();
   const getRigidBodyRef = useRef(() => {
@@ -72,94 +101,25 @@ export const useRigidBody = <O extends Object3D>(
     // isSleeping used for onSleep and onWake events
     ref.current.userData.isSleeping = false;
 
-    // Get intitial world transforms
-    const worldPosition = ref.current.getWorldPosition(new Vector3());
-    const worldRotation = ref.current.getWorldQuaternion(new Quaternion());
-    const scale = ref.current.parent?.getWorldScale(new Vector3()) || {
-      x: 1,
-      y: 1,
-      z: 1,
-    };
-
-    // Transforms from options
-    const [x, y, z] = options?.position || [0, 0, 0];
-    const [rx, ry, rz] = options?.rotation || [0, 0, 0];
-
-    // Set initial transforms based on world transforms
-    rigidBody.setTranslation(
-      {
-        x: worldPosition.x + x * scale.x,
-        y: worldPosition.y + y * scale.y,
-        z: worldPosition.z + z * scale.z,
-      },
-      false
-    );
-
-    const rotation = vector3ToQuaternion(new Vector3(rx, ry, rz)).multiply(
-      worldRotation
-    );
-
-    rigidBody.setRotation(
-      { x: rotation.x, y: rotation.y, z: rotation.z, w: rotation.w },
-      false
-    );
-
-    rigidBody.resetForces(false);
-    rigidBody.resetTorques(false);
-
-    const colliderSetting =
-      options?.colliders ?? physicsOptions.colliders ?? false;
-
-    const autoColliders =
-      colliderSetting !== false
-        ? createCollidersFromChildren({
-          object: ref.current,
-          rigidBody,
-          options: { ...options, colliders: colliderSetting },
-          world,
-          ignoreMeshColliders: true
-        }
-        )
-        : [];
-
-    rigidBodyStates.set(rigidBody.handle, {
-      mesh: ref.current!,
-      invertedMatrixWorld: ref.current.parent!.matrixWorld.clone().invert(),
-      isSleeping: false,
-      worldScale: ref.current.getWorldScale(_vector3).clone(),
-      setMatrix: (mat) => ref.current!.matrix.copy(mat),
-      getMatrix: () => ref.current!.matrix
-    });
-
-    ref.current.matrixAutoUpdate = false;
+    rigidBodyStates.set(
+      rigidBody.handle, 
+      createRigidBodyState({
+        rigidBody, 
+        object: ref.current
+      }));
 
     return () => {
       world.removeRigidBody(rigidBody);
-      autoColliders.forEach((collider) => world.removeCollider(collider));
-      rigidBodyRef.current = undefined;
       rigidBodyStates.delete(rigidBody.handle);
     };
   }, []);
 
-  // Events
-  useEffect(() => {
-    const rigidBody = getRigidBodyRef.current() as RigidBody;
-
-    rigidBodyEvents.set(rigidBody.handle, {
-      onCollisionEnter: options?.onCollisionEnter,
-      onCollisionExit: options?.onCollisionExit,
-      onSleep: options?.onSleep,
-      onWake: options?.onWake,
-    });
-
-    return () => {
-      rigidBodyEvents.delete(rigidBody.handle);
-    };
-  }, [options.onCollisionEnter, options.onCollisionExit]);
+  useUpdateRigidBodyOptions(rigidBodyRef, mergedOptions, rigidBodyStates);
+  useRigidBodyEvents(rigidBodyRef, mergedOptions, rigidBodyEvents);
 
   const api = useMemo(() => createRigidBodyApi(getRigidBodyRef), []);
 
-  return [ref as MutableRefObject<O>, api];
+  return [ref as MutableRefObject<O>, api, childColliderProps];
 };
 
 // Joints
