@@ -1,5 +1,11 @@
 # @react-three/rapier
 
+## 0.7.1
+
+### Patch Changes
+
+- 36328f7: Fix InstancedRigidBodies not passing options to colliders
+
 ## 0.7.0
 
 ### Minor Changes
