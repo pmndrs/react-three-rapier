@@ -55,8 +55,9 @@ const heightFieldGeometry = new PlaneGeometry(
 );
 
 heightField.forEach((v, index) => {
-  (heightFieldGeometry.attributes.position.array as number[])[index * 3 + 2] =
-    v;
+  (heightFieldGeometry.attributes.position.array as number[])[
+    index * 3 + 2
+  ] = v;
 });
 heightFieldGeometry.scale(1, -1, 1);
 heightFieldGeometry.rotateX(-Math.PI / 2);

@@ -1,11 +1,7 @@
 import { MutableRefObject } from "react";
 
 import {
-  CoefficientCombineRule,
-  Collider as RapierCollider,
-  InteractionGroups,
-  RigidBody as RapierRigidBody,
-  TempContactManifold
+  CoefficientCombineRule, Collider as RapierCollider, InteractionGroups, RigidBody as RapierRigidBody, TempContactManifold
 } from "@dimforge/rapier3d-compat";
 import {
   createColliderApi,
@@ -19,6 +15,7 @@ import { Object3D } from "three";
 
 export { CoefficientCombineRule as CoefficientCombineRule } from "@dimforge/rapier3d-compat";
 export { RapierRigidBody, RapierCollider };
+
 
 export type RefGetter<T> = MutableRefObject<() => T | undefined>;
 
@@ -46,7 +43,7 @@ export type HeightfieldArgs = [
   width: number,
   height: number,
   heights: number[],
-  scale: { x: number; y: number; z: number }
+  scale: { x: number, y: number, z: number }
 ];
 export type TrimeshArgs = [
   vertices: ArrayLike<number>,
@@ -179,12 +176,12 @@ export interface UseColliderOptions<ColliderArgs extends Array<unknown>> {
   /**
    * The rotation, as a Quaternion, of this collider relative to the rigid body
    */
-  quaternion?: Object3DProps["quaternion"];
+  quaternion?: Object3DProps['quaternion']
 
   /**
    * The scale of this collider relative to the rigid body
    */
-  scale?: Object3DProps["scale"];
+  scale?: Object3DProps['scale']
 
   /**
    * Callback when this collider collides with another collider.
@@ -234,30 +231,26 @@ export type CollisionEnterPayload = {
   flipped: boolean;
   rigidBodyObject?: Object3D;
   colliderObject?: Object3D;
-};
+}
 
 export type CollisionExitPayload = {
   rigidBody?: RapierRigidBody;
   collider: RapierCollider;
   rigidBodyObject?: Object3D;
   colliderObject?: Object3D;
-};
+}
 
-export type IntersectionEnterPayload = CollisionExitPayload;
+export type IntersectionEnterPayload = CollisionExitPayload
 
-export type IntersectionExitPayload = CollisionExitPayload;
+export type IntersectionExitPayload = CollisionExitPayload
 
 export type CollisionEnterHandler = (payload: CollisionEnterPayload) => void;
 
 export type CollisionExitHandler = (payload: CollisionExitPayload) => void;
 
-export type IntersectionEnterHandler = (
-  payload: IntersectionEnterPayload
-) => void;
+export type IntersectionEnterHandler = (payload: IntersectionEnterPayload) => void;
 
-export type IntersectionExitHandler = (
-  payload: IntersectionExitPayload
-) => void;
+export type IntersectionExitHandler = (payload: IntersectionExitPayload) => void;
 
 export interface UseRigidBodyOptions extends ColliderProps {
   /**
@@ -339,8 +332,8 @@ export interface UseRigidBodyOptions extends ColliderProps {
   collisionGroups?: InteractionGroups;
 
   /**
-   * The default solver groups bitmask for all colliders in this rigid body.
-   * Can be customized per-collider.
+  * The default solver groups bitmask for all colliders in this rigid body.
+  * Can be customized per-collider.
    */
   solverGroups?: InteractionGroups;
 
@@ -371,7 +364,7 @@ export interface UseRigidBodyOptions extends ColliderProps {
   /**
    * Passed down to the object3d representing this collider.
    */
-  userData?: Object3DProps["userData"];
+  userData?: Object3DProps['userData'];
 }
 
 // Joints

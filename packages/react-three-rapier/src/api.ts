@@ -96,23 +96,24 @@ export interface RigidBodyApi {
    */
   setAngvel(velocity: Vector3Object): void;
 
+
   /**
    * The linear damping of this rigid-body.
    */
-  linearDamping(): number;
-  /**
-   * Sets the linear damping factor applied to this rigid-body.
-   */
+   linearDamping(): number;
+   /**
+    * Sets the linear damping factor applied to this rigid-body.
+    */
   setLinearDamping(factor: number): void;
-
-  /**
-   * The angular damping of this rigid-body.
-   */
-  angularDamping(): number;
-  /**
-   * Sets the anugular damping factor applied to this rigid-body.
-   */
-  setAngularDamping(factor: number): void;
+ 
+   /**
+    * The angular damping of this rigid-body.
+    */
+   angularDamping(): number;
+   /**
+    * Sets the anugular damping factor applied to this rigid-body.
+    */
+   setAngularDamping(factor: number): void;
 
   /**
    * If this rigid body is kinematic, sets its future rotation after the next timestep integration.
@@ -210,19 +211,21 @@ export const createRigidBodyApi = (ref: RefGetter<RigidBody>): RigidBodyApi => {
     setAngvel: (velocity) => ref.current()!.setAngvel(velocity, true),
 
     linearDamping() {
-      return ref.current()!.linearDamping();
+      return ref.current()!.linearDamping()
     },
-
+    
     setLinearDamping: (factor) => ref.current()!.setLinearDamping(factor),
-
-    angularDamping() {
-      return ref.current()!.angularDamping();
+  
+    angularDamping(){
+      return ref.current()!.angularDamping()
     },
-
+    
     setAngularDamping: (factor) => ref.current()!.setAngularDamping(factor),
 
     setNextKinematicRotation: (rotation) => {
-      ref.current()!.setNextKinematicRotation(rotation);
+      ref
+        .current()!
+        .setNextKinematicRotation(rotation);
     },
     setNextKinematicTranslation: (translation) =>
       ref.current()!.setNextKinematicTranslation(translation),
@@ -236,30 +239,25 @@ export const createRigidBodyApi = (ref: RefGetter<RigidBody>): RigidBodyApi => {
     setEnabledRotations: (x, y, z) =>
       ref.current()!.setEnabledRotations(x, y, z, true),
     setEnabledTranslations: (x, y, z) =>
-      ref.current()!.setEnabledTranslations(x, y, z, true)
+      ref.current()!.setEnabledTranslations(x, y, z, true),
   };
 };
 
 export interface InstancedRigidBodyApi {
   at(index: number): RigidBodyApi;
   get count(): number;
-  forEach(
-    callback: (body: RigidBodyApi, index: number, array: RigidBodyApi[]) => void
-  ): void;
+  forEach(callback: (body: RigidBodyApi, index: number, array: RigidBodyApi[]) => void): void
 }
 
 export const createInstancedRigidBodiesApi = (
-  bodiesGetter: RefGetter<{ rigidBody: RigidBody; api: RigidBodyApi }[]>
+  bodiesGetter: RefGetter<{rigidBody: RigidBody, api: RigidBodyApi}[]>
 ): InstancedRigidBodyApi => ({
   at: (index: number) => bodiesGetter.current()![index].api,
   forEach(callback) {
-    return bodiesGetter
-      .current()!
-      .map((b) => b.api)
-      .forEach(callback);
+    return bodiesGetter.current()!.map(b => b.api).forEach(callback)
   },
-  get count() {
-    return bodiesGetter.current()!.length;
+  get count () {
+    return bodiesGetter.current()!.length
   }
 });
 
@@ -269,7 +267,7 @@ export const createColliderApi = (ref: RefGetter<Collider>) => {
     raw: () => ref.current(),
     get handle() {
       return ref.current()!.handle;
-    }
+    },
   };
 };
 
@@ -314,7 +312,8 @@ export const createWorldApi = (ref: RefGetter<World>): WorldApi => {
       ref.current()!.removeImpulseJoint(joint, true),
     forEachCollider: (callback: (collider: Collider) => void) =>
       ref.current()!.forEachCollider(callback),
-    setGravity: ({ x, y, z }: Vector3) => (ref.current()!.gravity = { x, y, z })
+    setGravity: ({ x, y, z }: Vector3) =>
+      (ref.current()!.gravity = { x, y, z }),
   };
 };
 
@@ -339,6 +338,6 @@ export const createJointApi = (ref: RefGetter<ImpulseJoint>) => {
       (ref.current()! as PrismaticImpulseJoint).configureMotorVelocity(
         targetVel,
         damping
-      )
+      ),
   };
 };
