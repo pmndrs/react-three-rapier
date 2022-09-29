@@ -15,8 +15,6 @@ export const Cluster: Demo = () => {
 
   const { isPaused } = useRapier();
 
-  console.log(isPaused);
-
   useFrame(() => {
     if (!isPaused) {
       api.current!.forEach(body => {
@@ -37,7 +35,7 @@ export const Cluster: Demo = () => {
           0
         ])}
         colliders={"ball"}
-        linearDamping={1}
+        linearDamping={5}
       >
         <instancedMesh args={[undefined, undefined, BALLS]} castShadow>
           <sphereBufferGeometry args={[0.2]} />
