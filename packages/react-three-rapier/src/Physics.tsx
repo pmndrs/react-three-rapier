@@ -187,6 +187,10 @@ export const Physics: FC<RapierWorldProps> = ({
     accumulator: 0
   })
 
+  /* Check if the timestep is supposed to be variable. We'll do this here
+  once so we don't have to string-check every frame. */
+  const timeStepVariable = timeStep === "vary"
+
   useFrame((_, dt) => {
     const world = worldRef.current;
     if (!world) return;
@@ -199,7 +203,7 @@ export const Physics: FC<RapierWorldProps> = ({
 
     const clampedDelta = clamp(dt, 0, 0.2)
 
-    if (timeStep === "vary") {
+    if (timeStepVariable) {
       world.timestep = clampedDelta
       if (!paused) world.step(eventQueue)
     } else {
@@ -217,7 +221,7 @@ export const Physics: FC<RapierWorldProps> = ({
       }
     }
 
-    const interpolationAlpha = timeStep === "vary" ? 1 : (steppingState.accumulator % timeStep) / timeStep
+    const interpolationAlpha = timeStepVariable ? 1 : (steppingState.accumulator % timeStep) / timeStep
 
     // Update meshes
     rigidBodyStates.forEach((state, handle) => {
