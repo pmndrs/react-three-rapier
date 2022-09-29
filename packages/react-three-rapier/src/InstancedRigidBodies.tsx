@@ -38,7 +38,9 @@ import { vector3ToQuaternion, vectorArrayToVector3 } from "./utils";
 import {
   createRigidBodyState,
   rigidBodyDescFromOptions,
-  setRigidBodyOptions
+  setRigidBodyOptions,
+  useRigidBodyEvents,
+  useUpdateRigidBodyOptions
 } from "./utils-rigidbody";
 
 export interface InstancedRigidBodiesProps
@@ -52,13 +54,18 @@ export const InstancedRigidBodies = forwardRef<
   InstancedRigidBodyApi,
   InstancedRigidBodiesProps
 >((props: InstancedRigidBodiesProps, ref) => {
-  const { world, rigidBodyStates, physicsOptions } = useRapier();
+  const {
+    world,
+    rigidBodyStates,
+    physicsOptions,
+    rigidBodyEvents
+  } = useRapier();
   const object = useRef<Object3D>(null);
   const { positions, rotations, children, ...options } = props;
 
   const instancesRef = useRef<
     { rigidBody: RapierRigidBody; api: RigidBodyApi }[]
-  >();
+  >([]);
   const instancesRefGetter = useRef(() => {
     if (!instancesRef.current) {
       instancesRef.current = [];
@@ -115,9 +122,8 @@ export const InstancedRigidBodies = forwardRef<
           _object3d.position.set(x, y, z);
           _object3d.rotation.set(rx, ry, rz);
           _object3d.applyMatrix4(invertedWorld);
+          mesh.setMatrixAt(index, _object3d.matrix);
 
-          // Set initial transforms based on world transforms
-          // will be replaced by the setRigidBodyOption below
           rigidBody.setTranslation(_object3d.position, false);
           rigidBody.setRotation(_object3d.quaternion, false);
 
@@ -136,7 +142,7 @@ export const InstancedRigidBodies = forwardRef<
         world.removeRigidBody(rb.rigidBody);
         rigidBodyStates.delete(rb.rigidBody.handle);
       });
-      instancesRef.current = undefined;
+      instancesRef.current = [];
     };
   }, []);
 
@@ -149,6 +155,18 @@ export const InstancedRigidBodies = forwardRef<
   );
 
   useImperativeHandle(ref, () => api);
+  useUpdateRigidBodyOptions(
+    { current: instancesRef.current.map(({ rigidBody }) => rigidBody) },
+    mergedOptions,
+    rigidBodyStates,
+    false
+  );
+  useRigidBodyEvents(
+    { current: instancesRef.current.map(({ rigidBody }) => rigidBody) },
+    mergedOptions,
+    rigidBodyEvents,
+    false
+  );
 
   return (
     <RigidBodyContext.Provider

@@ -3,7 +3,7 @@ import {
   CuboidCollider,
   InstancedRigidBodies,
   InstancedRigidBodyApi,
-  useRapier,
+  useRapier
 } from "@react-three/rapier";
 import { createRef, useEffect, useRef } from "react";
 import { Demo } from "../App";
@@ -19,7 +19,7 @@ export const Cluster: Demo = () => {
 
   useFrame(() => {
     if (!isPaused) {
-      api.current!.forEach((body) => {
+      api.current!.forEach(body => {
         const p = body.translation();
         p.normalize().multiplyScalar(-0.01);
         body.applyImpulse(p);
@@ -34,9 +34,10 @@ export const Cluster: Demo = () => {
         positions={Array.from({ length: BALLS }, (_, i) => [
           Math.floor(i / 30) * 1,
           (i % 30) * 0.5,
-          0,
+          0
         ])}
         colliders={"ball"}
+        linearDamping={1}
       >
         <instancedMesh args={[undefined, undefined, BALLS]} castShadow>
           <sphereBufferGeometry args={[0.2]} />
