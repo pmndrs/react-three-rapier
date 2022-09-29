@@ -166,12 +166,12 @@ export interface UseColliderOptions<ColliderArgs extends Array<unknown>> {
   /**
    * The position of this collider relative to the rigid body
    */
-  position?: Vector3Array;
+  position?: Object3DProps['position'];
 
   /**
    * The rotation of this collider relative to the rigid body
    */
-  rotation?: Vector3Array;
+  rotation?: Object3DProps['rotation'];
 
   /**
    * The rotation, as a Quaternion, of this collider relative to the rigid body
