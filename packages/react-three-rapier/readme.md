@@ -309,6 +309,22 @@ A Collider can be set to be a sensor, which means that it will not generate any 
 
 WIP
 
+## Configuring Time Step Size
+
+By default, `<Physics>` will simulate the physics world at a fixed rate of 60 frames per second. This can be changed by setting the `timeStep` prop on `<Physics>`:
+
+```tsx
+<Physics timeStep={1 / 30}>{/* ... */}</Physics>
+```
+
+The `timeStep` prop may also be set to `"vary"`, which will cause the simulation's time step to adjust to every frame's frame delta:
+
+```tsx
+<Physics timeStep="vary">{/* ... */}</Physics>
+```
+
+> **Note** This is useful for games that run at variable frame rates, but may cause instability in the simulation. It also prevents the physics simulation from being fully deterministic. Please use with care!
+
 ---
 
 ## Roadmap
