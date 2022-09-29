@@ -66,6 +66,7 @@ export const InstancedRigidBodies = forwardRef<
   const instancesRef = useRef<
     { rigidBody: RapierRigidBody; api: RigidBodyApi }[]
   >([]);
+  const rigidBodyRefs = useRef<RapierRigidBody[]>([]);
   const instancesRefGetter = useRef(() => {
     if (!instancesRef.current) {
       instancesRef.current = [];
@@ -85,7 +86,7 @@ export const InstancedRigidBodies = forwardRef<
 
   useLayoutEffect(() => {
     object.current!.updateWorldMatrix(true, false);
-    const rigidBodies = instancesRefGetter.current();
+    const instances = instancesRefGetter.current();
     const invertedWorld = object.current!.matrixWorld.clone().invert();
 
     object.current!.traverseVisible(mesh => {
@@ -96,6 +97,8 @@ export const InstancedRigidBodies = forwardRef<
         for (let index = 0; index < mesh.count; index++) {
           const desc = rigidBodyDescFromOptions(props);
           const rigidBody = world.createRigidBody(desc);
+
+          rigidBodyRefs.current.push(rigidBody);
 
           const scale = options.scales?.[index] || [1, 1, 1];
           const instanceScale = worldScale
@@ -132,16 +135,17 @@ export const InstancedRigidBodies = forwardRef<
               return rigidBody;
             }
           });
-          rigidBodies.push({ rigidBody, api });
+          instances.push({ rigidBody, api });
         }
       }
     });
 
     return () => {
-      rigidBodies.forEach(rb => {
+      instances.forEach(rb => {
         world.removeRigidBody(rb.rigidBody);
         rigidBodyStates.delete(rb.rigidBody.handle);
       });
+      rigidBodyRefs.current = [];
       instancesRef.current = [];
     };
   }, []);
@@ -156,17 +160,12 @@ export const InstancedRigidBodies = forwardRef<
 
   useImperativeHandle(ref, () => api);
   useUpdateRigidBodyOptions(
-    { current: instancesRef.current.map(({ rigidBody }) => rigidBody) },
+    rigidBodyRefs,
     mergedOptions,
     rigidBodyStates,
     false
   );
-  useRigidBodyEvents(
-    { current: instancesRef.current.map(({ rigidBody }) => rigidBody) },
-    mergedOptions,
-    rigidBodyEvents,
-    false
-  );
+  useRigidBodyEvents(rigidBodyRefs, mergedOptions, rigidBodyEvents);
 
   return (
     <RigidBodyContext.Provider
