@@ -167,14 +167,16 @@ export const InstancedRigidBodies = forwardRef<
   );
   useRigidBodyEvents(rigidBodyRefs, mergedOptions, rigidBodyEvents);
 
+  const contextValue = useMemo(() => {
+    return {
+      ref: object,
+      api,
+      options: mergedOptions
+    };
+  }, [api, mergedOptions]);
+
   return (
-    <RigidBodyContext.Provider
-      value={{
-        ref: object,
-        api,
-        options: props
-      }}
-    >
+    <RigidBodyContext.Provider value={contextValue}>
       <object3D ref={object}>
         {props.children}
 

@@ -13,6 +13,7 @@ import {
   memo,
   ReactNode,
   SetStateAction,
+  useCallback,
   useContext,
   useState
 } from "react";
@@ -75,26 +76,29 @@ const Collisioner = memo(
 
     const { children, ...rest } = props;
 
-    const handleCollisionEnter: CollisionEnterHandler = ({ manifold }) => {
-      setColor("red");
+    const handleCollisionEnter: CollisionEnterHandler = useCallback(
+      ({ manifold }) => {
+        setColor("red");
 
-      const contact = manifold?.solverContactPoint(0) as {
-        x: number;
-        y: number;
-        z: number;
-      };
+        const contact = manifold?.solverContactPoint(0) as {
+          x: number;
+          y: number;
+          z: number;
+        };
 
-      if (contact) {
-        setExplosions((curr: ReactNode[]) => [
-          ...curr,
-          <Explosion position={[contact.x, contact.y, contact.z]} />
-        ]);
-      }
-    };
+        if (contact) {
+          setExplosions((curr: ReactNode[]) => [
+            ...curr,
+            <Explosion position={[contact.x, contact.y, contact.z]} />
+          ]);
+        }
+      },
+      []
+    );
 
-    const handleCollsionExit = () => {
+    const handleCollsionExit = useCallback(() => {
       setColor("blue");
-    };
+    }, []);
 
     return (
       <RigidBody
