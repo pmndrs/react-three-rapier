@@ -111,11 +111,13 @@ interface RapierWorldProps {
   /**
    * Set the timestep for the simulation.
    * Setting this to a number (eg. 1/60) will run the
-   * simulation at that framerate.
+   * simulation at that framerate. Alternatively, you can set this to
+   * "vary", which will cause the simulation to always synchronize with
+   * the current frame delta times.
    *
    * @defaultValue 1/60
    */
-  timeStep?: number;
+  timeStep?: number | "vary";
 
   /**
    * Pause the physics simulation
@@ -185,29 +187,41 @@ export const Physics: FC<RapierWorldProps> = ({
     accumulator: 0
   })
 
+  /* Check if the timestep is supposed to be variable. We'll do this here
+  once so we don't have to string-check every frame. */
+  const timeStepVariable = timeStep === "vary"
+
   useFrame((_, dt) => {
     const world = worldRef.current;
     if (!world) return;
 
-    world.timestep = timeStep;
 
     /**
      * Fixed timeStep simulation progression
      * @see https://gafferongames.com/post/fix_your_timestep/
     */
 
-    // don't step time forwards if paused
-    // Increase accumulator
-    steppingState.accumulator += paused ? 0 : clamp(dt, 0, 0.2)
+    const clampedDelta = clamp(dt, 0, 0.2)
 
-    if (!paused) {
-      while (steppingState.accumulator >= timeStep) {
-        world.step(eventQueue)
-        steppingState.accumulator -= timeStep
+    if (timeStepVariable) {
+      world.timestep = clampedDelta
+      if (!paused) world.step(eventQueue)
+    } else {
+      world.timestep = timeStep
+
+      // don't step time forwards if paused
+      // Increase accumulator
+      steppingState.accumulator += paused ? 0 : clampedDelta
+
+      if (!paused) {
+        while (steppingState.accumulator >= timeStep) {
+          world.step(eventQueue)
+          steppingState.accumulator -= timeStep
+        }
       }
     }
 
-    const interpolationAlpha = (steppingState.accumulator % timeStep) / timeStep
+    const interpolationAlpha = timeStepVariable ? 1 : (steppingState.accumulator % timeStep) / timeStep
 
     // Update meshes
     rigidBodyStates.forEach((state, handle) => {
@@ -231,7 +245,7 @@ export const Physics: FC<RapierWorldProps> = ({
       ) {
         return;
       }
- 
+
       let t = rigidBody.translation() as Vector3
       let r = rigidBody.rotation() as Quaternion
 
@@ -365,7 +379,7 @@ export const Physics: FC<RapierWorldProps> = ({
         collider2Events?.onIntersectionExit?.({ rigidBody: rigidBody1, collider: collider1 });
       }
     });
-  }, updatePriority); 
+  }, updatePriority);
 
   const api = useMemo(() => createWorldApi(getWorldRef), []);
 
