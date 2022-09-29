@@ -1,5 +1,13 @@
 # @react-three/rapier
 
+## 0.7.2
+
+### Patch Changes
+
+- 7c14e3c: Reduce rerendering of RigidBodies
+- d93b21b: Less rerenders in InstancedRigidBodies
+- f92d017: **New:** The `timeStep` prop can now be set to `"vary"` to adjust the time step to every frame's delta time.
+
 ## 0.7.1
 
 ### Patch Changes
