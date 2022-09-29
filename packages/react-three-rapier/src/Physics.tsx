@@ -197,15 +197,17 @@ export const Physics: FC<RapierWorldProps> = ({
      * @see https://gafferongames.com/post/fix_your_timestep/
     */
 
+    const clampedDelta = clamp(dt, 0, 0.2)
+
     if (timeStep === "vary") {
-      world.timestep = dt
+      world.timestep = clampedDelta
       if (!paused) world.step(eventQueue)
     } else {
       world.timestep = timeStep
 
       // don't step time forwards if paused
       // Increase accumulator
-      steppingState.accumulator += paused ? 0 : clamp(dt, 0, 0.2)
+      steppingState.accumulator += paused ? 0 : clampedDelta
 
       if (!paused) {
         while (steppingState.accumulator >= timeStep) {
