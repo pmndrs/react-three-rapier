@@ -40,14 +40,17 @@ export const RigidBody = forwardRef<RigidBodyApi, RigidBodyProps>(
 
     useImperativeHandle(ref, () => api);
 
+    const contextValue = useMemo(
+      () => ({
+        ref: object,
+        api,
+        options: props
+      }),
+      [object, api, props]
+    );
+
     return (
-      <RigidBodyContext.Provider
-        value={{
-          ref: object,
-          api,
-          options: props
-        }}
-      >
+      <RigidBodyContext.Provider value={contextValue}>
         <object3D
           ref={object}
           {...objectProps}
