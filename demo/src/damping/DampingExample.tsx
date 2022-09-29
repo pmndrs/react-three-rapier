@@ -31,7 +31,7 @@ export const Damping: Demo = () => {
           </Box>
         </RigidBody>
 
-        {balls.map(i => (
+        {balls.map((i) => (
           <RigidBody
             key={i}
             colliders="ball"

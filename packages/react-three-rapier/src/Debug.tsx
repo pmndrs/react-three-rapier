@@ -5,7 +5,7 @@ import React, {
   RefObject,
   useMemo,
   useRef,
-  useState,
+  useState
 } from "react";
 import { useFrame } from "@react-three/fiber";
 import { useRapier } from "./hooks";
@@ -20,7 +20,7 @@ import {
   Heightfield,
   RoundCuboid,
   ShapeType,
-  TriMesh,
+  TriMesh
 } from "@dimforge/rapier3d-compat";
 import {
   BoxBufferGeometry,
@@ -34,7 +34,7 @@ import {
   MeshBasicMaterial,
   PlaneGeometry,
   Quaternion,
-  SphereBufferGeometry,
+  SphereBufferGeometry
 } from "three";
 import { RoundedBoxGeometry } from "three-stdlib";
 
@@ -168,7 +168,7 @@ const DebugShape = memo<DebugShapeProps>(
     const [material] = useState(
       new MeshBasicMaterial({
         color,
-        wireframe: true,
+        wireframe: true
       })
     );
 
@@ -221,7 +221,7 @@ interface DebugProps {
 }
 export const Debug: FC<DebugProps> = ({
   color = "red",
-  sleepColor = "blue",
+  sleepColor = "blue"
 }) => {
   const { world } = useRapier();
   const [colliders, setColliders] = useState<number[]>([]);

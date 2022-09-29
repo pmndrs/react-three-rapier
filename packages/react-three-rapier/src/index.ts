@@ -1,7 +1,7 @@
 export * from "./types";
 export type { RigidBodyApi, WorldApi, InstancedRigidBodyApi } from "./api";
-export type { RigidBodyProps } from './RigidBody'
-export type { InstancedRigidBodiesProps } from './InstancedRigidBodies'
+export type { RigidBodyProps } from "./RigidBody";
+export type { InstancedRigidBodiesProps } from "./InstancedRigidBodies";
 export type {
   CylinderColliderProps,
   BallColliderProps,
@@ -12,7 +12,7 @@ export type {
   HeightfieldColliderProps,
   RoundCuboidColliderProps,
   TrimeshColliderProps
-} from './AnyCollider'
+} from "./AnyCollider";
 
 export { Physics } from "./Physics";
 export { RigidBody } from "./RigidBody";

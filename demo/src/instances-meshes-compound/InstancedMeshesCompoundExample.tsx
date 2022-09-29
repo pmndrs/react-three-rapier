@@ -29,7 +29,7 @@ export const InstancedMeshesCompound: Demo = () => {
 
   useEffect(() => {
     if (api.current) {
-      api.current.forEach(body => {
+      api.current.forEach((body) => {
         body.applyImpulse({
           x: -Math.random() * 5,
           y: Math.random() * 5,

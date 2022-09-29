@@ -32,9 +32,12 @@ import { InteractionGroups } from "@dimforge/rapier3d-compat";
  * @param filters Groups the interaction group should filter against. (Values can range from 0 to 15.)
  * @returns An InteractionGroup bitmask.
  */
-export const interactionGroups =
-  (memberships: number | number[], filters?: number | number[]): InteractionGroups =>
-    (bitmask(memberships) << 16) + (filters !== undefined ? bitmask(filters) : 0b1111_1111_1111_1111)
+export const interactionGroups = (
+  memberships: number | number[],
+  filters?: number | number[]
+): InteractionGroups =>
+  (bitmask(memberships) << 16) +
+  (filters !== undefined ? bitmask(filters) : 0b1111_1111_1111_1111);
 
 const bitmask = (groups: number | number[]): InteractionGroups =>
   [groups].flat().reduce((acc, layer) => acc | (1 << layer), 0);

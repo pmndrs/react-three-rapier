@@ -120,7 +120,7 @@ export const setRigidBodyOptions = (
       rigidBody.setRotation(_rotation, false);
     }
 
-    mutableRigidBodyOptionKeys.forEach(key => {
+    mutableRigidBodyOptionKeys.forEach((key) => {
       if (key in options) {
         mutableRigidBodyOptions[key as keyof RigidBodyProps]!(
           rigidBody,
@@ -139,7 +139,7 @@ export const useUpdateRigidBodyOptions = (
 ) => {
   useEffect(() => {
     if ("length" in rigidBodyRef.current!) {
-      (rigidBodyRef.current as RigidBody[]).forEach(rigidBody => {
+      (rigidBodyRef.current as RigidBody[]).forEach((rigidBody) => {
         setRigidBodyOptions(rigidBody, props, states, updateTranslations);
       });
     } else {
@@ -178,7 +178,7 @@ export const useRigidBodyEvents = (
 
   useEffect(() => {
     if ("length" in rigidBodyRef.current!) {
-      (rigidBodyRef.current as RigidBody[]).forEach(rigidBody => {
+      (rigidBodyRef.current as RigidBody[]).forEach((rigidBody) => {
         events.set(rigidBody.handle, eventHandlers);
       });
     } else {
@@ -187,7 +187,7 @@ export const useRigidBodyEvents = (
 
     return () => {
       if ("length" in rigidBodyRef.current!) {
-        (rigidBodyRef.current as RigidBody[]).forEach(rigidBody => {
+        (rigidBodyRef.current as RigidBody[]).forEach((rigidBody) => {
           events.delete(rigidBody.handle);
         });
       } else {

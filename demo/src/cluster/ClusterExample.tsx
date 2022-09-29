@@ -17,7 +17,7 @@ export const Cluster: Demo = () => {
 
   useFrame(() => {
     if (!isPaused) {
-      api.current!.forEach(body => {
+      api.current!.forEach((body) => {
         const p = body.translation();
         p.normalize().multiplyScalar(-0.01);
         body.applyImpulse(p);

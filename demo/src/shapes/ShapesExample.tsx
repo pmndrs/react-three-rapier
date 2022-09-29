@@ -116,9 +116,9 @@ const RigidBall = memo(() => {
 useGLTF.preload(new URL("objects.glb", import.meta.url).toString());
 
 const HullPear = memo(() => {
-  const { nodes } = (useGLTF(
+  const { nodes } = useGLTF(
     new URL("objects.glb", import.meta.url).toString()
-  ) as unknown) as {
+  ) as unknown as {
     nodes: {
       pear: Mesh;
     };
@@ -138,9 +138,9 @@ const HullPear = memo(() => {
 });
 
 const MeshBoat = memo(() => {
-  const { nodes } = (useGLTF(
+  const { nodes } = useGLTF(
     new URL("objects.glb", import.meta.url).toString()
-  ) as unknown) as {
+  ) as unknown as {
     nodes: {
       boat: Mesh;
     };
@@ -179,7 +179,7 @@ const Scene: FC = () => {
   const { setUI } = useDemo();
 
   const addItem = (str: string) => {
-    setItems(curr => [...curr, str]);
+    setItems((curr) => [...curr, str]);
   };
 
   useEffect(() => {

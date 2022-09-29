@@ -119,7 +119,7 @@ export const App = () => {
   const [physicsKey, setPhysicsKey] = useState<number>(0);
 
   const updatePhysicsKey = () => {
-    setPhysicsKey(current => current + 1);
+    setPhysicsKey((current) => current + 1);
   };
 
   const ContextBridge = useContextBridge(
@@ -187,7 +187,7 @@ export const App = () => {
           maxWidth: 600
         }}
       >
-        {Object.keys(routes).map(key => (
+        {Object.keys(routes).map((key) => (
           <Link key={key} to={key}>
             {key.replace(/-/g, " ") || "Shapes"}
           </Link>
@@ -196,17 +196,17 @@ export const App = () => {
         <ToggleButton
           label="Debug"
           value={debug}
-          onClick={() => setDebug(v => !v)}
+          onClick={() => setDebug((v) => !v)}
         />
         <ToggleButton
           label="Perf"
           value={perf}
-          onClick={() => setPerf(v => !v)}
+          onClick={() => setPerf((v) => !v)}
         />
         <ToggleButton
           label="Paused"
           value={paused}
-          onClick={() => setPaused(v => !v)}
+          onClick={() => setPaused((v) => !v)}
         />
         <ToggleButton label="Reset" value={false} onClick={updatePhysicsKey} />
       </div>

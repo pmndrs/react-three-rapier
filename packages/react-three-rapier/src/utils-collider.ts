@@ -136,7 +136,7 @@ export const setColliderOptions = (
     });
     collider.setRotationWrtParent(_rotation);
 
-    mutableColliderOptionKeys.forEach(key => {
+    mutableColliderOptionKeys.forEach((key) => {
       if (key in options) {
         mutableColliderOptions[key as keyof ColliderProps]!(
           collider,
@@ -153,7 +153,7 @@ export const useUpdateColliderOptions = (
   states: ColliderStateMap
 ) => {
   useEffect(() => {
-    collidersRef.current.forEach(collider => {
+    collidersRef.current.forEach((collider) => {
       setColliderOptions(collider, props, states);
     });
   }, [props]);
@@ -161,7 +161,7 @@ export const useUpdateColliderOptions = (
 
 const isChildOfMeshCollider = (child: Mesh) => {
   let flag = false;
-  child.traverseAncestors(a => {
+  child.traverseAncestors((a) => {
     if (a.userData.r3RapierType === "MeshCollider") flag = true;
   });
   return flag;
@@ -194,56 +194,53 @@ interface CreateColliderPropsFromChildren {
   }): ColliderProps[];
 }
 
-export const createColliderPropsFromChildren: CreateColliderPropsFromChildren = ({
-  object,
-  ignoreMeshColliders = true,
-  options
-}): ColliderProps[] => {
-  const colliderProps: ColliderProps[] = [];
+export const createColliderPropsFromChildren: CreateColliderPropsFromChildren =
+  ({ object, ignoreMeshColliders = true, options }): ColliderProps[] => {
+    const colliderProps: ColliderProps[] = [];
 
-  object.updateWorldMatrix(true, false);
-  const invertedParentMatrixWorld = object.matrixWorld.clone().invert();
+    object.updateWorldMatrix(true, false);
+    const invertedParentMatrixWorld = object.matrixWorld.clone().invert();
 
-  object.traverseVisible(child => {
-    if ("isMesh" in child) {
-      if (ignoreMeshColliders && isChildOfMeshCollider(child as Mesh)) return;
+    object.traverseVisible((child) => {
+      if ("isMesh" in child) {
+        if (ignoreMeshColliders && isChildOfMeshCollider(child as Mesh)) return;
 
-      const worldScale = child.getWorldScale(_scale);
-      const shape = autoColliderMap[
-        options.colliders || "cuboid"
-      ] as ColliderShape;
+        const worldScale = child.getWorldScale(_scale);
+        const shape = autoColliderMap[
+          options.colliders || "cuboid"
+        ] as ColliderShape;
 
-      child.updateWorldMatrix(true, false);
-      _matrix4
-        .copy(child.matrixWorld)
-        .premultiply(invertedParentMatrixWorld)
-        .decompose(_position, _rotation, _scale);
+        child.updateWorldMatrix(true, false);
+        _matrix4
+          .copy(child.matrixWorld)
+          .premultiply(invertedParentMatrixWorld)
+          .decompose(_position, _rotation, _scale);
 
-      const rotationEuler = new Euler().setFromQuaternion(_rotation, "XYZ");
+        const rotationEuler = new Euler().setFromQuaternion(_rotation, "XYZ");
 
-      const { geometry } = child as Mesh;
-      const { args, offset } = getColliderArgsFromGeometry(
-        geometry,
-        options.colliders || "cuboid"
-      );
+        const { geometry } = child as Mesh;
+        const { args, offset } = getColliderArgsFromGeometry(
+          geometry,
+          options.colliders || "cuboid"
+        );
 
-      colliderProps.push({
-        ...options,
-        args: args,
-        shape: shape,
-        rotation: [rotationEuler.x, rotationEuler.y, rotationEuler.z],
-        position: [
-          _position.x + offset.x * worldScale.x,
-          _position.y + offset.y * worldScale.y,
-          _position.z + offset.z * worldScale.z
-        ],
-        scale: [worldScale.x, worldScale.y, worldScale.z]
-      });
-    }
-  });
+        colliderProps.push({
+          ...options,
+          args: args,
+          shape: shape,
+          rotation: [rotationEuler.x, rotationEuler.y, rotationEuler.z],
+          position: [
+            _position.x + offset.x * worldScale.x,
+            _position.y + offset.y * worldScale.y,
+            _position.z + offset.z * worldScale.z
+          ],
+          scale: [worldScale.x, worldScale.y, worldScale.z]
+        });
+      }
+    });
 
-  return colliderProps;
-};
+    return colliderProps;
+  };
 
 export const getColliderArgsFromGeometry = (
   geometry: BufferGeometry,
@@ -322,7 +319,7 @@ export const useColliderEvents = (
   } = props;
 
   useEffect(() => {
-    collidersRef.current?.forEach(collider => {
+    collidersRef.current?.forEach((collider) => {
       if (
         onCollisionEnter ||
         onCollisionExit ||
@@ -341,7 +338,9 @@ export const useColliderEvents = (
     });
 
     return () => {
-      collidersRef.current?.forEach(collider => events.delete(collider.handle));
+      collidersRef.current?.forEach((collider) =>
+        events.delete(collider.handle)
+      );
     };
   }, [onCollisionEnter, onCollisionExit]);
 };

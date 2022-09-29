@@ -89,7 +89,7 @@ export const AnyCollider = memo((props: ColliderProps) => {
     collidersRef.current = colliders;
 
     return () => {
-      colliders.forEach(collider => {
+      colliders.forEach((collider) => {
         world.removeCollider(collider);
       });
     };
@@ -120,22 +120,18 @@ type UseColliderOptionsRequiredArgs<T extends unknown[]> = Omit<
 };
 
 export type CuboidColliderProps = UseColliderOptionsRequiredArgs<CuboidArgs>;
-export type RoundCuboidColliderProps = UseColliderOptionsRequiredArgs<
-  RoundCuboidArgs
->;
+export type RoundCuboidColliderProps =
+  UseColliderOptionsRequiredArgs<RoundCuboidArgs>;
 export type BallColliderProps = UseColliderOptionsRequiredArgs<BallArgs>;
 export type CapsuleColliderProps = UseColliderOptionsRequiredArgs<CapsuleArgs>;
-export type HeightfieldColliderProps = UseColliderOptionsRequiredArgs<
-  HeightfieldArgs
->;
+export type HeightfieldColliderProps =
+  UseColliderOptionsRequiredArgs<HeightfieldArgs>;
 export type TrimeshColliderProps = UseColliderOptionsRequiredArgs<TrimeshArgs>;
 export type ConeColliderProps = UseColliderOptionsRequiredArgs<ConeArgs>;
-export type CylinderColliderProps = UseColliderOptionsRequiredArgs<
-  CylinderArgs
->;
-export type ConvexHullColliderProps = UseColliderOptionsRequiredArgs<
-  ConvexHullArgs
->;
+export type CylinderColliderProps =
+  UseColliderOptionsRequiredArgs<CylinderArgs>;
+export type ConvexHullColliderProps =
+  UseColliderOptionsRequiredArgs<ConvexHullArgs>;
 
 export const CuboidCollider = (props: CuboidColliderProps) => {
   return <AnyCollider {...props} shape="cuboid" />;
