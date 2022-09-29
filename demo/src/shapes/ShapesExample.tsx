@@ -103,7 +103,7 @@ const RigidBall = memo(() => {
   return (
     <RigidBody
       colliders="ball"
-      position={[-4 + Math.random() * 8, 10, 0]}
+      position={new Vector3(-4 + Math.random() * 8, 10, 0)}
       scale={1}
     >
       <Sphere scale={0.2} castShadow receiveShadow>

@@ -295,12 +295,12 @@ export interface UseRigidBodyOptions extends ColliderProps {
   /**
    * Initial position of the RigidBody
    */
-  position?: Vector3Array;
+  position?: Object3DProps['position'];
 
   /**
    * Initial rotation of the RigidBody
    */
-  rotation?: Vector3Array;
+  rotation?: Object3DProps['rotation'];
 
   /**
    * Automatically generate colliders based on meshes inside this
