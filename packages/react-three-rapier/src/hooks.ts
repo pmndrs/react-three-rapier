@@ -54,7 +54,7 @@ export const useChildColliderProps = <O extends Object3D>(ref:MutableRefObject<O
         ignoreMeshColliders,
       }))
     }
-  }, [options]);
+  }, [options.colliders]);
 
   return colliderProps;
 }
