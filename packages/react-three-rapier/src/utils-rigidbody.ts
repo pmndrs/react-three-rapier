@@ -99,7 +99,8 @@ const mutableRigidBodyOptionKeys = Object.keys(mutableRigidBodyOptions);
 export const setRigidBodyOptions = (
   rigidBody: RigidBody,
   options: RigidBodyProps,
-  states: RigidBodyStateMap
+  states: RigidBodyStateMap,
+  updateTranslations: boolean = true
 ) => {
   if (!rigidBody) {
     return;
@@ -108,14 +109,16 @@ export const setRigidBodyOptions = (
   const state = states.get(rigidBody.handle);
 
   if (state) {
-    state.object.updateWorldMatrix(true, false);
+    if (updateTranslations) {
+      state.object.updateWorldMatrix(true, false);
 
-    _matrix4
-      .copy(state.object.matrixWorld)
-      .decompose(_position, _rotation, _scale);
+      _matrix4
+        .copy(state.object.matrixWorld)
+        .decompose(_position, _rotation, _scale);
 
-    rigidBody.setTranslation(_position, false);
-    rigidBody.setRotation(_rotation, false);
+      rigidBody.setTranslation(_position, false);
+      rigidBody.setRotation(_rotation, false);
+    }
 
     mutableRigidBodyOptionKeys.forEach(key => {
       if (key in options) {
@@ -129,17 +132,29 @@ export const setRigidBodyOptions = (
 };
 
 export const useUpdateRigidBodyOptions = (
-  rigidBodyRef: MutableRefObject<RigidBody | undefined>,
+  rigidBodyRef: MutableRefObject<RigidBody | RigidBody[] | undefined>,
   props: RigidBodyProps,
-  states: RigidBodyStateMap
+  states: RigidBodyStateMap,
+  updateTranslations: boolean = true
 ) => {
   useEffect(() => {
-    setRigidBodyOptions(rigidBodyRef.current!, props, states);
+    if ("length" in rigidBodyRef.current!) {
+      (rigidBodyRef.current as RigidBody[]).forEach(rigidBody => {
+        setRigidBodyOptions(rigidBody, props, states, updateTranslations);
+      });
+    } else {
+      setRigidBodyOptions(
+        rigidBodyRef.current!,
+        props,
+        states,
+        updateTranslations
+      );
+    }
   }, [props]);
 };
 
 export const useRigidBodyEvents = (
-  rigidBodyRef: MutableRefObject<RigidBody | undefined>,
+  rigidBodyRef: MutableRefObject<RigidBody | RigidBody[] | undefined>,
   props: RigidBodyProps,
   events: EventMap
 ) => {
@@ -152,18 +167,32 @@ export const useRigidBodyEvents = (
     onIntersectionExit
   } = props;
 
+  const eventHandlers = {
+    onWake,
+    onSleep,
+    onCollisionEnter,
+    onCollisionExit,
+    onIntersectionEnter,
+    onIntersectionExit
+  };
+
   useEffect(() => {
-    events.set(rigidBodyRef.current!.handle, {
-      onWake,
-      onSleep,
-      onCollisionEnter,
-      onCollisionExit,
-      onIntersectionEnter,
-      onIntersectionExit
-    });
+    if ("length" in rigidBodyRef.current!) {
+      (rigidBodyRef.current as RigidBody[]).forEach(rigidBody => {
+        events.set(rigidBody.handle, eventHandlers);
+      });
+    } else {
+      events.set(rigidBodyRef.current!.handle, eventHandlers);
+    }
 
     return () => {
-      events.delete(rigidBodyRef.current!.handle);
+      if ("length" in rigidBodyRef.current!) {
+        (rigidBodyRef.current as RigidBody[]).forEach(rigidBody => {
+          events.delete(rigidBody.handle);
+        });
+      } else {
+        events.delete(rigidBodyRef.current!.handle);
+      }
     };
   }, [onWake, onSleep, onCollisionEnter, onCollisionExit]);
 };
