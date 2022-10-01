@@ -1,4 +1,5 @@
-import { interactionGroups } from "../src/bitmasks";
+import { interactionGroups } from "../src";
+import { expect, describe, it } from "vitest";
 
 describe("interactionGroups", () => {
   it("returns the correct bitmask for the given memberships and filters", () => {

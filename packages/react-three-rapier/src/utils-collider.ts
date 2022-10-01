@@ -82,8 +82,43 @@ export const immutableColliderOptions: ImmutableColliderOptions = [
 ];
 
 type MutableColliderOptions = {
-  [key in keyof ColliderProps]: (collider: Collider, value: any) => void;
+  [key in keyof ColliderProps]: (
+    collider: Collider,
+    value: Exclude<ColliderProps[key], undefined>,
+    options: ColliderProps
+  ) => void;
 };
+
+const defaultMassRotation = vector3ToQuaternion(new Vector3(0, 0, 0)).clone();
+
+type MassPropertiesType = 'mass' | 'centerOfMass' | 'principalAngularInertia' | 'density';
+const fixMass = (collider: Collider, options: Pick<ColliderProps, MassPropertiesType>) => {
+  if(options.density) {
+    collider.setDensity(options.density);
+    return;
+  }
+
+  collider.setDensity(0);
+  const mass = options?.mass || 1;
+  if(options.centerOfMass || options.principalAngularInertia) {
+    const [cmx, cmy, cmz] = options?.centerOfMass || [0, 0, 0];
+    const [pix, piy, piz] = options?.principalAngularInertia || [
+      mass * 0.2,
+      mass * 0.2,
+      mass * 0.2
+    ];
+
+    // If any of the mass properties are specified, add mass properties
+    collider.setMassProperties(
+      mass,
+      { x: cmx, y: cmy, z: cmz },
+      { x: pix, y: piy, z: piz },
+      defaultMassRotation,
+    );
+  } else {
+    collider.setMass(mass);
+  }
+}
 
 const mutableColliderOptions: MutableColliderOptions = {
   sensor: (collider, value: boolean) => {
@@ -98,18 +133,18 @@ const mutableColliderOptions: MutableColliderOptions = {
   friction: (collider, value: number) => {
     collider.setFriction(value);
   },
+  frictionCombineRule: (collider, value) => {
+    collider.setFrictionCombineRule(value);
+  },
   restitution: (collider, value: number) => {
     collider.setRestitution(value);
   },
-  density: (collider, value: number) => {
-    collider.setDensity(value);
+  restitutionCombineRule: (collider, value) => {
+    collider.setRestitutionCombineRule(value);
   },
-  mass: (collider, value: number) => {
-    collider.setMass(value);
-  }
 };
 
-const mutableColliderOptionKeys = Object.keys(mutableColliderOptions);
+const mutableColliderOptionKeys = Object.keys(mutableColliderOptions) as (keyof ColliderProps)[];
 
 export const setColliderOptions = (
   collider: Collider,
@@ -147,12 +182,19 @@ export const setColliderOptions = (
 
     mutableColliderOptionKeys.forEach((key) => {
       if (key in options) {
-        mutableColliderOptions[key as keyof ColliderProps]!(
+        const option = options[key];
+        mutableColliderOptions[key]!(
           collider,
-          options[key as keyof ColliderProps]
+          // @ts-ignore Option does not want to fit into the function, but it will
+          option,
+          options,
         );
       }
     });
+
+    // handle mass separately, because if some of them have changed,
+    // you need to use all values at the same time.
+    fixMass(collider, options);
   }
 };
 

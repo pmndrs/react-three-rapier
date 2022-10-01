@@ -1,5 +1,5 @@
 import { Collider, ColliderDesc } from "@dimforge/rapier3d-compat";
-import React, { ReactNode, useRef, useEffect, memo, useMemo } from "react";
+import React, { ReactNode, useRef, useEffect, memo, ForwardedRef, useMemo, MutableRefObject } from "react";
 import { Object3D, Vector3, InstancedMesh } from "three";
 import { useRapier } from "./hooks";
 import { useRigidBodyContext, RigidBodyProps } from "./RigidBody";
@@ -30,12 +30,20 @@ export interface ColliderProps extends UseColliderOptions<any> {
 }
 
 // Colliders
-export const AnyCollider = memo((props: ColliderProps) => {
+export const AnyCollider = memo(React.forwardRef((props: ColliderProps, forwardedRef: ForwardedRef<Collider[]>) => {
   const { children, position, rotation, quaternion, scale } = props;
   const { world, colliderEvents, colliderStates } = useRapier();
   const rigidBodyContext = useRigidBodyContext();
   const ref = useRef<Object3D>(null);
-  const collidersRef = useRef<Collider[]>([]);
+  const collidersRef = useMemo(() => {
+    if(forwardedRef !== null) {
+      return forwardedRef as MutableRefObject<Collider[]>;
+    }
+
+    const result = React.createRef() as MutableRefObject<Collider[]>;
+    result.current = [];
+    return result;
+  }, []);
 
   useEffect(() => {
     const object = ref.current!;
@@ -113,7 +121,7 @@ export const AnyCollider = memo((props: ColliderProps) => {
       {children}
     </object3D>
   );
-});
+}));
 
 type UseColliderOptionsRequiredArgs<T extends unknown[]> = Omit<
   UseColliderOptions<T>,
@@ -137,38 +145,38 @@ export type CylinderColliderProps =
 export type ConvexHullColliderProps =
   UseColliderOptionsRequiredArgs<ConvexHullArgs>;
 
-export const CuboidCollider = (props: CuboidColliderProps) => {
-  return <AnyCollider {...props} shape="cuboid" />;
-};
+export const CuboidCollider = React.forwardRef((props: CuboidColliderProps, ref: ForwardedRef<Collider[]>) => {
+  return <AnyCollider {...props} shape="cuboid" ref={ref}/>;
+});
 
-export const RoundCuboidCollider = (props: RoundCuboidColliderProps) => {
-  return <AnyCollider {...props} shape="roundCuboid" />;
-};
+export const RoundCuboidCollider = React.forwardRef((props: RoundCuboidColliderProps, ref: ForwardedRef<Collider[]>) => {
+  return <AnyCollider {...props} shape="roundCuboid" ref={ref}/>;
+});
 
-export const BallCollider = (props: BallColliderProps) => {
-  return <AnyCollider {...props} shape="ball" />;
-};
+export const BallCollider = React.forwardRef((props: BallColliderProps, ref: ForwardedRef<Collider[]>) => {
+  return <AnyCollider {...props} shape="ball" ref={ref}/>;
+});
 
-export const CapsuleCollider = (props: CapsuleColliderProps) => {
-  return <AnyCollider {...props} shape="capsule" />;
-};
+export const CapsuleCollider = React.forwardRef((props: CapsuleColliderProps, ref: ForwardedRef<Collider[]>) => {
+  return <AnyCollider {...props} shape="capsule" ref={ref}/>;
+});
 
-export const HeightfieldCollider = (props: HeightfieldColliderProps) => {
-  return <AnyCollider {...props} shape="heightfield" />;
-};
+export const HeightfieldCollider = React.forwardRef((props: HeightfieldColliderProps, ref: ForwardedRef<Collider[]>) => {
+  return <AnyCollider {...props} shape="heightfield" ref={ref}/>;
+});
 
-export const TrimeshCollider = (props: TrimeshColliderProps) => {
-  return <AnyCollider {...props} shape="trimesh" />;
-};
+export const TrimeshCollider = React.forwardRef((props: TrimeshColliderProps, ref: ForwardedRef<Collider[]>) => {
+  return <AnyCollider {...props} shape="trimesh" ref={ref}/>;
+});
 
-export const ConeCollider = (props: ConeColliderProps) => {
-  return <AnyCollider {...props} shape="cone" />;
-};
+export const ConeCollider = React.forwardRef((props: ConeColliderProps, ref: ForwardedRef<Collider[]>) => {
+  return <AnyCollider {...props} shape="cone" ref={ref}/>;
+});
 
-export const CylinderCollider = (props: CylinderColliderProps) => {
-  return <AnyCollider {...props} shape="cylinder" />;
-};
+export const CylinderCollider = React.forwardRef((props: CylinderColliderProps, ref: ForwardedRef<Collider[]>) => {
+  return <AnyCollider {...props} shape="cylinder" ref={ref}/>;
+});
 
-export const ConvexHullCollider = (props: ConvexHullColliderProps) => {
-  return <AnyCollider {...props} shape="convexHull" />;
-};
+export const ConvexHullCollider = React.forwardRef((props: ConvexHullColliderProps, ref: ForwardedRef<Collider[]>) => {
+  return <AnyCollider {...props} shape="convexHull" ref={ref}/>;
+});
