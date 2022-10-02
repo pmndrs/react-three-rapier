@@ -19,14 +19,13 @@ import {
   RigidBodyHandle,
   World,
 } from "@dimforge/rapier3d-compat";
-import { InstancedMesh, Matrix, Matrix4, Mesh, Object3D, Quaternion, Vector3 } from "three";
+import { InstancedMesh, Matrix, Matrix4, Mesh, Object3D, Quaternion, Vector3, clamp } from "three";
 import {
   rapierQuaternionToQuaternion,
   vectorArrayToVector3,
 } from "./utils";
 import { createWorldApi } from "./api";
 import { _matrix4, _object3d, _position, _quaternion, _rotation, _scale, _vector3 } from "./shared-objects";
-import { clamp } from "three/src/math/MathUtils";
 
 export interface RigidBodyState {
   rigidBody: RigidBody;
