@@ -44,7 +44,7 @@ export const Kinematics: Demo = () => {
       platform.current.setNextKinematicTranslation({
         x: Math.sin(now / 100),
         y: -8 + Math.sin(now / 50) * 0.5,
-        z: 0,
+        z: 0
       });
     }
   });

@@ -6,7 +6,7 @@ import {
   RigidBodyApi,
   RigidBodyApiRef,
   useRevoluteJoint,
-  Vector3Array,
+  Vector3Array
 } from "@react-three/rapier";
 import { createRef, useRef } from "react";
 import { Demo } from "../App";
@@ -16,7 +16,7 @@ const WheelJoint = ({
   wheel,
   bodyAnchor,
   wheelAnchor,
-  rotationAxis,
+  rotationAxis
 }: {
   body: RigidBodyApiRef;
   wheel: RigidBodyApiRef;
@@ -27,7 +27,7 @@ const WheelJoint = ({
   const joint = useRevoluteJoint(body, wheel, [
     bodyAnchor,
     wheelAnchor,
-    rotationAxis,
+    rotationAxis
   ]);
   return null;
 };
@@ -38,7 +38,7 @@ export const Car: Demo = () => {
     [-3, 0, 2],
     [-3, 0, -2],
     [3, 0, 2],
-    [3, 0, -2],
+    [3, 0, -2]
   ];
   const wheelRefs = useRef(wheelPositions.map(() => createRef<RigidBodyApi>()));
 

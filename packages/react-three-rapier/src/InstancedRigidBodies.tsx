@@ -54,12 +54,8 @@ export const InstancedRigidBodies = forwardRef<
   InstancedRigidBodyApi,
   InstancedRigidBodiesProps
 >((props: InstancedRigidBodiesProps, ref) => {
-  const {
-    world,
-    rigidBodyStates,
-    physicsOptions,
-    rigidBodyEvents
-  } = useRapier();
+  const { world, rigidBodyStates, physicsOptions, rigidBodyEvents } =
+    useRapier();
   const object = useRef<Object3D>(null);
   const { positions, rotations, children, ...options } = props;
 
@@ -89,7 +85,7 @@ export const InstancedRigidBodies = forwardRef<
     const instances = instancesRefGetter.current();
     const invertedWorld = object.current!.matrixWorld.clone().invert();
 
-    object.current!.traverseVisible(mesh => {
+    object.current!.traverseVisible((mesh) => {
       if (mesh instanceof InstancedMesh) {
         mesh.instanceMatrix.setUsage(DynamicDrawUsage);
         const worldScale = mesh.getWorldScale(_scale);
@@ -141,7 +137,7 @@ export const InstancedRigidBodies = forwardRef<
     });
 
     return () => {
-      instances.forEach(rb => {
+      instances.forEach((rb) => {
         world.removeRigidBody(rb.rigidBody);
         rigidBodyStates.delete(rb.rigidBody.handle);
       });

@@ -5,43 +5,65 @@ import React, {
   useEffect,
   useMemo,
   useRef,
-  useState,
+  useState
 } from "react";
 import { useAsset } from "use-asset";
 import type Rapier from "@dimforge/rapier3d-compat";
 import { useFrame } from "@react-three/fiber";
-import { CollisionEnterHandler, CollisionExitHandler, IntersectionEnterHandler, IntersectionExitHandler, RigidBodyAutoCollider, Vector3Array, WorldApi } from "./types";
+import {
+  CollisionEnterHandler,
+  CollisionExitHandler,
+  IntersectionEnterHandler,
+  IntersectionExitHandler,
+  RigidBodyAutoCollider,
+  Vector3Array,
+  WorldApi
+} from "./types";
 import {
   Collider,
   ColliderHandle,
   EventQueue,
   RigidBody,
   RigidBodyHandle,
-  World,
+  World
 } from "@dimforge/rapier3d-compat";
-import { InstancedMesh, Matrix, Matrix4, Mesh, Object3D, Quaternion, Vector3, MathUtils  } from "three";
-
 import {
-  rapierQuaternionToQuaternion,
-  vectorArrayToVector3,
-} from "./utils";
+  InstancedMesh,
+  Matrix,
+  Matrix4,
+  Mesh,
+  Object3D,
+  Quaternion,
+  Vector3,
+  MathUtils
+} from "three";
+
+import { rapierQuaternionToQuaternion, vectorArrayToVector3 } from "./utils";
 import { createWorldApi } from "./api";
-import { _matrix4, _object3d, _position, _quaternion, _rotation, _scale, _vector3 } from "./shared-objects";
+import {
+  _matrix4,
+  _object3d,
+  _position,
+  _quaternion,
+  _rotation,
+  _scale,
+  _vector3
+} from "./shared-objects";
 
 export interface RigidBodyState {
   rigidBody: RigidBody;
   object: Object3D;
-  invertedWorldMatrix: Matrix4
+  invertedWorldMatrix: Matrix4;
   setMatrix: (matrix: Matrix4) => void;
   getMatrix: (matrix: Matrix4) => Matrix4;
   /**
    * Required for instanced rigid bodies.
    */
   scale: Vector3;
-  isSleeping: boolean
+  isSleeping: boolean;
 }
 
-export type RigidBodyStateMap = Map<RigidBody['handle'], RigidBodyState>
+export type RigidBodyStateMap = Map<RigidBody["handle"], RigidBodyState>;
 
 export interface ColliderState {
   collider: Collider;
@@ -50,17 +72,17 @@ export interface ColliderState {
    * The parent of which this collider needs to base its
    * world position on
    */
-  worldParent: Object3D
+  worldParent: Object3D;
 }
 
-export type ColliderStateMap = Map<Collider['handle'], ColliderState>
+export type ColliderStateMap = Map<Collider["handle"], ColliderState>;
 
 export interface RapierContext {
   rapier: typeof Rapier;
   world: WorldApi;
 
-  rigidBodyStates: RigidBodyStateMap,
-  colliderStates: ColliderStateMap,
+  rigidBodyStates: RigidBodyStateMap;
+  colliderStates: ColliderStateMap;
 
   rigidBodyEvents: EventMap;
   colliderEvents: EventMap;
@@ -72,8 +94,9 @@ export interface RapierContext {
   isPaused: boolean;
 }
 
-export const RapierContext =
-  createContext<RapierContext | undefined>(undefined);
+export const RapierContext = createContext<RapierContext | undefined>(
+  undefined
+);
 
 const importRapier = async () => {
   let r = await import("@dimforge/rapier3d-compat");
@@ -124,14 +147,14 @@ interface RapierWorldProps {
    *
    * @defaultValue false
    */
-  paused?: boolean
+  paused?: boolean;
 
   /**
    * The update priority at which the physics simulation should run.
    *
    * @defaultValue undefined
    */
-  updatePriority?: number
+  updatePriority?: number;
 }
 
 export const Physics: FC<RapierWorldProps> = ({
@@ -140,14 +163,14 @@ export const Physics: FC<RapierWorldProps> = ({
   children,
   timeStep = 1 / 60,
   paused = false,
-  updatePriority,
+  updatePriority
 }) => {
   const rapier = useAsset(importRapier);
 
-  const [isPaused, setIsPaused] = useState(paused)
+  const [isPaused, setIsPaused] = useState(paused);
   useEffect(() => {
-    setIsPaused(paused)
-  }, [paused])
+    setIsPaused(paused);
+  }, [paused]);
 
   const worldRef = useRef<World>();
   const getWorldRef = useRef(() => {
@@ -185,43 +208,44 @@ export const Physics: FC<RapierWorldProps> = ({
 
   const [steppingState] = useState({
     accumulator: 0
-  })
+  });
 
   /* Check if the timestep is supposed to be variable. We'll do this here
   once so we don't have to string-check every frame. */
-  const timeStepVariable = timeStep === "vary"
+  const timeStepVariable = timeStep === "vary";
 
   useFrame((_, dt) => {
     const world = worldRef.current;
     if (!world) return;
 
-
     /**
      * Fixed timeStep simulation progression
      * @see https://gafferongames.com/post/fix_your_timestep/
-    */
+     */
 
-    const clampedDelta = MathUtils.clamp(dt, 0, 0.2)
+    const clampedDelta = MathUtils.clamp(dt, 0, 0.2);
 
     if (timeStepVariable) {
-      world.timestep = clampedDelta
-      if (!paused) world.step(eventQueue)
+      world.timestep = clampedDelta;
+      if (!paused) world.step(eventQueue);
     } else {
-      world.timestep = timeStep
+      world.timestep = timeStep;
 
       // don't step time forwards if paused
       // Increase accumulator
-      steppingState.accumulator += paused ? 0 : clampedDelta
+      steppingState.accumulator += paused ? 0 : clampedDelta;
 
       if (!paused) {
         while (steppingState.accumulator >= timeStep) {
-          world.step(eventQueue)
-          steppingState.accumulator -= timeStep
+          world.step(eventQueue);
+          steppingState.accumulator -= timeStep;
         }
       }
     }
 
-    const interpolationAlpha = timeStepVariable ? 1 : (steppingState.accumulator % timeStep) / timeStep
+    const interpolationAlpha = timeStepVariable
+      ? 1
+      : (steppingState.accumulator % timeStep) / timeStep;
 
     // Update meshes
     rigidBodyStates.forEach((state, handle) => {
@@ -238,33 +262,26 @@ export const Physics: FC<RapierWorldProps> = ({
         state.isSleeping = rigidBody.isSleeping();
       }
 
-      if (
-        !rigidBody ||
-        rigidBody.isSleeping() ||
-        !state.setMatrix
-      ) {
+      if (!rigidBody || rigidBody.isSleeping() || !state.setMatrix) {
         return;
       }
 
-      let t = rigidBody.translation() as Vector3
-      let r = rigidBody.rotation() as Quaternion
+      let t = rigidBody.translation() as Vector3;
+      let r = rigidBody.rotation() as Quaternion;
 
       // Get new position
-      _matrix4.compose(
-        t,
-        rapierQuaternionToQuaternion(r),
-        state.scale
-      )
+      _matrix4
+        .compose(t, rapierQuaternionToQuaternion(r), state.scale)
         .premultiply(state.invertedWorldMatrix)
-        .decompose(_position, _rotation, _scale)
+        .decompose(_position, _rotation, _scale);
 
       if (state.object instanceof InstancedMesh) {
-        state.setMatrix(_matrix4)
+        state.setMatrix(_matrix4);
         state.object.instanceMatrix.needsUpdate = true;
       } else {
         // Interpolate from last position
-        state.object.position.lerp(_position, interpolationAlpha)
-        state.object.quaternion.slerp(_rotation, interpolationAlpha)
+        state.object.position.lerp(_position, interpolationAlpha);
+        state.object.quaternion.slerp(_rotation, interpolationAlpha);
       }
     });
 
@@ -283,16 +300,28 @@ export const Physics: FC<RapierWorldProps> = ({
       const collider1Events = colliderEvents.get(collider1.handle);
       const collider2Events = colliderEvents.get(collider2.handle);
 
-      const rigidBody1 = rigidBodyHandle1 ? world.getRigidBody(rigidBodyHandle1) : undefined;
-      const rigidBody2 = rigidBodyHandle2 ? world.getRigidBody(rigidBodyHandle2) : undefined;
+      const rigidBody1 = rigidBodyHandle1
+        ? world.getRigidBody(rigidBodyHandle1)
+        : undefined;
+      const rigidBody2 = rigidBodyHandle2
+        ? world.getRigidBody(rigidBodyHandle2)
+        : undefined;
 
-      const rigidBody1Events = rigidBodyHandle1 ? rigidBodyEvents.get(rigidBodyHandle1) : undefined;
-      const rigidBody2Events = rigidBodyHandle2 ? rigidBodyEvents.get(rigidBodyHandle2) : undefined;
+      const rigidBody1Events = rigidBodyHandle1
+        ? rigidBodyEvents.get(rigidBodyHandle1)
+        : undefined;
+      const rigidBody2Events = rigidBodyHandle2
+        ? rigidBodyEvents.get(rigidBodyHandle2)
+        : undefined;
 
       const collider1State = colliderStates.get(collider1.handle);
       const collider2State = colliderStates.get(collider2.handle);
-      const rigidBody1State = rigidBodyHandle1 ? rigidBodyStates.get(rigidBodyHandle1) : undefined;
-      const rigidBody2State = rigidBodyHandle2 ? rigidBodyStates.get(rigidBodyHandle2) : undefined;
+      const rigidBody1State = rigidBodyHandle1
+        ? rigidBodyStates.get(rigidBodyHandle1)
+        : undefined;
+      const rigidBody2State = rigidBodyHandle2
+        ? rigidBodyStates.get(rigidBodyHandle2)
+        : undefined;
 
       if (started) {
         world.contactPair(collider1, collider2, (manifold, flipped) => {
@@ -312,7 +341,7 @@ export const Physics: FC<RapierWorldProps> = ({
             colliderObject: collider1State?.object,
             rigidBodyObject: rigidBody1State?.object,
             manifold,
-            flipped,
+            flipped
           });
 
           /* Collider events */
@@ -323,7 +352,7 @@ export const Physics: FC<RapierWorldProps> = ({
             rigidBodyObject: rigidBody2State?.object,
             manifold,
             flipped
-          })
+          });
 
           collider2Events?.onCollisionEnter?.({
             rigidBody: rigidBody1,
@@ -332,13 +361,25 @@ export const Physics: FC<RapierWorldProps> = ({
             rigidBodyObject: rigidBody1State?.object,
             manifold,
             flipped
-          })
+          });
         });
       } else {
-        rigidBody1Events?.onCollisionExit?.({ rigidBody: rigidBody2, collider: collider2 });
-        rigidBody2Events?.onCollisionExit?.({ rigidBody: rigidBody1, collider: collider1 });
-        collider1Events?.onCollisionExit?.({ rigidBody: rigidBody2, collider: collider2 });
-        collider2Events?.onCollisionExit?.({ rigidBody: rigidBody1, collider: collider1 });
+        rigidBody1Events?.onCollisionExit?.({
+          rigidBody: rigidBody2,
+          collider: collider2
+        });
+        rigidBody2Events?.onCollisionExit?.({
+          rigidBody: rigidBody1,
+          collider: collider1
+        });
+        collider1Events?.onCollisionExit?.({
+          rigidBody: rigidBody2,
+          collider: collider2
+        });
+        collider2Events?.onCollisionExit?.({
+          rigidBody: rigidBody1,
+          collider: collider1
+        });
       }
 
       // Sensor Intersections
@@ -348,35 +389,47 @@ export const Physics: FC<RapierWorldProps> = ({
             rigidBody: rigidBody2,
             collider: collider2,
             colliderObject: collider2State?.object,
-            rigidBodyObject: rigidBody2State?.object,
+            rigidBodyObject: rigidBody2State?.object
           });
 
           rigidBody2Events?.onIntersectionEnter?.({
             rigidBody: rigidBody1,
             collider: collider1,
             colliderObject: collider1State?.object,
-            rigidBodyObject: rigidBody1State?.object,
+            rigidBodyObject: rigidBody1State?.object
           });
 
           collider1Events?.onIntersectionEnter?.({
             rigidBody: rigidBody2,
             collider: collider2,
             colliderObject: collider2State?.object,
-            rigidBodyObject: rigidBody2State?.object,
-          })
+            rigidBodyObject: rigidBody2State?.object
+          });
 
           collider2Events?.onIntersectionEnter?.({
             rigidBody: rigidBody1,
             collider: collider1,
             colliderObject: collider1State?.object,
-            rigidBodyObject: rigidBody1State?.object,
-          })
+            rigidBodyObject: rigidBody1State?.object
+          });
         }
       } else {
-        rigidBody1Events?.onIntersectionExit?.({ rigidBody: rigidBody2, collider: collider2 });
-        rigidBody2Events?.onIntersectionExit?.({ rigidBody: rigidBody1, collider: collider1 });
-        collider1Events?.onIntersectionExit?.({ rigidBody: rigidBody2, collider: collider2 });
-        collider2Events?.onIntersectionExit?.({ rigidBody: rigidBody1, collider: collider1 });
+        rigidBody1Events?.onIntersectionExit?.({
+          rigidBody: rigidBody2,
+          collider: collider2
+        });
+        rigidBody2Events?.onIntersectionExit?.({
+          rigidBody: rigidBody1,
+          collider: collider1
+        });
+        collider1Events?.onIntersectionExit?.({
+          rigidBody: rigidBody2,
+          collider: collider2
+        });
+        collider2Events?.onIntersectionExit?.({
+          rigidBody: rigidBody1,
+          collider: collider1
+        });
       }
     });
   }, updatePriority);
@@ -389,7 +442,7 @@ export const Physics: FC<RapierWorldProps> = ({
       world: api,
       physicsOptions: {
         colliders,
-        gravity,
+        gravity
       },
       rigidBodyStates,
       colliderStates,

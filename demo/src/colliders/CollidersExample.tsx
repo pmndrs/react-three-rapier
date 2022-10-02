@@ -4,7 +4,7 @@ import {
   BallCollider,
   CuboidCollider,
   RigidBody,
-  RigidBodyApi,
+  RigidBodyApi
 } from "@react-three/rapier";
 import { useRef } from "react";
 import { Demo } from "../App";

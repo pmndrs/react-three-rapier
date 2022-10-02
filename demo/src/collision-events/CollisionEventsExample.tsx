@@ -50,9 +50,8 @@ const heightFieldGeometry = new PlaneGeometry(
 );
 
 heightField.forEach((v, index) => {
-  (heightFieldGeometry.attributes.position.array as number[])[
-    index * 3 + 2
-  ] = v;
+  (heightFieldGeometry.attributes.position.array as number[])[index * 3 + 2] =
+    v;
 });
 heightFieldGeometry.scale(1, -1, 1);
 heightFieldGeometry.rotateX(-Math.PI / 2);
@@ -116,14 +115,14 @@ const Collisioners = memo(() => {
   return (
     <group>
       <Collisioner position={[1, 5, 0]} colliders={"cuboid"}>
-        {color => (
+        {(color) => (
           <Box>
             <meshPhysicalMaterial color={color} />
           </Box>
         )}
       </Collisioner>
       <Collisioner position={[-1, 5, 0]} colliders={"cuboid"}>
-        {color => (
+        {(color) => (
           <Box>
             <meshPhysicalMaterial color={color} />
           </Box>
@@ -131,7 +130,7 @@ const Collisioners = memo(() => {
       </Collisioner>
 
       <Collisioner colliders="ball" position={[0, 8, 0]}>
-        {color => (
+        {(color) => (
           <Sphere>
             <meshPhysicalMaterial color={color} />
           </Sphere>
@@ -139,11 +138,11 @@ const Collisioners = memo(() => {
       </Collisioner>
 
       <Collisioner colliders="hull" position={[-4, 2, 0]}>
-        {color => <Suzanne color={color} />}
+        {(color) => <Suzanne color={color} />}
       </Collisioner>
 
       <Collisioner colliders={false} collisionGroups={interactionGroups([1])}>
-        {color => (
+        {(color) => (
           <>
             <mesh>
               <capsuleGeometry args={[1, 2, 16, 16]} />
@@ -164,7 +163,7 @@ const Collisioners = memo(() => {
       </Collisioner>
 
       <Collisioner type={"fixed"} position={[0, -8, 0]} colliders={false}>
-        {color => (
+        {(color) => (
           <>
             <mesh geometry={heightFieldGeometry} receiveShadow>
               <meshPhysicalMaterial side={2} color={color} />

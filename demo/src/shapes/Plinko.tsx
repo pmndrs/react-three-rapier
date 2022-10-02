@@ -30,10 +30,15 @@ export default function Plinko({ ...props }: JSX.IntrinsicElements["group"]) {
     new URL("plinko.glb", import.meta.url).toString()
   ) as unknown as GLTFResult;
 
-
   return (
-    <group ref={group} {...props} dispose={null} rotation={[0, -1, 0]} scale={1}>
-      <RigidBody type="fixed" colliders="trimesh" position={[0,1,0]}>
+    <group
+      ref={group}
+      {...props}
+      dispose={null}
+      rotation={[0, -1, 0]}
+      scale={1}
+    >
+      <RigidBody type="fixed" colliders="trimesh" position={[0, 1, 0]}>
         <group scale={1}>
           <mesh
             geometry={nodes.plinko.geometry}
@@ -41,12 +46,12 @@ export default function Plinko({ ...props }: JSX.IntrinsicElements["group"]) {
             material-color="blue"
             castShadow
             receiveShadow
-            rotation={[0, 0, .4]}
+            rotation={[0, 0, 0.4]}
             position={[0, 7.58, -1.06]}
           />
         </group>
       </RigidBody>
-      <RigidBody type="fixed" colliders={'trimesh'}>
+      <RigidBody type="fixed" colliders={"trimesh"}>
         <mesh
           geometry={nodes.container.geometry}
           material={materials.Material}
@@ -54,7 +59,7 @@ export default function Plinko({ ...props }: JSX.IntrinsicElements["group"]) {
           rotation={[0, 1, 0]}
         />
       </RigidBody>
-      <RigidBody type="fixed" colliders={'hull'}>
+      <RigidBody type="fixed" colliders={"hull"}>
         <mesh
           geometry={nodes.wall.geometry}
           material={materials["Material.001"]}

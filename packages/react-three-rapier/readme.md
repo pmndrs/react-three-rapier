@@ -141,7 +141,7 @@ const Scene = () => {
     instancedApi.at(40).applyImpulse({ x: 0, y: 10, z: 0 });
 
     // Or update all instances as if they were in an array
-    instancedApi.forEach(api => {
+    instancedApi.forEach((api) => {
       api.applyImpulse({ x: 0, y: 10, z: 0 });
     });
   }, []);
@@ -239,10 +239,10 @@ You may also subscribe to collision events on individual Colliders:
 
 ```tsx
 <CuboidCollider
-  onCollisionEnter={payload => {
+  onCollisionEnter={(payload) => {
     /* ... */
   }}
-  onCollisionExit={payload => {
+  onCollisionExit={(payload) => {
     /* ... */
   }}
 />

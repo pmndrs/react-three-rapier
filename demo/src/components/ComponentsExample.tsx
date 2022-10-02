@@ -7,10 +7,10 @@ import { Mesh } from "three";
 import { Demo } from "../App";
 
 const Map = () => {
-  const { nodes } = (useGLTF(
+  const { nodes } = useGLTF(
     // @ts-ignore
     new URL("../map.glb", import.meta.url).toString()
-  ) as unknown) as { nodes: { map: Mesh } };
+  ) as unknown as { nodes: { map: Mesh } };
 
   nodes.map.castShadow = true;
   nodes.map.receiveShadow = true;
@@ -22,7 +22,7 @@ const Map = () => {
         <TrimeshCollider
           args={[
             nodes.map.geometry.attributes.position.array,
-            nodes.map.geometry.index?.array || [],
+            nodes.map.geometry.index?.array || []
           ]}
         />
       </RigidBody>
@@ -31,9 +31,9 @@ const Map = () => {
 };
 
 const Pear = (props: GroupProps) => {
-  const { nodes } = (useGLTF(
+  const { nodes } = useGLTF(
     new URL("../shapes/objects.glb", import.meta.url).toString()
-  ) as unknown) as {
+  ) as unknown as {
     nodes: {
       pear: Mesh;
     };

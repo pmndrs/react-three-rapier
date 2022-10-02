@@ -6,7 +6,7 @@ import {
   RigidBodyApiRef,
   RigidBodyTypeString,
   useSphericalJoint,
-  Vector3Array,
+  Vector3Array
 } from "@react-three/rapier";
 import { useImperativeHandle } from "react";
 import { useFrame } from "@react-three/fiber";
@@ -24,7 +24,7 @@ const RopeSegment = forwardRef(
     {
       position,
       component,
-      type,
+      type
     }: {
       position: Vector3Array;
       component: ReactNode;
@@ -46,7 +46,7 @@ const RopeSegment = forwardRef(
 const RopeJoint = ({ a, b }: { a: RigidBodyApiRef; b: RigidBodyApiRef }) => {
   const joint = useSphericalJoint(a, b, [
     [-0.5, 0, 0],
-    [0.5, 0, 0],
+    [0.5, 0, 0]
   ]);
   return null;
 };
