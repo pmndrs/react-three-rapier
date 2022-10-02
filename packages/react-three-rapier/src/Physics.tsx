@@ -19,14 +19,14 @@ import {
   RigidBodyHandle,
   World,
 } from "@dimforge/rapier3d-compat";
-import { InstancedMesh, Matrix, Matrix4, Mesh, Object3D, Quaternion, Vector3 } from "three";
+import { InstancedMesh, Matrix, Matrix4, Mesh, Object3D, Quaternion, Vector3, MathUtils  } from "three";
+
 import {
   rapierQuaternionToQuaternion,
   vectorArrayToVector3,
 } from "./utils";
 import { createWorldApi } from "./api";
 import { _matrix4, _object3d, _position, _quaternion, _rotation, _scale, _vector3 } from "./shared-objects";
-import { clamp } from "three/src/math/MathUtils";
 
 export interface RigidBodyState {
   rigidBody: RigidBody;
@@ -201,7 +201,7 @@ export const Physics: FC<RapierWorldProps> = ({
      * @see https://gafferongames.com/post/fix_your_timestep/
     */
 
-    const clampedDelta = clamp(dt, 0, 0.2)
+    const clampedDelta = MathUtils.clamp(dt, 0, 0.2)
 
     if (timeStepVariable) {
       world.timestep = clampedDelta
