@@ -1,5 +1,11 @@
 # @react-three/rapier
 
+## 0.7.3
+
+### Patch Changes
+
+- 5a6c822: fix: prefer bare imports to three
+
 ## 0.7.2
 
 ### Patch Changes
