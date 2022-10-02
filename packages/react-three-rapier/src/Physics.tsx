@@ -19,7 +19,8 @@ import {
   RigidBodyHandle,
   World,
 } from "@dimforge/rapier3d-compat";
-import { InstancedMesh, Matrix, Matrix4, Mesh, Object3D, Quaternion, Vector3, clamp } from "three";
+import { InstancedMesh, Matrix, Matrix4, Mesh, Object3D, Quaternion, Vector3, MathUtils  } from "three";
+
 import {
   rapierQuaternionToQuaternion,
   vectorArrayToVector3,
@@ -200,7 +201,7 @@ export const Physics: FC<RapierWorldProps> = ({
      * @see https://gafferongames.com/post/fix_your_timestep/
     */
 
-    const clampedDelta = clamp(dt, 0, 0.2)
+    const clampedDelta = MathUtils.clamp(dt, 0, 0.2)
 
     if (timeStepVariable) {
       world.timestep = clampedDelta
