@@ -1,5 +1,12 @@
 # @react-three/rapier
 
+## 0.7.4
+
+### Patch Changes
+
+- a0d0b71: Fix translation offsets for parent-less colliders
+- a0d0b71: Accurately pass RigidBody options to custom colliders
+
 ## 0.7.3
 
 ### Patch Changes
