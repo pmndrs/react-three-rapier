@@ -316,6 +316,7 @@ export const Physics: FC<RapierWorldProps> = ({
 
       const collider1State = colliderStates.get(collider1.handle);
       const collider2State = colliderStates.get(collider2.handle);
+
       const rigidBody1State = rigidBodyHandle1
         ? rigidBodyStates.get(rigidBodyHandle1)
         : undefined;

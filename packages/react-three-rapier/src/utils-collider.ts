@@ -129,12 +129,21 @@ export const setColliderOptions = (
       .premultiply(state.worldParent.matrixWorld.clone().invert())
       .decompose(_position, _rotation, _scale);
 
-    collider.setTranslationWrtParent({
-      x: _position.x * parentWorldScale.x,
-      y: _position.y * parentWorldScale.y,
-      z: _position.z * parentWorldScale.z
-    });
-    collider.setRotationWrtParent(_rotation);
+    if (collider.parent()) {
+      collider.setTranslationWrtParent({
+        x: _position.x * parentWorldScale.x,
+        y: _position.y * parentWorldScale.y,
+        z: _position.z * parentWorldScale.z
+      });
+      collider.setRotationWrtParent(_rotation);
+    } else {
+      collider.setTranslation({
+        x: _position.x * parentWorldScale.x,
+        y: _position.y * parentWorldScale.y,
+        z: _position.z * parentWorldScale.z
+      });
+      collider.setRotation(_rotation);
+    }
 
     mutableColliderOptionKeys.forEach((key) => {
       if (key in options) {
