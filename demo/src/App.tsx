@@ -5,7 +5,7 @@ import {
   useContextBridge
 } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
-import { CuboidCollider, Debug, Physics, RigidBody } from "@react-three/rapier";
+import { Debug, Physics, RigidBody } from "@react-three/rapier";
 import { Perf } from "r3f-perf";
 import {
   createContext,
