@@ -1,4 +1,4 @@
-import { MutableRefObject } from 'react';
+import { MutableRefObject } from "react";
 
 import {
   CoefficientCombineRule,
@@ -20,7 +20,6 @@ import { Object3D } from "three";
 export { CoefficientCombineRule as CoefficientCombineRule } from "@dimforge/rapier3d-compat";
 export { RapierRigidBody, RapierCollider };
 import { Rotation, Vector } from "@dimforge/rapier3d-compat/math";
-
 
 export type RefGetter<T> = MutableRefObject<() => T | undefined>;
 
@@ -227,10 +226,10 @@ export interface UseColliderOptions<ColliderArgs extends Array<unknown>> {
    * Cannot be used at the same time as the density or mass values.
    */
   massProperties?: {
-    mass: number,
-    centerOfMass: Vector,
-    principalAngularInertia: Vector,
-    angularInertiaLocalFrame: Rotation,
+    mass: number;
+    centerOfMass: Vector;
+    principalAngularInertia: Vector;
+    angularInertiaLocalFrame: Rotation;
   };
 
   /**

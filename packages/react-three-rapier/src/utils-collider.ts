@@ -89,12 +89,16 @@ type MutableColliderOptions = {
   ) => void;
 };
 
-const massPropertiesConflictError = 'Please pick ONLY ONE of the `density`, `mass` and `massProperties` options.';
+const massPropertiesConflictError =
+  "Please pick ONLY ONE of the `density`, `mass` and `massProperties` options.";
 
-type MassPropertiesType = 'mass' | 'massProperties' | 'density';
-const fixMass = (collider: Collider, options: Pick<ColliderProps, MassPropertiesType>) => {
-  if(options.density !== undefined) {
-    if(options.mass !== undefined || options.massProperties !== undefined) {
+type MassPropertiesType = "mass" | "massProperties" | "density";
+const fixMass = (
+  collider: Collider,
+  options: Pick<ColliderProps, MassPropertiesType>
+) => {
+  if (options.density !== undefined) {
+    if (options.mass !== undefined || options.massProperties !== undefined) {
       throw new Error(massPropertiesConflictError);
     }
     collider.setDensity(options.density);
@@ -102,8 +106,8 @@ const fixMass = (collider: Collider, options: Pick<ColliderProps, MassProperties
     return;
   }
 
-  if(options.mass !== undefined) {
-    if(options.massProperties !== undefined) {
+  if (options.mass !== undefined) {
+    if (options.massProperties !== undefined) {
       throw new Error(massPropertiesConflictError);
     }
 
@@ -111,15 +115,15 @@ const fixMass = (collider: Collider, options: Pick<ColliderProps, MassProperties
     return;
   }
 
-  if(options.massProperties !== undefined) {
+  if (options.massProperties !== undefined) {
     collider.setMassProperties(
       options.massProperties.mass,
       options.massProperties.centerOfMass,
       options.massProperties.principalAngularInertia,
-      options.massProperties.angularInertiaLocalFrame,
-    )
+      options.massProperties.angularInertiaLocalFrame
+    );
   }
-}
+};
 
 const mutableColliderOptions: MutableColliderOptions = {
   sensor: (collider, value: boolean) => {
@@ -142,10 +146,12 @@ const mutableColliderOptions: MutableColliderOptions = {
   },
   restitutionCombineRule: (collider, value) => {
     collider.setRestitutionCombineRule(value);
-  },
+  }
 };
 
-const mutableColliderOptionKeys = Object.keys(mutableColliderOptions) as (keyof ColliderProps)[];
+const mutableColliderOptionKeys = Object.keys(
+  mutableColliderOptions
+) as (keyof ColliderProps)[];
 
 export const setColliderOptions = (
   collider: Collider,
@@ -188,7 +194,7 @@ export const setColliderOptions = (
           collider,
           // @ts-ignore Option does not want to fit into the function, but it will
           option,
-          options,
+          options
         );
       }
     });
