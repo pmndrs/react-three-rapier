@@ -1,5 +1,5 @@
 import { Collider, ColliderDesc } from "@dimforge/rapier3d-compat";
-import React, { ReactNode, useRef, useEffect, memo } from "react";
+import React, { ReactNode, useRef, useEffect, memo, useMemo } from "react";
 import { Object3D, Vector3, InstancedMesh } from "three";
 import { useRapier } from "./hooks";
 import { useRigidBodyContext, RigidBodyProps } from "./RigidBody";
@@ -95,8 +95,12 @@ export const AnyCollider = memo((props: ColliderProps) => {
     };
   }, []);
 
-  useUpdateColliderOptions(collidersRef, props, colliderStates);
-  useColliderEvents(collidersRef, props, colliderEvents);
+  const mergedProps = useMemo(() => {
+    return { ...rigidBodyContext?.options, ...props };
+  }, [props, rigidBodyContext?.options]);
+
+  useUpdateColliderOptions(collidersRef, mergedProps, colliderStates);
+  useColliderEvents(collidersRef, mergedProps, colliderEvents);
 
   return (
     <object3D
