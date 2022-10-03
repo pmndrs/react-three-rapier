@@ -89,34 +89,35 @@ type MutableColliderOptions = {
   ) => void;
 };
 
-const defaultMassRotation = vector3ToQuaternion(new Vector3(0, 0, 0)).clone();
+const massPropertiesConflictError = 'Please pick ONLY ONE of the `density`, `mass` and `massProperties` options.';
 
-type MassPropertiesType = 'mass' | 'centerOfMass' | 'principalAngularInertia' | 'density';
+type MassPropertiesType = 'mass' | 'massProperties' | 'density';
 const fixMass = (collider: Collider, options: Pick<ColliderProps, MassPropertiesType>) => {
-  if(options.density) {
+  if(options.density !== undefined) {
+    if(options.mass !== undefined || options.massProperties !== undefined) {
+      throw new Error(massPropertiesConflictError);
+    }
     collider.setDensity(options.density);
+
     return;
   }
 
-  collider.setDensity(0);
-  const mass = options?.mass || 1;
-  if(options.centerOfMass || options.principalAngularInertia) {
-    const [cmx, cmy, cmz] = options?.centerOfMass || [0, 0, 0];
-    const [pix, piy, piz] = options?.principalAngularInertia || [
-      mass * 0.2,
-      mass * 0.2,
-      mass * 0.2
-    ];
+  if(options.mass !== undefined) {
+    if(options.massProperties !== undefined) {
+      throw new Error(massPropertiesConflictError);
+    }
 
-    // If any of the mass properties are specified, add mass properties
+    collider.setMass(options.mass);
+    return;
+  }
+
+  if(options.massProperties !== undefined) {
     collider.setMassProperties(
-      mass,
-      { x: cmx, y: cmy, z: cmz },
-      { x: pix, y: piy, z: piz },
-      defaultMassRotation,
-    );
-  } else {
-    collider.setMass(mass);
+      options.massProperties.mass,
+      options.massProperties.centerOfMass,
+      options.massProperties.principalAngularInertia,
+      options.massProperties.angularInertiaLocalFrame,
+    )
   }
 }
 
@@ -192,8 +193,8 @@ export const setColliderOptions = (
       }
     });
 
-    // handle mass separately, because if some of them have changed,
-    // you need to use all values at the same time.
+    // handle mass separately, because the assignments
+    // are exclusive.
     fixMass(collider, options);
   }
 };
