@@ -1,5 +1,13 @@
 # @react-three/rapier
 
+## 0.7.5
+
+### Patch Changes
+
+- 6ff5dbc: Add `massProperties` together with `mass` and `density`
+- 3226cd1: Adapt to changes in THREE - rename [X]BufferGeometry to [X]Geometry
+- f0b9a89: Allow control of `wakeUp` boolean when calling RigidBody api
+
 ## 0.7.4
 
 ### Patch Changes
