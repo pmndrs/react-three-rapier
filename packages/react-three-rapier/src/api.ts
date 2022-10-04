@@ -33,32 +33,37 @@ export interface RigidBodyApi {
   /**
    * Applies an impulse at the center-of-mass of this rigid-body.
    */
-  applyImpulse(impulseVector: Vector3Object): void;
+  applyImpulse(impulseVector: Vector3Object, wakeUp: boolean): void;
   /**
    * Applies an impulsive torque at the center-of-mass of this rigid-body.
    */
-  applyTorqueImpulse(torqueVector: Vector3Object): void;
+  applyTorqueImpulse(torqueVector: Vector3Object, wakeUp: boolean): void;
   /**
    * Applies an impulse at the given world-space point of this rigid-body.
    */
   applyImpulseAtPoint(
     impulseVector: Vector3Object,
-    impulsePoint: Vector3Object
+    impulsePoint: Vector3Object,
+    wakeUp: boolean
   ): void;
 
   /**
    * Adds a force at the center-of-mass of this rigid-body.
    */
-  addForce(force: Vector3Object): void;
+  addForce(force: Vector3Object, wakeUp: boolean): void;
   /**
    * Adds a force at the given world-space point of this rigid-body.
    */
-  addForceAtPoint(force: Vector3Object, point: Vector3Object): void;
+  addForceAtPoint(
+    force: Vector3Object,
+    point: Vector3Object,
+    wakeUp: boolean
+  ): void;
 
   /**
    * Adds a torque at the center-of-mass of this rigid-body.
    */
-  addTorque(torque: Vector3Object): void;
+  addTorque(torque: Vector3Object, wakeUp: boolean): void;
 
   /**
    * The world-space translation of this rigid-body.
@@ -67,7 +72,7 @@ export interface RigidBodyApi {
   /**
    * Sets the translation of this rigid-body.
    */
-  setTranslation(translation: Vector3Object): void;
+  setTranslation(translation: Vector3Object, wakeUp: boolean): void;
 
   /**
    * The world-space orientation of this rigid-body.
@@ -76,7 +81,7 @@ export interface RigidBodyApi {
   /**
    * Sets the rotation quaternion of this rigid-body.
    */
-  setRotation(rotation: Quaternion): void;
+  setRotation(rotation: Quaternion, wakeUp: boolean): void;
 
   /**
    * The linear velocity of this rigid-body.
@@ -85,7 +90,7 @@ export interface RigidBodyApi {
   /**
    * Sets the linear velocity of this rigid-body.
    */
-  setLinvel(velocity: Vector3Object): void;
+  setLinvel(velocity: Vector3Object, wakeUp: boolean): void;
 
   /**
    * The angular velocity of this rigid-body.
@@ -94,7 +99,7 @@ export interface RigidBodyApi {
   /**
    * Sets the angular velocity of this rigid-body.
    */
-  setAngvel(velocity: Vector3Object): void;
+  setAngvel(velocity: Vector3Object, wakeUp: boolean): void;
 
   /**
    * The linear damping of this rigid-body.
@@ -136,31 +141,41 @@ export interface RigidBodyApi {
   /**
    * Resets to zero the user forces (but not torques) applied to this rigid-body.
    */
-  resetForces(): void;
+  resetForces(wakeUp: boolean): void;
   /**
    * Resets to zero the user torques applied to this rigid-body.
    */
-  resetTorques(): void;
+  resetTorques(wakeUp: boolean): void;
 
   /**
    * Locks or unlocks the ability of this rigid-body to rotate.
    */
-  lockRotations(locked: boolean): void;
+  lockRotations(locked: boolean, wakeUp: boolean): void;
 
   /**
    * Locks or unlocks the ability of this rigid-body to translate.
    */
-  lockTranslations(locked: boolean): void;
+  lockTranslations(locked: boolean, wakeUp: boolean): void;
 
   /**
    * Locks or unlocks the ability of this rigid-body to rotate along individual coordinate axes.
    */
-  setEnabledRotations(x: boolean, y: boolean, z: boolean): void;
+  setEnabledRotations(
+    x: boolean,
+    y: boolean,
+    z: boolean,
+    wakeUp: boolean
+  ): void;
 
   /**
    * Locks or unlocks the ability of this rigid-body to translate along individual coordinate axes.
    */
-  setEnabledTranslations(x: boolean, y: boolean, z: boolean): void;
+  setEnabledTranslations(
+    x: boolean,
+    y: boolean,
+    z: boolean,
+    wakeUp: boolean
+  ): void;
 }
 
 export const createRigidBodyApi = (ref: RefGetter<RigidBody>): RigidBodyApi => {
@@ -171,43 +186,46 @@ export const createRigidBodyApi = (ref: RefGetter<RigidBody>): RigidBodyApi => {
     },
     mass: () => ref.current()!.mass(),
 
-    applyImpulse(impulseVector) {
-      ref.current()!.applyImpulse(impulseVector, true);
+    applyImpulse(impulseVector, wakeUp = true) {
+      ref.current()!.applyImpulse(impulseVector, wakeUp);
     },
-    applyTorqueImpulse(torqueVector) {
-      ref.current()!.applyTorqueImpulse(torqueVector, true);
+    applyTorqueImpulse(torqueVector, wakeUp = true) {
+      ref.current()!.applyTorqueImpulse(torqueVector, wakeUp);
     },
-    applyImpulseAtPoint: (impulseVector, impulsePoint) =>
-      ref.current()!.applyImpulseAtPoint(impulseVector, impulsePoint, true),
+    applyImpulseAtPoint: (impulseVector, impulsePoint, wakeUp = true) =>
+      ref.current()!.applyImpulseAtPoint(impulseVector, impulsePoint, wakeUp),
 
-    addForce: (force) => ref.current()!.addForce(force, true),
-    addForceAtPoint: (force, point) =>
-      ref.current()!.addForceAtPoint(force, point, true),
+    addForce: (force, wakeUp = true) => ref.current()!.addForce(force, wakeUp),
+    addForceAtPoint: (force, point, wakeUp = true) =>
+      ref.current()!.addForceAtPoint(force, point, wakeUp),
 
-    addTorque: (torque) => ref.current()!.addTorque(torque, true),
+    addTorque: (torque, wakeUp = true) =>
+      ref.current()!.addTorque(torque, wakeUp),
 
     translation() {
       return rapierVector3ToVector3(ref.current()!.translation());
     },
-    setTranslation: (translation) =>
-      ref.current()!.setTranslation(translation, true),
+    setTranslation: (translation, wakeUp = true) =>
+      ref.current()!.setTranslation(translation, wakeUp),
     rotation() {
       const { x, y, z, w } = ref.current()!.rotation();
       return new Quaternion(x, y, z, w);
     },
-    setRotation: (rotation) => {
-      ref.current()!.setRotation(rotation, true);
+    setRotation: (rotation, wakeUp = true) => {
+      ref.current()!.setRotation(rotation, wakeUp);
     },
     linvel() {
       const { x, y, z } = ref.current()!.linvel();
       return new Vector3(x, y, z);
     },
-    setLinvel: (velocity) => ref.current()!.setLinvel(velocity, true),
+    setLinvel: (velocity, wakeUp = true) =>
+      ref.current()!.setLinvel(velocity, wakeUp),
     angvel() {
       const { x, y, z } = ref.current()!.angvel();
       return new Vector3(x, y, z);
     },
-    setAngvel: (velocity) => ref.current()!.setAngvel(velocity, true),
+    setAngvel: (velocity, wakeUp = true) =>
+      ref.current()!.setAngvel(velocity, wakeUp),
 
     linearDamping() {
       return ref.current()!.linearDamping();
@@ -227,16 +245,18 @@ export const createRigidBodyApi = (ref: RefGetter<RigidBody>): RigidBodyApi => {
     setNextKinematicTranslation: (translation) =>
       ref.current()!.setNextKinematicTranslation(translation),
 
-    resetForces: () => ref.current()!.resetForces(true),
-    resetTorques: () => ref.current()!.resetTorques(true),
+    resetForces: (wakeUp = true) => ref.current()!.resetForces(wakeUp),
+    resetTorques: (wakeUp = true) => ref.current()!.resetTorques(wakeUp),
 
-    lockRotations: (locked) => ref.current()!.lockRotations(locked, true),
-    lockTranslations: (locked) => ref.current()!.lockTranslations(locked, true),
+    lockRotations: (locked, wakeUp = true) =>
+      ref.current()!.lockRotations(locked, wakeUp),
+    lockTranslations: (locked, wakeUp = true) =>
+      ref.current()!.lockTranslations(locked, wakeUp),
 
-    setEnabledRotations: (x, y, z) =>
-      ref.current()!.setEnabledRotations(x, y, z, true),
-    setEnabledTranslations: (x, y, z) =>
-      ref.current()!.setEnabledTranslations(x, y, z, true)
+    setEnabledRotations: (x, y, z, wakeUp = true) =>
+      ref.current()!.setEnabledRotations(x, y, z, wakeUp),
+    setEnabledTranslations: (x, y, z, wakeUp = true) =>
+      ref.current()!.setEnabledTranslations(x, y, z, wakeUp)
   };
 };
 
@@ -280,13 +300,14 @@ export interface WorldApi {
   createRigidBody(desc: RigidBodyDesc): RigidBody;
   createCollider(desc: ColliderDesc, parent?: RigidBody): Collider;
   removeRigidBody(rigidBody: RigidBody): void;
-  removeCollider(collider: Collider): void;
+  removeCollider(collider: Collider, wakeUp: boolean): void;
   createImpulseJoint(
     params: JointData,
     rigidBodyA: RigidBody,
-    rigidBodyB: RigidBody
+    rigidBodyB: RigidBody,
+    wakeUp: boolean
   ): ImpulseJoint;
-  removeImpulseJoint(joint: ImpulseJoint): void;
+  removeImpulseJoint(joint: ImpulseJoint, wakeUp: boolean): void;
   forEachCollider(callback: (collider: Collider) => void): void;
   setGravity(gravity: Vector3): void;
 }
@@ -294,27 +315,21 @@ export interface WorldApi {
 export const createWorldApi = (ref: RefGetter<World>): WorldApi => {
   return {
     raw: () => ref.current()!,
-    getCollider: (handle: number) => ref.current()!.getCollider(handle),
-    getRigidBody: (handle: number) => ref.current()!.getRigidBody(handle),
-    createRigidBody: (desc: RigidBodyDesc) =>
-      ref.current()!.createRigidBody(desc),
-    createCollider: (desc: ColliderDesc, rigidBody: RigidBody) =>
+    getCollider: (handle) => ref.current()!.getCollider(handle),
+    getRigidBody: (handle) => ref.current()!.getRigidBody(handle),
+    createRigidBody: (desc) => ref.current()!.createRigidBody(desc),
+    createCollider: (desc, rigidBody) =>
       ref.current()!.createCollider(desc, rigidBody),
-    removeRigidBody: (rigidBody: RigidBody) =>
-      ref.current()!.removeRigidBody(rigidBody),
-    removeCollider: (collider: Collider) =>
-      ref.current()!.removeCollider(collider, true),
-    createImpulseJoint: (
-      params: JointData,
-      rigidBodyA: RigidBody,
-      rigidBodyB: RigidBody
-    ) =>
-      ref.current()!.createImpulseJoint(params, rigidBodyA, rigidBodyB, true),
-    removeImpulseJoint: (joint: ImpulseJoint) =>
-      ref.current()!.removeImpulseJoint(joint, true),
+    removeRigidBody: (rigidBody) => ref.current()!.removeRigidBody(rigidBody),
+    removeCollider: (collider, wakeUp = true) =>
+      ref.current()!.removeCollider(collider, wakeUp),
+    createImpulseJoint: (params, rigidBodyA, rigidBodyB, wakeUp = true) =>
+      ref.current()!.createImpulseJoint(params, rigidBodyA, rigidBodyB, wakeUp),
+    removeImpulseJoint: (joint, wakeUp = true) =>
+      ref.current()!.removeImpulseJoint(joint, wakeUp),
     forEachCollider: (callback: (collider: Collider) => void) =>
       ref.current()!.forEachCollider(callback),
-    setGravity: ({ x, y, z }: Vector3) => (ref.current()!.gravity = { x, y, z })
+    setGravity: ({ x, y, z }) => (ref.current()!.gravity = { x, y, z })
   };
 };
 
