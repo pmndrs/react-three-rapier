@@ -41,14 +41,13 @@
     "dev": "preconstruct dev",
     "watch": "preconstruct watch",
     "demo": "cd demo && yarn dev",
-    "prettier": "prettier packages/ demo/ --write",
     "release": "yarn build && changeset publish",
     "test": "vitest run",
     "test:ui": "vitest --ui"
   },
   "simple-git-hooks": {
     "commit-msg": "npx --no -- commitlint --edit ${1}",
-    "pre-commit": "yarn prettier; yarn ci"
+    "pre-commit": "yarn prettier packages/ demo/ --check; yarn ci"
   },
   "private": true,
   "workspaces": [
