@@ -19,6 +19,7 @@ import { Object3D } from "three";
 
 export { CoefficientCombineRule as CoefficientCombineRule } from "@dimforge/rapier3d-compat";
 export { RapierRigidBody, RapierCollider };
+import { Rotation, Vector } from "@dimforge/rapier3d-compat/math";
 
 export type RefGetter<T> = MutableRefObject<() => T | undefined>;
 
@@ -126,20 +127,6 @@ export interface UseColliderOptions<ColliderArgs extends Array<unknown>> {
   args?: ColliderArgs;
 
   /**
-   * The mass of this collider.
-   * The mass and density is automatically calculated based on the shape of the collider.
-   * Generally, it's not recommended to adjust the mass properties as it could lead to
-   * unexpected behaviors.
-   * More info https://rapier.rs/docs/user_guides/javascript/colliders#mass-properties
-   */
-  mass?: number;
-
-  /**
-   * The center of mass of this rigid body
-   */
-  centerOfMass?: Vector3Array;
-
-  /**
    * Principal angular inertia of this rigid body
    */
   principalAngularInertia?: Vector3Array;
@@ -218,8 +205,32 @@ export interface UseColliderOptions<ColliderArgs extends Array<unknown>> {
 
   /**
    * Sets the uniform density of this collider.
+   * If this is set, other mass-properties like the angular inertia tensor are computed
+   * automatically from the collider's shape.
+   * Cannot be used at the same time as the mass or massProperties values.
+   * More info https://rapier.rs/docs/user_guides/javascript/colliders#mass-properties
    */
   density?: number;
+
+  /**
+   * The mass of this collider.
+   * Generally, it's not recommended to adjust the mass properties as it could lead to
+   * unexpected behaviors.
+   * Cannot be used at the same time as the density or massProperties values.
+   * More info https://rapier.rs/docs/user_guides/javascript/colliders#mass-properties
+   */
+  mass?: number;
+
+  /**
+   * The mass properties of this rigid body.
+   * Cannot be used at the same time as the density or mass values.
+   */
+  massProperties?: {
+    mass: number;
+    centerOfMass: Vector;
+    principalAngularInertia: Vector;
+    angularInertiaLocalFrame: Rotation;
+  };
 
   /**
    * Sets whether or not this collider is a sensor.

@@ -1,23 +1,14 @@
 import {
   Collider,
   ColliderDesc,
-  CoefficientCombineRule,
   ActiveEvents,
   RigidBody
 } from "@dimforge/rapier3d-compat";
 import { MutableRefObject, useEffect } from "react";
-import {
-  Vector3,
-  Mesh,
-  Object3D,
-  Quaternion,
-  BufferGeometry,
-  Matrix4,
-  Euler
-} from "three";
+import { Vector3, Mesh, Object3D, BufferGeometry, Euler } from "three";
 import { mergeVertices } from "three-stdlib";
 import { ColliderProps, RigidBodyProps } from ".";
-import { WorldApi, RigidBodyApi } from "./api";
+import { WorldApi } from "./api";
 import { ColliderState, ColliderStateMap, EventMap } from "./Physics";
 import {
   _matrix4,
@@ -26,12 +17,7 @@ import {
   _scale,
   _vector3
 } from "./shared-objects";
-import {
-  ColliderShape,
-  UseColliderOptions,
-  UseRigidBodyOptions,
-  RigidBodyAutoCollider
-} from "./types";
+import { ColliderShape, RigidBodyAutoCollider } from "./types";
 import { scaleVertices, vector3ToQuaternion } from "./utils";
 
 export const scaleColliderArgs = (
@@ -82,7 +68,47 @@ export const immutableColliderOptions: ImmutableColliderOptions = [
 ];
 
 type MutableColliderOptions = {
-  [key in keyof ColliderProps]: (collider: Collider, value: any) => void;
+  [key in keyof ColliderProps]: (
+    collider: Collider,
+    value: Exclude<ColliderProps[key], undefined>,
+    options: ColliderProps
+  ) => void;
+};
+
+const massPropertiesConflictError =
+  "Please pick ONLY ONE of the `density`, `mass` and `massProperties` options.";
+
+type MassPropertiesType = "mass" | "massProperties" | "density";
+const setColliderMassOptions = (
+  collider: Collider,
+  options: Pick<ColliderProps, MassPropertiesType>
+) => {
+  if (options.density !== undefined) {
+    if (options.mass !== undefined || options.massProperties !== undefined) {
+      throw new Error(massPropertiesConflictError);
+    }
+    collider.setDensity(options.density);
+
+    return;
+  }
+
+  if (options.mass !== undefined) {
+    if (options.massProperties !== undefined) {
+      throw new Error(massPropertiesConflictError);
+    }
+
+    collider.setMass(options.mass);
+    return;
+  }
+
+  if (options.massProperties !== undefined) {
+    collider.setMassProperties(
+      options.massProperties.mass,
+      options.massProperties.centerOfMass,
+      options.massProperties.principalAngularInertia,
+      options.massProperties.angularInertiaLocalFrame
+    );
+  }
 };
 
 const mutableColliderOptions: MutableColliderOptions = {
@@ -98,18 +124,20 @@ const mutableColliderOptions: MutableColliderOptions = {
   friction: (collider, value: number) => {
     collider.setFriction(value);
   },
+  frictionCombineRule: (collider, value) => {
+    collider.setFrictionCombineRule(value);
+  },
   restitution: (collider, value: number) => {
     collider.setRestitution(value);
   },
-  density: (collider, value: number) => {
-    collider.setDensity(value);
-  },
-  mass: (collider, value: number) => {
-    collider.setMass(value);
+  restitutionCombineRule: (collider, value) => {
+    collider.setRestitutionCombineRule(value);
   }
 };
 
-const mutableColliderOptionKeys = Object.keys(mutableColliderOptions);
+const mutableColliderOptionKeys = Object.keys(
+  mutableColliderOptions
+) as (keyof ColliderProps)[];
 
 export const setColliderOptions = (
   collider: Collider,
@@ -147,12 +175,19 @@ export const setColliderOptions = (
 
     mutableColliderOptionKeys.forEach((key) => {
       if (key in options) {
-        mutableColliderOptions[key as keyof ColliderProps]!(
+        const option = options[key];
+        mutableColliderOptions[key]!(
           collider,
-          options[key as keyof ColliderProps]
+          // @ts-ignore Option does not want to fit into the function, but it will
+          option,
+          options
         );
       }
     });
+
+    // handle mass separately, because the assignments
+    // are exclusive.
+    setColliderMassOptions(collider, options);
   }
 };
 

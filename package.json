@@ -26,25 +26,22 @@
     "@changesets/cli": "^2.22.0",
     "@manypkg/cli": "^0.19.1",
     "@preconstruct/cli": "^2.1.5",
-    "@types/jest": "^29.0.1",
     "buffer": "^6.0.3",
-    "jest": "^29.0.3",
-    "jest-environment-jsdom": "^29.0.3",
     "np": "^7.6.1",
     "prettier": "2.7.1",
-    "ts-jest": "^29.0.0",
     "typescript": "^4.6.3"
   },
   "scripts": {
     "ci": "preconstruct validate && manypkg check && yarn test",
-    "test": "jest",
     "postinstall": "preconstruct dev",
     "build": "preconstruct build",
     "dev": "preconstruct dev",
     "watch": "preconstruct watch",
     "demo": "cd demo && yarn dev",
     "prettier": "prettier packages/ demo/ --write",
-    "release": "yarn build && changeset publish"
+    "release": "yarn build && changeset publish",
+    "test": "vitest run",
+    "test:ui": "vitest --ui"
   },
   "private": true,
   "workspaces": [
