@@ -14,13 +14,13 @@
     "@react-three/test-renderer": "^8.0.17",
     "@types/react-dom": "^18.0.2",
     "@types/three": "^0.139.0",
+    "@vitejs/plugin-react": "^2.1.0",
     "@vitest/ui": "^0.23.4",
     "happy-dom": "^6.0.4",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
     "three": "^0.139.2",
-    "vitest": "^0.23.4",
-    "@vitejs/plugin-react": "^2.1.0"
+    "vitest": "^0.23.4"
   },
   "peerDependencies": {
     "@react-three/fiber": "^8.0.12",

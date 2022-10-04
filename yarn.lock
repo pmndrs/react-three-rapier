@@ -910,26 +910,12 @@
   dependencies:
     "@babel/plugin-transform-react-jsx" "^7.18.6"
 
-"@babel/plugin-transform-react-jsx-self@^7.16.7":
-  version "7.16.7"
-  resolved "https://registry.yarnpkg.com/@babel/plugin-transform-react-jsx-self/-/plugin-transform-react-jsx-self-7.16.7.tgz#f432ad0cba14c4a1faf44f0076c69e42a4d4479e"
-  integrity sha512-oe5VuWs7J9ilH3BCCApGoYjHoSO48vkjX2CbA5bFVhIuO2HKxA3vyF7rleA4o6/4rTDbk6r8hBW7Ul8E+UZrpA==
-  dependencies:
-    "@babel/helper-plugin-utils" "^7.16.7"
-
 "@babel/plugin-transform-react-jsx-self@^7.18.6":
   version "7.18.6"
   resolved "https://registry.yarnpkg.com/@babel/plugin-transform-react-jsx-self/-/plugin-transform-react-jsx-self-7.18.6.tgz#3849401bab7ae8ffa1e3e5687c94a753fc75bda7"
   integrity sha512-A0LQGx4+4Jv7u/tWzoJF7alZwnBDQd6cGLh9P+Ttk4dpiL+J5p7NSNv/9tlEFFJDq3kjxOavWmbm6t0Gk+A3Ig==
   dependencies:
     "@babel/helper-plugin-utils" "^7.18.6"
-
-"@babel/plugin-transform-react-jsx-source@^7.16.7":
-  version "7.16.7"
-  resolved "https://registry.yarnpkg.com/@babel/plugin-transform-react-jsx-source/-/plugin-transform-react-jsx-source-7.16.7.tgz#1879c3f23629d287cc6186a6c683154509ec70c0"
-  integrity sha512-rONFiQz9vgbsnaMtQlZCjIRwhJvlrPET8TabIUK2hzlXw9B9s2Ieaxte1SCOOXMbWRHodbKixNf3BLcWVOQ8Bw==
-  dependencies:
-    "@babel/helper-plugin-utils" "^7.16.7"
 
 "@babel/plugin-transform-react-jsx-source@^7.18.6":
   version "7.18.6"
@@ -938,7 +924,7 @@
   dependencies:
     "@babel/helper-plugin-utils" "^7.18.6"
 
-"@babel/plugin-transform-react-jsx@^7.16.7", "@babel/plugin-transform-react-jsx@^7.17.3":
+"@babel/plugin-transform-react-jsx@^7.16.7":
   version "7.17.3"
   resolved "https://registry.yarnpkg.com/@babel/plugin-transform-react-jsx/-/plugin-transform-react-jsx-7.17.3.tgz#eac1565da176ccb1a715dae0b4609858808008c1"
   integrity sha512-9tjBm4O07f7mzKSIlEmPdiE6ub7kfIe6Cd+w+oQebpATfTQMAgW+YOuWxogbKVTulA+MEO7byMeIUtQ1z+z+ZQ==
@@ -1998,14 +1984,6 @@
     estree-walker "^1.0.1"
     picomatch "^2.2.2"
 
-"@rollup/pluginutils@^4.2.1":
-  version "4.2.1"
-  resolved "https://registry.yarnpkg.com/@rollup/pluginutils/-/pluginutils-4.2.1.tgz#e6c6c3aba0744edce3fb2074922d3776c0af2a6d"
-  integrity sha512-iKnFXr7NkdZAIHiIWE+BX5ULi/ucVFYWD6TbAV+rZctiRTY2PL6tsIKhoIOaoskiWAkgu+VsbXgUVDNLHf+InQ==
-  dependencies:
-    estree-walker "^2.0.1"
-    picomatch "^2.2.2"
-
 "@samverschueren/stream-to-observable@^0.3.0", "@samverschueren/stream-to-observable@^0.3.1":
   version "0.3.1"
   resolved "https://registry.yarnpkg.com/@samverschueren/stream-to-observable/-/stream-to-observable-0.3.1.tgz#a21117b19ee9be70c379ec1877537ef2e1c63301"
@@ -2275,20 +2253,6 @@
   integrity sha512-ykNZWRjwesSirhaBmcAWveHyivXn/E5/R4kY6i8+cDtklKuPM91oFEML9tV5CRBuGJONY/rxD+JVNs/SOwfp4w==
   dependencies:
     "@use-gesture/core" "10.2.12"
-
-"@vitejs/plugin-react@^1.3.2":
-  version "1.3.2"
-  resolved "https://registry.yarnpkg.com/@vitejs/plugin-react/-/plugin-react-1.3.2.tgz#2fcf0b6ce9bcdcd4cec5c760c199779d5657ece1"
-  integrity sha512-aurBNmMo0kz1O4qRoY+FM4epSA39y3ShWGuqfLRA/3z0oEJAdtoSfgA3aO98/PCCHAqMaduLxIxErWrVKIFzXA==
-  dependencies:
-    "@babel/core" "^7.17.10"
-    "@babel/plugin-transform-react-jsx" "^7.17.3"
-    "@babel/plugin-transform-react-jsx-development" "^7.16.7"
-    "@babel/plugin-transform-react-jsx-self" "^7.16.7"
-    "@babel/plugin-transform-react-jsx-source" "^7.16.7"
-    "@rollup/pluginutils" "^4.2.1"
-    react-refresh "^0.13.0"
-    resolve "^1.22.0"
 
 "@vitejs/plugin-react@^2.1.0":
   version "2.1.0"
@@ -6146,11 +6110,6 @@ react-reconciler@^0.27.0:
     loose-envify "^1.1.0"
     scheduler "^0.21.0"
 
-react-refresh@^0.13.0:
-  version "0.13.0"
-  resolved "https://registry.yarnpkg.com/react-refresh/-/react-refresh-0.13.0.tgz#cbd01a4482a177a5da8d44c9755ebb1f26d5a1c1"
-  integrity sha512-XP8A9BT0CpRBD+NYLLeIhld/RqG9+gktUjW1FkE+Vm7OCinbG1SshcK5tb9ls4kzvjZr9mOQc7HYgBngEyPAXg==
-
 react-refresh@^0.14.0:
   version "0.14.0"
   resolved "https://registry.yarnpkg.com/react-refresh/-/react-refresh-0.14.0.tgz#4e02825378a5f227079554d4284889354e5f553e"
@@ -6373,7 +6332,7 @@ resolve-url@^0.2.1:
   resolved "https://registry.yarnpkg.com/resolve-url/-/resolve-url-0.2.1.tgz#2c637fe77c893afd2a663fe21aa9080068e2052a"
   integrity sha1-LGN/53yJOv0qZj/iGqkIAGjiBSo=
 
-resolve@^1.10.0, resolve@^1.14.2, resolve@^1.17.0, resolve@^1.22.0:
+resolve@^1.10.0, resolve@^1.14.2, resolve@^1.17.0:
   version "1.22.0"
   resolved "https://registry.yarnpkg.com/resolve/-/resolve-1.22.0.tgz#5e0b8c67c15df57a89bdbabe603a002f21731198"
   integrity sha512-Hhtrw0nLeSrFQ7phPp4OOcVjLPIeMnRlr5mcnVuMe7M/7eBn98A3hmFRLoFo3DLZkivSYwhRUJTyPyWAk56WLw==

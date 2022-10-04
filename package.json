@@ -47,7 +47,8 @@
     "test:ui": "vitest --ui"
   },
   "simple-git-hooks": {
-    "commit-msg": "npx --no -- commitlint --edit ${1}"
+    "commit-msg": "npx --no -- commitlint --edit ${1}",
+    "pre-commit": "yarn prettier; yarn ci"
   },
   "private": true,
   "workspaces": [
