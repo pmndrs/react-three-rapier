@@ -2,4 +2,4 @@
 "@react-three/rapier": patch
 ---
 
-Restored prop settings and added testing
+Add `massProperties` together with `mass` and `density`

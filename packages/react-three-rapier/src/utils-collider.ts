@@ -1,23 +1,14 @@
 import {
   Collider,
   ColliderDesc,
-  CoefficientCombineRule,
   ActiveEvents,
   RigidBody
 } from "@dimforge/rapier3d-compat";
 import { MutableRefObject, useEffect } from "react";
-import {
-  Vector3,
-  Mesh,
-  Object3D,
-  Quaternion,
-  BufferGeometry,
-  Matrix4,
-  Euler
-} from "three";
+import { Vector3, Mesh, Object3D, BufferGeometry, Euler } from "three";
 import { mergeVertices } from "three-stdlib";
 import { ColliderProps, RigidBodyProps } from ".";
-import { WorldApi, RigidBodyApi } from "./api";
+import { WorldApi } from "./api";
 import { ColliderState, ColliderStateMap, EventMap } from "./Physics";
 import {
   _matrix4,
@@ -26,12 +17,7 @@ import {
   _scale,
   _vector3
 } from "./shared-objects";
-import {
-  ColliderShape,
-  UseColliderOptions,
-  UseRigidBodyOptions,
-  RigidBodyAutoCollider
-} from "./types";
+import { ColliderShape, RigidBodyAutoCollider } from "./types";
 import { scaleVertices, vector3ToQuaternion } from "./utils";
 
 export const scaleColliderArgs = (
@@ -93,7 +79,7 @@ const massPropertiesConflictError =
   "Please pick ONLY ONE of the `density`, `mass` and `massProperties` options.";
 
 type MassPropertiesType = "mass" | "massProperties" | "density";
-const fixMass = (
+const setColliderMassOptions = (
   collider: Collider,
   options: Pick<ColliderProps, MassPropertiesType>
 ) => {
@@ -201,7 +187,7 @@ export const setColliderOptions = (
 
     // handle mass separately, because the assignments
     // are exclusive.
-    fixMass(collider, options);
+    setColliderMassOptions(collider, options);
   }
 };
 
