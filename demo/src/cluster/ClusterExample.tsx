@@ -38,7 +38,7 @@ export const Cluster: Demo = () => {
         linearDamping={5}
       >
         <instancedMesh args={[undefined, undefined, BALLS]} castShadow>
-          <sphereBufferGeometry args={[0.2]} />
+          <sphereGeometry args={[0.2]} />
           <meshPhysicalMaterial
             roughness={0}
             metalness={0.5}
