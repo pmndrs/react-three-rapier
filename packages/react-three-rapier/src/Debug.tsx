@@ -23,18 +23,18 @@ import {
   TriMesh
 } from "@dimforge/rapier3d-compat";
 import {
-  BoxBufferGeometry,
+  BoxGeometry,
   BufferAttribute,
   BufferGeometry,
-  CapsuleBufferGeometry,
+  CapsuleGeometry,
   Color,
-  ConeBufferGeometry,
-  CylinderBufferGeometry,
+  ConeGeometry,
+  CylinderGeometry,
   Mesh,
   MeshBasicMaterial,
   PlaneGeometry,
   Quaternion,
-  SphereBufferGeometry
+  SphereGeometry
 } from "three";
 import { RoundedBoxGeometry } from "three-stdlib";
 
@@ -42,7 +42,7 @@ const geometryFromCollider = (collider: Collider) => {
   switch (collider.shape.type) {
     case ShapeType.Cuboid: {
       const { x, y, z } = (collider.shape as Cuboid).halfExtents;
-      return new BoxBufferGeometry(x * 2 + 0.01, y * 2 + 0.01, z * 2 + 0.01);
+      return new BoxGeometry(x * 2 + 0.01, y * 2 + 0.01, z * 2 + 0.01);
 
       break;
     }
@@ -63,7 +63,7 @@ const geometryFromCollider = (collider: Collider) => {
 
     case ShapeType.Ball: {
       const r = (collider.shape as Ball).radius;
-      return new SphereBufferGeometry(r + +0.01, 8, 8);
+      return new SphereGeometry(r + +0.01, 8, 8);
 
       break;
     }
@@ -101,7 +101,7 @@ const geometryFromCollider = (collider: Collider) => {
       const r = (collider.shape as Cylinder).radius;
       const h = (collider.shape as Cylinder).halfHeight;
 
-      const g = new CylinderBufferGeometry(r, r, h * 2);
+      const g = new CylinderGeometry(r, r, h * 2);
 
       return g;
 
@@ -112,7 +112,7 @@ const geometryFromCollider = (collider: Collider) => {
       const r = (collider.shape as Cylinder).radius;
       const h = (collider.shape as Cylinder).halfHeight;
 
-      const g = new CapsuleBufferGeometry(r, h * 2, 4, 8);
+      const g = new CapsuleGeometry(r, h * 2, 4, 8);
 
       return g;
 
@@ -123,7 +123,7 @@ const geometryFromCollider = (collider: Collider) => {
       const r = (collider.shape as Cone).radius;
       const h = (collider.shape as Cone).halfHeight;
 
-      const g = new ConeBufferGeometry(r, h * 2, 16);
+      const g = new ConeGeometry(r, h * 2, 16);
 
       return g;
 
@@ -153,7 +153,7 @@ const geometryFromCollider = (collider: Collider) => {
     }
   }
 
-  return new BoxBufferGeometry(1, 1, 1);
+  return new BoxGeometry(1, 1, 1);
 };
 
 interface DebugShapeProps extends DebugProps {

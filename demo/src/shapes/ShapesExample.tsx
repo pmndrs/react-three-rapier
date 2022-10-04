@@ -89,7 +89,7 @@ const RigidCylinder = memo(() => {
   return (
     <RigidBody colliders={false} position={[-4 + Math.random() * 8, 10, 0]}>
       <mesh castShadow receiveShadow scale={1}>
-        <cylinderBufferGeometry args={[0.4, 0.4, 0.4, 16]} />
+        <cylinderGeometry args={[0.4, 0.4, 0.4, 16]} />
         <meshPhysicalMaterial color={color} />
       </mesh>
       <CylinderCollider args={[0.2, 0.4]} />
