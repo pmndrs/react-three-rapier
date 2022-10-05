@@ -7,6 +7,7 @@ import {
   RigidBodyApi
 } from "@react-three/rapier";
 import { useRef } from "react";
+import { Euler, Vector3 } from "three";
 import { Demo } from "../App";
 
 const Ball = () => {
@@ -22,7 +23,11 @@ const Ball = () => {
   });
 
   return (
-    <RigidBody ref={ball} colliders="ball">
+    <RigidBody
+      ref={ball}
+      colliders="ball"
+      position={[Math.random(), 5 + Math.random() * 20, Math.random()]}
+    >
       <Sphere castShadow receiveShadow>
         <meshPhysicalMaterial color="red" />
       </Sphere>
@@ -39,7 +44,11 @@ export const Colliders: Demo = () => {
       <Ball />
       <Ball />
 
-      <CuboidCollider args={[10, 1, 10]} />
+      <CuboidCollider
+        args={[10, 1, 10]}
+        position={[0, 0, 0]}
+        rotation={[0.1, 0.1, 0.2]}
+      />
       <BallCollider args={[3]} position={[1, 2, 1]} />
     </group>
   );

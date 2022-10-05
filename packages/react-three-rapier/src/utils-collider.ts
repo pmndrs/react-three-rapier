@@ -4,7 +4,7 @@ import {
   ActiveEvents,
   RigidBody
 } from "@dimforge/rapier3d-compat";
-import { MutableRefObject, useEffect } from "react";
+import { MutableRefObject, useEffect, useMemo } from "react";
 import { Vector3, Mesh, Object3D, BufferGeometry, Euler } from "three";
 import { mergeVertices } from "three-stdlib";
 import { ColliderProps, RigidBodyProps } from ".";
@@ -18,7 +18,7 @@ import {
   _vector3
 } from "./shared-objects";
 import { ColliderShape, RigidBodyAutoCollider } from "./types";
-import { scaleVertices, vector3ToQuaternion } from "./utils";
+import { scaleVertices, vector3ToQuaternion, vectorToTuple } from "./utils";
 
 export const scaleColliderArgs = (
   shape: ColliderShape,
@@ -132,7 +132,12 @@ const mutableColliderOptions: MutableColliderOptions = {
   },
   restitutionCombineRule: (collider, value) => {
     collider.setRestitutionCombineRule(value);
-  }
+  },
+  // To make sure the options all mutalbe options are listed
+  quaternion: () => {},
+  position: () => {},
+  rotation: () => {},
+  scale: () => {}
 };
 
 const mutableColliderOptionKeys = Object.keys(
@@ -196,11 +201,20 @@ export const useUpdateColliderOptions = (
   props: ColliderProps,
   states: ColliderStateMap
 ) => {
+  // TODO: Improve this, split each prop into its own effect
+  const mutablePropsAsFlatArray = useMemo(
+    () =>
+      mutableColliderOptionKeys.flatMap((key) => {
+        return vectorToTuple(props[key as keyof ColliderProps]);
+      }),
+    [props]
+  );
+
   useEffect(() => {
     collidersRef.current.forEach((collider) => {
       setColliderOptions(collider, props, states);
     });
-  }, [props]);
+  }, mutablePropsAsFlatArray);
 };
 
 const isChildOfMeshCollider = (child: Mesh) => {
@@ -386,5 +400,10 @@ export const useColliderEvents = (
         events.delete(collider.handle)
       );
     };
-  }, [onCollisionEnter, onCollisionExit]);
+  }, [
+    onCollisionEnter,
+    onCollisionExit,
+    onIntersectionEnter,
+    onIntersectionExit
+  ]);
 };

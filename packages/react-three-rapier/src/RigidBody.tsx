@@ -1,11 +1,13 @@
 import React, {
   createContext,
+  memo,
   MutableRefObject,
   RefObject,
+  useEffect,
   useMemo
 } from "react";
 import { forwardRef, ReactNode, useContext, useImperativeHandle } from "react";
-import { Object3D } from "three";
+import { Object3D, Quaternion, Vector3 } from "three";
 import { Object3DProps } from "@react-three/fiber";
 import { InstancedRigidBodyApi } from "./api";
 import { useRigidBody } from "./hooks";
@@ -25,8 +27,8 @@ export interface RigidBodyProps extends UseRigidBodyOptions {
   children?: ReactNode;
 }
 
-export const RigidBody = forwardRef<RigidBodyApi, RigidBodyProps>(
-  (props, ref) => {
+export const RigidBody = memo(
+  forwardRef<RigidBodyApi, RigidBodyProps>((props, ref) => {
     const {
       children,
       type,
@@ -36,6 +38,7 @@ export const RigidBody = forwardRef<RigidBodyApi, RigidBodyProps>(
       quaternion,
       ...objectProps
     } = props;
+
     const [object, api, childColliderProps] = useRigidBody<Object3D>(props);
 
     useImperativeHandle(ref, () => api);
@@ -67,5 +70,5 @@ export const RigidBody = forwardRef<RigidBodyApi, RigidBodyProps>(
         </object3D>
       </RigidBodyContext.Provider>
     );
-  }
+  })
 );
