@@ -59,7 +59,7 @@ export const vectorToTuple = (
     return [v.x, v.y, v.z, v.w];
   }
 
-  if (v instanceof Vector3) {
+  if (v instanceof Vector3 || v instanceof Euler) {
     return [v.x, v.y, v.z];
   }
 
