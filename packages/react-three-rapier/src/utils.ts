@@ -3,7 +3,7 @@ import {
   Vector3 as RapierVector3
 } from "@dimforge/rapier3d-compat";
 
-import { Vector3 } from "three";
+import { Euler, Quaternion, Vector3 } from "three";
 import { _euler, _quaternion, _vector3 } from "./shared-objects";
 import { RigidBodyTypeString, Vector3Array } from "./types";
 
@@ -48,4 +48,24 @@ export const scaleVertices = (vertices: ArrayLike<number>, scale: Vector3) => {
   }
 
   return scaledVerts;
+};
+
+export const vectorToTuple = (
+  v: Vector3 | Quaternion | any[] | undefined | number | Euler
+) => {
+  if (!v) return [0];
+
+  if (v instanceof Quaternion) {
+    return [v.x, v.y, v.z, v.w];
+  }
+
+  if (v instanceof Vector3 || v instanceof Euler) {
+    return [v.x, v.y, v.z];
+  }
+
+  if (Array.isArray(v)) {
+    return v;
+  }
+
+  return [v];
 };

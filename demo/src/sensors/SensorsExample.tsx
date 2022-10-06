@@ -16,7 +16,7 @@ const Goal = (props: RigidBodyProps) => {
   const [intersecting, setIntersection] = useState(false);
 
   return (
-    <RigidBody position={[0, -7, 0]}>
+    <RigidBody position={[0, 1, 0]}>
       <Box
         scale={[11, 1, 1]}
         position={[0, 3, 0]}

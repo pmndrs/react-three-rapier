@@ -66,55 +66,57 @@ const Explosion = ({ position }: { position: [number, number, number] }) => {
   );
 };
 
-const Collisioner = memo(
-  (props: UseRigidBodyOptions & { children(color: string): ReactNode }) => {
-    const [color, setColor] = useState("blue");
-    const { setExplosions } = useContext(explosionContext) as {
-      setExplosions: Dispatch<SetStateAction<ReactNode[]>>;
-    };
+const Collisioner = (
+  props: UseRigidBodyOptions & { children(color: string): ReactNode }
+) => {
+  const [color, setColor] = useState("blue");
+  const { setExplosions } = useContext(explosionContext) as {
+    setExplosions: Dispatch<SetStateAction<ReactNode[]>>;
+  };
 
-    const { children, ...rest } = props;
+  const { children, type, colliders, position } = props;
 
-    const handleCollisionEnter: CollisionEnterHandler = useCallback(
-      ({ manifold }) => {
-        setColor("red");
+  const handleCollisionEnter: CollisionEnterHandler = useCallback(
+    ({ manifold }) => {
+      setColor("red");
 
-        const contact = manifold?.solverContactPoint(0) as {
-          x: number;
-          y: number;
-          z: number;
-        };
+      const contact = manifold?.solverContactPoint(0) as {
+        x: number;
+        y: number;
+        z: number;
+      };
 
-        if (contact) {
-          setExplosions((curr: ReactNode[]) => [
-            ...curr,
-            <Explosion position={[contact.x, contact.y, contact.z]} />
-          ]);
-        }
-      },
-      []
-    );
+      if (contact) {
+        setExplosions((curr: ReactNode[]) => [
+          ...curr,
+          <Explosion position={[contact.x, contact.y, contact.z]} />
+        ]);
+      }
+    },
+    []
+  );
 
-    const handleCollsionExit = useCallback(() => {
-      setColor("blue");
-    }, []);
+  const handleCollsionExit = useCallback(() => {
+    setColor("blue");
+  }, []);
 
-    return (
-      <RigidBody
-        {...rest}
-        onCollisionEnter={handleCollisionEnter}
-        onCollisionExit={handleCollsionExit}
-      >
-        {children(color)}
-      </RigidBody>
-    );
-  }
-);
+  return (
+    <RigidBody
+      type={type}
+      colliders={colliders}
+      position={position}
+      onCollisionEnter={handleCollisionEnter}
+      onCollisionExit={handleCollsionExit}
+    >
+      {children(color)}
+    </RigidBody>
+  );
+};
 
 const Collisioners = memo(() => {
   return (
     <group>
-      <Collisioner position={[1, 5, 0]} colliders={"cuboid"}>
+      <Collisioner position={[1, 4, 0]} colliders={"cuboid"}>
         {(color) => (
           <Box>
             <meshPhysicalMaterial color={color} />
@@ -188,16 +190,26 @@ const Collisioners = memo(() => {
   );
 });
 
+const Explosions = () => {
+  const { explosions } = useContext(explosionContext) as {
+    explosions: ReactNode[];
+  };
+  return (
+    <>
+      {explosions.map((explosion, index) => (
+        <group key={index}>{explosion}</group>
+      ))}
+    </>
+  );
+};
+
 export const CollisionEventsExample = () => {
   const [explosions, setExplosions] = useState<ReactNode[]>([]);
 
   return (
     <explosionContext.Provider value={{ explosions, setExplosions }}>
       <Collisioners />
-
-      {explosions.map((explosion, index) => (
-        <group key={index}>{explosion}</group>
-      ))}
+      <Explosions />
     </explosionContext.Provider>
   );
 };

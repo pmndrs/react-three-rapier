@@ -33,37 +33,37 @@ export interface RigidBodyApi {
   /**
    * Applies an impulse at the center-of-mass of this rigid-body.
    */
-  applyImpulse(impulseVector: Vector3Object, wakeUp: boolean): void;
+  applyImpulse(impulseVector: Vector3Object, wakeUp?: boolean): void;
   /**
    * Applies an impulsive torque at the center-of-mass of this rigid-body.
    */
-  applyTorqueImpulse(torqueVector: Vector3Object, wakeUp: boolean): void;
+  applyTorqueImpulse(torqueVector: Vector3Object, wakeUp?: boolean): void;
   /**
    * Applies an impulse at the given world-space point of this rigid-body.
    */
   applyImpulseAtPoint(
     impulseVector: Vector3Object,
     impulsePoint: Vector3Object,
-    wakeUp: boolean
+    wakeUp?: boolean
   ): void;
 
   /**
    * Adds a force at the center-of-mass of this rigid-body.
    */
-  addForce(force: Vector3Object, wakeUp: boolean): void;
+  addForce(force: Vector3Object, wakeUp?: boolean): void;
   /**
    * Adds a force at the given world-space point of this rigid-body.
    */
   addForceAtPoint(
     force: Vector3Object,
     point: Vector3Object,
-    wakeUp: boolean
+    wakeUp?: boolean
   ): void;
 
   /**
    * Adds a torque at the center-of-mass of this rigid-body.
    */
-  addTorque(torque: Vector3Object, wakeUp: boolean): void;
+  addTorque(torque: Vector3Object, wakeUp?: boolean): void;
 
   /**
    * The world-space translation of this rigid-body.
@@ -72,7 +72,7 @@ export interface RigidBodyApi {
   /**
    * Sets the translation of this rigid-body.
    */
-  setTranslation(translation: Vector3Object, wakeUp: boolean): void;
+  setTranslation(translation: Vector3Object, wakeUp?: boolean): void;
 
   /**
    * The world-space orientation of this rigid-body.
@@ -81,7 +81,7 @@ export interface RigidBodyApi {
   /**
    * Sets the rotation quaternion of this rigid-body.
    */
-  setRotation(rotation: Quaternion, wakeUp: boolean): void;
+  setRotation(rotation: Quaternion, wakeUp?: boolean): void;
 
   /**
    * The linear velocity of this rigid-body.
@@ -90,7 +90,7 @@ export interface RigidBodyApi {
   /**
    * Sets the linear velocity of this rigid-body.
    */
-  setLinvel(velocity: Vector3Object, wakeUp: boolean): void;
+  setLinvel(velocity: Vector3Object, wakeUp?: boolean): void;
 
   /**
    * The angular velocity of this rigid-body.
@@ -99,7 +99,7 @@ export interface RigidBodyApi {
   /**
    * Sets the angular velocity of this rigid-body.
    */
-  setAngvel(velocity: Vector3Object, wakeUp: boolean): void;
+  setAngvel(velocity: Vector3Object, wakeUp?: boolean): void;
 
   /**
    * The linear damping of this rigid-body.
@@ -141,21 +141,21 @@ export interface RigidBodyApi {
   /**
    * Resets to zero the user forces (but not torques) applied to this rigid-body.
    */
-  resetForces(wakeUp: boolean): void;
+  resetForces(wakeUp?: boolean): void;
   /**
    * Resets to zero the user torques applied to this rigid-body.
    */
-  resetTorques(wakeUp: boolean): void;
+  resetTorques(wakeUp?: boolean): void;
 
   /**
    * Locks or unlocks the ability of this rigid-body to rotate.
    */
-  lockRotations(locked: boolean, wakeUp: boolean): void;
+  lockRotations(locked: boolean, wakeUp?: boolean): void;
 
   /**
    * Locks or unlocks the ability of this rigid-body to translate.
    */
-  lockTranslations(locked: boolean, wakeUp: boolean): void;
+  lockTranslations(locked: boolean, wakeUp?: boolean): void;
 
   /**
    * Locks or unlocks the ability of this rigid-body to rotate along individual coordinate axes.
@@ -164,7 +164,7 @@ export interface RigidBodyApi {
     x: boolean,
     y: boolean,
     z: boolean,
-    wakeUp: boolean
+    wakeUp?: boolean
   ): void;
 
   /**
@@ -174,7 +174,7 @@ export interface RigidBodyApi {
     x: boolean,
     y: boolean,
     z: boolean,
-    wakeUp: boolean
+    wakeUp?: boolean
   ): void;
 }
 
@@ -300,14 +300,14 @@ export interface WorldApi {
   createRigidBody(desc: RigidBodyDesc): RigidBody;
   createCollider(desc: ColliderDesc, parent?: RigidBody): Collider;
   removeRigidBody(rigidBody: RigidBody): void;
-  removeCollider(collider: Collider, wakeUp: boolean): void;
+  removeCollider(collider: Collider, wakeUp?: boolean): void;
   createImpulseJoint(
     params: JointData,
     rigidBodyA: RigidBody,
     rigidBodyB: RigidBody,
-    wakeUp: boolean
+    wakeUp?: boolean
   ): ImpulseJoint;
-  removeImpulseJoint(joint: ImpulseJoint, wakeUp: boolean): void;
+  removeImpulseJoint(joint: ImpulseJoint, wakeUp?: boolean): void;
   forEachCollider(callback: (collider: Collider) => void): void;
   setGravity(gravity: Vector3): void;
 }

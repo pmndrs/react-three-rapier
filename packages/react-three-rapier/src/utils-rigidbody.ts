@@ -1,5 +1,5 @@
 import { RigidBody, RigidBodyDesc } from "@dimforge/rapier3d-compat";
-import { MutableRefObject, useEffect } from "react";
+import { MutableRefObject, useEffect, useMemo } from "react";
 import { Matrix4, Object3D, Vector3 } from "three";
 import { Boolean3Array, RigidBodyProps, Vector3Array } from ".";
 import { EventMap, RigidBodyState, RigidBodyStateMap } from "./Physics";
@@ -10,7 +10,7 @@ import {
   _scale,
   _vector3
 } from "./shared-objects";
-import { rigidBodyTypeFromString } from "./utils";
+import { rigidBodyTypeFromString, vectorToTuple } from "./utils";
 
 export const rigidBodyDescFromOptions = (options: RigidBodyProps) => {
   const type = rigidBodyTypeFromString(options?.type || "dynamic");
@@ -91,7 +91,11 @@ const mutableRigidBodyOptions: MutableRigidBodyOptions = {
   },
   ccd: (rb: RigidBody, value: boolean) => {
     rb.enableCcd(value);
-  }
+  },
+  position: () => {},
+  rotation: () => {},
+  quaternion: () => {},
+  scale: () => {}
 };
 
 const mutableRigidBodyOptionKeys = Object.keys(mutableRigidBodyOptions);
@@ -137,6 +141,15 @@ export const useUpdateRigidBodyOptions = (
   states: RigidBodyStateMap,
   updateTranslations: boolean = true
 ) => {
+  // TODO: Improve this, split each prop into its own effect
+  const mutablePropsAsFlatArray = useMemo(
+    () =>
+      mutableRigidBodyOptionKeys.flatMap((key) => {
+        return vectorToTuple(props[key as keyof RigidBodyProps]);
+      }),
+    [props]
+  );
+
   useEffect(() => {
     if ("length" in rigidBodyRef.current!) {
       (rigidBodyRef.current as RigidBody[]).forEach((rigidBody) => {
@@ -150,7 +163,7 @@ export const useUpdateRigidBodyOptions = (
         updateTranslations
       );
     }
-  }, [props]);
+  }, mutablePropsAsFlatArray);
 };
 
 export const useRigidBodyEvents = (
@@ -194,5 +207,12 @@ export const useRigidBodyEvents = (
         events.delete(rigidBodyRef.current!.handle);
       }
     };
-  }, [onWake, onSleep, onCollisionEnter, onCollisionExit]);
+  }, [
+    onWake,
+    onSleep,
+    onCollisionEnter,
+    onCollisionExit,
+    onIntersectionEnter,
+    onIntersectionExit
+  ]);
 };
