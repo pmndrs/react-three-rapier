@@ -13,7 +13,7 @@ import {
   Suspense,
   useContext,
   useState,
-  StrictMode,
+  StrictMode
 } from "react";
 import {
   NavLink,
@@ -151,7 +151,7 @@ export const App = () => {
                   shadow-camera-left={-40}
                   shadow-camera-right={40}
                   shadow-mapSize-width={1024}
-                  shadowBias={-0.0001}
+                  shadow-bias={-0.0001}
                 />
                 <Environment preset="apartment" />
                 <OrbitControls />
