@@ -1,5 +1,11 @@
 # @react-three/rapier
 
+## 0.7.6
+
+### Patch Changes
+
+- 9ddbc90: Less frequent updating of props, rerenders should not cause updates
+
 ## 0.7.5
 
 ### Patch Changes
