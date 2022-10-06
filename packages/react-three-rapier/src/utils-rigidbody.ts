@@ -151,13 +151,13 @@ export const useUpdateRigidBodyOptions = (
   );
 
   useEffect(() => {
-    if ("length" in rigidBodyRef.current!) {
-      (rigidBodyRef.current as RigidBody[]).forEach((rigidBody) => {
+    if (Array.isArray(rigidBodyRef.current)) {
+      for (const rigidBody of rigidBodyRef.current) {
         setRigidBodyOptions(rigidBody, props, states, updateTranslations);
-      });
-    } else {
+      }
+    } else if (rigidBodyRef.current) {
       setRigidBodyOptions(
-        rigidBodyRef.current!,
+        rigidBodyRef.current,
         props,
         states,
         updateTranslations
