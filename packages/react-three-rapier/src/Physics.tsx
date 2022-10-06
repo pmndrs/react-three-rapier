@@ -194,6 +194,7 @@ export const Physics: FC<RapierWorldProps> = ({
     return () => {
       if (world) {
         world.free();
+        worldRef.current = undefined;
       }
     };
   }, []);
