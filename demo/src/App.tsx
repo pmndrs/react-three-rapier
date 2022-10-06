@@ -12,7 +12,8 @@ import {
   ReactNode,
   Suspense,
   useContext,
-  useState
+  useState,
+  StrictMode,
 } from "react";
 import {
   NavLink,
@@ -138,42 +139,44 @@ export const App = () => {
       }}
     >
       <Canvas shadows>
-        <Suspense fallback="Loading...">
-          <ContextBridge>
-            <Physics paused={paused} key={physicsKey}>
-              <directionalLight
-                castShadow
-                position={[10, 10, 10]}
-                shadow-camera-bottom={-40}
-                shadow-camera-top={40}
-                shadow-camera-left={-40}
-                shadow-camera-right={40}
-                shadow-mapSize-width={1024}
-                shadowBias={-0.0001}
-              />
-              <Environment preset="apartment" />
-              <OrbitControls />
+        <StrictMode>
+          <Suspense fallback="Loading...">
+            <ContextBridge>
+              <Physics paused={paused} key={physicsKey}>
+                <directionalLight
+                  castShadow
+                  position={[10, 10, 10]}
+                  shadow-camera-bottom={-40}
+                  shadow-camera-top={40}
+                  shadow-camera-left={-40}
+                  shadow-camera-right={40}
+                  shadow-mapSize-width={1024}
+                  shadowBias={-0.0001}
+                />
+                <Environment preset="apartment" />
+                <OrbitControls />
 
-              <demoContext.Provider
-                value={{
-                  setUI,
-                  setDebug
-                }}
-              >
-                <Routes>
-                  {Object.keys(routes).map((key, index, array) => (
-                    <Route path={key} key={key} element={routes[key]} />
-                  ))}
-                </Routes>
-              </demoContext.Provider>
+                <demoContext.Provider
+                  value={{
+                    setUI,
+                    setDebug
+                  }}
+                >
+                  <Routes>
+                    {Object.keys(routes).map((key, index, array) => (
+                      <Route path={key} key={key} element={routes[key]} />
+                    ))}
+                  </Routes>
+                </demoContext.Provider>
 
-              <Floor />
+                <Floor />
 
-              {debug && <Debug color="green" sleepColor="red" />}
-              {perf && <Perf />}
-            </Physics>
-          </ContextBridge>
-        </Suspense>
+                {debug && <Debug color="green" sleepColor="red" />}
+                {perf && <Perf />}
+              </Physics>
+            </ContextBridge>
+          </Suspense>
+        </StrictMode>
       </Canvas>
 
       <div
