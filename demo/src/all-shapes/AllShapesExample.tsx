@@ -64,40 +64,40 @@ export const AllShapesExample: Demo = () => {
       <group>
         <RigidBody colliders="cuboid">
           <Suzanne />
-          {/* <Html>Auto Cuboid</Html> */}
+          <Html>Auto Cuboid</Html>
         </RigidBody>
 
         <RigidBody colliders="ball" position={[4, 0, 0]}>
           <Suzanne />
-          {/* <Html>Auto Ball</Html> */}
+          <Html>Auto Ball</Html>
         </RigidBody>
 
         <RigidBody colliders="hull" position={[8, 0, 0]}>
           <Suzanne />
-          {/* <Html>Auto Hull</Html> */}
+          <Html>Auto Hull</Html>
         </RigidBody>
 
         <RigidBody colliders="trimesh" position={[12, 0, 0]}>
           <Suzanne />
-          {/* <Html>Auto Trimesh</Html> */}
+          <Html>Auto Trimesh</Html>
         </RigidBody>
 
         <RigidBody position={[0, 4, 0]}>
           <Suzanne />
           <CuboidCollider args={[1, 1, 1]} />
-          {/* <Html>Custom Cuboid</Html> */}
+          <Html>Custom Cuboid</Html>
         </RigidBody>
 
         <RigidBody position={[4.1, 4, 0]}>
           <Suzanne />
           <BallCollider args={[1]} />
-          {/* <Html>Custom BallCollider</Html> */}
+          <Html>Custom BallCollider</Html>
         </RigidBody>
 
         <RigidBody position={[8, 4, 0]}>
           <Suzanne />
           <ConeCollider args={[1, 1]} />
-          {/* <Html>Custom ConeCollider</Html> */}
+          <Html>Custom ConeCollider</Html>
         </RigidBody>
 
         <RigidBody position={[5, 8, 0]}>
@@ -109,7 +109,7 @@ export const AllShapesExample: Demo = () => {
             ]}
             mass={1}
           />
-          {/* <Html>Custom TrimeshCollider</Html> */}
+          <Html>Custom TrimeshCollider</Html>
         </RigidBody>
 
         <RigidBody position={[0, 8, 0]}>
@@ -117,12 +117,12 @@ export const AllShapesExample: Demo = () => {
           <ConvexHullCollider
             args={[nodes.Suzanne.geometry.attributes.position.array]}
           />
-          {/* <Html>Custom TrimeshCollider</Html> */}
+          <Html>Custom TrimeshCollider</Html>
         </RigidBody>
 
         <RigidBody position={[8, 8, 0]}>
           <Suzanne />
-          {/* <Html>Custom Combound shape</Html> */}
+          <Html>Custom Combound shape</Html>
 
           <CuboidCollider args={[0.5, 0.5, 0.5]} position={[1, 1, 1]} />
           <BallCollider args={[0.5]} position={[-1, -1, 1]} />
@@ -130,7 +130,7 @@ export const AllShapesExample: Demo = () => {
 
         <RigidBody position={[4, 10, 0]} colliders={"ball"}>
           <Suzanne />
-          {/* <Html>Auto and Custom Combound shape</Html> */}
+          <Html>Auto and Custom Combound shape</Html>
 
           <CuboidCollider args={[0.5, 0.5, 0.5]} position={[1, 1, 1]} />
           <BallCollider args={[0.5]} position={[-1, -1, 1]} />
@@ -141,7 +141,7 @@ export const AllShapesExample: Demo = () => {
             <group position={[-2, -2, -2]} scale={1.2}>
               <OffsetTorus />
             </group>
-            {/* <Html>Mesh with offset geometry</Html> */}
+            <Html>Mesh with offset geometry</Html>
           </RigidBody>
         </group>
       </group>

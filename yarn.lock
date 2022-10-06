@@ -1884,6 +1884,30 @@
   resolved "https://registry.yarnpkg.com/@react-spring/types/-/types-9.4.4.tgz#97c69881788e624d7cc68d4385fdaa9b5fd20642"
   integrity sha512-KpxKt/D//q/t/6FBcde/RE36LKp8PpWu7kFEMLwpzMGl9RpcexunmYOQJWwmJWtkQjgE1YRr7DzBMryz6La1cQ==
 
+"@react-three/drei@^9.34.1":
+  version "9.34.1"
+  resolved "https://registry.yarnpkg.com/@react-three/drei/-/drei-9.34.1.tgz#6ac09f9692464ab8aa5edfac7854bdd9383fd222"
+  integrity sha512-QATmoLjC9BhzcFso45x0ELGxqaiMfAxkX6DHSEzi0+oOYLewG4HhwH9pDBWPHA4q8qtcyZU1ayd43fMtw9FNAg==
+  dependencies:
+    "@babel/runtime" "^7.11.2"
+    "@react-spring/three" "^9.3.1"
+    "@use-gesture/react" "^10.2.0"
+    detect-gpu "^4.0.36"
+    glsl-noise "^0.0.0"
+    lodash.clamp "^4.0.3"
+    lodash.omit "^4.5.0"
+    lodash.pick "^4.4.0"
+    meshline "^2.0.4"
+    react-composer "^5.0.3"
+    react-merge-refs "^1.1.0"
+    stats.js "^0.17.0"
+    suspend-react "^0.0.8"
+    three-mesh-bvh "^0.5.15"
+    three-stdlib "2.17.0"
+    troika-three-text "^0.46.4"
+    utility-types "^3.10.0"
+    zustand "^3.5.13"
+
 "@react-three/drei@^9.6.2":
   version "9.6.2"
   resolved "https://registry.yarnpkg.com/@react-three/drei/-/drei-9.6.2.tgz#1557fc08036f67775707df979067297b19914a4c"
@@ -3303,6 +3327,13 @@ detect-gpu@^4.0.19:
   version "4.0.20"
   resolved "https://registry.yarnpkg.com/detect-gpu/-/detect-gpu-4.0.20.tgz#e0eb95bfc6f6e96303c8140dc7b206be43dd5a0a"
   integrity sha512-pHQnqxYn4TC9Xw6b4DZCJxn+X+YGcPp4c+Eq6u6OhjbrniZeqiQiBFN3Sz2JuNanx4IzyDvm2FTdj3yEmrAjYQ==
+  dependencies:
+    webgl-constants "^1.1.1"
+
+detect-gpu@^4.0.36:
+  version "4.0.42"
+  resolved "https://registry.yarnpkg.com/detect-gpu/-/detect-gpu-4.0.42.tgz#c549cbb5093b1eb003feef6ab3086a1be2c44ee5"
+  integrity sha512-2etUqDWJdyz47snrhciQviLcn4ogedwly7QgFJcIs6Rdiggay4MvnLNO4VjIoKSRr6MRD+JBHhYeVZANW4E5oA==
   dependencies:
     webgl-constants "^1.1.1"
 
@@ -5024,6 +5055,11 @@ locate-path@^6.0.0:
   integrity sha512-iPZK6eYjbxRu3uB4/WZ3EsEIMJFMqAoopl3R+zuq0UjcAm/MO6KCweDgPfP3elTztoKP3KtnVHxTn2NHBSDVUw==
   dependencies:
     p-locate "^5.0.0"
+
+lodash.clamp@^4.0.3:
+  version "4.0.3"
+  resolved "https://registry.yarnpkg.com/lodash.clamp/-/lodash.clamp-4.0.3.tgz#5c24bedeeeef0753560dc2b4cb4671f90a6ddfaa"
+  integrity sha512-HvzRFWjtcguTW7yd8NJBshuNaCa8aqNFtnswdT7f/cMd/1YKy5Zzoq4W/Oxvnx9l7aeY258uSdDfM793+eLsVg==
 
 lodash.debounce@^4.0.8:
   version "4.0.8"
@@ -6983,6 +7019,28 @@ three-mesh-bvh@^0.5.10:
   version "0.5.10"
   resolved "https://registry.yarnpkg.com/three-mesh-bvh/-/three-mesh-bvh-0.5.10.tgz#6eadd0a9f63d8fc1bb3516bdc96b6ed906a888c4"
   integrity sha512-yOJPT3DhfZB/DvIr0lEfPUPMRX11HJABGapeuBa4GwgsF1NMMsy1nW1wMGxImmVyRCZ61yoor/YVqRRQV1p5VQ==
+
+three-mesh-bvh@^0.5.15:
+  version "0.5.16"
+  resolved "https://registry.yarnpkg.com/three-mesh-bvh/-/three-mesh-bvh-0.5.16.tgz#ed8518355fb70d7da6a5537558ba43f76a56b067"
+  integrity sha512-kN3QGKJNiQQcuiOsjVIkjtPnV3PJa+0Orih2E52afa+kQfs3zfoYt6Kxn6b6RNiAfaQ+7ckwPK0mTVFVl2F2LA==
+
+three-stdlib@2.17.0:
+  version "2.17.0"
+  resolved "https://registry.yarnpkg.com/three-stdlib/-/three-stdlib-2.17.0.tgz#5915b110ec6dbf07e0e653bd59889293c7b93407"
+  integrity sha512-m19X4+ajh+2EJIVcjB288LgbqTli5b8kFahJlg9oNCBfaL8geCgEoM4OUirgV0Ez6Lr58N1MPBR6LjJt7ALfKQ==
+  dependencies:
+    "@babel/runtime" "^7.16.7"
+    "@types/offscreencanvas" "^2019.6.4"
+    "@webgpu/glslang" "^0.0.15"
+    chevrotain "^10.1.2"
+    draco3d "^1.4.1"
+    fflate "^0.6.9"
+    ktx-parse "^0.4.5"
+    mmd-parser "^1.0.4"
+    opentype.js "^1.3.3"
+    potpack "^1.0.1"
+    zstddec "^0.0.2"
 
 three-stdlib@^2.10.1:
   version "2.10.1"

@@ -74,7 +74,7 @@ export const AllCollidersExample = () => {
         <CuteBox />
         <CuboidCollider args={[0.5, 0.5, 0.5]} />
 
-        {/* <Html>CuboidCollider</Html> */}
+        <Html>CuboidCollider</Html>
       </RigidBody>
 
       <RigidBody position={[2, 0, 0]} colliders={false}>
@@ -83,7 +83,7 @@ export const AllCollidersExample = () => {
         </mesh>
         <RoundCuboidCollider args={[0.5, 0.5, 0.5, 0.2]} />
 
-        {/* <Html>RoundCuboidCollider</Html> */}
+        <Html>RoundCuboidCollider</Html>
       </RigidBody>
 
       <RigidBody position={[4, 0, 0]} colliders={false}>
@@ -92,7 +92,7 @@ export const AllCollidersExample = () => {
         </Sphere>
         <BallCollider args={[0.5]} />
 
-        {/* <Html>BallCollider</Html> */}
+        <Html>BallCollider</Html>
       </RigidBody>
 
       <RigidBody position={[6, 0, 0]} colliders={false}>
@@ -102,7 +102,7 @@ export const AllCollidersExample = () => {
         </mesh>
         <CapsuleCollider args={[0.5, 0.5]} />
 
-        {/* <Html>CapsuleCollider</Html> */}
+        <Html>CapsuleCollider</Html>
       </RigidBody>
 
       <RigidBody position={[15, 0, 0]} colliders={false}>
@@ -111,19 +111,19 @@ export const AllCollidersExample = () => {
         </Cylinder>
         <CylinderCollider args={[1, 0.5]} />
 
-        {/* <Html>CylinderCollider</Html> */}
+        <Html>CylinderCollider</Html>
       </RigidBody>
 
       <RigidBody position={[8, 0, 0]} colliders="trimesh">
         <Suzanne />
 
-        {/* <Html>TrimeshCollider</Html> */}
+        <Html>TrimeshCollider</Html>
       </RigidBody>
 
       <RigidBody position={[11, 0, 0]} colliders="hull">
         <Suzanne />
 
-        {/* <Html>HullCollider</Html> */}
+        <Html>HullCollider</Html>
       </RigidBody>
 
       <RigidBody colliders={false}>
@@ -131,7 +131,7 @@ export const AllCollidersExample = () => {
           <meshPhysicalMaterial color="orange" />
         </Cone>
         <ConeCollider args={[1, 0.5]} />
-        {/* <Html>ConeCollider</Html> */}
+        <Html>ConeCollider</Html>
       </RigidBody>
 
       <RigidBody colliders={false} position={[0, -8, 0]}>
@@ -146,7 +146,7 @@ export const AllCollidersExample = () => {
             { x: heightFieldWidth, y: 1, z: heightFieldHeight }
           ]}
         />
-        {/* <Html>HeightfieldCollider</Html> */}
+        <Html>HeightfieldCollider</Html>
       </RigidBody>
 
       <RigidBodyBox position={[4, 10, 2]} />
