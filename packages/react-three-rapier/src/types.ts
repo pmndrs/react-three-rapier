@@ -41,7 +41,7 @@ export type CuboidArgs = [
   halfDepth: number
 ];
 export type BallArgs = [radius: number];
-export type CapsuleArgs = [radius: number, height: number];
+export type CapsuleArgs = [halfHeight: number, radius: number];
 export type ConvexHullArgs = [vertices: ArrayLike<number>];
 export type HeightfieldArgs = [
   width: number,
