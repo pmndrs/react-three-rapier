@@ -60,16 +60,16 @@ export type RoundCuboidArgs = [
   halfDepth: number,
   borderRadius: number
 ];
-export type CylinderArgs = [radius: number, height: number];
+export type CylinderArgs = [halfHeight: number, radius: number];
 export type RoundCylinderArgs = [
+  halfHeight: number,
   radius: number,
-  height: number,
   borderRadius: number
 ];
-export type ConeArgs = [radius: number, height: number];
+export type ConeArgs = [halfHeight: number, radius: number];
 export type RoundConeArgs = [
+  halfHeight: number,
   radius: number,
-  height: number,
   borderRadius: number
 ];
 export type ConvexMeshArgs = [
