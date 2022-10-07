@@ -1,9 +1,4 @@
-import {
-  Box,
-  Environment,
-  OrbitControls,
-  useContextBridge
-} from "@react-three/drei";
+import { Box, Environment, OrbitControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { Debug, Physics, RigidBody } from "@react-three/rapier";
 import { Perf } from "r3f-perf";
@@ -15,15 +10,7 @@ import {
   useState,
   StrictMode
 } from "react";
-import {
-  NavLink,
-  NavLinkProps,
-  Route,
-  Routes,
-  UNSAFE_LocationContext,
-  UNSAFE_NavigationContext,
-  UNSAFE_RouteContext
-} from "react-router-dom";
+import { NavLink, NavLinkProps, Route, Routes } from "react-router-dom";
 import { AllCollidersExample } from "./all-colliders/AllCollidersExample";
 import { AllShapesExample } from "./all-shapes/AllShapesExample";
 import { ApiUsage } from "./api-usage/ApiUsageExample";
@@ -123,12 +110,6 @@ export const App = () => {
     setPhysicsKey((current) => current + 1);
   };
 
-  const ContextBridge = useContextBridge(
-    UNSAFE_LocationContext,
-    UNSAFE_NavigationContext,
-    UNSAFE_RouteContext
-  );
-
   return (
     <div
       style={{
@@ -138,46 +119,44 @@ export const App = () => {
         fontFamily: "sans-serif"
       }}
     >
-      <Canvas shadows>
-        <StrictMode>
-          <Suspense fallback="Loading...">
-            <ContextBridge>
-              <Physics paused={paused} key={physicsKey}>
-                <directionalLight
-                  castShadow
-                  position={[10, 10, 10]}
-                  shadow-camera-bottom={-40}
-                  shadow-camera-top={40}
-                  shadow-camera-left={-40}
-                  shadow-camera-right={40}
-                  shadow-mapSize-width={1024}
-                  shadow-bias={-0.0001}
-                />
-                <Environment preset="apartment" />
-                <OrbitControls />
+      <Suspense fallback="Loading...">
+        <Canvas shadows>
+          <StrictMode>
+            <Physics paused={paused} key={physicsKey}>
+              <directionalLight
+                castShadow
+                position={[10, 10, 10]}
+                shadow-camera-bottom={-40}
+                shadow-camera-top={40}
+                shadow-camera-left={-40}
+                shadow-camera-right={40}
+                shadow-mapSize-width={1024}
+                shadow-bias={-0.0001}
+              />
+              <Environment preset="apartment" />
+              <OrbitControls />
 
-                <demoContext.Provider
-                  value={{
-                    setUI,
-                    setDebug
-                  }}
-                >
-                  <Routes>
-                    {Object.keys(routes).map((key, index, array) => (
-                      <Route path={key} key={key} element={routes[key]} />
-                    ))}
-                  </Routes>
-                </demoContext.Provider>
+              <demoContext.Provider
+                value={{
+                  setUI,
+                  setDebug
+                }}
+              >
+                <Routes>
+                  {Object.keys(routes).map((key, index, array) => (
+                    <Route path={key} key={key} element={routes[key]} />
+                  ))}
+                </Routes>
+              </demoContext.Provider>
 
-                <Floor />
+              <Floor />
 
-                {debug && <Debug color="green" sleepColor="red" />}
-                {perf && <Perf />}
-              </Physics>
-            </ContextBridge>
-          </Suspense>
-        </StrictMode>
-      </Canvas>
+              {debug && <Debug color="green" sleepColor="red" />}
+              {perf && <Perf />}
+            </Physics>
+          </StrictMode>
+        </Canvas>
+      </Suspense>
 
       <div
         style={{
