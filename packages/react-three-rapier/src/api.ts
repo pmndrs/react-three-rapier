@@ -326,7 +326,7 @@ export const createWorldApi = (ref: RefGetter<World>): WorldApi => {
       ref.current()!.removeRigidBody(rigidBody);
     },
     removeCollider: (collider, wakeUp = true) => {
-      if (!ref.current()!.bodies.contains(collider.handle)) return;
+      if (!ref.current()!.colliders.contains(collider.handle)) return;
 
       ref.current()!.removeCollider(collider, wakeUp);
     },

@@ -9,8 +9,8 @@
     "dist"
   ],
   "devDependencies": {
-    "@react-three/drei": "^9.6.2",
-    "@react-three/fiber": "^8.0.12",
+    "@react-three/drei": "^9.34.1",
+    "@react-three/fiber": "^8.8.9",
     "@react-three/test-renderer": "^8.0.17",
     "@types/react-dom": "^18.0.2",
     "@types/three": "^0.139.0",
