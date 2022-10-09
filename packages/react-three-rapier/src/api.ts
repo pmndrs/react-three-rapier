@@ -129,12 +129,12 @@ export interface RigidBodyApi {
    */
   setNextKinematicRotation(rotation: Quaternion): void;
   /**
-   * If this rigid body is kinematic, sets its future rotation after the next timestep integration.
+   * If this rigid body is kinematic, sets its future translation after the next timestep integration.
    *
-   * This should be used instead of rigidBody.setRotation to make the dynamic object interacting with
-   *  this kinematic body behave as expected. Internally, Rapier will compute an artificial velocity
-   *  for this rigid-body from its current position and its next kinematic position. This velocity
-   *  will be used to compute forces on dynamic bodies interacting with this body.
+   * This should be used instead of rigidBody.setTranslation to make the dynamic object interacting with
+   * this kinematic body behave as expected. Internally, Rapier will compute an artificial velocity
+   * for this rigid-body from its current position and its next kinematic position. This velocity
+   * will be used to compute forces on dynamic bodies interacting with this body.
    */
   setNextKinematicTranslation(translation: Vector3Object): void;
 
