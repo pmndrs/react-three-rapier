@@ -333,7 +333,7 @@ export const createWorldApi = (ref: RefGetter<World>): WorldApi => {
     createImpulseJoint: (params, rigidBodyA, rigidBodyB, wakeUp = true) =>
       ref.current()!.createImpulseJoint(params, rigidBodyA, rigidBodyB, wakeUp),
     removeImpulseJoint: (joint, wakeUp = true) => {
-      if (!ref.current()!.bodies.contains(joint.handle)) return;
+      if (!ref.current()!.impulseJoints.contains(joint.handle)) return;
 
       ref.current()!.removeImpulseJoint(joint, wakeUp);
     },
