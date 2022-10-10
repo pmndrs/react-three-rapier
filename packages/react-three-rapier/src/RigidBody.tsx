@@ -30,10 +30,6 @@ export const RigidBody = memo(
     const {
       children,
       type,
-      position,
-      rotation,
-      scale,
-      quaternion,
       ...objectProps
     } = props;
 
@@ -55,10 +51,6 @@ export const RigidBody = memo(
         <object3D
           ref={object}
           {...objectProps}
-          position={position}
-          rotation={rotation}
-          quaternion={quaternion}
-          scale={scale}
         >
           {children}
 
@@ -70,3 +62,5 @@ export const RigidBody = memo(
     );
   })
 );
+
+RigidBody.displayName = 'RigidBody';

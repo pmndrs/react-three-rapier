@@ -84,6 +84,7 @@ export interface RapierContext {
   };
 
   isPaused: boolean;
+  step(): void;
 }
 
 export const RapierContext = createContext<RapierContext | undefined>(
@@ -109,7 +110,7 @@ export type EventMap = Map<
   }
 >;
 
-interface RapierWorldProps {
+export interface RapierWorldProps {
   children: ReactNode;
   /**
    * Set the gravity of the physics world
@@ -295,6 +296,13 @@ export const Physics: FC<RapierWorldProps> = ({
       timeStepVariable || !interpolate
         ? 1
         : steppingState.accumulator / timeStep;
+
+    drainEventQueue(interpolationAlpha);
+  }, updatePriority);
+
+  const drainEventQueue = useCallback((interpolationAlpha: number) => {
+    const world = worldRef.current;
+    if (!world) return;
 
     // Update meshes
     rigidBodyStates.forEach((state, handle) => {
@@ -535,9 +543,22 @@ export const Physics: FC<RapierWorldProps> = ({
         maxForceMagnitude: event.maxForceMagnitude()
       });
     });
-  }, updatePriority);
+  }, []);
 
   const api = useMemo(() => createWorldApi(getWorldRef), []);
+
+  const manualStep = useCallback( () => {
+    const world = worldRef.current;
+    if(!world) {
+      return;
+    }
+
+    world.step(eventQueue);
+
+    steppingState.accumulator = 0;
+
+    drainEventQueue(1);
+  }, [drainEventQueue]);
 
   const context = useMemo<RapierContext>(
     () => ({
@@ -551,9 +572,10 @@ export const Physics: FC<RapierWorldProps> = ({
       colliderStates,
       rigidBodyEvents,
       colliderEvents,
-      isPaused: paused
+      isPaused: paused,
+      step: manualStep,
     }),
-    [paused]
+    [paused, manualStep]
   );
 
   return (
