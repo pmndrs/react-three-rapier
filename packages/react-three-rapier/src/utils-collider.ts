@@ -300,46 +300,6 @@ export const createColliderPropsFromChildren: CreateColliderPropsFromChildren =
     if(options.includeInvisible) object.traverse(traverse);
     else object.traverseVisible(traverse);
 
-    // traverse((child) => {
-    // object.traverse((child) => {
-    // // object.traverseVisible((child) => {
-    //   if ("isMesh" in child) {
-    //     if (ignoreMeshColliders && isChildOfMeshCollider(child as Mesh)) return;
-
-    //     const worldScale = child.getWorldScale(_scale);
-    //     const shape = autoColliderMap[
-    //       options.colliders || "cuboid"
-    //     ] as ColliderShape;
-
-    //     child.updateWorldMatrix(true, false);
-    //     _matrix4
-    //       .copy(child.matrixWorld)
-    //       .premultiply(invertedParentMatrixWorld)
-    //       .decompose(_position, _rotation, _scale);
-
-    //     const rotationEuler = new Euler().setFromQuaternion(_rotation, "XYZ");
-
-    //     const { geometry } = child as Mesh;
-    //     const { args, offset } = getColliderArgsFromGeometry(
-    //       geometry,
-    //       options.colliders || "cuboid"
-    //     );
-
-    //     colliderProps.push({
-    //       ...options,
-    //       args: args,
-    //       shape: shape,
-    //       rotation: [rotationEuler.x, rotationEuler.y, rotationEuler.z],
-    //       position: [
-    //         _position.x + offset.x * worldScale.x,
-    //         _position.y + offset.y * worldScale.y,
-    //         _position.z + offset.z * worldScale.z
-    //       ],
-    //       scale: [worldScale.x, worldScale.y, worldScale.z]
-    //     });
-    //   }
-    // });
-
     return colliderProps;
   };
 
