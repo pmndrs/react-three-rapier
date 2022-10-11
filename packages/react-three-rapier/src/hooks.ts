@@ -7,7 +7,7 @@ import React, {
 } from "react";
 import { RapierContext } from "./Physics";
 import { useRef } from "react";
-import { Object3D, Quaternion, Vector3 } from "three";
+import { Object3D } from "three";
 
 import type Rapier from "@dimforge/rapier3d-compat";
 
@@ -36,23 +36,16 @@ import {
   SphericalImpulseJoint
 } from "@dimforge/rapier3d-compat";
 
-import {
-  rigidBodyTypeFromString,
-  vector3ToQuaternion,
-  vectorArrayToVector3
-} from "./utils";
+import { ColliderProps, RigidBodyProps } from ".";
 import { createJointApi, createRigidBodyApi } from "./api";
-import { _position, _rotation, _scale, _vector3 } from "./shared-objects";
+import { vectorArrayToVector3 } from "./utils";
+import { createColliderPropsFromChildren } from "./utils-collider";
 import {
   createRigidBodyState,
-  immutableRigidBodyOptions,
   rigidBodyDescFromOptions,
-  setRigidBodyOptions,
   useRigidBodyEvents,
   useUpdateRigidBodyOptions
 } from "./utils-rigidbody";
-import { ColliderProps, RigidBodyProps } from ".";
-import { createColliderPropsFromChildren } from "./utils-collider";
 
 export const useChildColliderProps = <O extends Object3D>(
   ref: MutableRefObject<O | undefined | null>,

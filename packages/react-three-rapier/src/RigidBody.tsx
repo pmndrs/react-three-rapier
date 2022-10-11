@@ -3,12 +3,10 @@ import React, {
   memo,
   MutableRefObject,
   RefObject,
-  useEffect,
   useMemo
 } from "react";
 import { forwardRef, ReactNode, useContext, useImperativeHandle } from "react";
-import { Object3D, Quaternion, Vector3 } from "three";
-import { Object3DProps } from "@react-three/fiber";
+import { Object3D } from "three";
 import { InstancedRigidBodyApi } from "./api";
 import { useRigidBody } from "./hooks";
 import { InstancedRigidBodiesProps } from "./InstancedRigidBodies";
