@@ -1,5 +1,13 @@
 # @react-three/rapier
 
+## 0.7.7
+
+### Patch Changes
+
+- 2dd45d1: fix: jsdoc for `setNextKinematicTranslation`
+- 7f006ab: fix: play nice with strictmode
+- 3469907: Fix some of the collider argument type hints
+
 ## 0.7.6
 
 ### Patch Changes
