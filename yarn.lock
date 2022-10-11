@@ -1999,10 +1999,10 @@
     magic-string "^0.26.2"
     react-refresh "^0.14.0"
 
-"@vitest/ui@^0.23.4":
-  version "0.23.4"
-  resolved "https://registry.yarnpkg.com/@vitest/ui/-/ui-0.23.4.tgz#87b77ad9f92b18ebc50a7380b703753069dc17fa"
-  integrity sha512-lNZVTTrkHThGAwNQ1ah1qCNnm70r7OLB5LCUdSqboStve/1eKTrtt27QfDSSUTG8AVJQzU0eaN/j8UocH+CqfA==
+"@vitest/ui@^0.24.1":
+  version "0.24.1"
+  resolved "https://registry.yarnpkg.com/@vitest/ui/-/ui-0.24.1.tgz#1ef619b50fc0cf9874a005ea7cae2ac25030d250"
+  integrity sha512-7baeu1+XspO+eAOsygPNL1k8EQRpn7Mj8fhwgyzsTzoYAkqP62mOPO+sqa+TdVaE3241sbAniIzHD1mVMJp70A==
   dependencies:
     sirv "^2.0.2"
 
@@ -3668,10 +3668,10 @@ grapheme-splitter@^1.0.4:
   resolved "https://registry.yarnpkg.com/grapheme-splitter/-/grapheme-splitter-1.0.4.tgz#9cf3a665c6247479896834af35cf1dbb4400767e"
   integrity sha512-bzh50DW9kTPM00T8y4o8vQg89Di9oLJVLW/KaOGIXJWP/iqCN6WKYkbNOF04vFLJhwcpYUh9ydh/+5vpOqV4YQ==
 
-happy-dom@^6.0.4:
-  version "6.0.4"
-  resolved "https://registry.yarnpkg.com/happy-dom/-/happy-dom-6.0.4.tgz#553c1a8ba842455beb975c579d769914808c7404"
-  integrity sha512-b+ID23Ms0BY08UNLymsOMG7EI2jSlwEt4cbJs938GZfeNAg+fqgkSO3TokQMgSOFoHznpjWmpVjBUL5boJ9PWw==
+happy-dom@^7.5.5:
+  version "7.5.5"
+  resolved "https://registry.yarnpkg.com/happy-dom/-/happy-dom-7.5.5.tgz#ec0aa205610cc316190bc2d04b3d338149859289"
+  integrity sha512-VOIZRL7RmNUfz0xbY9XZIjKpmfnQ5evfZ/5YQ3O3KsyndLo2ighZgxqkW72vJU2qhtX1K3J3+2A36REPHW5amA==
   dependencies:
     css.escape "^1.5.1"
     he "^1.2.0"
@@ -6064,7 +6064,7 @@ strip-json-comments@~2.0.1:
   resolved "https://registry.yarnpkg.com/strip-json-comments/-/strip-json-comments-2.0.1.tgz#3c531942e908c2697c0ec344858c286c7ca0a60a"
   integrity sha512-4gB8na07fecVVkOI6Rs4e7T6NOTki5EmL7TUduTs6bu3EdnSycntVJ4re8kgZA+wx9IueI2Y11bfbgwtzuE0KQ==
 
-strip-literal@^0.4.1:
+strip-literal@^0.4.2:
   version "0.4.2"
   resolved "https://registry.yarnpkg.com/strip-literal/-/strip-literal-0.4.2.tgz#4f9fa6c38bb157b924e9ace7155ebf8a2342cbcf"
   integrity sha512-pv48ybn4iE1O9RLgCAN0iU4Xv7RlBTiit6DKmMiErbs9x1wH6vXBs45tWc0H5wUIF6TLTrKweqkmYF/iraQKNw==
@@ -6223,7 +6223,7 @@ tiny-inflate@^1.0.3:
   resolved "https://registry.yarnpkg.com/tiny-inflate/-/tiny-inflate-1.0.3.tgz#122715494913a1805166aaf7c93467933eea26c4"
   integrity sha512-pkY1fj1cKHb2seWDy0B16HeWyczlJA9/WW3u3c4z/NiWDsO3DOU5D7nhTLE9CF0yXv/QZFY7sEJmj24dK+Rrqw==
 
-tinybench@^2.1.5:
+tinybench@^2.3.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/tinybench/-/tinybench-2.3.0.tgz#febb2e697c735c0cdb8eb1e43cb1d2fa1821f983"
   integrity sha512-zs1gMVBwyyG2QbVchYIbnabRhMOCGvrwZz/q+SV+LIMa9q5YDQZi2kkI6ZRqV2Bz7ba1uvrc7ieUoE4KWnGeKg==
@@ -6552,10 +6552,10 @@ vite@3.0.3:
   optionalDependencies:
     fsevents "~2.3.2"
 
-"vite@^2.9.12 || ^3.0.0-0":
-  version "3.1.6"
-  resolved "https://registry.yarnpkg.com/vite/-/vite-3.1.6.tgz#4c6db3000326342c918204a42a130fb3ffed2414"
-  integrity sha512-qMXIwnehvvcK5XfJiXQUiTxoYAEMKhM+jqCY6ZSTKFBKu1hJnAKEzP3AOcnTerI0cMZYAaJ4wpW1wiXLMDt4mA==
+vite@^3.0.0:
+  version "3.1.7"
+  resolved "https://registry.yarnpkg.com/vite/-/vite-3.1.7.tgz#9fc2b57a395f79175d38fa3cffd15080b0d9cbfc"
+  integrity sha512-5vCAmU4S8lyVdFCInu9M54f/g8qbOMakVw5xJ4pjoaDy5wgy9sLLZkGdSLN52dlsBqh0tBqxjaqqa8LgPqwRAA==
   dependencies:
     esbuild "^0.15.9"
     postcss "^8.4.16"
@@ -6564,10 +6564,10 @@ vite@3.0.3:
   optionalDependencies:
     fsevents "~2.3.2"
 
-vitest@^0.23.4:
-  version "0.23.4"
-  resolved "https://registry.yarnpkg.com/vitest/-/vitest-0.23.4.tgz#7ebea620f203f4df09a27ca17819dc9da61f88ef"
-  integrity sha512-iukBNWqQAv8EKDBUNntspLp9SfpaVFbmzmM0sNcnTxASQZMzRw3PsM6DMlsHiI+I6GeO5/sYDg3ecpC+SNFLrQ==
+vitest@^0.24.1:
+  version "0.24.1"
+  resolved "https://registry.yarnpkg.com/vitest/-/vitest-0.24.1.tgz#4b4ceb3d9c6710e8fb7a3b936b740f9c9f9cde10"
+  integrity sha512-NKkK1xnDIOOr42pKBfGQQl6b6IWdFVBpG6ZS1T+nUlJuqcOiZ7lxjVwHy9wrtTYpJ0BWww9y6bSGYXubD29Nag==
   dependencies:
     "@types/chai" "^4.3.3"
     "@types/chai-subset" "^1.3.3"
@@ -6575,11 +6575,11 @@ vitest@^0.23.4:
     chai "^4.3.6"
     debug "^4.3.4"
     local-pkg "^0.4.2"
-    strip-literal "^0.4.1"
-    tinybench "^2.1.5"
+    strip-literal "^0.4.2"
+    tinybench "^2.3.0"
     tinypool "^0.3.0"
     tinyspy "^1.0.2"
-    vite "^2.9.12 || ^3.0.0-0"
+    vite "^3.0.0"
 
 wcwidth@^1.0.1:
   version "1.0.1"
