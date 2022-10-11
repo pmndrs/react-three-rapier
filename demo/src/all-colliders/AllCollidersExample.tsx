@@ -1,5 +1,5 @@
 import { Box, Cone, Cylinder, Html, Sphere } from "@react-three/drei";
-import { MeshProps } from "@react-three/fiber";
+import { MeshProps, Object3DProps } from "@react-three/fiber";
 import {
   BallCollider,
   CapsuleCollider,
@@ -32,10 +32,10 @@ const RigidBodyBox = (props: RigidBodyProps) => {
   );
 };
 
-const Suzanne = () => {
+const Suzanne = (props?: Object3DProps) => {
   const { nodes: suzanne } = useSuzanne();
   return (
-    <primitive object={suzanne.Suzanne.clone()} castShadow receiveShadow />
+    <primitive object={suzanne.Suzanne.clone()} castShadow receiveShadow {...props} />
   );
 };
 
@@ -124,6 +124,13 @@ export const AllCollidersExample = () => {
         <Suzanne />
 
         <Html>HullCollider</Html>
+      </RigidBody>
+
+      <RigidBody position={[-5, 0, 0]} colliders="hull" includeInvisible>
+        <object3D>
+          <Suzanne visible={false} />
+        </object3D>
+        <Html>Invisible collider</Html>
       </RigidBody>
 
       <RigidBody colliders={false}>
