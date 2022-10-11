@@ -320,13 +320,23 @@ export const createWorldApi = (ref: RefGetter<World>): WorldApi => {
     createRigidBody: (desc) => ref.current()!.createRigidBody(desc),
     createCollider: (desc, rigidBody) =>
       ref.current()!.createCollider(desc, rigidBody),
-    removeRigidBody: (rigidBody) => ref.current()!.removeRigidBody(rigidBody),
-    removeCollider: (collider, wakeUp = true) =>
-      ref.current()!.removeCollider(collider, wakeUp),
+    removeRigidBody: (rigidBody) => {
+      if (!ref.current()!.bodies.contains(rigidBody.handle)) return;
+
+      ref.current()!.removeRigidBody(rigidBody);
+    },
+    removeCollider: (collider, wakeUp = true) => {
+      if (!ref.current()!.colliders.contains(collider.handle)) return;
+
+      ref.current()!.removeCollider(collider, wakeUp);
+    },
     createImpulseJoint: (params, rigidBodyA, rigidBodyB, wakeUp = true) =>
       ref.current()!.createImpulseJoint(params, rigidBodyA, rigidBodyB, wakeUp),
-    removeImpulseJoint: (joint, wakeUp = true) =>
-      ref.current()!.removeImpulseJoint(joint, wakeUp),
+    removeImpulseJoint: (joint, wakeUp = true) => {
+      if (!ref.current()!.impulseJoints.contains(joint.handle)) return;
+
+      ref.current()!.removeImpulseJoint(joint, wakeUp);
+    },
     forEachCollider: (callback: (collider: Collider) => void) =>
       ref.current()!.forEachCollider(callback),
     setGravity: ({ x, y, z }) => (ref.current()!.gravity = { x, y, z })

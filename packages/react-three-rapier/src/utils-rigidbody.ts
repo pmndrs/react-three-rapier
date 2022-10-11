@@ -151,13 +151,13 @@ export const useUpdateRigidBodyOptions = (
   );
 
   useEffect(() => {
-    if ("length" in rigidBodyRef.current!) {
-      (rigidBodyRef.current as RigidBody[]).forEach((rigidBody) => {
+    if (Array.isArray(rigidBodyRef.current)) {
+      for (const rigidBody of rigidBodyRef.current) {
         setRigidBodyOptions(rigidBody, props, states, updateTranslations);
-      });
-    } else {
+      }
+    } else if (rigidBodyRef.current) {
       setRigidBodyOptions(
-        rigidBodyRef.current!,
+        rigidBodyRef.current,
         props,
         states,
         updateTranslations
@@ -190,21 +190,21 @@ export const useRigidBodyEvents = (
   };
 
   useEffect(() => {
-    if ("length" in rigidBodyRef.current!) {
-      (rigidBodyRef.current as RigidBody[]).forEach((rigidBody) => {
+    if (Array.isArray(rigidBodyRef.current)) {
+      for (const rigidBody of rigidBodyRef.current) {
         events.set(rigidBody.handle, eventHandlers);
-      });
-    } else {
-      events.set(rigidBodyRef.current!.handle, eventHandlers);
+      }
+    } else if (rigidBodyRef.current) {
+      events.set(rigidBodyRef.current.handle, eventHandlers);
     }
 
     return () => {
-      if ("length" in rigidBodyRef.current!) {
-        (rigidBodyRef.current as RigidBody[]).forEach((rigidBody) => {
+      if (Array.isArray(rigidBodyRef.current)) {
+        for (const rigidBody of rigidBodyRef.current) {
           events.delete(rigidBody.handle);
-        });
-      } else {
-        events.delete(rigidBodyRef.current!.handle);
+        }
+      } else if (rigidBodyRef.current) {
+        events.delete(rigidBodyRef.current.handle);
       }
     };
   }, [

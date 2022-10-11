@@ -131,6 +131,7 @@ export const useRigidBody = <O extends Object3D>(
     return () => {
       world.removeRigidBody(rigidBody);
       rigidBodyStates.delete(rigidBody.handle);
+      rigidBodyRef.current = undefined;
     };
   }, []);
 
