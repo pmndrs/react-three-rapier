@@ -259,7 +259,7 @@ export const createColliderPropsFromChildren: CreateColliderPropsFromChildren =
     object.updateWorldMatrix(true, false);
     const invertedParentMatrixWorld = object.matrixWorld.clone().invert();
 
-    function traverse(child: Object3D) {
+    const colliderFromChild = (child: Object3D) => {
       if ("isMesh" in child) {
         if (ignoreMeshColliders && isChildOfMeshCollider(child as Mesh)) return;
 
@@ -297,8 +297,11 @@ export const createColliderPropsFromChildren: CreateColliderPropsFromChildren =
       }
     }
 
-    if(options.includeInvisible) object.traverse(traverse);
-    else object.traverseVisible(traverse);
+    if (options.includeInvisible) {
+      object.traverse(colliderFromChild);
+    } else {
+      object.traverseVisible(colliderFromChild);
+    }
 
     return colliderProps;
   };
