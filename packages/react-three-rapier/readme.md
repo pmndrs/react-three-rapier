@@ -199,7 +199,7 @@ import { RigidBody, Debug } from "@react-three/rapier";
 const Scene = () => {
   return (
     <Physics>
-      <Debug color="red" sleepColor="blue" />
+      <Debug />
 
       <RigidBody>
         <Box />

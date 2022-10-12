@@ -151,7 +151,7 @@ export const App = () => {
 
               <Floor />
 
-              {debug && <Debug color="green" sleepColor="red" />}
+              {debug && <Debug />}
               {perf && <Perf />}
             </Physics>
           </StrictMode>
@@ -170,7 +170,7 @@ export const App = () => {
         }}
       >
         {Object.keys(routes).map((key) => (
-          <Link key={key} to={key}>
+          <Link key={key} to={key} end>
             {key.replace(/-/g, " ") || "Shapes"}
           </Link>
         ))}

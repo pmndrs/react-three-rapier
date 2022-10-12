@@ -1,6 +1,7 @@
 import {
   Collider,
   ColliderDesc,
+  DebugRenderBuffers,
   ImpulseJoint,
   JointData,
   PrismaticImpulseJoint,
@@ -310,6 +311,7 @@ export interface WorldApi {
   removeImpulseJoint(joint: ImpulseJoint, wakeUp?: boolean): void;
   forEachCollider(callback: (collider: Collider) => void): void;
   setGravity(gravity: Vector3): void;
+  debugRender(): DebugRenderBuffers;
 }
 
 export const createWorldApi = (ref: RefGetter<World>): WorldApi => {
@@ -339,7 +341,8 @@ export const createWorldApi = (ref: RefGetter<World>): WorldApi => {
     },
     forEachCollider: (callback: (collider: Collider) => void) =>
       ref.current()!.forEachCollider(callback),
-    setGravity: ({ x, y, z }) => (ref.current()!.gravity = { x, y, z })
+    setGravity: ({ x, y, z }) => (ref.current()!.gravity = { x, y, z }),
+    debugRender: () => ref.current()!.debugRender()
   };
 };
 
