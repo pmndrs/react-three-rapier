@@ -8,7 +8,7 @@ import {
   World
 } from "@dimforge/rapier3d-compat";
 import { useFrame } from "@react-three/fiber";
-import {
+import React, {
   createContext,
   FC,
   ReactNode,
@@ -462,7 +462,7 @@ export const Physics: FC<RapierWorldProps> = ({
 
       source2.rigidBody.events?.onContactForce?.({
         rigidBody: source1.rigidBody.object,
-        collider: source2.collider.object,
+        collider: source1.collider.object,
         colliderObject: source1.collider.state?.object,
         rigidBodyObject: source1.rigidBody.state?.object,
         totalForce: event.totalForce(),
@@ -483,10 +483,10 @@ export const Physics: FC<RapierWorldProps> = ({
       });
 
       source2.collider.events?.onContactForce?.({
-        rigidBody: source2.rigidBody.object,
+        rigidBody: source1.rigidBody.object,
         collider: source1.collider.object,
-        colliderObject: source2.collider.state?.object,
-        rigidBodyObject: source2.rigidBody.state?.object,
+        colliderObject: source1.collider.state?.object,
+        rigidBodyObject: source1.rigidBody.state?.object,
         totalForce: event.totalForce(),
         totalForceMagnitude: event.totalForceMagnitude(),
         maxForceDirection: event.maxForceDirection(),
