@@ -43,7 +43,8 @@
     "demo": "cd demo && yarn dev",
     "release": "yarn build && changeset publish",
     "test": "vitest run",
-    "test:ui": "vitest --ui"
+    "test:ui": "vitest --ui",
+    "ts": "cd packages/react-three-rapier && yarn ts"
   },
   "simple-git-hooks": {
     "commit-msg": "npx --no -- commitlint --edit ${1}",

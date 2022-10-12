@@ -8,6 +8,9 @@
   "files": [
     "dist"
   ],
+  "scripts": {
+    "ts": "tsc -w"
+  },
   "devDependencies": {
     "@react-three/drei": "^9.34.1",
     "@react-three/fiber": "^8.8.9",

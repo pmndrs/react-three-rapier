@@ -122,6 +122,16 @@ const Scene = () => (
 );
 ```
 
+If part of our meshes are invisible and you want to include them in the collider creation, use the `includeInvisible` flag.
+
+```tsx
+<RigidBody colliders="hull" includeInvisible>
+  <object3D>
+    <Suzanne visible={false} />
+  </object3D>
+</RigidBody>
+```
+
 ## Instanced Meshes
 
 Instanced meshes can also be used and have automatic colliders generated from their mesh.

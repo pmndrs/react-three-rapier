@@ -383,6 +383,11 @@ export interface UseRigidBodyOptions extends ColliderProps {
    * Passed down to the object3d representing this collider.
    */
   userData?: Object3DProps["userData"];
+
+  /**
+   * Include invisible objects on the collider creation estimation.
+   */
+  includeInvisible?: boolean;
 }
 
 // Joints
