@@ -185,12 +185,7 @@ const Scene = () => {
 
 ## Debug
 
-Use the Debug component to see live representations of all colliders in a scene.
-
-- The `color` prop sets the color of awake colliders that are affected by forces.
-- The `sleepColor` prop set the color of a static (fixed, or kinematic) or sleeping collider.
-
-> Note: Experimental. Not all shapes are supported. Unsupported shapes are always represented by cubes.
+Use the Debug component to see live representations of all colliders in a scene, using the live debug buffer from the physics engine.
 
 ```tsx
 import { Box, Sphere } from "@react-three/drei";
@@ -199,7 +194,7 @@ import { RigidBody, Debug } from "@react-three/rapier";
 const Scene = () => {
   return (
     <Physics>
-      <Debug color="red" sleepColor="blue" />
+      <Debug />
 
       <RigidBody>
         <Box />
