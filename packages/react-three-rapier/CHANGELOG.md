@@ -1,5 +1,11 @@
 # @react-three/rapier
 
+## 0.8.1
+
+### Patch Changes
+
+- 3c0d18c: Fix missing React import in Debug
+
 ## 0.8.0
 
 ### Minor Changes
