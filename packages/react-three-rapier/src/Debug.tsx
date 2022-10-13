@@ -24,7 +24,7 @@ export const Debug: FC<DebugProps> = () => {
   });
 
   return (
-    <lineSegments ref={ref}>
+    <lineSegments ref={ref} frustumCulled={false}>
       <lineBasicMaterial color={0xffffff} vertexColors />
       <bufferGeometry />
     </lineSegments>
