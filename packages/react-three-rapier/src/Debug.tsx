@@ -1,3 +1,4 @@
+import React from "react";
 import { useFrame } from "@react-three/fiber";
 import { FC, useRef } from "react";
 import { BufferAttribute, LineSegments } from "three";
