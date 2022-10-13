@@ -1,5 +1,11 @@
 # @react-three/rapier
 
+## 0.8.2
+
+### Patch Changes
+
+- 8110058: Do not frustumCull Debug LineSegments
+
 ## 0.8.1
 
 ### Patch Changes
