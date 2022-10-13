@@ -1,5 +1,12 @@
 # @react-three/rapier
 
+## 0.8.0
+
+### Minor Changes
+
+- 05bc714: Add `includeInvisible` flag to <RigidBody> (@RodrigoHamuy)
+- c5a2e23: Switch to native Rapier debug renderer. (@alexandernanberg)
+
 ## 0.7.7
 
 ### Patch Changes
