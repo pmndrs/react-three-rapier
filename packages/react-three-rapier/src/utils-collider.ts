@@ -295,7 +295,7 @@ export const createColliderPropsFromChildren: CreateColliderPropsFromChildren =
           scale: [worldScale.x, worldScale.y, worldScale.z]
         });
       }
-    }
+    };
 
     if (options.includeInvisible) {
       object.traverse(colliderFromChild);

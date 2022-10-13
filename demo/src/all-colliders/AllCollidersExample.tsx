@@ -35,7 +35,12 @@ const RigidBodyBox = (props: RigidBodyProps) => {
 const Suzanne = (props?: Object3DProps) => {
   const { nodes: suzanne } = useSuzanne();
   return (
-    <primitive object={suzanne.Suzanne.clone()} castShadow receiveShadow {...props} />
+    <primitive
+      object={suzanne.Suzanne.clone()}
+      castShadow
+      receiveShadow
+      {...props}
+    />
   );
 };
 
