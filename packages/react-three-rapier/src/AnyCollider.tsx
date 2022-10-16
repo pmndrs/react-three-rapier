@@ -1,29 +1,13 @@
-import { Collider, ColliderDesc } from "@dimforge/rapier3d-compat";
+import { Collider } from "@dimforge/rapier3d-compat";
 import React, {
-  ReactNode,
-  useRef,
-  useEffect,
-  memo,
-  ForwardedRef,
-  useMemo,
-  MutableRefObject
+  ForwardedRef, memo, MutableRefObject, ReactNode, useEffect, useMemo, useRef
 } from "react";
-import { Object3D, Vector3, InstancedMesh } from "three";
+import { Object3D, Vector3 } from "three";
 import { useRapier } from "./hooks";
-import { useRigidBodyContext, RigidBodyProps } from "./RigidBody";
-import { _euler, _position, _rotation, _scale } from "./shared-objects";
+import { useRigidBodyContext } from "./RigidBody";
 import {
-  UseColliderOptions,
-  CuboidArgs,
-  RoundCuboidArgs,
   BallArgs,
-  CapsuleArgs,
-  HeightfieldArgs,
-  TrimeshArgs,
-  ConeArgs,
-  CylinderArgs,
-  ConvexHullArgs,
-  RigidBodyApi
+  CapsuleArgs, ConeArgs, ConvexHullArgs, CuboidArgs, CylinderArgs, HeightfieldArgs, RigidBodyApi, RoundCuboidArgs, TrimeshArgs, UseColliderOptions
 } from "./types";
 import { vectorArrayToVector3 } from "./utils";
 import {
@@ -62,51 +46,17 @@ export const AnyCollider = memo(
 
         const colliders: Collider[] = [];
 
-        // If this is an InstancedRigidBody api
-        if (rigidBodyContext && "at" in rigidBodyContext.api) {
-          rigidBodyContext.api.forEach((body, index) => {
-            let instanceScale = worldScale;
-
-            if (
-              "scales" in rigidBodyContext.options &&
-              rigidBodyContext?.options?.scales?.[index]
-            ) {
-              instanceScale = instanceScale
-                .clone()
-                .multiply(
-                  vectorArrayToVector3(rigidBodyContext.options.scales[index])
-                );
-            }
-
-            const collider = createColliderFromOptions(
-              props,
-              world,
-              instanceScale,
-              body.raw()
-            );
-            colliderStates.set(
-              collider.handle,
-              createColliderState(
-                collider,
-                object,
-                rigidBodyContext?.ref.current
-              )
-            );
-            colliders.push(collider);
-          });
-        } else {
-          const collider = createColliderFromOptions(
-            props,
-            world,
-            worldScale,
-            rigidBodyContext && (rigidBodyContext?.api as RigidBodyApi).raw()
-          );
-          colliderStates.set(
-            collider.handle,
-            createColliderState(collider, object, rigidBodyContext?.ref.current)
-          );
-          colliders.push(collider);
-        }
+        const collider = createColliderFromOptions(
+          props,
+          world,
+          worldScale,
+          rigidBodyContext && (rigidBodyContext?.api as RigidBodyApi).raw()
+        );
+        colliderStates.set(
+          collider.handle,
+          createColliderState(collider, object, rigidBodyContext?.ref.current)
+        );
+        colliders.push(collider);
 
         collidersRef.current = colliders;
 

@@ -20,22 +20,22 @@ export const InstancedMeshesCompound: Demo = () => {
   const api = useRef<InstancedRigidBodyApi>(null);
 
   const handleClickInstance = (evt: ThreeEvent<MouseEvent>) => {
-    if (api.current) {
-      api.current
-        .at(evt.instanceId!)
-        .applyTorqueImpulse({ x: 0, y: 100, z: 0 });
-    }
+    if(!api.current) return;
+    if(evt.instanceId === undefined) return;
+    const body = api.current[evt.instanceId];
+    if(!body) return;
+    body.applyTorqueImpulse({ x: 0, y: 100, z: 0 });
   };
 
   useEffect(() => {
-    if (api.current) {
-      api.current.forEach((body) => {
-        body.applyImpulse({
-          x: -Math.random() * 5,
-          y: Math.random() * 5,
-          z: -Math.random() * 5
-        });
-      });
+    if(!api.current) return;
+    for (const body of api.current) {
+      if(!body) continue;
+      body.applyImpulse({
+        x: -Math.random() * 5,
+        y: Math.random() * 5,
+        z: -Math.random() * 5
+      });      
     }
   }, []);
 
@@ -44,21 +44,24 @@ export const InstancedMeshesCompound: Demo = () => {
       <InstancedRigidBodies
         ref={api}
         colliders={false}
-        positions={Array.from({ length: COUNT }, () => [
-          Math.random() * 20,
-          Math.random() * 20,
-          Math.random() * 20
-        ])}
-        rotations={Array.from({ length: COUNT }, () => [
-          Math.random() * Math.PI * 2,
-          Math.random() * Math.PI * 2,
-          Math.random() * Math.PI * 2
-        ])}
-        scales={Array.from({ length: COUNT }, () => [
-          0.5 + Math.random(),
-          0.5 + Math.random(),
-          0.5 + Math.random()
-        ])}
+        rigidBodies={Array.from({ length: COUNT }, (_v, i) => ({
+          key: i,
+          position: [
+            Math.random() * 20,
+            Math.random() * 20,
+            Math.random() * 20
+          ],
+          rotation: [
+            Math.random() * Math.PI * 2,
+            Math.random() * Math.PI * 2,
+            Math.random() * Math.PI * 2
+          ],
+          scale: [
+            0.5 + Math.random(),
+            0.5 + Math.random(),
+            0.5 + Math.random()
+          ]
+        }))}
       >
         <instancedMesh
           castShadow

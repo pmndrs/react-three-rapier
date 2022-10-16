@@ -1,185 +1,108 @@
-import {
-  Collider,
-  RigidBody as RapierRigidBody
-} from "@dimforge/rapier3d-compat";
-import React, {
-  useRef,
-  useEffect,
-  forwardRef,
-  useImperativeHandle,
-  useMemo,
-  useLayoutEffect,
-  useState
-} from "react";
-import {
-  Object3D,
-  InstancedMesh,
-  Matrix4,
-  Vector3,
-  DynamicDrawUsage
-} from "three";
-import { AnyCollider } from ".";
-import {
-  createInstancedRigidBodiesApi,
-  createRigidBodyApi,
-  InstancedRigidBodyApi
-} from "./api";
-import { useChildColliderProps, useRapier } from "./hooks";
-import { RigidBody, RigidBodyContext, RigidBodyProps } from "./RigidBody";
-import {
-  _matrix4,
-  _object3d,
-  _position,
-  _rotation,
-  _scale
-} from "./shared-objects";
-import { RigidBodyApi, Vector3Array } from "./types";
-import { vector3ToQuaternion, vectorArrayToVector3 } from "./utils";
-import {
-  createRigidBodyState,
-  rigidBodyDescFromOptions,
-  setRigidBodyOptions,
-  useRigidBodyEvents,
-  useUpdateRigidBodyOptions
-} from "./utils-rigidbody";
+import { useFrame } from "@react-three/fiber";
+import { forwardRef, memo, ReactNode, useImperativeHandle, useLayoutEffect, useRef } from "react";
+import { Color, DynamicDrawUsage, InstancedMesh, Matrix4, Object3D, Vector3 } from "three";
+import { InstancedRigidBody } from "./InstancedRigidBody";
+import {useChildColliderProps} from "./hooks";
+import { Representation2Vector3 } from "./utils/Representation2Vector3";
+import { _matrix4, _vector3 } from "./shared-objects";
+import { RigidBodyApi } from "./api";
+import { RigidBody, RigidBodyProps } from "./RigidBody";
+import { AnyCollider } from "./AnyCollider";
+const _one = new Vector3(1, 1, 1);
+const _oldColor = new Color;
+const _newColor = new Color;
 
-export interface InstancedRigidBodiesProps
-  extends Omit<RigidBodyProps, "position" | "rotation"> {
-  positions?: Vector3Array[];
-  rotations?: Vector3Array[];
-  scales?: Vector3Array[];
+export type InstancedRigidBodyApi = readonly (RigidBodyApi | null)[];
+
+export interface InstancedRigidBodiesProps extends RigidBodyProps {
+  children: ReactNode;
+  rigidBodies: readonly InstancedRigidBody[];
+  colors?: boolean;
 }
 
-export const InstancedRigidBodies = forwardRef<
-  InstancedRigidBodyApi,
-  InstancedRigidBodiesProps
->((props: InstancedRigidBodiesProps, ref) => {
-  const { world, rigidBodyStates, physicsOptions, rigidBodyEvents } =
-    useRapier();
-  const object = useRef<Object3D>(null);
-  const { positions, rotations, children, ...options } = props;
+const _InstancedRigidBodies = forwardRef<InstancedRigidBodyApi, InstancedRigidBodiesProps>(
+  function InstancedRigidBodies({ children, rigidBodies, colors, ...baseBody }, ref) {
+    const container = useRef<Object3D>(null);
+    const mesh = useRef<InstancedMesh>();
 
-  const instancesRef = useRef<
-    { rigidBody: RapierRigidBody; api: RigidBodyApi }[]
-  >([]);
-  const rigidBodyRefs = useRef<RapierRigidBody[]>([]);
-  const instancesRefGetter = useRef(() => {
-    if (!instancesRef.current) {
-      instancesRef.current = [];
-    }
+    const colliders = useChildColliderProps(container, baseBody);
+    const rigidBodiesApi = useRef<(RigidBodyApi | null)[]>([]);
 
-    return instancesRef.current;
-  });
+    useImperativeHandle(ref, () => rigidBodiesApi.current);
 
-  const mergedOptions = useMemo(() => {
-    return {
-      ...physicsOptions,
-      ...options
-    };
-  }, [physicsOptions, options]);
-
-  const childColliderProps = useChildColliderProps(object, mergedOptions);
-
-  useLayoutEffect(() => {
-    object.current!.updateWorldMatrix(true, false);
-    const instances = instancesRefGetter.current();
-    const invertedWorld = object.current!.matrixWorld.clone().invert();
-
-    object.current!.traverseVisible((mesh) => {
-      if (mesh instanceof InstancedMesh) {
-        mesh.instanceMatrix.setUsage(DynamicDrawUsage);
-        const worldScale = mesh.getWorldScale(_scale);
-
-        for (let index = 0; index < mesh.count; index++) {
-          const desc = rigidBodyDescFromOptions(props);
-          const rigidBody = world.createRigidBody(desc);
-
-          rigidBodyRefs.current.push(rigidBody);
-
-          const scale = options.scales?.[index] || [1, 1, 1];
-          const instanceScale = worldScale
-            .clone()
-            .multiply(vectorArrayToVector3(scale));
-
-          rigidBodyStates.set(
-            rigidBody.handle,
-            createRigidBodyState({
-              rigidBody,
-              object: mesh,
-              setMatrix: (matrix: Matrix4) => mesh.setMatrixAt(index, matrix),
-              getMatrix: (matrix: Matrix4) => {
-                mesh.getMatrixAt(index, matrix);
-                return matrix;
-              },
-              worldScale: instanceScale
-            })
-          );
-
-          const [x, y, z] = positions?.[index] || [0, 0, 0];
-          const [rx, ry, rz] = rotations?.[index] || [0, 0, 0];
-
-          _object3d.position.set(x, y, z);
-          _object3d.rotation.set(rx, ry, rz);
-          _object3d.applyMatrix4(invertedWorld);
-          mesh.setMatrixAt(index, _object3d.matrix);
-
-          rigidBody.setTranslation(_object3d.position, false);
-          rigidBody.setRotation(_object3d.quaternion, false);
-
-          const api = createRigidBodyApi({
-            current() {
-              return rigidBody;
-            }
-          });
-          instances.push({ rigidBody, api });
-        }
+    // update positions
+    useFrame(() => {
+      if (!mesh.current) return;
+      for (let i = 0; i < rigidBodiesApi.current.length; i++) {
+        const body = rigidBodiesApi.current[i];
+        if (!body) continue;
+        const props = rigidBodies[i];
+        const scale = props.scale || _one;
+        _matrix4.compose(body.translation(), body.rotation(), Representation2Vector3(scale, _vector3));
+        mesh.current.setMatrixAt(i, _matrix4);
       }
-    });
+      mesh.current.instanceMatrix.needsUpdate = true;
+    })
 
-    return () => {
-      instances.forEach((rb) => {
-        world.removeRigidBody(rb.rigidBody);
-        rigidBodyStates.delete(rb.rigidBody.handle);
-      });
-      rigidBodyRefs.current = [];
-      instancesRef.current = [];
-    };
-  }, []);
+    // update colours
+    useFrame(() => {
+      if (!mesh.current) return;
+      // ignore if colors are not required and not defined
+      if (!colors && !mesh.current.instanceColor) return;
+      let didChange = false;
+      for (let i = 0; i < rigidBodiesApi.current.length; i++) {
+        const body = rigidBodiesApi.current[i];
+        if (!body) continue;
+        const props = rigidBodies[i];
+        _newColor.set(props.color === undefined || !colors ? 0xffffff : props.color);
+        if (mesh.current.instanceColor) {
+          mesh.current.getColorAt(i, _oldColor);
+          if (_oldColor.equals(_newColor)) continue;
+        }
+        mesh.current.setColorAt(i, _newColor);
+        didChange = true;
+      }
+      if (didChange && mesh.current.instanceColor) mesh.current.instanceColor.needsUpdate = true;
+    })
 
-  const api = useMemo(
-    () =>
-      createInstancedRigidBodiesApi(instancesRefGetter) as ReturnType<
-        typeof createInstancedRigidBodiesApi
-      >,
-    []
-  );
+    useLayoutEffect(() => {
+      if (!container.current) return;
+      mesh.current = container.current.children[0] as InstancedMesh;
 
-  useImperativeHandle(ref, () => api);
-  useUpdateRigidBodyOptions(
-    rigidBodyRefs,
-    mergedOptions,
-    rigidBodyStates,
-    false
-  );
-  useRigidBodyEvents(rigidBodyRefs, mergedOptions, rigidBodyEvents);
+      if (!mesh.current || !mesh.current.isInstancedMesh) {
+        console.error("`InstancedRigidBodies` expects an `InstancedMesh` as a children");
+        return;
+      }
 
-  const contextValue = useMemo(() => {
-    return {
-      ref: object,
-      api,
-      options: mergedOptions
-    };
-  }, [api, mergedOptions]);
+      mesh.current.instanceMatrix.setUsage(DynamicDrawUsage);
+    }, [children]);
 
-  return (
-    <RigidBodyContext.Provider value={contextValue}>
-      <object3D ref={object}>
-        {props.children}
+    useLayoutEffect(() => {
+      if (colors) return;
+      if (!mesh.current?.instanceColor) return;
+      // if colors disabled, reset them to white
+      _newColor.set(0xffffff);
+      for (let i = 0; i < mesh.current.count; i++) {
+        mesh.current.setColorAt(i, _newColor);
+      }
+      mesh.current.instanceColor.needsUpdate = true;
+    }, [colors])
 
-        {childColliderProps.map((colliderProps, index) => (
-          <AnyCollider key={index} {...colliderProps} />
-        ))}
+    return <>
+      <object3D ref={container}>
+        {children}
       </object3D>
-    </RigidBodyContext.Provider>
-  );
-});
+      {rigidBodies.map((props, x) => (
+        <RigidBody
+          {...baseBody}
+          {...props}
+          ref={el => rigidBodiesApi.current[x] = el}
+        >
+          {colliders && colliders.map((c, i) => <AnyCollider key={i} {...c} />)}
+        </RigidBody>
+      ))}
+    </>
+  }
+)
+
+export const InstancedRigidBodies = memo(_InstancedRigidBodies);

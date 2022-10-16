@@ -1,4 +1,14 @@
-import React, {
+import type Rapier from "@dimforge/rapier3d-compat";
+import {
+  Collider,
+  ColliderHandle,
+  EventQueue,
+  RigidBody,
+  RigidBodyHandle,
+  World
+} from "@dimforge/rapier3d-compat";
+import { useFrame } from "@react-three/fiber";
+import {
   createContext,
   FC,
   ReactNode,
@@ -7,9 +17,13 @@ import React, {
   useRef,
   useState
 } from "react";
+import {
+  MathUtils, Matrix4, Object3D,
+  Quaternion,
+  Vector3,
+  Vector3Tuple
+} from "three";
 import { useAsset } from "use-asset";
-import type Rapier from "@dimforge/rapier3d-compat";
-import { useFrame } from "@react-three/fiber";
 import {
   CollisionEnterHandler,
   CollisionExitHandler,
@@ -19,36 +33,15 @@ import {
   Vector3Array,
   WorldApi
 } from "./types";
-import {
-  Collider,
-  ColliderHandle,
-  EventQueue,
-  RigidBody,
-  RigidBodyHandle,
-  World
-} from "@dimforge/rapier3d-compat";
-import {
-  InstancedMesh,
-  Matrix,
-  Matrix4,
-  Mesh,
-  Object3D,
-  Quaternion,
-  Vector3,
-  MathUtils
-} from "three";
 
-import { rapierQuaternionToQuaternion, vectorArrayToVector3 } from "./utils";
 import { createWorldApi } from "./api";
 import {
-  _matrix4,
-  _object3d,
-  _position,
-  _quaternion,
-  _rotation,
+  _matrix4, _position, _rotation,
   _scale,
   _vector3
 } from "./shared-objects";
+import { rapierQuaternionToQuaternion, vectorArrayToVector3 } from "./utils";
+import { Representation2Vector3 } from "./utils/Representation2Vector3";
 
 export interface RigidBodyState {
   rigidBody: RigidBody;
@@ -59,7 +52,7 @@ export interface RigidBodyState {
   /**
    * Required for instanced rigid bodies.
    */
-  scale: Vector3;
+  scale: Vector3|Vector3Tuple|number;
   isSleeping: boolean;
 }
 
@@ -267,18 +260,12 @@ export const Physics: FC<RapierWorldProps> = ({
 
       // Get new position
       _matrix4
-        .compose(t, rapierQuaternionToQuaternion(r), state.scale)
+        .compose(t, rapierQuaternionToQuaternion(r), Representation2Vector3(state.scale, _vector3))
         .premultiply(state.invertedWorldMatrix)
         .decompose(_position, _rotation, _scale);
-
-      if (state.object instanceof InstancedMesh) {
-        state.setMatrix(_matrix4);
-        state.object.instanceMatrix.needsUpdate = true;
-      } else {
-        // Interpolate from last position
-        state.object.position.lerp(_position, interpolationAlpha);
-        state.object.quaternion.slerp(_rotation, interpolationAlpha);
-      }
+      // Interpolate from last position
+      state.object.position.lerp(_position, interpolationAlpha);
+      state.object.quaternion.slerp(_rotation, interpolationAlpha);
     });
 
     eventQueue.drainCollisionEvents((handle1, handle2, started) => {

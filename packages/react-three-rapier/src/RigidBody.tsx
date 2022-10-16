@@ -1,24 +1,16 @@
-import React, {
-  createContext,
-  memo,
-  MutableRefObject,
-  RefObject,
-  useEffect,
-  useMemo
+import {
+  createContext, forwardRef, memo,
+  MutableRefObject, ReactNode, RefObject, useContext, useImperativeHandle, useMemo
 } from "react";
-import { forwardRef, ReactNode, useContext, useImperativeHandle } from "react";
-import { Object3D, Quaternion, Vector3 } from "three";
-import { Object3DProps } from "@react-three/fiber";
-import { InstancedRigidBodyApi } from "./api";
-import { useRigidBody } from "./hooks";
-import { InstancedRigidBodiesProps } from "./InstancedRigidBodies";
-import { RigidBodyApi, UseRigidBodyOptions } from "./types";
+import { Object3D } from "three";
 import { AnyCollider } from "./AnyCollider";
+import { useRigidBody } from "./hooks";
+import { RigidBodyApi, UseRigidBodyOptions } from "./types";
 
 export const RigidBodyContext = createContext<{
   ref: RefObject<Object3D> | MutableRefObject<Object3D>;
-  api: RigidBodyApi | InstancedRigidBodyApi;
-  options: UseRigidBodyOptions | InstancedRigidBodiesProps;
+  api: RigidBodyApi;
+  options: UseRigidBodyOptions;
 }>(undefined!);
 
 export const useRigidBodyContext = () => useContext(RigidBodyContext);
