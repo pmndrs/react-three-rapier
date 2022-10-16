@@ -1,5 +1,24 @@
 # @react-three/rapier
 
+## 0.8.2
+
+### Patch Changes
+
+- 8110058: Do not frustumCull Debug LineSegments
+
+## 0.8.1
+
+### Patch Changes
+
+- 3c0d18c: Fix missing React import in Debug
+
+## 0.8.0
+
+### Minor Changes
+
+- 05bc714: Add `includeInvisible` flag to <RigidBody> (@RodrigoHamuy)
+- c5a2e23: Switch to native Rapier debug renderer. (@alexandernanberg)
+
 ## 0.7.7
 
 ### Patch Changes

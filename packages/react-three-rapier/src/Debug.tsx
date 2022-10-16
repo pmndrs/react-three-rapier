@@ -1,3 +1,4 @@
+import React from "react";
 import { useFrame } from "@react-three/fiber";
 import { FC, useRef } from "react";
 import { BufferAttribute, LineSegments } from "three";
@@ -23,7 +24,7 @@ export const Debug: FC<DebugProps> = () => {
   });
 
   return (
-    <lineSegments ref={ref}>
+    <lineSegments ref={ref} frustumCulled={false}>
       <lineBasicMaterial color={0xffffff} vertexColors />
       <bufferGeometry />
     </lineSegments>
