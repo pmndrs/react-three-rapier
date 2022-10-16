@@ -117,6 +117,11 @@ export type Boolean3Array = [x: boolean, y: boolean, z: boolean];
 
 export interface UseColliderOptions<ColliderArgs extends Array<unknown>> {
   /**
+   * The optional name passed to THREE's Object3D
+   */
+  name?: string,
+
+  /**
    * The shape of your collider
    */
   shape?: ColliderShape;
