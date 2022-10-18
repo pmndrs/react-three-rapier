@@ -67,7 +67,7 @@ const Explosion = ({ position }: { position: [number, number, number] }) => {
 };
 
 const Collisioner = (
-  props: UseRigidBodyOptions & { children(color: string): ReactNode }
+  props: Omit<UseRigidBodyOptions,'children'> & { children(color: string): ReactNode }
 ) => {
   const [color, setColor] = useState("blue");
   const { setExplosions } = useContext(explosionContext) as {

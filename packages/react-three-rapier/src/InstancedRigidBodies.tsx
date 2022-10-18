@@ -1,16 +1,13 @@
 import { useFrame } from "@react-three/fiber";
-import { forwardRef, memo, ReactNode, useImperativeHandle, useLayoutEffect, useRef } from "react";
+import { forwardRef, memo, ReactNode, useImperativeHandle, useLayoutEffect, useMemo, useRef } from "react";
 import { Color, DynamicDrawUsage, InstancedMesh, Matrix4, Object3D, Vector3 } from "three";
-import { InstancedRigidBody } from "./InstancedRigidBody";
-import {useChildColliderProps} from "./hooks";
-import { Representation2Vector3 } from "./utils/Representation2Vector3";
-import { _matrix4, _vector3 } from "./shared-objects";
-import { RigidBodyApi } from "./api";
-import { RigidBody, RigidBodyProps } from "./RigidBody";
 import { AnyCollider } from "./AnyCollider";
-const _one = new Vector3(1, 1, 1);
-const _oldColor = new Color;
-const _newColor = new Color;
+import { RigidBodyApi } from "./api";
+import { useChildColliderProps } from "./hooks";
+import { InstancedRigidBody } from "./InstancedRigidBody";
+import { RigidBody, RigidBodyProps } from "./RigidBody";
+import { Representation2Vector3 } from "./utils/Representation2Vector3";
+
 
 export type InstancedRigidBodyApi = readonly (RigidBodyApi | null)[];
 
@@ -22,6 +19,16 @@ export interface InstancedRigidBodiesProps extends RigidBodyProps {
 
 const _InstancedRigidBodies = forwardRef<InstancedRigidBodyApi, InstancedRigidBodiesProps>(
   function InstancedRigidBodies({ children, rigidBodies, colors, ...baseBody }, ref) {
+
+    const {_mx, _one, _scale, _globalScale, _oldColor, _newColor} = useMemo(()=>({
+      _mx: new Matrix4,
+      _scale: new Vector3,
+      _globalScale: new Vector3,
+      _one: new Vector3(1,1,1),
+      _oldColor: new Color,
+      _newColor: new Color,
+    }), [])
+
     const container = useRef<Object3D>(null);
     const mesh = useRef<InstancedMesh>();
 
@@ -33,13 +40,15 @@ const _InstancedRigidBodies = forwardRef<InstancedRigidBodyApi, InstancedRigidBo
     // update positions
     useFrame(() => {
       if (!mesh.current) return;
+      mesh.current.getWorldScale(_globalScale);
       for (let i = 0; i < rigidBodiesApi.current.length; i++) {
         const body = rigidBodiesApi.current[i];
         if (!body) continue;
         const props = rigidBodies[i];
-        const scale = props.scale || _one;
-        _matrix4.compose(body.translation(), body.rotation(), Representation2Vector3(scale, _vector3));
-        mesh.current.setMatrixAt(i, _matrix4);
+        const scale = Representation2Vector3(props.scale || _one, _scale);
+        const pos = body.translation().divide(_globalScale);
+        _mx.compose(pos, body.rotation(), scale);        
+        mesh.current.setMatrixAt(i, _mx);
       }
       mesh.current.instanceMatrix.needsUpdate = true;
     })

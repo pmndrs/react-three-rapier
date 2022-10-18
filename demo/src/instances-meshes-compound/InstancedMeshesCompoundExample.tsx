@@ -2,11 +2,9 @@ import { ThreeEvent } from "@react-three/fiber";
 import {
   BallCollider,
   CuboidCollider,
-  Debug,
-  InstancedRigidBodies,
-  InstancedRigidBodyApi
+  InstancedRigidBodies, InstancedRigidBody, InstancedRigidBodyApi
 } from "@react-three/rapier";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useSuzanne } from "../all-shapes/AllShapesExample";
 import { Demo } from "../App";
 
