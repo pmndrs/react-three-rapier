@@ -2,9 +2,9 @@ import { ThreeEvent } from "@react-three/fiber";
 import {
   BallCollider,
   CuboidCollider,
-  InstancedRigidBodies, InstancedRigidBody, InstancedRigidBodyApi
+  InstancedRigidBodies, InstancedRigidBodyApi
 } from "@react-three/rapier";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useSuzanne } from "../all-shapes/AllShapesExample";
 import { Demo } from "../App";
 
@@ -18,22 +18,22 @@ export const InstancedMeshesCompound: Demo = () => {
   const api = useRef<InstancedRigidBodyApi>(null);
 
   const handleClickInstance = (evt: ThreeEvent<MouseEvent>) => {
-    if(!api.current) return;
-    if(evt.instanceId === undefined) return;
+    if (!api.current) return;
+    if (evt.instanceId === undefined) return;
     const body = api.current[evt.instanceId];
-    if(!body) return;
+    if (!body) return;
     body.applyTorqueImpulse({ x: 0, y: 100, z: 0 });
   };
 
   useEffect(() => {
-    if(!api.current) return;
+    if (!api.current) return;
     for (const body of api.current) {
-      if(!body) continue;
+      if (!body) continue;
       body.applyImpulse({
         x: -Math.random() * 5,
         y: Math.random() * 5,
         z: -Math.random() * 5
-      });      
+      });
     }
   }, []);
 
@@ -60,6 +60,11 @@ export const InstancedMeshesCompound: Demo = () => {
             0.5 + Math.random()
           ]
         }))}
+        colliderNodes={<>
+          <BallCollider args={[1]} />
+          <BallCollider args={[0.5]} position={[1, 0.3, -0.25]} />
+          <CuboidCollider args={[0.5, 0.2, 0.5]} position={[-1, 0.3, -0.25]} />
+        </>}
       >
         <instancedMesh
           castShadow
@@ -68,10 +73,6 @@ export const InstancedMeshesCompound: Demo = () => {
         >
           <meshPhysicalMaterial color={"yellow"} />
         </instancedMesh>
-
-        <BallCollider args={[1]} />
-        <BallCollider args={[0.5]} position={[1, 0.3, -0.25]} />
-        <CuboidCollider args={[0.5, 0.2, 0.5]} position={[-1, 0.3, -0.25]} />
       </InstancedRigidBodies>
     </group>
   );
