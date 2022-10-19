@@ -1,3 +1,4 @@
+import { Leva } from "leva";
 import { Box, Environment, OrbitControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { Debug, Physics, RigidBody } from "@react-three/rapier";
@@ -21,6 +22,7 @@ import { CollisionEventsExample } from "./collision-events/CollisionEventsExampl
 import { ComponentsExample } from "./components/ComponentsExample";
 import { CradleExample } from "./cradle/CradleExample";
 import { Damping } from "./damping/DampingExample";
+import { DynamicInstancedMeshes } from "./dynamic-instanced-meshes/dynamic-instanced-meshes-example";
 import { InstancedMeshes } from "./instanced-meshes/InstancedMeshesExample";
 import { InstancedMeshesCompound } from "./instances-meshes-compound/InstancedMeshesCompoundExample";
 import { Joints } from "./joints/JointsExample";
@@ -92,6 +94,7 @@ const routes: Record<string, ReactNode> = {
   "mesh-collider-test": <MeshColliderTest />,
   colliders: <Colliders />,
   "instanced-meshes": <InstancedMeshes />,
+  "dynamic-instanced-meshes": <DynamicInstancedMeshes />,
   damping: <Damping />,
   "instanced-meshes-compound": <InstancedMeshesCompound />,
   "all-colliders": <AllCollidersExample />,
@@ -110,7 +113,8 @@ export const App = () => {
     setPhysicsKey((current) => current + 1);
   };
 
-  return (
+  return (<>
+    <Leva />
     <div
       style={{
         position: "fixed",
@@ -203,6 +207,7 @@ export const App = () => {
         {ui}
       </div>
     </div>
+  </>
   );
 };
 
