@@ -138,7 +138,7 @@ Instanced meshes can also be used and have automatic colliders generated from th
 
 By wrapping the `InstancedMesh` in `<InstancedRigidBodies />`, each instance will be attached to an individual `RigidBody`.
 
-> Note: Custom colliders (compound shapes) for InstancedMesh is currently not supported
+You can also pass custom colliders (compound shapes) with the `colliderNodes` property.
 
 ```tsx
 import { InstancedRigidBodies } from "@react-three/rapier";
@@ -150,16 +150,15 @@ const Scene = () => {
 
   useEffect(() => {
     // You can access individual instanced by their index
-    instancedApi.at(40).applyImpulse({ x: 0, y: 10, z: 0 });
+    instancedApi.current[40].applyImpulse({ x: 0, y: 10, z: 0 });
 
-    // Or update all instances as if they were in an array
-    instancedApi.forEach((api) => {
+    // Or update all instances in the array
+    instancedApi.current.forEach((api) => {
       api.applyImpulse({ x: 0, y: 10, z: 0 });
     });
   }, []);
 
-  // We can set the initial positions, and rotations, and scales, of
-  // the instances by providing an array equal to the instance count
+  // Add as many RigidBodies as you want using the `rigidBodies`. The only difference to the normal `RigidBodyProps` is that you also have to pass a `key`, as this is how rapier can differentiate each instance.
   const positions = Array.from({ length: COUNT }, (_, index) => [index, 0, 0]);
 
   const rotations = Array.from({ length: COUNT }, (_, index) => [
@@ -177,16 +176,32 @@ const Scene = () => {
   return (
     <InstancedRigidBodies
       ref={instancedApi}
-      positions={positions}
-      rotations={rotations}
-      scales={scales}
+      rigidBodies={Array.from({ length: COUNT }, (_v, i) => ({
+        key: i,
+        position: [
+          Math.random() * 20,
+          Math.random() * 20,
+          Math.random() * 20
+        ],
+        rotation: [
+          Math.random() * Math.PI * 2,
+          Math.random() * Math.PI * 2,
+          Math.random() * Math.PI * 2
+        ],
+        scale: [
+          0.5 + Math.random(),
+          0.5 + Math.random(),
+          0.5 + Math.random()
+        ]
+      }))}
+      colliderNodes={<>
+        <CuboidCollider args={[0.1, 0.2, 0.1]} />
+      </>}
       colliders="ball"
     >
       <instancedMesh args={[undefined, undefined, COUNT]}>
         <sphereGeometry args={[0.2]} />
-        <meshPhysicalGeometry color="blue" />
-
-        <CuboidCollider args={[0.1, 0.2, 0.1]} />
+        <meshPhysicalMaterial color="blue" />
       </instancedMesh>
     </InstancedRigidBodies>
   );
