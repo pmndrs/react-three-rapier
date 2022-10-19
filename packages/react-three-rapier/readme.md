@@ -158,20 +158,8 @@ const Scene = () => {
     });
   }, []);
 
-  // Add as many RigidBodies as you want using the `rigidBodies`. The only difference to the normal `RigidBodyProps` is that you also have to pass a `key`, as this is how rapier can differentiate each instance.
-  const positions = Array.from({ length: COUNT }, (_, index) => [index, 0, 0]);
-
-  const rotations = Array.from({ length: COUNT }, (_, index) => [
-    Math.random(),
-    Math.random(),
-    Math.random()
-  ]);
-
-  const scales = Array.from({ length: COUNT }, (_, index) => [
-    Math.random(),
-    Math.random(),
-    Math.random()
-  ]);
+  // Add as many RigidBodies as you want through the `rigidBodies` property.
+  // It expects an array of `RigidBodyProps` + `key`, as this is how rapier can differentiate each instance.
 
   return (
     <InstancedRigidBodies
