@@ -110,9 +110,6 @@ export const useRigidBody = <O extends Object3D>(
       ref.current = new Object3D() as O;
     }
 
-    // isSleeping used for onSleep and onWake events
-    ref.current.userData.isSleeping = false;
-
     rigidBodyStates.set(
       rigidBody.handle,
       createRigidBodyState({
@@ -124,6 +121,7 @@ export const useRigidBody = <O extends Object3D>(
     return () => {
       world.removeRigidBody(rigidBody);
       rigidBodyStates.delete(rigidBody.handle);
+      rigidBodyRef.current = undefined;
     };
   }, []);
 

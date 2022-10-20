@@ -160,11 +160,6 @@ export const Physics: FC<RapierWorldProps> = ({
 }) => {
   const rapier = useAsset(importRapier);
 
-  const [isPaused, setIsPaused] = useState(paused);
-  useEffect(() => {
-    setIsPaused(paused);
-  }, [paused]);
-
   const worldRef = useRef<World>();
   const getWorldRef = useRef(() => {
     if (!worldRef.current) {
@@ -187,6 +182,7 @@ export const Physics: FC<RapierWorldProps> = ({
     return () => {
       if (world) {
         world.free();
+        worldRef.current = undefined;
       }
     };
   }, []);
@@ -509,9 +505,9 @@ export const Physics: FC<RapierWorldProps> = ({
       colliderStates,
       rigidBodyEvents,
       colliderEvents,
-      isPaused
+      isPaused: paused
     }),
-    [isPaused]
+    [paused]
   );
 
   return (
