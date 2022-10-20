@@ -296,6 +296,45 @@ When the second argument is omitted, the collider will interact with all groups:
 
 > **Note** By default, colliders are members of all groups, and will interact with all other groups.
 
+## Contact force events
+
+Contact force events are triggered on `<RigidBody>` and any collider components when two objects collider.
+
+```tsx
+<RigidBody
+  colliders="ball"
+  onContactForce={(payload) => {
+    console.log(`The total force generated was: ${payload.totalForce}`);
+  }}>
+  <Sphere>
+    <meshPhysicalMaterial color={'grey'}>
+  </Sphere>
+</RigidBody>
+```
+
+The payload for the contact force event contains the following properties:
+
+`rigidBody` - The rigid body of the other colliding rigid body
+`collider` - The other collider
+`rigidBodyObject` - The THREE `Object3D` instance of the other rigid body object
+`colliderObject` - The THREE `Object3D` instance of the other collider object
+`totalForce` - The sum of all the forces between the two colliders
+`totalForceMagnitude` - The sum of the magnitudes of each force between the two colliders
+`maxForceDirection` - The magnitude of the largest force at a contact point of this contact pair
+`maxForceMagnitude` - The world-space (unit) direction of the force with strongest magnitude
+
+More information about each property can be found in the rapier [TempContactForceEvent API documentation](https://rapier.rs/javascript3d/classes/TempContactForceEvent.html).
+
+You can also add the `onContactForce` event to any collider.
+
+```tsx
+<CapsuleCollider
+  onContactForce={(payload) => {
+    /* ... */
+  }}
+/>
+```
+
 ## Sensors
 
 A Collider can be set to be a sensor, which means that it will not generate any contact points, and will not be affected by forces. This is useful for detecting when a collider enters or leaves another collider, without affecting the other collider.

@@ -5,7 +5,7 @@ import {
   RigidBody
 } from "@dimforge/rapier3d-compat";
 import { MutableRefObject, useEffect, useMemo } from "react";
-import { Vector3, Mesh, Object3D, BufferGeometry, Euler } from "three";
+import { BufferGeometry, Euler, Mesh, Object3D, Vector3 } from "three";
 import { mergeVertices } from "three-stdlib";
 import { ColliderProps, RigidBodyProps } from ".";
 import { WorldApi } from "./api";
@@ -18,7 +18,7 @@ import {
   _vector3
 } from "./shared-objects";
 import { ColliderShape, RigidBodyAutoCollider } from "./types";
-import { scaleVertices, vector3ToQuaternion, vectorToTuple } from "./utils";
+import { scaleVertices, vectorToTuple } from "./utils";
 
 export const scaleColliderArgs = (
   shape: ColliderShape,
@@ -379,25 +379,36 @@ export const useColliderEvents = (
     onCollisionEnter,
     onCollisionExit,
     onIntersectionEnter,
-    onIntersectionExit
+    onIntersectionExit,
+    onContactForce
   } = props;
 
   useEffect(() => {
     collidersRef.current?.forEach((collider) => {
-      if (
+      const hasCollisionEvent = !!(
         onCollisionEnter ||
         onCollisionExit ||
         onIntersectionEnter ||
         onIntersectionExit
-      ) {
+      );
+      const hasContactForceEvent = !!onContactForce;
+
+      if (hasCollisionEvent && hasContactForceEvent) {
+        collider.setActiveEvents(
+          ActiveEvents.COLLISION_EVENTS | ActiveEvents.CONTACT_FORCE_EVENTS
+        );
+      } else if (hasCollisionEvent) {
         collider.setActiveEvents(ActiveEvents.COLLISION_EVENTS);
+      } else if (hasContactForceEvent) {
+        collider.setActiveEvents(ActiveEvents.CONTACT_FORCE_EVENTS);
       }
 
       events.set(collider.handle, {
         onCollisionEnter,
         onCollisionExit,
         onIntersectionEnter,
-        onIntersectionExit
+        onIntersectionExit,
+        onContactForce
       });
     });
 
@@ -410,6 +421,7 @@ export const useColliderEvents = (
     onCollisionEnter,
     onCollisionExit,
     onIntersectionEnter,
-    onIntersectionExit
+    onIntersectionExit,
+    onContactForce
   ]);
 };

@@ -19,6 +19,7 @@ import { Cluster } from "./cluster/ClusterExample";
 import { Colliders } from "./colliders/CollidersExample";
 import { CollisionEventsExample } from "./collision-events/CollisionEventsExample";
 import { ComponentsExample } from "./components/ComponentsExample";
+import { ContactForceEventsExample } from "./contact-force-events/ContactForceEventsExample";
 import { CradleExample } from "./cradle/CradleExample";
 import { Damping } from "./damping/DampingExample";
 import { InstancedMeshes } from "./instanced-meshes/InstancedMeshesExample";
@@ -96,6 +97,7 @@ const routes: Record<string, ReactNode> = {
   "instanced-meshes-compound": <InstancedMeshesCompound />,
   "all-colliders": <AllCollidersExample />,
   "collision-events": <CollisionEventsExample />,
+  "contact-force-events": <ContactForceEventsExample />,
   sensors: <SensorsExample />
 };
 

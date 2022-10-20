@@ -7,19 +7,19 @@ import {
   RigidBody as RapierRigidBody,
   TempContactManifold
 } from "@dimforge/rapier3d-compat";
+import { Rotation, Vector } from "@dimforge/rapier3d-compat/math";
+import { Object3DProps } from "@react-three/fiber";
+import { Object3D } from "three";
+import { ColliderProps } from ".";
 import {
   createColliderApi,
   createJointApi,
   createRigidBodyApi,
   createWorldApi
 } from "./api";
-import { ColliderProps } from ".";
-import { Object3DProps } from "@react-three/fiber";
-import { Object3D } from "three";
 
 export { CoefficientCombineRule as CoefficientCombineRule } from "@dimforge/rapier3d-compat";
 export { RapierRigidBody, RapierCollider };
-import { Rotation, Vector } from "@dimforge/rapier3d-compat/math";
 
 export type RefGetter<T> = MutableRefObject<() => T | undefined>;
 
@@ -199,6 +199,11 @@ export interface UseColliderOptions<ColliderArgs extends Array<unknown>> {
   onIntersectionExit?: IntersectionExitHandler;
 
   /**
+   * Callback when this, or another collider triggers a contact force event
+   */
+  onContactForce?: ContactForceHandler;
+
+  /**
    * The bit mask configuring the groups and mask for collision handling.
    */
   collisionGroups?: InteractionGroups;
@@ -243,25 +248,30 @@ export interface UseColliderOptions<ColliderArgs extends Array<unknown>> {
   sensor?: boolean;
 }
 
-export type CollisionEnterPayload = {
+export type BaseCollisionPayload = {
   rigidBody?: RapierRigidBody;
   collider: RapierCollider;
+  rigidBodyObject?: Object3D;
+  colliderObject?: Object3D;
+};
+
+export type CollisionEnterPayload = BaseCollisionPayload & {
   manifold: TempContactManifold;
   flipped: boolean;
-  rigidBodyObject?: Object3D;
-  colliderObject?: Object3D;
 };
 
-export type CollisionExitPayload = {
-  rigidBody?: RapierRigidBody;
-  collider: RapierCollider;
-  rigidBodyObject?: Object3D;
-  colliderObject?: Object3D;
+export type CollisionExitPayload = BaseCollisionPayload;
+
+export type IntersectionEnterPayload = BaseCollisionPayload;
+
+export type IntersectionExitPayload = BaseCollisionPayload;
+
+export type ContactForcePayload = BaseCollisionPayload & {
+  totalForce: Vector;
+  totalForceMagnitude: number;
+  maxForceDirection: Vector;
+  maxForceMagnitude: number;
 };
-
-export type IntersectionEnterPayload = CollisionExitPayload;
-
-export type IntersectionExitPayload = CollisionExitPayload;
 
 export type CollisionEnterHandler = (payload: CollisionEnterPayload) => void;
 
@@ -274,6 +284,8 @@ export type IntersectionEnterHandler = (
 export type IntersectionExitHandler = (
   payload: IntersectionExitPayload
 ) => void;
+
+export type ContactForceHandler = (payload: ContactForcePayload) => void;
 
 export interface UseRigidBodyOptions extends ColliderProps {
   /**

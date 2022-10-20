@@ -1,24 +1,4 @@
-import React, {
-  createContext,
-  FC,
-  ReactNode,
-  useEffect,
-  useMemo,
-  useRef,
-  useState
-} from "react";
-import { useAsset } from "use-asset";
 import type Rapier from "@dimforge/rapier3d-compat";
-import { useFrame } from "@react-three/fiber";
-import {
-  CollisionEnterHandler,
-  CollisionExitHandler,
-  IntersectionEnterHandler,
-  IntersectionExitHandler,
-  RigidBodyAutoCollider,
-  Vector3Array,
-  WorldApi
-} from "./types";
 import {
   Collider,
   ColliderHandle,
@@ -27,28 +7,40 @@ import {
   RigidBodyHandle,
   World
 } from "@dimforge/rapier3d-compat";
+import { useFrame } from "@react-three/fiber";
+import React, {
+  createContext,
+  FC,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from "react";
 import {
   InstancedMesh,
-  Matrix,
+  MathUtils,
   Matrix4,
-  Mesh,
   Object3D,
   Quaternion,
-  Vector3,
-  MathUtils
+  Vector3
 } from "three";
-
-import { rapierQuaternionToQuaternion, vectorArrayToVector3 } from "./utils";
-import { createWorldApi } from "./api";
+import { useAsset } from "use-asset";
 import {
-  _matrix4,
-  _object3d,
-  _position,
-  _quaternion,
-  _rotation,
-  _scale,
-  _vector3
-} from "./shared-objects";
+  CollisionEnterHandler,
+  CollisionExitHandler,
+  ContactForceHandler,
+  IntersectionEnterHandler,
+  IntersectionExitHandler,
+  RigidBodyAutoCollider,
+  Vector3Array,
+  WorldApi
+} from "./types";
+
+import { createWorldApi } from "./api";
+import { _matrix4, _position, _rotation, _scale } from "./shared-objects";
+import { rapierQuaternionToQuaternion, vectorArrayToVector3 } from "./utils";
 
 export interface RigidBodyState {
   rigidBody: RigidBody;
@@ -113,6 +105,7 @@ export type EventMap = Map<
     onCollisionExit?: CollisionExitHandler;
     onIntersectionEnter?: IntersectionEnterHandler;
     onIntersectionExit?: IntersectionExitHandler;
+    onContactForce?: ContactForceHandler;
   }
 >;
 
@@ -210,6 +203,40 @@ export const Physics: FC<RapierWorldProps> = ({
   once so we don't have to string-check every frame. */
   const timeStepVariable = timeStep === "vary";
 
+  const getSourceFromColliderHandle = useCallback((handle: ColliderHandle) => {
+    const world = worldRef.current;
+    if (world) {
+      const collider = world.getCollider(handle);
+      const colEvents = colliderEvents.get(handle);
+      const colliderState = colliderStates.get(handle);
+
+      const rigidBodyHandle = collider?.parent()?.handle;
+      const rigidBody = rigidBodyHandle
+        ? world.getRigidBody(rigidBodyHandle)
+        : undefined;
+      const rbEvents =
+        rigidBody && rigidBodyHandle
+          ? rigidBodyEvents.get(rigidBodyHandle)
+          : undefined;
+      const rigidBodyState = rigidBodyHandle
+        ? rigidBodyStates.get(rigidBodyHandle)
+        : undefined;
+
+      return {
+        collider: {
+          object: collider,
+          events: colEvents,
+          state: colliderState
+        },
+        rigidBody: {
+          object: rigidBody,
+          events: rbEvents,
+          state: rigidBodyState
+        }
+      };
+    }
+  }, []);
+
   useFrame((_, dt) => {
     const world = worldRef.current;
     if (!world) return;
@@ -282,152 +309,185 @@ export const Physics: FC<RapierWorldProps> = ({
     });
 
     eventQueue.drainCollisionEvents((handle1, handle2, started) => {
-      const collider1 = world.getCollider(handle1);
-      const collider2 = world.getCollider(handle2);
-
-      const rigidBodyHandle1 = collider1.parent()?.handle;
-      const rigidBodyHandle2 = collider2.parent()?.handle;
+      const source1 = getSourceFromColliderHandle(handle1);
+      const source2 = getSourceFromColliderHandle(handle2);
 
       // Collision Events
-      if (!collider1 || !collider2) {
+      if (!source1?.collider.object || !source2?.collider.object) {
         return;
       }
 
-      const collider1Events = colliderEvents.get(collider1.handle);
-      const collider2Events = colliderEvents.get(collider2.handle);
-
-      const rigidBody1 = rigidBodyHandle1
-        ? world.getRigidBody(rigidBodyHandle1)
-        : undefined;
-      const rigidBody2 = rigidBodyHandle2
-        ? world.getRigidBody(rigidBodyHandle2)
-        : undefined;
-
-      const rigidBody1Events = rigidBodyHandle1
-        ? rigidBodyEvents.get(rigidBodyHandle1)
-        : undefined;
-      const rigidBody2Events = rigidBodyHandle2
-        ? rigidBodyEvents.get(rigidBodyHandle2)
-        : undefined;
-
-      const collider1State = colliderStates.get(collider1.handle);
-      const collider2State = colliderStates.get(collider2.handle);
-
-      const rigidBody1State = rigidBodyHandle1
-        ? rigidBodyStates.get(rigidBodyHandle1)
-        : undefined;
-      const rigidBody2State = rigidBodyHandle2
-        ? rigidBodyStates.get(rigidBodyHandle2)
-        : undefined;
-
       if (started) {
-        world.contactPair(collider1, collider2, (manifold, flipped) => {
-          /* RigidBody events */
-          rigidBody1Events?.onCollisionEnter?.({
-            rigidBody: rigidBody2,
-            collider: collider2,
-            colliderObject: collider2State?.object,
-            rigidBodyObject: rigidBody2State?.object,
-            manifold,
-            flipped
-          });
+        world.contactPair(
+          source1.collider.object,
+          source2.collider.object,
+          (manifold, flipped) => {
+            /* RigidBody events */
+            source1.rigidBody.events?.onCollisionEnter?.({
+              rigidBody: source2.rigidBody.object,
+              collider: source2.collider.object,
+              colliderObject: source2.collider.state?.object,
+              rigidBodyObject: source2.rigidBody.state?.object,
+              manifold,
+              flipped
+            });
 
-          rigidBody2Events?.onCollisionEnter?.({
-            rigidBody: rigidBody1,
-            collider: collider1,
-            colliderObject: collider1State?.object,
-            rigidBodyObject: rigidBody1State?.object,
-            manifold,
-            flipped
-          });
+            source2.rigidBody.events?.onCollisionEnter?.({
+              rigidBody: source1.rigidBody.object,
+              collider: source1.collider.object,
+              colliderObject: source1.collider.state?.object,
+              rigidBodyObject: source1.rigidBody.state?.object,
+              manifold,
+              flipped
+            });
 
-          /* Collider events */
-          collider1Events?.onCollisionEnter?.({
-            rigidBody: rigidBody2,
-            collider: collider2,
-            colliderObject: collider2State?.object,
-            rigidBodyObject: rigidBody2State?.object,
-            manifold,
-            flipped
-          });
+            /* Collider events */
+            source1.collider.events?.onCollisionEnter?.({
+              rigidBody: source2.rigidBody.object,
+              collider: source2.collider.object,
+              colliderObject: source2.collider.state?.object,
+              rigidBodyObject: source2.rigidBody.state?.object,
+              manifold,
+              flipped
+            });
 
-          collider2Events?.onCollisionEnter?.({
-            rigidBody: rigidBody1,
-            collider: collider1,
-            colliderObject: collider1State?.object,
-            rigidBodyObject: rigidBody1State?.object,
-            manifold,
-            flipped
-          });
-        });
+            source2.collider.events?.onCollisionEnter?.({
+              rigidBody: source1.rigidBody.object,
+              collider: source1.collider.object,
+              colliderObject: source1.collider.state?.object,
+              rigidBodyObject: source1.rigidBody.state?.object,
+              manifold,
+              flipped
+            });
+          }
+        );
       } else {
-        rigidBody1Events?.onCollisionExit?.({
-          rigidBody: rigidBody2,
-          collider: collider2
+        source1.rigidBody.events?.onCollisionExit?.({
+          rigidBody: source2.rigidBody.object,
+          collider: source2.collider.object
         });
-        rigidBody2Events?.onCollisionExit?.({
-          rigidBody: rigidBody1,
-          collider: collider1
+        source2.rigidBody.events?.onCollisionExit?.({
+          rigidBody: source1.rigidBody.object,
+          collider: source1.collider.object
         });
-        collider1Events?.onCollisionExit?.({
-          rigidBody: rigidBody2,
-          collider: collider2
+        source1.collider.events?.onCollisionExit?.({
+          rigidBody: source2.rigidBody.object,
+          collider: source2.collider.object
         });
-        collider2Events?.onCollisionExit?.({
-          rigidBody: rigidBody1,
-          collider: collider1
+        source2.collider.events?.onCollisionExit?.({
+          rigidBody: source1.rigidBody.object,
+          collider: source1.collider.object
         });
       }
 
       // Sensor Intersections
       if (started) {
-        if (world.intersectionPair(collider1, collider2)) {
-          rigidBody1Events?.onIntersectionEnter?.({
-            rigidBody: rigidBody2,
-            collider: collider2,
-            colliderObject: collider2State?.object,
-            rigidBodyObject: rigidBody2State?.object
+        if (
+          world.intersectionPair(
+            source1.collider.object,
+            source2.collider.object
+          )
+        ) {
+          source1.rigidBody.events?.onIntersectionEnter?.({
+            rigidBody: source2.rigidBody.object,
+            collider: source2.collider.object,
+            colliderObject: source2.collider.state?.object,
+            rigidBodyObject: source2.rigidBody.state?.object
           });
 
-          rigidBody2Events?.onIntersectionEnter?.({
-            rigidBody: rigidBody1,
-            collider: collider1,
-            colliderObject: collider1State?.object,
-            rigidBodyObject: rigidBody1State?.object
+          source2.rigidBody.events?.onIntersectionEnter?.({
+            rigidBody: source1.rigidBody.object,
+            collider: source1.collider.object,
+            colliderObject: source1.collider.state?.object,
+            rigidBodyObject: source1.rigidBody.state?.object
           });
 
-          collider1Events?.onIntersectionEnter?.({
-            rigidBody: rigidBody2,
-            collider: collider2,
-            colliderObject: collider2State?.object,
-            rigidBodyObject: rigidBody2State?.object
+          source1.collider.events?.onIntersectionEnter?.({
+            rigidBody: source2.rigidBody.object,
+            collider: source2.collider.object,
+            colliderObject: source2.collider.state?.object,
+            rigidBodyObject: source2.rigidBody.state?.object
           });
 
-          collider2Events?.onIntersectionEnter?.({
-            rigidBody: rigidBody1,
-            collider: collider1,
-            colliderObject: collider1State?.object,
-            rigidBodyObject: rigidBody1State?.object
+          source2.collider.events?.onIntersectionEnter?.({
+            rigidBody: source1.rigidBody.object,
+            collider: source1.collider.object,
+            colliderObject: source1.collider.state?.object,
+            rigidBodyObject: source1.rigidBody.state?.object
           });
         }
       } else {
-        rigidBody1Events?.onIntersectionExit?.({
-          rigidBody: rigidBody2,
-          collider: collider2
+        source1.rigidBody.events?.onIntersectionExit?.({
+          rigidBody: source2.rigidBody.object,
+          collider: source2.collider.object
         });
-        rigidBody2Events?.onIntersectionExit?.({
-          rigidBody: rigidBody1,
-          collider: collider1
+        source2.rigidBody.events?.onIntersectionExit?.({
+          rigidBody: source1.rigidBody.object,
+          collider: source1.collider.object
         });
-        collider1Events?.onIntersectionExit?.({
-          rigidBody: rigidBody2,
-          collider: collider2
+        source1.collider.events?.onIntersectionExit?.({
+          rigidBody: source2.rigidBody.object,
+          collider: source2.collider.object
         });
-        collider2Events?.onIntersectionExit?.({
-          rigidBody: rigidBody1,
-          collider: collider1
+        source2.collider.events?.onIntersectionExit?.({
+          rigidBody: source1.rigidBody.object,
+          collider: source1.collider.object
         });
       }
+    });
+
+    eventQueue.drainContactForceEvents((event) => {
+      const source1 = getSourceFromColliderHandle(event.collider1());
+      const source2 = getSourceFromColliderHandle(event.collider2());
+
+      // Collision Events
+      if (!source1?.collider.object || !source2?.collider.object) {
+        return;
+      }
+
+      source1.rigidBody.events?.onContactForce?.({
+        rigidBody: source2.rigidBody.object,
+        collider: source2.collider.object,
+        colliderObject: source2.collider.state?.object,
+        rigidBodyObject: source2.rigidBody.state?.object,
+        totalForce: event.totalForce(),
+        totalForceMagnitude: event.totalForceMagnitude(),
+        maxForceDirection: event.maxForceDirection(),
+        maxForceMagnitude: event.maxForceMagnitude()
+      });
+
+      source2.rigidBody.events?.onContactForce?.({
+        rigidBody: source1.rigidBody.object,
+        collider: source1.collider.object,
+        colliderObject: source1.collider.state?.object,
+        rigidBodyObject: source1.rigidBody.state?.object,
+        totalForce: event.totalForce(),
+        totalForceMagnitude: event.totalForceMagnitude(),
+        maxForceDirection: event.maxForceDirection(),
+        maxForceMagnitude: event.maxForceMagnitude()
+      });
+
+      source1.collider.events?.onContactForce?.({
+        rigidBody: source2.rigidBody.object,
+        collider: source2.collider.object,
+        colliderObject: source2.collider.state?.object,
+        rigidBodyObject: source2.rigidBody.state?.object,
+        totalForce: event.totalForce(),
+        totalForceMagnitude: event.totalForceMagnitude(),
+        maxForceDirection: event.maxForceDirection(),
+        maxForceMagnitude: event.maxForceMagnitude()
+      });
+
+      source2.collider.events?.onContactForce?.({
+        rigidBody: source1.rigidBody.object,
+        collider: source1.collider.object,
+        colliderObject: source1.collider.state?.object,
+        rigidBodyObject: source1.rigidBody.state?.object,
+        totalForce: event.totalForce(),
+        totalForceMagnitude: event.totalForceMagnitude(),
+        maxForceDirection: event.maxForceDirection(),
+        maxForceMagnitude: event.maxForceMagnitude()
+      });
     });
   }, updatePriority);
 
