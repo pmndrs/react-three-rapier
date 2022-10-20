@@ -148,6 +148,14 @@ interface RapierWorldProps {
    * @defaultValue undefined
    */
   updatePriority?: number;
+
+  /**
+   * Interpolate the world transform using the frame delta times.
+   * Has no effect if timeStep is set to "vary".
+   *
+   * @default true
+   **/
+  interpolate?: boolean;
 }
 
 export const Physics: FC<RapierWorldProps> = ({
@@ -156,7 +164,8 @@ export const Physics: FC<RapierWorldProps> = ({
   children,
   timeStep = 1 / 60,
   paused = false,
-  updatePriority
+  updatePriority,
+  interpolate = true
 }) => {
   const rapier = useAsset(importRapier);
 
@@ -195,7 +204,11 @@ export const Physics: FC<RapierWorldProps> = ({
     }
   }, [gravity]);
 
-  const [steppingState] = useState({
+  const [steppingState] = useState<{
+    accumulator: number;
+    previousState: Record<number, any>;
+  }>({
+    previousState: {},
     accumulator: 0
   });
 
@@ -260,15 +273,28 @@ export const Physics: FC<RapierWorldProps> = ({
 
       if (!paused) {
         while (steppingState.accumulator >= timeStep) {
+          if (interpolate) {
+            // Set up previous state
+            // needed for accurate interpolations if the world steps more than once
+            steppingState.previousState = {};
+            world.forEachRigidBody((body) => {
+              steppingState.previousState[body.handle] = {
+                position: body.translation(),
+                rotation: body.rotation()
+              };
+            });
+          }
+
           world.step(eventQueue);
           steppingState.accumulator -= timeStep;
         }
       }
     }
 
-    const interpolationAlpha = timeStepVariable
-      ? 1
-      : (steppingState.accumulator % timeStep) / timeStep;
+    const interpolationAlpha =
+      timeStepVariable || !interpolate
+        ? 1
+        : steppingState.accumulator / timeStep;
 
     // Update meshes
     rigidBodyStates.forEach((state, handle) => {
@@ -292,6 +318,26 @@ export const Physics: FC<RapierWorldProps> = ({
       let t = rigidBody.translation() as Vector3;
       let r = rigidBody.rotation() as Quaternion;
 
+      let previousState = steppingState.previousState[handle];
+
+      if (previousState) {
+        // Get previous simulated world position
+        _matrix4
+          .compose(
+            previousState.position,
+            rapierQuaternionToQuaternion(previousState.rotation),
+            state.scale
+          )
+          .premultiply(state.invertedWorldMatrix)
+          .decompose(_position, _rotation, _scale);
+
+        // Apply previous tick position
+        if (!(state.object instanceof InstancedMesh)) {
+          state.object.position.copy(_position);
+          state.object.quaternion.copy(_rotation);
+        }
+      }
+
       // Get new position
       _matrix4
         .compose(t, rapierQuaternionToQuaternion(r), state.scale)
@@ -302,7 +348,7 @@ export const Physics: FC<RapierWorldProps> = ({
         state.setMatrix(_matrix4);
         state.object.instanceMatrix.needsUpdate = true;
       } else {
-        // Interpolate from last position
+        // Interpolate to new position
         state.object.position.lerp(_position, interpolationAlpha);
         state.object.quaternion.slerp(_rotation, interpolationAlpha);
       }
