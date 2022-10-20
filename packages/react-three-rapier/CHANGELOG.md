@@ -1,5 +1,17 @@
 # @react-three/rapier
 
+## 0.9.0
+
+### Minor Changes
+
+- 668252c: Add support for contact force events (@micmania1)
+
+### Patch Changes
+
+- bf68df9: More accurate interpolation by adding current previous state (@wiledal)
+- f50fb7b: The RigidBody `userData` prop now sets rigid body `userData`, as well as the object3d `userData` (@isaac-mason)
+- 5d46293: Add name prop to RigidBody and collider components (@micmania1)
+
 ## 0.8.2
 
 ### Patch Changes
