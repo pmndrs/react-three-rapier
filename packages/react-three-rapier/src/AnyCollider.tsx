@@ -41,7 +41,7 @@ export interface ColliderProps extends UseColliderOptions<any> {
 export const AnyCollider = memo(
   React.forwardRef(
     (props: ColliderProps, forwardedRef: ForwardedRef<Collider[]>) => {
-      const { children, position, rotation, quaternion, scale } = props;
+      const { children, position, rotation, quaternion, scale, name } = props;
       const { world, colliderEvents, colliderStates } = useRapier();
       const rigidBodyContext = useRigidBodyContext();
       const ref = useRef<Object3D>(null);
@@ -131,6 +131,7 @@ export const AnyCollider = memo(
           quaternion={quaternion}
           scale={scale}
           ref={ref}
+          name={name}
         >
           {children}
         </object3D>
