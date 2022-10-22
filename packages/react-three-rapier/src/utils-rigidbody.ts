@@ -92,6 +92,9 @@ const mutableRigidBodyOptions: MutableRigidBodyOptions = {
   ccd: (rb: RigidBody, value: boolean) => {
     rb.enableCcd(value);
   },
+  userData: (rb: RigidBody, value: { [key: string]: any }) => {
+    rb.userData = value;
+  },
   position: () => {},
   rotation: () => {},
   quaternion: () => {},

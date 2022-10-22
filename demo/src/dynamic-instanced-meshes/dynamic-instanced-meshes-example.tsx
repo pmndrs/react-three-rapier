@@ -64,9 +64,11 @@ export const DynamicInstancedMeshes = () => {
     addBody();
   })
 
-  const onSelect = useCallback<(e: ThreeEvent<MouseEvent>) => void>(({ intersections }) => {
-    if (!intersections[0]) return;
-    const i = intersections[0].instanceId;
+  const onSelect = useCallback<(e: ThreeEvent<MouseEvent>) => void>((e) => {
+    e.stopPropagation();
+    const intersection = e.intersections[0];
+    if (!intersection) return;
+    const i = intersection.instanceId;
     if (i === undefined) return;
     setRigidBodiesProps(bodies => {
       if (!bodies[i]) return bodies;
@@ -76,9 +78,11 @@ export const DynamicInstancedMeshes = () => {
     })
   }, [])
 
-  const onRemove = useCallback<(e: ThreeEvent<MouseEvent>) => void>(({ intersections }) => {
-    if (!intersections[0]) return;
-    const i = intersections[0].instanceId;
+  const onRemove = useCallback<(e: ThreeEvent<MouseEvent>) => void>((e) => {
+    e.stopPropagation();
+    const intersection = e.intersections[0];
+    if (!intersection) return;
+    const i = intersection.instanceId;
     if (i === undefined) return;
     setRigidBodiesProps(bodies => {
       if (!bodies[i]) return bodies;
