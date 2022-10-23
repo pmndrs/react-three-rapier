@@ -253,6 +253,10 @@ export type BaseCollisionPayload = {
   collider: RapierCollider;
   rigidBodyObject?: Object3D;
   colliderObject?: Object3D;
+  thisRigidBody?: RapierRigidBody;
+  thisCollider: RapierCollider;
+  thisRigidBodyObject?: Object3D;
+  thisColliderObject?: Object3D;
 };
 
 export type CollisionEnterPayload = BaseCollisionPayload & {

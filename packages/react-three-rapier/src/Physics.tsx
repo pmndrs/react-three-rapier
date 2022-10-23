@@ -374,6 +374,10 @@ export const Physics: FC<RapierWorldProps> = ({
               collider: source2.collider.object,
               colliderObject: source2.collider.state?.object,
               rigidBodyObject: source2.rigidBody.state?.object,
+              thisRigidBody: source1.rigidBody.object,
+              thisCollider: source1.collider.object,
+              thisColliderObject: source1.collider.state?.object,
+              thisRigidBodyObject: source1.rigidBody.state?.object,
               manifold,
               flipped
             });
@@ -383,6 +387,10 @@ export const Physics: FC<RapierWorldProps> = ({
               collider: source1.collider.object,
               colliderObject: source1.collider.state?.object,
               rigidBodyObject: source1.rigidBody.state?.object,
+              thisRigidBody: source2.rigidBody.object,
+              thisCollider: source2.collider.object,
+              thisColliderObject: source2.collider.state?.object,
+              thisRigidBodyObject: source2.rigidBody.state?.object,
               manifold,
               flipped
             });
@@ -393,6 +401,10 @@ export const Physics: FC<RapierWorldProps> = ({
               collider: source2.collider.object,
               colliderObject: source2.collider.state?.object,
               rigidBodyObject: source2.rigidBody.state?.object,
+              thisRigidBody: source1.rigidBody.object,
+              thisCollider: source1.collider.object,
+              thisColliderObject: source1.collider.state?.object,
+              thisRigidBodyObject: source1.rigidBody.state?.object,
               manifold,
               flipped
             });
@@ -402,6 +414,10 @@ export const Physics: FC<RapierWorldProps> = ({
               collider: source1.collider.object,
               colliderObject: source1.collider.state?.object,
               rigidBodyObject: source1.rigidBody.state?.object,
+              thisRigidBody: source2.rigidBody.object,
+              thisCollider: source2.collider.object,
+              thisColliderObject: source2.collider.state?.object,
+              thisRigidBodyObject: source2.rigidBody.state?.object,
               manifold,
               flipped
             });
@@ -410,19 +426,27 @@ export const Physics: FC<RapierWorldProps> = ({
       } else {
         source1.rigidBody.events?.onCollisionExit?.({
           rigidBody: source2.rigidBody.object,
-          collider: source2.collider.object
+          collider: source2.collider.object,
+          thisRigidBody: source1.rigidBody.object,
+          thisCollider: source1.collider.object
         });
         source2.rigidBody.events?.onCollisionExit?.({
           rigidBody: source1.rigidBody.object,
-          collider: source1.collider.object
+          collider: source1.collider.object,
+          thisRigidBody: source2.rigidBody.object,
+          thisCollider: source2.collider.object,
         });
         source1.collider.events?.onCollisionExit?.({
           rigidBody: source2.rigidBody.object,
-          collider: source2.collider.object
+          collider: source2.collider.object,
+          thisRigidBody: source1.rigidBody.object,
+          thisCollider: source1.collider.object
         });
         source2.collider.events?.onCollisionExit?.({
           rigidBody: source1.rigidBody.object,
-          collider: source1.collider.object
+          collider: source1.collider.object,
+          thisRigidBody: source2.rigidBody.object,
+          thisCollider: source2.collider.object,
         });
       }
 
@@ -438,46 +462,70 @@ export const Physics: FC<RapierWorldProps> = ({
             rigidBody: source2.rigidBody.object,
             collider: source2.collider.object,
             colliderObject: source2.collider.state?.object,
-            rigidBodyObject: source2.rigidBody.state?.object
+            rigidBodyObject: source2.rigidBody.state?.object,
+            thisRigidBody: source1.rigidBody.object,
+            thisCollider: source1.collider.object,
+            thisColliderObject: source1.collider.state?.object,
+            thisRigidBodyObject: source1.rigidBody.state?.object
           });
 
           source2.rigidBody.events?.onIntersectionEnter?.({
             rigidBody: source1.rigidBody.object,
             collider: source1.collider.object,
             colliderObject: source1.collider.state?.object,
-            rigidBodyObject: source1.rigidBody.state?.object
+            rigidBodyObject: source1.rigidBody.state?.object,
+            thisRigidBody: source2.rigidBody.object,
+            thisCollider: source2.collider.object,
+            thisColliderObject: source2.collider.state?.object,
+            thisRigidBodyObject: source2.rigidBody.state?.object,
           });
 
           source1.collider.events?.onIntersectionEnter?.({
             rigidBody: source2.rigidBody.object,
             collider: source2.collider.object,
             colliderObject: source2.collider.state?.object,
-            rigidBodyObject: source2.rigidBody.state?.object
+            rigidBodyObject: source2.rigidBody.state?.object,
+            thisRigidBody: source1.rigidBody.object,
+            thisCollider: source1.collider.object,
+            thisColliderObject: source1.collider.state?.object,
+            thisRigidBodyObject: source1.rigidBody.state?.object,
           });
 
           source2.collider.events?.onIntersectionEnter?.({
             rigidBody: source1.rigidBody.object,
             collider: source1.collider.object,
             colliderObject: source1.collider.state?.object,
-            rigidBodyObject: source1.rigidBody.state?.object
+            rigidBodyObject: source1.rigidBody.state?.object,
+            thisRigidBody: source2.rigidBody.object,
+            thisCollider: source2.collider.object,
+            thisColliderObject: source2.collider.state?.object,
+            thisRigidBodyObject: source2.rigidBody.state?.object,
           });
         }
       } else {
         source1.rigidBody.events?.onIntersectionExit?.({
           rigidBody: source2.rigidBody.object,
-          collider: source2.collider.object
+          collider: source2.collider.object,
+          thisRigidBody: source1.rigidBody.object,
+          thisCollider: source1.collider.object,
         });
         source2.rigidBody.events?.onIntersectionExit?.({
           rigidBody: source1.rigidBody.object,
-          collider: source1.collider.object
+          collider: source1.collider.object,
+          thisRigidBody: source2.rigidBody.object,
+          thisCollider: source2.collider.object,
         });
         source1.collider.events?.onIntersectionExit?.({
           rigidBody: source2.rigidBody.object,
-          collider: source2.collider.object
+          collider: source2.collider.object,
+          thisRigidBody: source1.rigidBody.object,
+          thisCollider: source1.collider.object,
         });
         source2.collider.events?.onIntersectionExit?.({
           rigidBody: source1.rigidBody.object,
-          collider: source1.collider.object
+          collider: source1.collider.object,
+          thisRigidBody: source2.rigidBody.object,
+          thisCollider: source2.collider.object,
         });
       }
     });
@@ -496,6 +544,10 @@ export const Physics: FC<RapierWorldProps> = ({
         collider: source2.collider.object,
         colliderObject: source2.collider.state?.object,
         rigidBodyObject: source2.rigidBody.state?.object,
+        thisRigidBody: source1.rigidBody.object,
+        thisCollider: source1.collider.object,
+        thisColliderObject: source1.collider.state?.object,
+        thisRigidBodyObject: source1.rigidBody.state?.object,
         totalForce: event.totalForce(),
         totalForceMagnitude: event.totalForceMagnitude(),
         maxForceDirection: event.maxForceDirection(),
@@ -507,6 +559,10 @@ export const Physics: FC<RapierWorldProps> = ({
         collider: source1.collider.object,
         colliderObject: source1.collider.state?.object,
         rigidBodyObject: source1.rigidBody.state?.object,
+        thisRigidBody: source2.rigidBody.object,
+        thisCollider: source2.collider.object,
+        thisColliderObject: source2.collider.state?.object,
+        thisRigidBodyObject: source2.rigidBody.state?.object,
         totalForce: event.totalForce(),
         totalForceMagnitude: event.totalForceMagnitude(),
         maxForceDirection: event.maxForceDirection(),
@@ -518,6 +574,10 @@ export const Physics: FC<RapierWorldProps> = ({
         collider: source2.collider.object,
         colliderObject: source2.collider.state?.object,
         rigidBodyObject: source2.rigidBody.state?.object,
+        thisRigidBody: source1.rigidBody.object,
+        thisCollider: source1.collider.object,
+        thisColliderObject: source1.collider.state?.object,
+        thisRigidBodyObject: source1.rigidBody.state?.object,
         totalForce: event.totalForce(),
         totalForceMagnitude: event.totalForceMagnitude(),
         maxForceDirection: event.maxForceDirection(),
@@ -529,6 +589,10 @@ export const Physics: FC<RapierWorldProps> = ({
         collider: source1.collider.object,
         colliderObject: source1.collider.state?.object,
         rigidBodyObject: source1.rigidBody.state?.object,
+        thisRigidBody: source2.rigidBody.object,
+        thisCollider: source2.collider.object,
+        thisColliderObject: source2.collider.state?.object,
+        thisRigidBodyObject: source2.rigidBody.state?.object,
         totalForce: event.totalForce(),
         totalForceMagnitude: event.totalForceMagnitude(),
         maxForceDirection: event.maxForceDirection(),
