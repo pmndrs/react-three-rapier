@@ -281,21 +281,19 @@ export const Physics: FC<RapierWorldProps> = ({
 
       if (!paused) {
         while (steppingState.accumulator >= timeStep) {
-          if (interpolate) {
+          world.forEachRigidBody((body) => {
             // Set up previous state
             // needed for accurate interpolations if the world steps more than once
-            steppingState.previousState = {};
-            world.forEachRigidBody((body) => {
+            if (interpolate) {
+              steppingState.previousState = {};
               steppingState.previousState[body.handle] = {
                 position: body.translation(),
                 rotation: body.rotation()
               };
-            });
-          }
+            }
 
-          // Apply attractors
-          attractorStates.forEach((attractorState) => {
-            world.forEachRigidBody((body) => {
+            // Apply attractors
+            attractorStates.forEach((attractorState) => {
               applyAttractorForceOnRigidBody(body, attractorState);
             });
           });
