@@ -248,15 +248,24 @@ export interface UseColliderOptions<ColliderArgs extends Array<unknown>> {
   sensor?: boolean;
 }
 
-export type BaseCollisionPayload = {
+export type BaseCollisionObject = {
   rigidBody?: RapierRigidBody;
   collider: RapierCollider;
   rigidBodyObject?: Object3D;
   colliderObject?: Object3D;
-  thisRigidBody?: RapierRigidBody;
-  thisCollider: RapierCollider;
-  thisRigidBodyObject?: Object3D;
-  thisColliderObject?: Object3D;
+}
+
+export type BaseCollisionPayload = {
+  target: BaseCollisionObject;
+  other: BaseCollisionObject;
+  /** deprecated use `other.rigidBody` instead */
+  rigidBody?: RapierRigidBody;
+  /** deprecated use `other.collider` instead */
+  collider: RapierCollider;
+  /** deprecated use `other.rigidBodyObject` instead */
+  rigidBodyObject?: Object3D;
+  /** deprecated use `other.colliderObject` instead */
+  colliderObject?: Object3D;
 };
 
 export type CollisionEnterPayload = BaseCollisionPayload & {
