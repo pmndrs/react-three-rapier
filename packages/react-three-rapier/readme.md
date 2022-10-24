@@ -314,8 +314,8 @@ Contact force events are triggered on `<RigidBody>` and any collider components 
 
 The payload for the contact force event contains the following properties:
 
-- `target` - The object firing the event.
-- `other` - The other object involved in the event.
+`target` - The object firing the event.
+`other` - The other object involved in the event.
 `totalForce` - The sum of all the forces between the two colliders
 `totalForceMagnitude` - The sum of the magnitudes of each force between the two colliders
 `maxForceDirection` - The magnitude of the largest force at a contact point of this contact pair
