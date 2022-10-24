@@ -1,10 +1,10 @@
+import { Sphere } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import {
   Attractor,
-  CuboidCollider,
   InstancedRigidBodies,
   InstancedRigidBodyApi,
-  useRapier
+  RigidBody
 } from "@react-three/rapier";
 import { createRef, useEffect, useRef } from "react";
 import { Demo } from "../App";
@@ -35,7 +35,13 @@ export const AttractorExample: Demo = () => {
         </instancedMesh>
       </InstancedRigidBodies>
 
-      <Attractor range={20} strength={2} />
+      <RigidBody>
+        <Sphere />
+        <Attractor strength={2} />
+      </RigidBody>
+
+      <Attractor position={[20, 0, 0]} range={20} strength={-2} />
+      <Attractor position={[-20, 0, 0]} range={20} strength={2} />
     </group>
   );
 };

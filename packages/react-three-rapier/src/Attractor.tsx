@@ -3,7 +3,7 @@ import { RigidBody } from "@dimforge/rapier3d-compat";
 import { Vector3Array } from "./types";
 import { useRapier } from "./hooks";
 import { FC, memo, useEffect, useRef } from "react";
-import { Object3D } from "three";
+import { Object3D, Vector3 } from "three";
 import { _position, _vector3 } from "./shared-objects";
 
 type GravityType = "static" | "linear" | "newtonian";
@@ -43,7 +43,10 @@ export const applyAttractorForceOnRigidBody = (
 ) => {
   const rbPosition = rigidBody.translation();
   _position.set(rbPosition.x, rbPosition.y, rbPosition.z);
-  const distance: number = object.position.distanceTo(_position);
+
+  const worldPosition = object.getWorldPosition(new Vector3());
+
+  const distance: number = worldPosition.distanceTo(_position);
 
   if (distance < range) {
     let force = calcForceByType[gravityType](
@@ -59,7 +62,7 @@ export const applyAttractorForceOnRigidBody = (
 
     _vector3
       .set(0, 0, 0)
-      .subVectors(object.position, _position)
+      .subVectors(worldPosition, _position)
       .normalize()
       .multiplyScalar(force);
 
