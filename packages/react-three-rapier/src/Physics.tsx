@@ -501,7 +501,7 @@ export const Physics: FC<RapierWorldProps> = ({
       }
 
       source1.rigidBody.events?.onContactForce?.({
-        ...getBaseCollisionPayload(source1, source2, true),
+        ...getBaseCollisionPayload(source1, source2),
         totalForce: event.totalForce(),
         totalForceMagnitude: event.totalForceMagnitude(),
         maxForceDirection: event.maxForceDirection(),
@@ -509,7 +509,7 @@ export const Physics: FC<RapierWorldProps> = ({
       });
 
       source2.rigidBody.events?.onContactForce?.({
-        ...getBaseCollisionPayload(source2, source1, true),
+        ...getBaseCollisionPayload(source2, source1),
         totalForce: event.totalForce(),
         totalForceMagnitude: event.totalForceMagnitude(),
         maxForceDirection: event.maxForceDirection(),
@@ -517,7 +517,7 @@ export const Physics: FC<RapierWorldProps> = ({
       });
 
       source1.collider.events?.onContactForce?.({
-        ...getBaseCollisionPayload(source1, source2, true),
+        ...getBaseCollisionPayload(source1, source2),
         totalForce: event.totalForce(),
         totalForceMagnitude: event.totalForceMagnitude(),
         maxForceDirection: event.maxForceDirection(),
@@ -525,7 +525,7 @@ export const Physics: FC<RapierWorldProps> = ({
       });
 
       source2.collider.events?.onContactForce?.({
-        ...getBaseCollisionPayload(source2, source1, true),
+        ...getBaseCollisionPayload(source2, source1),
         totalForce: event.totalForce(),
         totalForceMagnitude: event.totalForceMagnitude(),
         maxForceDirection: event.maxForceDirection(),
