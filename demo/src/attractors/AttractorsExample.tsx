@@ -35,7 +35,7 @@ export const AttractorExample: Demo = () => {
         </instancedMesh>
       </InstancedRigidBodies>
 
-      <Attractor range={100} strength={2} />
+      <Attractor range={20} strength={2} />
     </group>
   );
 };
