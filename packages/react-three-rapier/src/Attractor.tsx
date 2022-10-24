@@ -5,14 +5,45 @@ import { useRapier } from "./hooks";
 import { FC, memo, useEffect, useRef } from "react";
 import { Object3D, Vector3 } from "three";
 import { _position, _vector3 } from "./shared-objects";
+import { Object3DProps } from "@react-three/fiber";
 
 type GravityType = "static" | "linear" | "newtonian";
 
 interface AttractorProps {
-  position?: Vector3Array;
+  /**
+   * The relative position of this attractor
+   */
+  position?: Object3DProps["position"];
+
+  /**
+   * The strength of the attractor.
+   * Positive values attract, negative values repel.
+   *
+   * @default 1
+   */
   strength?: number;
+
+  /**
+   * The range of the attractor. Will not affect objects outside of this range.
+   *
+   * @default 10
+   * @min 0
+   */
   range?: number;
-  gravityType?: GravityType;
+
+  /**
+   * The type of gravity to use.
+   * - static: The gravity is constant and does not change over time.
+   * - linear: The gravity is linearly interpolated the closer the object is to the attractor.
+   * - newtonian: The gravity is calculated using the newtonian gravity formula.
+   * @default "static"
+   */
+  type?: GravityType;
+
+  /**
+   * The mass of the attractor. Used when type is `newtonian`.
+   * @default 6.673e-11
+   */
   gravitationalConstant?: number;
 }
 
@@ -33,13 +64,7 @@ const calcForceByType = {
 
 export const applyAttractorForceOnRigidBody = (
   rigidBody: RigidBody,
-  {
-    object,
-    strength,
-    range,
-    gravitationalConstant,
-    gravityType
-  }: AttractorState
+  { object, strength, range, gravitationalConstant, type }: AttractorState
 ) => {
   const rbPosition = rigidBody.translation();
   _position.set(rbPosition.x, rbPosition.y, rbPosition.z);
@@ -49,7 +74,7 @@ export const applyAttractorForceOnRigidBody = (
   const distance: number = worldPosition.distanceTo(_position);
 
   if (distance < range) {
-    let force = calcForceByType[gravityType](
+    let force = calcForceByType[type](
       strength,
       rigidBody.mass(),
       range,
@@ -73,9 +98,9 @@ export const applyAttractorForceOnRigidBody = (
 export const Attractor: FC<AttractorProps> = memo((props) => {
   const {
     position = [0, 0, 0],
-    strength = 0.5,
-    range = 15,
-    gravityType = "static",
+    strength = 1,
+    range = 10,
+    type = "static",
     gravitationalConstant = 6.673e-11
   } = props;
   const { attractorStates } = useRapier();
@@ -89,7 +114,7 @@ export const Attractor: FC<AttractorProps> = memo((props) => {
         object: object.current,
         strength,
         range,
-        gravityType,
+        type,
         gravitationalConstant
       });
     }

@@ -351,6 +351,31 @@ A Collider can be set to be a sensor, which means that it will not generate any 
 </RigidBody>
 ```
 
+## Attractor
+
+An attractor simulates a source of gravity. Any rigid-body within range will be "pulled" toward the attractor.
+
+The force applied to rigid-bodies within range is calculated differently, depending on the `gravityType`.
+
+```tsx
+<Attractor range={10} strength={5} type="linear" position={[5, -5, 0]} />
+```
+
+Gravity types:
+
+- Static (Default)  
+  Static gravity means that the same force (`strength`) is applied on all rigid-bodies within range, regardless of distance.
+
+- Linear  
+  Linear gravity means that force is calculated as `strength * distance / range`. That means the force applied decreases the farther a rigid-body is from the attractor position.
+
+- Newtonian  
+  Newtonian gravity uses the traditional method of calculating gravitational force (`F = GMm/r^2`) and as such force is calculated as `gravitationalConstant * mass1 * mass2 / Math.pow(distance, 2)`.
+  - `gravitationalConstant` defaults to 6.673e-11 but you can provide your own
+  - `mass1` here is the "mass" of the Attractor, which is just the `strength` property
+  - `mass2` is the mass of the rigid-body at the time of calculation. Note that rigid-bodies with colliders will use the mass provided to the collider. This is not a value you can control from the attractor, only from wherever you're creating rigid-body components in the scene.
+  - `distance` is the distance between the attractor and rigid-body at the time of calculation
+
 ## Joints
 
 WIP
@@ -370,24 +395,3 @@ The `timeStep` prop may also be set to `"vary"`, which will cause the simulation
 ```
 
 > **Note** This is useful for games that run at variable frame rates, but may cause instability in the simulation. It also prevents the physics simulation from being fully deterministic. Please use with care!
-
----
-
-## Roadmap
-
-In order, but also not necessarily:
-
-- [x] RigidBodies, Colliders
-- [x] Joints
-- [x] Nested objects retain world transforms
-- [x] Nested objects retain correct collider scale
-- [x] Automatic colliders based on rigidbody children
-- [x] Translation and rotational constraints
-- [x] Collision events
-- [x] Colliders outside RigidBodies
-- [x] InstancedMesh support
-- [x] Timestep improvements for determinism
-- [x] Normalize and improve collision events (add events to single Colliders)
-- [x] Add collision events to InstancedRigidBodies
-- [ ] Docs
-- [ ] CodeSandbox examples
