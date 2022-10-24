@@ -73,7 +73,6 @@ export const Debug: FC<DebugProps> = () => {
 
     // Update attractors
     if (!mapsEqual(currMap.current, attractorStates)) {
-      console.log("new attr");
       setAttractors([...attractorStates.values()]);
       currMap.current = new Map(attractorStates);
     }
