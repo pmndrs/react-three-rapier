@@ -351,25 +351,30 @@ A Collider can be set to be a sensor, which means that it will not generate any 
 </RigidBody>
 ```
 
-## Attractor
+## Attractors
 
-An attractor simulates a source of gravity. Any rigid-body within range will be "pulled" toward the attractor.
+An attractor simulates a source of gravity. Any `RigidBody` within range will be _pulled_ (attracted) toward the attractor.  
+Setting the `strength` to a negative value will cause the `RigidBody` to be _pushed_ (repelled) away from the attractor.
 
-The force applied to rigid-bodies within range is calculated differently, depending on the `gravityType`.
+The force applied to rigid-bodies within range is calculated differently, depending on the `type`.
 
 ```tsx
+// Standard attractor
 <Attractor range={10} strength={5} type="linear" position={[5, -5, 0]} />
+
+// An attractor with negative strength, repels RigidBodies
+<Attractor range={10} strength={-5} position={[5, -5, 0]} />
 ```
 
 Gravity types:
 
-- Static (Default)  
+- "static" (Default)  
   Static gravity means that the same force (`strength`) is applied on all rigid-bodies within range, regardless of distance.
 
-- Linear  
+- "linear"  
   Linear gravity means that force is calculated as `strength * distance / range`. That means the force applied decreases the farther a rigid-body is from the attractor position.
 
-- Newtonian  
+- "newtonian"  
   Newtonian gravity uses the traditional method of calculating gravitational force (`F = GMm/r^2`) and as such force is calculated as `gravitationalConstant * mass1 * mass2 / Math.pow(distance, 2)`.
   - `gravitationalConstant` defaults to 6.673e-11 but you can provide your own
   - `mass1` here is the "mass" of the Attractor, which is just the `strength` property
