@@ -256,7 +256,9 @@ export type BaseCollisionObject = {
 }
 
 export type BaseCollisionPayload = {
+  /** the object firing the event */
   target: BaseCollisionObject;
+  /** the other object involved in the event */
   other: BaseCollisionObject;
   /** deprecated use `other.rigidBody` instead */
   rigidBody?: RapierRigidBody;
