@@ -11,12 +11,12 @@
 
 For contributions, please read the [contributing guide](https://github.com/pmndrs/react-three-rapier/blob/main/packages/react-three-rapier/CONTRIBUTING.md).
 
-## Usage
+## Basic Usage
 
 ```tsx
 import { Box, Torus } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
-import { Physics, RigidBody } from "@react-three/rapier";
+import { Physics, RigidBody, Debug } from "@react-three/rapier";
 
 const App = () => {
   return (
@@ -27,15 +27,31 @@ const App = () => {
             <Torus />
           </RigidBody>
 
-          <RigidBody position={[0, -2, 0]} type="kinematicPosition">
-            <Box args={[20, 0.5, 20]} />
-          </RigidBody>
+          <CuboidCollider position={[0, -2, 0]} args={[20, .5, 20]}>
+
+          <Debug />
         </Physics>
       </Suspense>
     </Canvas>
   );
 };
 ```
+
+---
+
+## Readme Topics
+
+- [Automatic Colliders](#automatic-colliders)
+- [Instanced Meshes](#instanced-meshes)
+- [Debug](#debug)
+- [Collision Events](#collision-events)
+- [Collision Groups](#configuring-collision-and-solver-groups)
+- [Contact Force Events](#contact-force-events)
+- [Sensors](#sensors)
+- [Attractors](#attractors)
+- [The timeStep](#configuring-time-step-size)
+
+---
 
 ## Automatic colliders
 
@@ -223,7 +239,7 @@ You can subscribe to collision and state events on a RigidBody:
 const RigidBottle = () => {
   const [isAsleep, setIsAsleep] = useState(false);
 
-return (
+  return (
     <RigidBody
       colliders="hull"
       onSleep={() => setIsAsleep(true)}
@@ -354,7 +370,7 @@ A Collider can be set to be a sensor, which means that it will not generate any 
 An attractor simulates a source of gravity. Any `RigidBody` within range will be _pulled_ (attracted) toward the attractor.  
 Setting the `strength` to a negative value will cause the `RigidBody` to be _pushed_ (repelled) away from the attractor.
 
-The force applied to rigid-bodies within range is calculated differently, depending on the `type`.
+The force applied to rigid-bodies within range is calculated differently depending on the `type`.
 
 ```tsx
 // Standard attractor
@@ -379,10 +395,6 @@ Gravity types:
   - `mass2` is the mass of the rigid-body at the time of calculation. Note that rigid-bodies with colliders will use the mass provided to the collider. This is not a value you can control from the attractor, only from wherever you're creating rigid-body components in the scene.
   - `distance` is the distance between the attractor and rigid-body at the time of calculation
 
-## Joints
-
-WIP
-
 ## Configuring Time Step Size
 
 By default, `<Physics>` will simulate the physics world at a fixed rate of 60 frames per second. This can be changed by setting the `timeStep` prop on `<Physics>`:
@@ -398,3 +410,7 @@ The `timeStep` prop may also be set to `"vary"`, which will cause the simulation
 ```
 
 > **Note** This is useful for games that run at variable frame rates, but may cause instability in the simulation. It also prevents the physics simulation from being fully deterministic. Please use with care!
+
+## Joints
+
+WIP
