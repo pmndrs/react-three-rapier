@@ -138,8 +138,6 @@ Instanced meshes can also be used and have automatic colliders generated from th
 
 By wrapping the `InstancedMesh` in `<InstancedRigidBodies />`, each instance will be attached to an individual `RigidBody`.
 
-> Note: Custom colliders (compound shapes) for InstancedMesh is currently not supported
-
 ```tsx
 import { InstancedRigidBodies } from "@react-three/rapier";
 
