@@ -22,7 +22,7 @@
     "happy-dom": "^7.5.5",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
-    "three": "^0.139.2",
+    "three": "^0.146.0",
     "vitest": "^0.24.1"
   },
   "peerDependencies": {
