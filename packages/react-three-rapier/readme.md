@@ -353,6 +353,8 @@ You can also add the `onContactForce` event to any collider.
 
 A Collider can be set to be a sensor, which means that it will not generate any contact points, and will not be affected by forces. This is useful for detecting when a collider enters or leaves another collider, without affecting the other collider.
 
+To detect when a collider enters or leaves another collider, you can use the `onIntersectionEnter` and `onIntersectionExit` events on the collider.
+
 ```tsx
 <RigidBody>
   <GoalPosts />

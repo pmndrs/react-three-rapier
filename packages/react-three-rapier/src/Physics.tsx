@@ -65,11 +65,12 @@ export type RigidBodyStateMap = Map<RigidBody["handle"], RigidBodyState>;
 export interface ColliderState {
   collider: Collider;
   object: Object3D;
+
   /**
    * The parent of which this collider needs to base its
-   * world position on
+   * world position on, can be empty
    */
-  worldParent: Object3D;
+  worldParent?: Object3D;
 }
 
 export type ColliderStateMap = Map<Collider["handle"], ColliderState>;
@@ -232,16 +233,18 @@ export const Physics: FC<RapierWorldProps> = ({
       const colliderState = colliderStates.get(handle);
 
       const rigidBodyHandle = collider?.parent()?.handle;
-      const rigidBody = rigidBodyHandle
-        ? world.getRigidBody(rigidBodyHandle)
-        : undefined;
+      const rigidBody =
+        rigidBodyHandle !== undefined
+          ? world.getRigidBody(rigidBodyHandle)
+          : undefined;
       const rbEvents =
-        rigidBody && rigidBodyHandle
+        rigidBody && rigidBodyHandle !== undefined
           ? rigidBodyEvents.get(rigidBodyHandle)
           : undefined;
-      const rigidBodyState = rigidBodyHandle
-        ? rigidBodyStates.get(rigidBodyHandle)
-        : undefined;
+      const rigidBodyState =
+        rigidBodyHandle !== undefined
+          ? rigidBodyStates.get(rigidBodyHandle)
+          : undefined;
 
       return {
         collider: {

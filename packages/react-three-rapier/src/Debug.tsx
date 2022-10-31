@@ -36,6 +36,7 @@ const AttractorHelper = (props: AttractorState) => {
         props.range,
         color
       );
+      normalsHelper.current.frustumCulled = false;
       scene.add(normalsHelper.current);
     }
 
@@ -56,7 +57,7 @@ const AttractorHelper = (props: AttractorState) => {
   });
 
   return (
-    <mesh ref={ref} position={props.object.position}>
+    <mesh ref={ref} position={props.object.position} frustumCulled={false}>
       <sphereGeometry args={[0.2, 6, 6]} />
       <meshBasicMaterial color={color} wireframe />
     </mesh>

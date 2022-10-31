@@ -1,9 +1,10 @@
-import { Sphere } from "@react-three/drei";
+import { Box, Html, Sphere } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import {
   Attractor,
   InstancedRigidBodies,
   InstancedRigidBodyApi,
+  interactionGroups,
   RigidBody
 } from "@react-three/rapier";
 import { createRef, useEffect, useRef } from "react";
@@ -35,13 +36,25 @@ export const AttractorExample: Demo = () => {
         </instancedMesh>
       </InstancedRigidBodies>
 
-      <RigidBody>
+      <RigidBody
+        position={[-21, 50, 0]}
+        colliders="ball"
+        collisionGroups={interactionGroups(1)}
+      >
         <Sphere />
-        <Attractor strength={2} />
+        <Html>Nested Attractor</Html>
+        <Attractor strength={4} collisionGroups={interactionGroups(1, 2)} />
       </RigidBody>
 
-      <Attractor position={[20, 0, 0]} range={20} strength={-2} />
-      <Attractor position={[-20, 0, 0]} range={20} strength={2} />
+      <group position={[20, 0, 0]}>
+        <Attractor range={20} strength={-2} />
+        <Html>Repeller</Html>
+      </group>
+
+      <group position={[-20, 0, 0]}>
+        <Attractor range={20} strength={10} />
+        <Html>Attractor</Html>
+      </group>
     </group>
   );
 };

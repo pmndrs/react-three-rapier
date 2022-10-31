@@ -25,4 +25,4 @@ export * from "./AnyCollider";
 export { Attractor } from "./Attractor";
 
 export * from "./hooks";
-export * from "./bitmasks";
+export * from "./interaction-groups";

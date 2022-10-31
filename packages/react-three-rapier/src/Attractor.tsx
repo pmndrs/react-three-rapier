@@ -1,11 +1,18 @@
 import React from "react";
-import { RigidBody } from "@dimforge/rapier3d-compat";
-import { Vector3Array } from "./types";
+import { InteractionGroups, RigidBody } from "@dimforge/rapier3d-compat";
 import { useRapier } from "./hooks";
 import { FC, memo, useEffect, useRef } from "react";
 import { Object3D, Vector3 } from "three";
 import { _position, _vector3 } from "./shared-objects";
 import { Object3DProps } from "@react-three/fiber";
+import {
+  BallArgs,
+  BallCollider,
+  interactionGroups,
+  IntersectionEnterHandler,
+  IntersectionExitHandler,
+  UseColliderOptions
+} from ".";
 
 type GravityType = "static" | "linear" | "newtonian";
 
@@ -45,11 +52,18 @@ interface AttractorProps {
    * @default 6.673e-11
    */
   gravitationalConstant?: number;
+
+  /**
+   * The collision groups that this attractor will apply effects to. If a RigidBody contains one or more colliders that are in one of the mask group, it will be affected by this attractor.
+   * If not specified, the attractor will apply effects to all RigidBodies.
+   */
+  collisionGroups?: InteractionGroups;
 }
 
 export interface AttractorState
-  extends Required<Omit<AttractorProps, "position">> {
+  extends Required<Omit<AttractorProps, "position" | "collisionGroups">> {
   object: Object3D;
+  collisionGroups?: InteractionGroups;
 }
 
 export type AttractorStateMap = Map<Object3D["uuid"], AttractorState>;
@@ -64,7 +78,14 @@ const calcForceByType = {
 
 export const applyAttractorForceOnRigidBody = (
   rigidBody: RigidBody,
-  { object, strength, range, gravitationalConstant, type }: AttractorState
+  {
+    object,
+    strength,
+    range,
+    gravitationalConstant,
+    collisionGroups,
+    type
+  }: AttractorState
 ) => {
   const rbPosition = rigidBody.translation();
   _position.set(rbPosition.x, rbPosition.y, rbPosition.z);
@@ -85,13 +106,32 @@ export const applyAttractorForceOnRigidBody = (
     // Prevent wild forces when Attractors collide
     force = force === Infinity ? strength : force;
 
-    _vector3
-      .set(0, 0, 0)
-      .subVectors(worldPosition, _position)
-      .normalize()
-      .multiplyScalar(force);
+    // Naively test if the rigidBody contains a collider in one of the collision groups
+    let isRigidBodyInCollisionGroup =
+      collisionGroups === undefined ? true : false;
+    if (collisionGroups !== undefined) {
+      for (let i = 0; i < rigidBody.numColliders(); i++) {
+        const collider = rigidBody.collider(i);
+        const colliderCollisionGroups = collider.collisionGroups();
+        if (
+          ((collisionGroups >> 16) & colliderCollisionGroups) != 0 &&
+          ((colliderCollisionGroups >> 16) & collisionGroups) != 0
+        ) {
+          isRigidBodyInCollisionGroup = true;
+          break;
+        }
+      }
+    }
 
-    rigidBody.applyImpulse(_vector3, true);
+    if (isRigidBodyInCollisionGroup) {
+      _vector3
+        .set(0, 0, 0)
+        .subVectors(worldPosition, _position)
+        .normalize()
+        .multiplyScalar(force);
+
+      rigidBody.applyImpulse(_vector3, true);
+    }
   }
 };
 
@@ -101,7 +141,8 @@ export const Attractor: FC<AttractorProps> = memo((props) => {
     strength = 1,
     range = 10,
     type = "static",
-    gravitationalConstant = 6.673e-11
+    gravitationalConstant = 6.673e-11,
+    collisionGroups
   } = props;
   const { attractorStates } = useRapier();
   const object = useRef<Object3D>(null);
@@ -115,7 +156,8 @@ export const Attractor: FC<AttractorProps> = memo((props) => {
         strength,
         range,
         type,
-        gravitationalConstant
+        gravitationalConstant,
+        collisionGroups
       });
     }
 
