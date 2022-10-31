@@ -1,3 +1,5 @@
+import { Attractor } from "./Attractor";
+
 export * from "./types";
 export type { RigidBodyApi, WorldApi, InstancedRigidBodyApi } from "./api";
 export type { RigidBodyProps } from "./RigidBody";
@@ -20,6 +22,7 @@ export { MeshCollider } from "./MeshCollider";
 export { Debug } from "./Debug";
 export { InstancedRigidBodies } from "./InstancedRigidBodies";
 export * from "./AnyCollider";
+export { Attractor } from "./Attractor";
 
 export * from "./hooks";
-export * from "./bitmasks";
+export * from "./interaction-groups";

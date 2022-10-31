@@ -11,12 +11,12 @@
 
 For contributions, please read the [contributing guide](https://github.com/pmndrs/react-three-rapier/blob/main/packages/react-three-rapier/CONTRIBUTING.md).
 
-## Usage
+## Basic Usage
 
 ```tsx
 import { Box, Torus } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
-import { Physics, RigidBody } from "@react-three/rapier";
+import { Physics, RigidBody, Debug } from "@react-three/rapier";
 
 const App = () => {
   return (
@@ -27,15 +27,31 @@ const App = () => {
             <Torus />
           </RigidBody>
 
-          <RigidBody position={[0, -2, 0]} type="kinematicPosition">
-            <Box args={[20, 0.5, 20]} />
-          </RigidBody>
+          <CuboidCollider position={[0, -2, 0]} args={[20, .5, 20]}>
+
+          <Debug />
         </Physics>
       </Suspense>
     </Canvas>
   );
 };
 ```
+
+---
+
+## Readme Topics
+
+- [Automatic Colliders](#automatic-colliders)
+- [Instanced Meshes](#instanced-meshes)
+- [Debug](#debug)
+- [Collision Events](#collision-events)
+- [Collision Groups](#configuring-collision-and-solver-groups)
+- [Contact Force Events](#contact-force-events)
+- [Sensors](#sensors)
+- [Attractors](#attractors)
+- [The timeStep](#configuring-time-step-size)
+
+---
 
 ## Automatic colliders
 
@@ -138,8 +154,6 @@ Instanced meshes can also be used and have automatic colliders generated from th
 
 By wrapping the `InstancedMesh` in `<InstancedRigidBodies />`, each instance will be attached to an individual `RigidBody`.
 
-> Note: Custom colliders (compound shapes) for InstancedMesh is currently not supported
-
 ```tsx
 import { InstancedRigidBodies } from "@react-three/rapier";
 
@@ -225,7 +239,7 @@ You can subscribe to collision and state events on a RigidBody:
 const RigidBottle = () => {
   const [isAsleep, setIsAsleep] = useState(false);
 
-return (
+  return (
     <RigidBody
       colliders="hull"
       onSleep={() => setIsAsleep(true)}
@@ -339,6 +353,8 @@ You can also add the `onContactForce` event to any collider.
 
 A Collider can be set to be a sensor, which means that it will not generate any contact points, and will not be affected by forces. This is useful for detecting when a collider enters or leaves another collider, without affecting the other collider.
 
+To detect when a collider enters or leaves another collider, you can use the `onIntersectionEnter` and `onIntersectionExit` events on the collider.
+
 ```tsx
 <RigidBody>
   <GoalPosts />
@@ -351,9 +367,35 @@ A Collider can be set to be a sensor, which means that it will not generate any 
 </RigidBody>
 ```
 
-## Joints
+## Attractors
 
-WIP
+An attractor simulates a source of gravity. Any `RigidBody` within range will be _pulled_ (attracted) toward the attractor.  
+Setting the `strength` to a negative value will cause the `RigidBody` to be _pushed_ (repelled) away from the attractor.
+
+The force applied to rigid-bodies within range is calculated differently depending on the `type`.
+
+```tsx
+// Standard attractor
+<Attractor range={10} strength={5} type="linear" position={[5, -5, 0]} />
+
+// An attractor with negative strength, repels RigidBodies
+<Attractor range={10} strength={-5} position={[5, -5, 0]} />
+```
+
+Gravity types:
+
+- "static" (Default)  
+  Static gravity means that the same force (`strength`) is applied on all rigid-bodies within range, regardless of distance.
+
+- "linear"  
+  Linear gravity means that force is calculated as `strength * distance / range`. That means the force applied decreases the farther a rigid-body is from the attractor position.
+
+- "newtonian"  
+  Newtonian gravity uses the traditional method of calculating gravitational force (`F = GMm/r^2`) and as such force is calculated as `gravitationalConstant * mass1 * mass2 / Math.pow(distance, 2)`.
+  - `gravitationalConstant` defaults to 6.673e-11 but you can provide your own
+  - `mass1` here is the "mass" of the Attractor, which is just the `strength` property
+  - `mass2` is the mass of the rigid-body at the time of calculation. Note that rigid-bodies with colliders will use the mass provided to the collider. This is not a value you can control from the attractor, only from wherever you're creating rigid-body components in the scene.
+  - `distance` is the distance between the attractor and rigid-body at the time of calculation
 
 ## Configuring Time Step Size
 
@@ -371,23 +413,6 @@ The `timeStep` prop may also be set to `"vary"`, which will cause the simulation
 
 > **Note** This is useful for games that run at variable frame rates, but may cause instability in the simulation. It also prevents the physics simulation from being fully deterministic. Please use with care!
 
----
+## Joints
 
-## Roadmap
-
-In order, but also not necessarily:
-
-- [x] RigidBodies, Colliders
-- [x] Joints
-- [x] Nested objects retain world transforms
-- [x] Nested objects retain correct collider scale
-- [x] Automatic colliders based on rigidbody children
-- [x] Translation and rotational constraints
-- [x] Collision events
-- [x] Colliders outside RigidBodies
-- [x] InstancedMesh support
-- [x] Timestep improvements for determinism
-- [x] Normalize and improve collision events (add events to single Colliders)
-- [x] Add collision events to InstancedRigidBodies
-- [ ] Docs
-- [ ] CodeSandbox examples
+WIP

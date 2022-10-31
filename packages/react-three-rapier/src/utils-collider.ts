@@ -154,13 +154,19 @@ export const setColliderOptions = (
   if (state) {
     // Update collider position based on the object's position
     const parentWorldScale = state.object.parent!.getWorldScale(_vector3);
+    const parentInvertedWorldMatrix = state.worldParent?.matrixWorld
+      .clone()
+      .invert();
 
     state.object.updateWorldMatrix(true, false);
 
-    _matrix4
-      .copy(state.object.matrixWorld)
-      .premultiply(state.worldParent.matrixWorld.clone().invert())
-      .decompose(_position, _rotation, _scale);
+    _matrix4.copy(state.object.matrixWorld);
+
+    if (parentInvertedWorldMatrix) {
+      _matrix4.premultiply(parentInvertedWorldMatrix);
+    }
+
+    _matrix4.decompose(_position, _rotation, _scale);
 
     if (collider.parent()) {
       collider.setTranslationWrtParent({
@@ -232,7 +238,7 @@ export const createColliderState = (
 ): ColliderState => {
   return {
     collider,
-    worldParent: rigidBodyObject || object.parent!,
+    worldParent: rigidBodyObject || undefined,
     object
   };
 };

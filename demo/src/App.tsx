@@ -14,6 +14,7 @@ import { NavLink, NavLinkProps, Route, Routes } from "react-router-dom";
 import { AllCollidersExample } from "./all-colliders/AllCollidersExample";
 import { AllShapesExample } from "./all-shapes/AllShapesExample";
 import { ApiUsage } from "./api-usage/ApiUsageExample";
+import { AttractorExample } from "./attractors/AttractorsExample";
 import { Car } from "./car/CarExample";
 import { Cluster } from "./cluster/ClusterExample";
 import { Colliders } from "./colliders/CollidersExample";
@@ -87,6 +88,7 @@ const routes: Record<string, ReactNode> = {
   transforms: <Transforms />,
   cluster: <Cluster />,
   "all-shapes": <AllShapesExample />,
+  attractors: <AttractorExample />,
   car: <Car />,
   "api-usage": <ApiUsage />,
   kinematics: <Kinematics />,

@@ -41,6 +41,11 @@ import {
 import { createWorldApi } from "./api";
 import { _matrix4, _position, _rotation, _scale } from "./shared-objects";
 import { rapierQuaternionToQuaternion, vectorArrayToVector3 } from "./utils";
+import {
+  applyAttractorForceOnRigidBody,
+  AttractorState,
+  AttractorStateMap
+} from "./Attractor";
 
 export interface RigidBodyState {
   rigidBody: RigidBody;
@@ -60,11 +65,12 @@ export type RigidBodyStateMap = Map<RigidBody["handle"], RigidBodyState>;
 export interface ColliderState {
   collider: Collider;
   object: Object3D;
+
   /**
    * The parent of which this collider needs to base its
-   * world position on
+   * world position on, can be empty
    */
-  worldParent: Object3D;
+  worldParent?: Object3D;
 }
 
 export type ColliderStateMap = Map<Collider["handle"], ColliderState>;
@@ -78,6 +84,8 @@ export interface RapierContext {
 
   rigidBodyEvents: EventMap;
   colliderEvents: EventMap;
+
+  attractorStates: AttractorStateMap;
 
   physicsOptions: {
     colliders: RigidBodyAutoCollider;
@@ -183,6 +191,7 @@ export const Physics: FC<RapierWorldProps> = ({
   const [rigidBodyEvents] = useState<EventMap>(() => new Map());
   const [colliderEvents] = useState<EventMap>(() => new Map());
   const [eventQueue] = useState(() => new EventQueue(false));
+  const [attractorStates] = useState<AttractorStateMap>(() => new Map());
 
   // Init world
   useEffect(() => {
@@ -224,16 +233,18 @@ export const Physics: FC<RapierWorldProps> = ({
       const colliderState = colliderStates.get(handle);
 
       const rigidBodyHandle = collider?.parent()?.handle;
-      const rigidBody = rigidBodyHandle
-        ? world.getRigidBody(rigidBodyHandle)
-        : undefined;
+      const rigidBody =
+        rigidBodyHandle !== undefined
+          ? world.getRigidBody(rigidBodyHandle)
+          : undefined;
       const rbEvents =
-        rigidBody && rigidBodyHandle
+        rigidBody && rigidBodyHandle !== undefined
           ? rigidBodyEvents.get(rigidBodyHandle)
           : undefined;
-      const rigidBodyState = rigidBodyHandle
-        ? rigidBodyStates.get(rigidBodyHandle)
-        : undefined;
+      const rigidBodyState =
+        rigidBodyHandle !== undefined
+          ? rigidBodyStates.get(rigidBodyHandle)
+          : undefined;
 
       return {
         collider: {
@@ -273,17 +284,22 @@ export const Physics: FC<RapierWorldProps> = ({
 
       if (!paused) {
         while (steppingState.accumulator >= timeStep) {
-          if (interpolate) {
+          world.forEachRigidBody((body) => {
             // Set up previous state
             // needed for accurate interpolations if the world steps more than once
-            steppingState.previousState = {};
-            world.forEachRigidBody((body) => {
+            if (interpolate) {
+              steppingState.previousState = {};
               steppingState.previousState[body.handle] = {
                 position: body.translation(),
                 rotation: body.rotation()
               };
+            }
+
+            // Apply attractors
+            attractorStates.forEach((attractorState) => {
+              applyAttractorForceOnRigidBody(body, attractorState);
             });
-          }
+          });
 
           world.step(eventQueue);
           steppingState.accumulator -= timeStep;
@@ -315,6 +331,7 @@ export const Physics: FC<RapierWorldProps> = ({
         return;
       }
 
+      // New states
       let t = rigidBody.translation() as Vector3;
       let r = rigidBody.rotation() as Quaternion;
 
@@ -551,6 +568,7 @@ export const Physics: FC<RapierWorldProps> = ({
       colliderStates,
       rigidBodyEvents,
       colliderEvents,
+      attractorStates,
       isPaused: paused
     }),
     [paused]
