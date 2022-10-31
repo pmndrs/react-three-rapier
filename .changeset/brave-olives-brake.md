@@ -1,5 +1,5 @@
 ---
-"@react-three/rapier": minor
+"@react-three/rapier": patch
 ---
 
-feat: events include data from both affected objects
+feat(CollisionEvents): include data from both affected objects (@RodrigoHamuy, @wiledal)

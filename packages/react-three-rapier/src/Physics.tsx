@@ -28,7 +28,7 @@ import {
 } from "three";
 import { useAsset } from "use-asset";
 import {
-  BaseCollisionPayload,
+  CollisionPayload,
   CollisionEnterHandler,
   CollisionExitHandler,
   ContactForceHandler,
@@ -93,42 +93,40 @@ export const RapierContext = createContext<RapierContext | undefined>(
 
 type CollisionSource = {
   collider: {
-    object: Collider,
-    events?: EventMapValue,
-    state?: ColliderState,
-  },
+    object: Collider;
+    events?: EventMapValue;
+    state?: ColliderState;
+  };
   rigidBody: {
-    object?: RigidBody,
-    events?: EventMapValue,
-    state?: RigidBodyState,
-  }
-}
+    object?: RigidBody;
+    events?: EventMapValue;
+    state?: RigidBodyState;
+  };
+};
 
-const getBaseCollisionPayload = (
-  target: CollisionSource, other: CollisionSource, onExit?: boolean
-): BaseCollisionPayload => {
-  const base: BaseCollisionPayload = {
-    target: {
-      rigidBody: target.rigidBody.object,
-      collider: target.collider.object,
-    },
-    other: {
-      rigidBody: other.rigidBody.object,
-      collider: other.collider.object,
-    },
+const getCollisionPayloadFromSource = (
+  target: CollisionSource,
+  other: CollisionSource
+): CollisionPayload => ({
+  target: {
+    rigidBody: target.rigidBody.object,
+    collider: target.collider.object,
+    colliderObject: target.collider.state?.object,
+    rigidBodyObject: target.rigidBody.state?.object
+  },
+
+  other: {
     rigidBody: other.rigidBody.object,
     collider: other.collider.object,
-  }
-  if(!onExit) {
-    base.target.colliderObject = target.collider.state?.object;
-    base.target.rigidBodyObject = target.rigidBody.state?.object;
-    base.other.colliderObject = other.collider.state?.object;
-    base.other.rigidBodyObject = other.rigidBody.state?.object;
-    base.colliderObject = other.collider.state?.object;
-    base.rigidBodyObject = other.rigidBody.state?.object;
-  }
-  return base;
-}
+    colliderObject: other.collider.state?.object,
+    rigidBodyObject: other.rigidBody.state?.object
+  },
+
+  rigidBody: other.rigidBody.object,
+  collider: other.collider.object,
+  colliderObject: other.collider.state?.object,
+  rigidBodyObject: other.rigidBody.state?.object
+});
 
 const importRapier = async () => {
   let r = await import("@dimforge/rapier3d-compat");
@@ -144,7 +142,7 @@ export type EventMapValue = {
   onIntersectionEnter?: IntersectionEnterHandler;
   onIntersectionExit?: IntersectionExitHandler;
   onContactForce?: ContactForceHandler;
-}
+};
 
 export type EventMap = Map<ColliderHandle | RigidBodyHandle, EventMapValue>;
 
@@ -274,7 +272,7 @@ export const Physics: FC<RapierWorldProps> = ({
         ? rigidBodyStates.get(rigidBodyHandle)
         : undefined;
 
-      const source : CollisionSource = {
+      const source: CollisionSource = {
         collider: {
           object: collider,
           events: colEvents,
@@ -285,7 +283,7 @@ export const Physics: FC<RapierWorldProps> = ({
           events: rbEvents,
           state: rigidBodyState
         }
-      }
+      };
 
       return source;
     }
@@ -404,6 +402,9 @@ export const Physics: FC<RapierWorldProps> = ({
         return;
       }
 
+      const collisionPayload1 = getCollisionPayloadFromSource(source1, source2);
+      const collisionPayload2 = getCollisionPayloadFromSource(source2, source1);
+
       if (started) {
         world.contactPair(
           source1.collider.object,
@@ -411,44 +412,36 @@ export const Physics: FC<RapierWorldProps> = ({
           (manifold, flipped) => {
             /* RigidBody events */
             source1.rigidBody.events?.onCollisionEnter?.({
-              ...getBaseCollisionPayload(source1, source2),
+              ...collisionPayload1,
               manifold,
               flipped
             });
 
             source2.rigidBody.events?.onCollisionEnter?.({
-              ...getBaseCollisionPayload(source2, source1),
+              ...collisionPayload2,
               manifold,
               flipped
             });
 
             /* Collider events */
             source1.collider.events?.onCollisionEnter?.({
-              ...getBaseCollisionPayload(source1, source2),
+              ...collisionPayload1,
               manifold,
               flipped
             });
 
             source2.collider.events?.onCollisionEnter?.({
-              ...getBaseCollisionPayload(source2, source1),
+              ...collisionPayload2,
               manifold,
               flipped
             });
           }
         );
       } else {
-        source1.rigidBody.events?.onCollisionExit?.(
-          getBaseCollisionPayload(source1, source2, true)
-        );
-        source2.rigidBody.events?.onCollisionExit?.(
-          getBaseCollisionPayload(source2, source1, true)
-        );
-        source1.collider.events?.onCollisionExit?.(
-          getBaseCollisionPayload(source1, source2, true)
-        );
-        source2.collider.events?.onCollisionExit?.(
-          getBaseCollisionPayload(source2, source1, true)
-        );
+        source1.rigidBody.events?.onCollisionExit?.(collisionPayload1);
+        source2.rigidBody.events?.onCollisionExit?.(collisionPayload2);
+        source1.collider.events?.onCollisionExit?.(collisionPayload1);
+        source2.collider.events?.onCollisionExit?.(collisionPayload2);
       }
 
       // Sensor Intersections
@@ -459,35 +452,19 @@ export const Physics: FC<RapierWorldProps> = ({
             source2.collider.object
           )
         ) {
-          source1.rigidBody.events?.onIntersectionEnter?.(
-            getBaseCollisionPayload(source1, source2)
-          );
+          source1.rigidBody.events?.onIntersectionEnter?.(collisionPayload1);
 
-          source2.rigidBody.events?.onIntersectionEnter?.(
-            getBaseCollisionPayload(source2, source1)
-          );
+          source2.rigidBody.events?.onIntersectionEnter?.(collisionPayload2);
 
-          source1.collider.events?.onIntersectionEnter?.(
-            getBaseCollisionPayload(source1, source2)
-          );
+          source1.collider.events?.onIntersectionEnter?.(collisionPayload1);
 
-          source2.collider.events?.onIntersectionEnter?.(
-            getBaseCollisionPayload(source2, source1)
-          );
+          source2.collider.events?.onIntersectionEnter?.(collisionPayload2);
         }
       } else {
-        source1.rigidBody.events?.onIntersectionExit?.(
-          getBaseCollisionPayload(source1, source2, true)
-        );
-        source2.rigidBody.events?.onIntersectionExit?.(
-          getBaseCollisionPayload(source2, source1, true)
-        );
-        source1.collider.events?.onIntersectionExit?.(
-          getBaseCollisionPayload(source1, source2, true)
-        );
-        source2.collider.events?.onIntersectionExit?.(
-          getBaseCollisionPayload(source2, source1, true)
-        );
+        source1.rigidBody.events?.onIntersectionExit?.(collisionPayload1);
+        source2.rigidBody.events?.onIntersectionExit?.(collisionPayload2);
+        source1.collider.events?.onIntersectionExit?.(collisionPayload1);
+        source2.collider.events?.onIntersectionExit?.(collisionPayload2);
       }
     });
 
@@ -500,8 +477,11 @@ export const Physics: FC<RapierWorldProps> = ({
         return;
       }
 
+      const collisionPayload1 = getCollisionPayloadFromSource(source1, source2);
+      const collisionPayload2 = getCollisionPayloadFromSource(source2, source1);
+
       source1.rigidBody.events?.onContactForce?.({
-        ...getBaseCollisionPayload(source1, source2),
+        ...collisionPayload1,
         totalForce: event.totalForce(),
         totalForceMagnitude: event.totalForceMagnitude(),
         maxForceDirection: event.maxForceDirection(),
@@ -509,7 +489,7 @@ export const Physics: FC<RapierWorldProps> = ({
       });
 
       source2.rigidBody.events?.onContactForce?.({
-        ...getBaseCollisionPayload(source2, source1),
+        ...collisionPayload2,
         totalForce: event.totalForce(),
         totalForceMagnitude: event.totalForceMagnitude(),
         maxForceDirection: event.maxForceDirection(),
@@ -517,7 +497,7 @@ export const Physics: FC<RapierWorldProps> = ({
       });
 
       source1.collider.events?.onContactForce?.({
-        ...getBaseCollisionPayload(source1, source2),
+        ...collisionPayload1,
         totalForce: event.totalForce(),
         totalForceMagnitude: event.totalForceMagnitude(),
         maxForceDirection: event.maxForceDirection(),
@@ -525,7 +505,7 @@ export const Physics: FC<RapierWorldProps> = ({
       });
 
       source2.collider.events?.onContactForce?.({
-        ...getBaseCollisionPayload(source2, source1),
+        ...collisionPayload2,
         totalForce: event.totalForce(),
         totalForceMagnitude: event.totalForceMagnitude(),
         maxForceDirection: event.maxForceDirection(),
