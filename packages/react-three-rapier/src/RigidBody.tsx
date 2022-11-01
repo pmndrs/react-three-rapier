@@ -70,3 +70,5 @@ export const RigidBody = memo(
     );
   })
 );
+
+RigidBody.displayName = "RigidBody";

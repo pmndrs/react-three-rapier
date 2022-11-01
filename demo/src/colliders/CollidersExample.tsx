@@ -45,7 +45,6 @@ export const Colliders: Demo = () => {
       <Ball />
 
       <group position={[0, 0, 0]} name="potato">
-        <Box />
         <CuboidCollider
           args={[10, 1, 10]}
           position={[0, 0, 0]}

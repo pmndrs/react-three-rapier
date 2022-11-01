@@ -93,6 +93,8 @@ export interface RapierContext {
   };
 
   isPaused: boolean;
+
+  step: (deltaTime: number) => void;
 }
 
 export const RapierContext = createContext<RapierContext | undefined>(
@@ -300,7 +302,7 @@ export const Physics: FC<RapierWorldProps> = ({
     }
   }, []);
 
-  useFrame((_, dt) => {
+  const step = useCallback((dt: number) => {
     const world = worldRef.current;
     if (!world) return;
 
@@ -313,36 +315,34 @@ export const Physics: FC<RapierWorldProps> = ({
 
     if (timeStepVariable) {
       world.timestep = clampedDelta;
-      if (!paused) world.step(eventQueue);
+      world.step(eventQueue);
     } else {
       world.timestep = timeStep;
 
       // don't step time forwards if paused
       // Increase accumulator
-      steppingState.accumulator += paused ? 0 : clampedDelta;
+      steppingState.accumulator += clampedDelta;
 
-      if (!paused) {
-        while (steppingState.accumulator >= timeStep) {
-          world.forEachRigidBody((body) => {
-            // Set up previous state
-            // needed for accurate interpolations if the world steps more than once
-            if (interpolate) {
-              steppingState.previousState = {};
-              steppingState.previousState[body.handle] = {
-                position: body.translation(),
-                rotation: body.rotation()
-              };
-            }
+      while (steppingState.accumulator >= timeStep) {
+        world.forEachRigidBody((body) => {
+          // Set up previous state
+          // needed for accurate interpolations if the world steps more than once
+          if (interpolate) {
+            steppingState.previousState = {};
+            steppingState.previousState[body.handle] = {
+              position: body.translation(),
+              rotation: body.rotation()
+            };
+          }
 
-            // Apply attractors
-            attractorStates.forEach((attractorState) => {
-              applyAttractorForceOnRigidBody(body, attractorState);
-            });
+          // Apply attractors
+          attractorStates.forEach((attractorState) => {
+            applyAttractorForceOnRigidBody(body, attractorState);
           });
+        });
 
-          world.step(eventQueue);
-          steppingState.accumulator -= timeStep;
-        }
+        world.step(eventQueue);
+        steppingState.accumulator -= timeStep;
       }
     }
 
@@ -529,6 +529,10 @@ export const Physics: FC<RapierWorldProps> = ({
         maxForceMagnitude: event.maxForceMagnitude()
       });
     });
+  }, []);
+
+  useFrame((_, dt) => {
+    if (!paused) step(dt);
   }, updatePriority);
 
   const api = useMemo(() => createWorldApi(getWorldRef), []);
@@ -546,7 +550,8 @@ export const Physics: FC<RapierWorldProps> = ({
       rigidBodyEvents,
       colliderEvents,
       attractorStates,
-      isPaused: paused
+      isPaused: paused,
+      step
     }),
     [paused]
   );

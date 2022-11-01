@@ -183,3 +183,5 @@ export const InstancedRigidBodies = forwardRef<
     </RigidBodyContext.Provider>
   );
 });
+
+InstancedRigidBodies.displayName = "InstancedRigidBodies";
