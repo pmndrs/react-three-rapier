@@ -67,7 +67,9 @@ const Explosion = ({ position }: { position: [number, number, number] }) => {
 };
 
 const Collisioner = (
-  props: UseRigidBodyOptions & { children(color: string): ReactNode }
+  props: Omit<UseRigidBodyOptions, "children"> & {
+    children(color: string): ReactNode;
+  }
 ) => {
   const [color, setColor] = useState("blue");
   const { setExplosions } = useContext(explosionContext) as {
@@ -77,8 +79,14 @@ const Collisioner = (
   const { children, type, colliders, position } = props;
 
   const handleCollisionEnter: CollisionEnterHandler = useCallback(
-    ({ manifold }) => {
+    ({ manifold, other, target }) => {
       setColor("red");
+
+      // console.log(
+      //   target.rigidBodyObject?.name,
+      //   "collided with",
+      //   other.rigidBodyObject?.name
+      // );
 
       const contact = manifold?.solverContactPoint(0) as {
         x: number;
@@ -107,6 +115,7 @@ const Collisioner = (
       position={position}
       onCollisionEnter={handleCollisionEnter}
       onCollisionExit={handleCollsionExit}
+      name={props.name}
     >
       {children(color)}
     </RigidBody>
@@ -116,14 +125,14 @@ const Collisioner = (
 const Collisioners = memo(() => {
   return (
     <group>
-      <Collisioner position={[1, 4, 0]} colliders={"cuboid"}>
+      <Collisioner position={[1, 4, 0]} colliders={"cuboid"} name={"Box 1"}>
         {(color) => (
           <Box>
             <meshPhysicalMaterial color={color} />
           </Box>
         )}
       </Collisioner>
-      <Collisioner position={[-1, 5, 0]} colliders={"cuboid"}>
+      <Collisioner position={[-1, 5, 0]} colliders={"cuboid"} name={"Box 2"}>
         {(color) => (
           <Box>
             <meshPhysicalMaterial color={color} />
@@ -131,7 +140,7 @@ const Collisioners = memo(() => {
         )}
       </Collisioner>
 
-      <Collisioner colliders="ball" position={[0, 8, 0]}>
+      <Collisioner colliders="ball" position={[0, 8, 0]} name={"Sphere 1"}>
         {(color) => (
           <Sphere>
             <meshPhysicalMaterial color={color} />
@@ -139,11 +148,15 @@ const Collisioners = memo(() => {
         )}
       </Collisioner>
 
-      <Collisioner colliders="hull" position={[-4, 2, 0]}>
+      <Collisioner colliders="hull" position={[-4, 2, 0]} name={"Suzanne"}>
         {(color) => <Suzanne color={color} />}
       </Collisioner>
 
-      <Collisioner colliders={false} collisionGroups={interactionGroups([1])}>
+      <Collisioner
+        colliders={false}
+        collisionGroups={interactionGroups([1])}
+        name={"Capsule 1"}
+      >
         {(color) => (
           <>
             <mesh>
@@ -164,7 +177,12 @@ const Collisioners = memo(() => {
         )}
       </Collisioner>
 
-      <Collisioner type={"fixed"} position={[0, -8, 0]} colliders={false}>
+      <Collisioner
+        type={"fixed"}
+        position={[0, -8, 0]}
+        colliders={false}
+        name={"Floor"}
+      >
         {(color) => (
           <>
             <mesh geometry={heightFieldGeometry} receiveShadow>
