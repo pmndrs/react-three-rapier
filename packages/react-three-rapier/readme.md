@@ -399,6 +399,10 @@ The force applied to rigid-bodies within range is calculated differently dependi
 
 // An attractor with negative strength, repels RigidBodies
 <Attractor range={10} strength={-5} position={[5, -5, 0]} />
+
+// You can also assign InteractionGroups.
+// An attractor belonging to group 0 only affecting bodies in group 2, and 3
+<Attractor range={10} strength={10} position={[5, -5, 0]} collisionGroups={interactionGroups(0, [2,3])} />
 ```
 
 Gravity types:
