@@ -80,12 +80,27 @@ export interface RapierContext {
   rapier: typeof Rapier;
   world: WorldApi;
 
+  /**
+   * @internal
+   */
   rigidBodyStates: RigidBodyStateMap;
+  /**
+   * @internal
+   */
   colliderStates: ColliderStateMap;
 
+  /**
+   * @internal
+   */
   rigidBodyEvents: EventMap;
+  /**
+   * @internal
+   */
   colliderEvents: EventMap;
 
+  /**
+   * @internal
+   */
   attractorStates: AttractorStateMap;
 
   physicsOptions: {
@@ -94,6 +109,16 @@ export interface RapierContext {
 
   isPaused: boolean;
 
+  /**
+   * Step the physics world one step
+   *
+   * @param deltaTime The delta time to step the world with
+   *
+   * @example
+   * ```
+   * step(1/60)
+   * ```
+   */
   step: (deltaTime: number) => void;
 }
 

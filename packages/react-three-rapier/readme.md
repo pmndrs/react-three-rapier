@@ -50,6 +50,7 @@ const App = () => {
 - [Sensors](#sensors)
 - [Attractors](#attractors)
 - [The timeStep](#configuring-time-step-size)
+- [Manual stepping](#manual-stepping)
 
 ---
 
@@ -441,6 +442,16 @@ The `timeStep` prop may also be set to `"vary"`, which will cause the simulation
 ```
 
 > **Note** This is useful for games that run at variable frame rates, but may cause instability in the simulation. It also prevents the physics simulation from being fully deterministic. Please use with care!
+
+## Manual stepping
+
+You can also manually step the physics simulation by calling the `step` method from the `useRapier` hook.
+
+```tsx
+const { step } = useRapier();
+
+step(1 / 60);
+```
 
 ## Joints
 
