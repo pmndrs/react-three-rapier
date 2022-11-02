@@ -215,3 +215,13 @@ export const ConvexHullCollider = React.forwardRef(
     return <AnyCollider {...props} shape="convexHull" ref={ref} />;
   }
 );
+
+CuboidCollider.displayName = "CuboidCollider";
+RoundCuboidCollider.displayName = "RoundCuboidCollider";
+BallCollider.displayName = "BallCollider";
+CapsuleCollider.displayName = "CapsuleCollider";
+HeightfieldCollider.displayName = "HeightfieldCollider";
+TrimeshCollider.displayName = "TrimeshCollider";
+ConeCollider.displayName = "ConeCollider";
+CylinderCollider.displayName = "CylinderCollider";
+ConvexHullCollider.displayName = "ConvexHullCollider";

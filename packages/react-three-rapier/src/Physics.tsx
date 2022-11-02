@@ -80,12 +80,27 @@ export interface RapierContext {
   rapier: typeof Rapier;
   world: WorldApi;
 
+  /**
+   * @internal
+   */
   rigidBodyStates: RigidBodyStateMap;
+  /**
+   * @internal
+   */
   colliderStates: ColliderStateMap;
 
+  /**
+   * @internal
+   */
   rigidBodyEvents: EventMap;
+  /**
+   * @internal
+   */
   colliderEvents: EventMap;
 
+  /**
+   * @internal
+   */
   attractorStates: AttractorStateMap;
 
   physicsOptions: {
@@ -93,6 +108,18 @@ export interface RapierContext {
   };
 
   isPaused: boolean;
+
+  /**
+   * Step the physics world one step
+   *
+   * @param deltaTime The delta time to step the world with
+   *
+   * @example
+   * ```
+   * step(1/60)
+   * ```
+   */
+  step: (deltaTime: number) => void;
 }
 
 export const RapierContext = createContext<RapierContext | undefined>(
@@ -300,28 +327,28 @@ export const Physics: FC<RapierWorldProps> = ({
     }
   }, []);
 
-  useFrame((_, dt) => {
-    const world = worldRef.current;
-    if (!world) return;
+  const step = useCallback(
+    (dt: number) => {
+      const world = worldRef.current;
+      if (!world) return;
 
-    /**
-     * Fixed timeStep simulation progression
-     * @see https://gafferongames.com/post/fix_your_timestep/
-     */
+      /**
+       * Fixed timeStep simulation progression
+       * @see https://gafferongames.com/post/fix_your_timestep/
+       */
 
-    const clampedDelta = MathUtils.clamp(dt, 0, 0.2);
+      const clampedDelta = MathUtils.clamp(dt, 0, 0.2);
 
-    if (timeStepVariable) {
-      world.timestep = clampedDelta;
-      if (!paused) world.step(eventQueue);
-    } else {
-      world.timestep = timeStep;
+      if (timeStepVariable) {
+        world.timestep = clampedDelta;
+        world.step(eventQueue);
+      } else {
+        world.timestep = timeStep;
 
-      // don't step time forwards if paused
-      // Increase accumulator
-      steppingState.accumulator += paused ? 0 : clampedDelta;
+        // don't step time forwards if paused
+        // Increase accumulator
+        steppingState.accumulator += clampedDelta;
 
-      if (!paused) {
         while (steppingState.accumulator >= timeStep) {
           world.forEachRigidBody((body) => {
             // Set up previous state
@@ -344,191 +371,208 @@ export const Physics: FC<RapierWorldProps> = ({
           steppingState.accumulator -= timeStep;
         }
       }
-    }
 
-    const interpolationAlpha =
-      timeStepVariable || !interpolate
-        ? 1
-        : steppingState.accumulator / timeStep;
+      const interpolationAlpha =
+        timeStepVariable || !interpolate || paused
+          ? 1
+          : steppingState.accumulator / timeStep;
 
-    // Update meshes
-    rigidBodyStates.forEach((state, handle) => {
-      const rigidBody = world.getRigidBody(handle);
+      // Update meshes
+      rigidBodyStates.forEach((state, handle) => {
+        const rigidBody = world.getRigidBody(handle);
 
-      const events = rigidBodyEvents.get(handle);
-      if (events?.onSleep || events?.onWake) {
-        if (rigidBody.isSleeping() && !state.isSleeping) {
-          events?.onSleep?.();
+        const events = rigidBodyEvents.get(handle);
+        if (events?.onSleep || events?.onWake) {
+          if (rigidBody.isSleeping() && !state.isSleeping) {
+            events?.onSleep?.();
+          }
+          if (!rigidBody.isSleeping() && state.isSleeping) {
+            events?.onWake?.();
+          }
+          state.isSleeping = rigidBody.isSleeping();
         }
-        if (!rigidBody.isSleeping() && state.isSleeping) {
-          events?.onWake?.();
+
+        if (!rigidBody || rigidBody.isSleeping() || !state.setMatrix) {
+          return;
         }
-        state.isSleeping = rigidBody.isSleeping();
-      }
 
-      if (!rigidBody || rigidBody.isSleeping() || !state.setMatrix) {
-        return;
-      }
+        // New states
+        let t = rigidBody.translation() as Vector3;
+        let r = rigidBody.rotation() as Quaternion;
 
-      // New states
-      let t = rigidBody.translation() as Vector3;
-      let r = rigidBody.rotation() as Quaternion;
+        let previousState = steppingState.previousState[handle];
 
-      let previousState = steppingState.previousState[handle];
+        if (previousState) {
+          // Get previous simulated world position
+          _matrix4
+            .compose(
+              previousState.position,
+              rapierQuaternionToQuaternion(previousState.rotation),
+              state.scale
+            )
+            .premultiply(state.invertedWorldMatrix)
+            .decompose(_position, _rotation, _scale);
 
-      if (previousState) {
-        // Get previous simulated world position
+          // Apply previous tick position
+          if (!(state.object instanceof InstancedMesh)) {
+            state.object.position.copy(_position);
+            state.object.quaternion.copy(_rotation);
+          }
+        }
+
+        // Get new position
         _matrix4
-          .compose(
-            previousState.position,
-            rapierQuaternionToQuaternion(previousState.rotation),
-            state.scale
-          )
+          .compose(t, rapierQuaternionToQuaternion(r), state.scale)
           .premultiply(state.invertedWorldMatrix)
           .decompose(_position, _rotation, _scale);
 
-        // Apply previous tick position
-        if (!(state.object instanceof InstancedMesh)) {
-          state.object.position.copy(_position);
-          state.object.quaternion.copy(_rotation);
+        if (state.object instanceof InstancedMesh) {
+          state.setMatrix(_matrix4);
+          state.object.instanceMatrix.needsUpdate = true;
+        } else {
+          // Interpolate to new position
+          state.object.position.lerp(_position, interpolationAlpha);
+          state.object.quaternion.slerp(_rotation, interpolationAlpha);
         }
-      }
+      });
 
-      // Get new position
-      _matrix4
-        .compose(t, rapierQuaternionToQuaternion(r), state.scale)
-        .premultiply(state.invertedWorldMatrix)
-        .decompose(_position, _rotation, _scale);
+      eventQueue.drainCollisionEvents((handle1, handle2, started) => {
+        const source1 = getSourceFromColliderHandle(handle1);
+        const source2 = getSourceFromColliderHandle(handle2);
 
-      if (state.object instanceof InstancedMesh) {
-        state.setMatrix(_matrix4);
-        state.object.instanceMatrix.needsUpdate = true;
-      } else {
-        // Interpolate to new position
-        state.object.position.lerp(_position, interpolationAlpha);
-        state.object.quaternion.slerp(_rotation, interpolationAlpha);
-      }
-    });
+        // Collision Events
+        if (!source1?.collider.object || !source2?.collider.object) {
+          return;
+        }
 
-    eventQueue.drainCollisionEvents((handle1, handle2, started) => {
-      const source1 = getSourceFromColliderHandle(handle1);
-      const source2 = getSourceFromColliderHandle(handle2);
-
-      // Collision Events
-      if (!source1?.collider.object || !source2?.collider.object) {
-        return;
-      }
-
-      const collisionPayload1 = getCollisionPayloadFromSource(source1, source2);
-      const collisionPayload2 = getCollisionPayloadFromSource(source2, source1);
-
-      if (started) {
-        world.contactPair(
-          source1.collider.object,
-          source2.collider.object,
-          (manifold, flipped) => {
-            /* RigidBody events */
-            source1.rigidBody.events?.onCollisionEnter?.({
-              ...collisionPayload1,
-              manifold,
-              flipped
-            });
-
-            source2.rigidBody.events?.onCollisionEnter?.({
-              ...collisionPayload2,
-              manifold,
-              flipped
-            });
-
-            /* Collider events */
-            source1.collider.events?.onCollisionEnter?.({
-              ...collisionPayload1,
-              manifold,
-              flipped
-            });
-
-            source2.collider.events?.onCollisionEnter?.({
-              ...collisionPayload2,
-              manifold,
-              flipped
-            });
-          }
+        const collisionPayload1 = getCollisionPayloadFromSource(
+          source1,
+          source2
         );
-      } else {
-        source1.rigidBody.events?.onCollisionExit?.(collisionPayload1);
-        source2.rigidBody.events?.onCollisionExit?.(collisionPayload2);
-        source1.collider.events?.onCollisionExit?.(collisionPayload1);
-        source2.collider.events?.onCollisionExit?.(collisionPayload2);
-      }
+        const collisionPayload2 = getCollisionPayloadFromSource(
+          source2,
+          source1
+        );
 
-      // Sensor Intersections
-      if (started) {
-        if (
-          world.intersectionPair(
+        if (started) {
+          world.contactPair(
             source1.collider.object,
-            source2.collider.object
-          )
-        ) {
-          source1.rigidBody.events?.onIntersectionEnter?.(collisionPayload1);
+            source2.collider.object,
+            (manifold, flipped) => {
+              /* RigidBody events */
+              source1.rigidBody.events?.onCollisionEnter?.({
+                ...collisionPayload1,
+                manifold,
+                flipped
+              });
 
-          source2.rigidBody.events?.onIntersectionEnter?.(collisionPayload2);
+              source2.rigidBody.events?.onCollisionEnter?.({
+                ...collisionPayload2,
+                manifold,
+                flipped
+              });
 
-          source1.collider.events?.onIntersectionEnter?.(collisionPayload1);
+              /* Collider events */
+              source1.collider.events?.onCollisionEnter?.({
+                ...collisionPayload1,
+                manifold,
+                flipped
+              });
 
-          source2.collider.events?.onIntersectionEnter?.(collisionPayload2);
+              source2.collider.events?.onCollisionEnter?.({
+                ...collisionPayload2,
+                manifold,
+                flipped
+              });
+            }
+          );
+        } else {
+          source1.rigidBody.events?.onCollisionExit?.(collisionPayload1);
+          source2.rigidBody.events?.onCollisionExit?.(collisionPayload2);
+          source1.collider.events?.onCollisionExit?.(collisionPayload1);
+          source2.collider.events?.onCollisionExit?.(collisionPayload2);
         }
-      } else {
-        source1.rigidBody.events?.onIntersectionExit?.(collisionPayload1);
-        source2.rigidBody.events?.onIntersectionExit?.(collisionPayload2);
-        source1.collider.events?.onIntersectionExit?.(collisionPayload1);
-        source2.collider.events?.onIntersectionExit?.(collisionPayload2);
-      }
-    });
 
-    eventQueue.drainContactForceEvents((event) => {
-      const source1 = getSourceFromColliderHandle(event.collider1());
-      const source2 = getSourceFromColliderHandle(event.collider2());
+        // Sensor Intersections
+        if (started) {
+          if (
+            world.intersectionPair(
+              source1.collider.object,
+              source2.collider.object
+            )
+          ) {
+            source1.rigidBody.events?.onIntersectionEnter?.(collisionPayload1);
 
-      // Collision Events
-      if (!source1?.collider.object || !source2?.collider.object) {
-        return;
-      }
+            source2.rigidBody.events?.onIntersectionEnter?.(collisionPayload2);
 
-      const collisionPayload1 = getCollisionPayloadFromSource(source1, source2);
-      const collisionPayload2 = getCollisionPayloadFromSource(source2, source1);
+            source1.collider.events?.onIntersectionEnter?.(collisionPayload1);
 
-      source1.rigidBody.events?.onContactForce?.({
-        ...collisionPayload1,
-        totalForce: event.totalForce(),
-        totalForceMagnitude: event.totalForceMagnitude(),
-        maxForceDirection: event.maxForceDirection(),
-        maxForceMagnitude: event.maxForceMagnitude()
+            source2.collider.events?.onIntersectionEnter?.(collisionPayload2);
+          }
+        } else {
+          source1.rigidBody.events?.onIntersectionExit?.(collisionPayload1);
+          source2.rigidBody.events?.onIntersectionExit?.(collisionPayload2);
+          source1.collider.events?.onIntersectionExit?.(collisionPayload1);
+          source2.collider.events?.onIntersectionExit?.(collisionPayload2);
+        }
       });
 
-      source2.rigidBody.events?.onContactForce?.({
-        ...collisionPayload2,
-        totalForce: event.totalForce(),
-        totalForceMagnitude: event.totalForceMagnitude(),
-        maxForceDirection: event.maxForceDirection(),
-        maxForceMagnitude: event.maxForceMagnitude()
-      });
+      eventQueue.drainContactForceEvents((event) => {
+        const source1 = getSourceFromColliderHandle(event.collider1());
+        const source2 = getSourceFromColliderHandle(event.collider2());
 
-      source1.collider.events?.onContactForce?.({
-        ...collisionPayload1,
-        totalForce: event.totalForce(),
-        totalForceMagnitude: event.totalForceMagnitude(),
-        maxForceDirection: event.maxForceDirection(),
-        maxForceMagnitude: event.maxForceMagnitude()
-      });
+        // Collision Events
+        if (!source1?.collider.object || !source2?.collider.object) {
+          return;
+        }
 
-      source2.collider.events?.onContactForce?.({
-        ...collisionPayload2,
-        totalForce: event.totalForce(),
-        totalForceMagnitude: event.totalForceMagnitude(),
-        maxForceDirection: event.maxForceDirection(),
-        maxForceMagnitude: event.maxForceMagnitude()
+        const collisionPayload1 = getCollisionPayloadFromSource(
+          source1,
+          source2
+        );
+        const collisionPayload2 = getCollisionPayloadFromSource(
+          source2,
+          source1
+        );
+
+        source1.rigidBody.events?.onContactForce?.({
+          ...collisionPayload1,
+          totalForce: event.totalForce(),
+          totalForceMagnitude: event.totalForceMagnitude(),
+          maxForceDirection: event.maxForceDirection(),
+          maxForceMagnitude: event.maxForceMagnitude()
+        });
+
+        source2.rigidBody.events?.onContactForce?.({
+          ...collisionPayload2,
+          totalForce: event.totalForce(),
+          totalForceMagnitude: event.totalForceMagnitude(),
+          maxForceDirection: event.maxForceDirection(),
+          maxForceMagnitude: event.maxForceMagnitude()
+        });
+
+        source1.collider.events?.onContactForce?.({
+          ...collisionPayload1,
+          totalForce: event.totalForce(),
+          totalForceMagnitude: event.totalForceMagnitude(),
+          maxForceDirection: event.maxForceDirection(),
+          maxForceMagnitude: event.maxForceMagnitude()
+        });
+
+        source2.collider.events?.onContactForce?.({
+          ...collisionPayload2,
+          totalForce: event.totalForce(),
+          totalForceMagnitude: event.totalForceMagnitude(),
+          maxForceDirection: event.maxForceDirection(),
+          maxForceMagnitude: event.maxForceMagnitude()
+        });
       });
-    });
+    },
+    [paused]
+  );
+
+  useFrame((_, dt) => {
+    if (!paused) step(dt);
   }, updatePriority);
 
   const api = useMemo(() => createWorldApi(getWorldRef), []);
@@ -546,9 +590,10 @@ export const Physics: FC<RapierWorldProps> = ({
       rigidBodyEvents,
       colliderEvents,
       attractorStates,
-      isPaused: paused
+      isPaused: paused,
+      step
     }),
-    [paused]
+    [paused, step]
   );
 
   return (

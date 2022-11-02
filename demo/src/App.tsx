@@ -1,6 +1,6 @@
 import { Box, Environment, OrbitControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
-import { Debug, Physics, RigidBody } from "@react-three/rapier";
+import { Debug, Physics, RigidBody, useRapier } from "@react-three/rapier";
 import { Perf } from "r3f-perf";
 import {
   createContext,
@@ -8,7 +8,8 @@ import {
   Suspense,
   useContext,
   useState,
-  StrictMode
+  StrictMode,
+  useEffect
 } from "react";
 import { NavLink, NavLinkProps, Route, Routes } from "react-router-dom";
 import { AllCollidersExample } from "./all-colliders/AllCollidersExample";
@@ -27,6 +28,7 @@ import { InstancedMeshes } from "./instanced-meshes/InstancedMeshesExample";
 import { InstancedMeshesCompound } from "./instances-meshes-compound/InstancedMeshesCompoundExample";
 import { Joints } from "./joints/JointsExample";
 import { Kinematics } from "./kinematics/KinematicsExample";
+import { ManualStepExample } from "./manual-step/ManualStepExamples";
 import { MeshColliderTest } from "./mesh-collider-test/MeshColliderExample";
 import { SensorsExample } from "./sensors/SensorsExample";
 import Shapes from "./shapes/ShapesExample";
@@ -34,7 +36,7 @@ import { Transforms } from "./transforms/TransformsExample";
 
 const demoContext = createContext<{
   setDebug?(f: boolean): void;
-  setUI?(n: ReactNode): void;
+  setPaused?(f: boolean): void;
 }>({});
 
 export const useDemo = () => useContext(demoContext);
@@ -100,11 +102,11 @@ const routes: Record<string, ReactNode> = {
   "all-colliders": <AllCollidersExample />,
   "collision-events": <CollisionEventsExample />,
   "contact-force-events": <ContactForceEventsExample />,
-  sensors: <SensorsExample />
+  sensors: <SensorsExample />,
+  "manual-step": <ManualStepExample />
 };
 
 export const App = () => {
-  const [ui, setUI] = useState<ReactNode>(null);
   const [debug, setDebug] = useState<boolean>(false);
   const [perf, setPerf] = useState<boolean>(false);
   const [paused, setPaused] = useState<boolean>(false);
@@ -142,8 +144,8 @@ export const App = () => {
 
               <demoContext.Provider
                 value={{
-                  setUI,
-                  setDebug
+                  setDebug,
+                  setPaused
                 }}
               >
                 <Routes>
@@ -195,16 +197,6 @@ export const App = () => {
           onClick={() => setPaused((v) => !v)}
         />
         <ToggleButton label="Reset" value={false} onClick={updatePhysicsKey} />
-      </div>
-
-      <div
-        style={{
-          position: "absolute",
-          top: 24,
-          left: 24
-        }}
-      >
-        {ui}
       </div>
     </div>
   );

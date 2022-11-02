@@ -45,3 +45,5 @@ export const MeshCollider = (props: MeshColliderProps) => {
     </object3D>
   );
 };
+
+MeshCollider.displayName = "MeshCollider";
