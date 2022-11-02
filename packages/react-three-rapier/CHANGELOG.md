@@ -1,5 +1,17 @@
 # @react-three/rapier
 
+## 0.10.0
+
+### Minor Changes
+
+- fcd9ac6: Add Attractor (@AlexWarnes, @wiledal)
+
+### Patch Changes
+
+- 30c30b6: feat(CollisionEvents): include data from both affected objects (@RodrigoHamuy, @wiledal)
+- fcd9ac6: Solve free-standing colliders having incorrect world translations (@wiledal)
+- f10368a: Expose a manual step function (@wiledal, @firtoz)
+
 ## 0.9.0
 
 ### Minor Changes
