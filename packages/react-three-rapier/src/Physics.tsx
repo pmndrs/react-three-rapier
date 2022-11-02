@@ -277,18 +277,6 @@ export const Physics: FC<RapierWorldProps> = ({
     }
   }, [gravity]);
 
-  const [steppingState] = useState<{
-    accumulator: number;
-    previousState: Record<number, any>;
-  }>({
-    previousState: {},
-    accumulator: 0
-  });
-
-  /* Check if the timestep is supposed to be variable. We'll do this here
-  once so we don't have to string-check every frame. */
-  const timeStepVariable = timeStep === "vary";
-
   const getSourceFromColliderHandle = useCallback((handle: ColliderHandle) => {
     const world = worldRef.current;
     if (world) {
@@ -327,10 +315,22 @@ export const Physics: FC<RapierWorldProps> = ({
     }
   }, []);
 
+  const [steppingState] = useState<{
+    accumulator: number;
+    previousState: Record<number, any>;
+  }>({
+    previousState: {},
+    accumulator: 0
+  });
+
   const step = useCallback(
     (dt: number) => {
       const world = worldRef.current;
       if (!world) return;
+
+      /* Check if the timestep is supposed to be variable. We'll do this here
+        once so we don't have to string-check every frame. */
+      const timeStepVariable = timeStep === "vary";
 
       /**
        * Fixed timeStep simulation progression
@@ -568,7 +568,7 @@ export const Physics: FC<RapierWorldProps> = ({
         });
       });
     },
-    [paused]
+    [paused, timeStep, interpolate]
   );
 
   useFrame((_, dt) => {
