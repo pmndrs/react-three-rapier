@@ -21,10 +21,11 @@ export interface InstancedRigidBodiesProps extends RigidBodyProps {
 const _InstancedRigidBodies = forwardRef<InstancedRigidBodyApi, InstancedRigidBodiesProps>(
   function InstancedRigidBodies({ children, rigidBodies, colors, colliderNodes = <></>, ...baseBody }, ref) {
 
-    const { _mx, _one, _scale, _globalScale, _oldColor, _newColor } = useMemo(() => ({
+    const { _mx, _one, _scale, _globalScale, _worldPos, _oldColor, _newColor } = useMemo(() => ({
       _mx: new Matrix4,
       _scale: new Vector3,
       _globalScale: new Vector3,
+      _worldPos: new Vector3(),
       _one: new Vector3(1, 1, 1),
       _oldColor: new Color,
       _newColor: new Color,
@@ -42,12 +43,13 @@ const _InstancedRigidBodies = forwardRef<InstancedRigidBodyApi, InstancedRigidBo
     useFrame(() => {
       if (!mesh.current) return;
       mesh.current.getWorldScale(_globalScale);
+      mesh.current.getWorldPosition(_worldPos);
       for (let i = 0; i < rigidBodiesApi.current.length; i++) {
         const body = rigidBodiesApi.current[i];
         if (!body) continue;
         const props = rigidBodies[i];
         const scale = Representation2Vector3(props.scale || _one, _scale);
-        const pos = body.translation().divide(_globalScale);
+        const pos = body.translation().divide(_globalScale).sub(_worldPos);
         _mx.compose(pos, body.rotation(), scale);
         mesh.current.setMatrixAt(i, _mx);
       }
