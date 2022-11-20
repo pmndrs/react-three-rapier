@@ -83,6 +83,12 @@ const mutableRigidBodyOptions: MutableRigidBodyOptions = {
   enabledTranslations: (rb: RigidBody, [x, y, z]: Boolean3Array) => {
     rb.setEnabledTranslations(x, y, z, true);
   },
+  lockRotations: (rb: RigidBody, value: boolean) => {
+    rb.lockRotations(value, true);
+  },
+  lockTranslations: (rb: RigidBody, value: boolean) => {
+    rb.lockTranslations(value, true);
+  },
   angularVelocity: (rb: RigidBody, [x, y, z]: Vector3Array) => {
     rb.setAngvel({ x, y, z }, true);
   },
