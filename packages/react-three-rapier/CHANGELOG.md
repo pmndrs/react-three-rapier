@@ -1,5 +1,15 @@
 # @react-three/rapier
 
+## 0.11.0
+
+### Minor Changes
+
+- 7638b8a: Update to @dimforge/rapier3d-compat@0.10.0
+
+### Patch Changes
+
+- 7638b8a: Add lockedRotations, lockedTranslations to RB mutable props
+
 ## 0.10.0
 
 ### Minor Changes
