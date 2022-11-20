@@ -19,6 +19,7 @@ import {
   Vector3
 } from "three";
 import { useDemo } from "../App";
+import { useControls, button } from "leva";
 
 const colors = ["red", "green", "blue", "yellow", "orange", "purple"];
 const randomColor = () => colors[Math.floor(Math.random() * colors.length)];
@@ -176,25 +177,18 @@ const Thing = ({ item }: { item: string }) => {
 
 const Scene: FC = () => {
   const [items, setItems] = useState<string[]>([]);
-  const { setUI } = useDemo();
+
+  useControls({
+    box: button(() => addItem("box")),
+    cylinder: button(() => addItem("cylinder")),
+    ball: button(() => addItem("ball")),
+    convexHull: button(() => addItem("convexHull")),
+    convexMesh: button(() => addItem("convexMesh"))
+  });
 
   const addItem = (str: string) => {
     setItems((curr) => [...curr, str]);
   };
-
-  useEffect(() => {
-    setUI?.(
-      <>
-        <button onClick={() => addItem("box")}>Box</button>
-        <button onClick={() => addItem("cylinder")}>Cylinder</button>
-        <button onClick={() => addItem("ball")}>Ball</button>
-        <button onClick={() => addItem("convexMesh")}>ConvexHull 1</button>
-        <button onClick={() => addItem("convexHull")}>ConvexHull 2</button>
-      </>
-    );
-
-    return () => setUI!(null);
-  }, []);
 
   return (
     <group scale={1}>

@@ -119,7 +119,7 @@ export interface UseColliderOptions<ColliderArgs extends Array<unknown>> {
   /**
    * The optional name passed to THREE's Object3D
    */
-  name?: string,
+  name?: string;
 
   /**
    * The shape of your collider
@@ -248,25 +248,41 @@ export interface UseColliderOptions<ColliderArgs extends Array<unknown>> {
   sensor?: boolean;
 }
 
-export type BaseCollisionPayload = {
+export type CollisionTarget = {
   rigidBody?: RapierRigidBody;
   collider: RapierCollider;
   rigidBodyObject?: Object3D;
   colliderObject?: Object3D;
 };
 
-export type CollisionEnterPayload = BaseCollisionPayload & {
+export type CollisionPayload = {
+  /** the object firing the event */
+  target: CollisionTarget;
+  /** the other object involved in the event */
+  other: CollisionTarget;
+
+  /** deprecated use `payload.other.rigidBody` instead */
+  rigidBody?: RapierRigidBody;
+  /** deprecated use `payload.other.collider` instead */
+  collider: RapierCollider;
+  /** deprecated use `payload.other.rigidBodyObject` instead */
+  rigidBodyObject?: Object3D;
+  /** deprecated use `payload.other.colliderObject` instead */
+  colliderObject?: Object3D;
+};
+
+export type CollisionEnterPayload = CollisionPayload & {
   manifold: TempContactManifold;
   flipped: boolean;
 };
 
-export type CollisionExitPayload = BaseCollisionPayload;
+export type CollisionExitPayload = CollisionPayload;
 
-export type IntersectionEnterPayload = BaseCollisionPayload;
+export type IntersectionEnterPayload = CollisionPayload;
 
-export type IntersectionExitPayload = BaseCollisionPayload;
+export type IntersectionExitPayload = CollisionPayload;
 
-export type ContactForcePayload = BaseCollisionPayload & {
+export type ContactForcePayload = CollisionPayload & {
   totalForce: Vector;
   totalForceMagnitude: number;
   maxForceDirection: Vector;

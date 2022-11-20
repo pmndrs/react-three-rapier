@@ -44,12 +44,14 @@ export const Colliders: Demo = () => {
       <Ball />
       <Ball />
 
-      <CuboidCollider
-        args={[10, 1, 10]}
-        position={[0, 0, 0]}
-        rotation={[0.1, 0.1, 0.2]}
-      />
-      <BallCollider args={[3]} position={[1, 2, 1]} />
+      <group position={[0, 0, 0]} name="potato">
+        <CuboidCollider
+          args={[10, 1, 10]}
+          position={[0, 0, 0]}
+          rotation={[0.1, 0.1, 0.2]}
+        />
+        <BallCollider args={[3]} position={[1, 2, 1]} />
+      </group>
     </group>
   );
 };

@@ -6,7 +6,7 @@ import { RigidBodyApi } from "./api";
 import { useChildColliderProps } from "./hooks";
 import { InstancedRigidBody } from "./InstancedRigidBody";
 import { RigidBody, RigidBodyProps } from "./RigidBody";
-import { Representation2Vector3 } from "./utils/Representation2Vector3";
+import { FiberToVector3 } from "./utils/FiberToVector3";
 
 
 export type InstancedRigidBodyApi = readonly (RigidBodyApi | null)[];
@@ -48,7 +48,7 @@ const _InstancedRigidBodies = forwardRef<InstancedRigidBodyApi, InstancedRigidBo
         const body = rigidBodiesApi.current[i];
         if (!body) continue;
         const props = rigidBodies[i];
-        const scale = Representation2Vector3(props.scale || _one, _scale);
+        const scale = FiberToVector3(props.scale || _one, _scale);
         const pos = body.translation().divide(_globalScale).sub(_worldPos);
         _mx.compose(pos, body.rotation(), scale);
         mesh.current.setMatrixAt(i, _mx);
@@ -119,3 +119,4 @@ const _InstancedRigidBodies = forwardRef<InstancedRigidBodyApi, InstancedRigidBo
 )
 
 export const InstancedRigidBodies = memo(_InstancedRigidBodies);
+InstancedRigidBodies.displayName = "InstancedRigidBodies";
