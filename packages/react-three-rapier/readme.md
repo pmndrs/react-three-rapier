@@ -41,18 +41,50 @@ const App = () => {
 
 ## Readme Topics
 
-- [Automatic Colliders](#automatic-colliders)
+- [Basic Usage](#basic-usage)
+- [Readme Topics](#readme-topics)
+- [The Physics Component](#the-physics-component)
+- [Automatic colliders](#automatic-colliders)
+  - [Collider Examples](#collider-examples)
 - [Instanced Meshes](#instanced-meshes)
 - [Debug](#debug)
 - [Collision Events](#collision-events)
-- [Collision Groups](#configuring-collision-and-solver-groups)
-- [Contact Force Events](#contact-force-events)
+  - [Configuring collision and solver groups](#configuring-collision-and-solver-groups)
+- [Contact force events](#contact-force-events)
 - [Sensors](#sensors)
+  - [Sensors Example](#sensors-example)
 - [Attractors](#attractors)
-- [The timeStep](#configuring-time-step-size)
+  - [Attractors Example](#attractors-example)
+- [Configuring Time Step Size](#configuring-time-step-size)
 - [Manual stepping](#manual-stepping)
+- [Joints](#joints)
+  - [Joints Example](#joints-example)
 
 ---
+
+## The Physics Component
+The `<Physics />` component is the root component of your physics world. It is responsible for creating the physics world and managing the simulation. It relies on lazily initiating `Rapier` and needs to be wrapped in `<Suspense />`.
+
+```tsx
+  // The gravity of the physics workd
+  gravity?: Vector3Array; // default [0, -9.81, 0]
+
+  // Which collider shape to generate for meshes by default
+  colliders?: RigidBodyAutoCollider; // default "cuboid"
+
+  // The number of physics steps per second
+  timeStep?: number | "vary"; // default 1/60
+
+  // Pause the physic simulation
+  paused?: boolean; // default false
+
+  // Which order to run the physics simulation
+  updatePriority?: number;
+
+  // If the physics updates slower than the monitor refreshes,
+  // interpolation will smooth out the steps between frames
+  interpolate?: boolean; // default true
+```
 
 ## Automatic colliders
 
@@ -148,6 +180,10 @@ If part of our meshes are invisible and you want to include them in the collider
   </object3D>
 </RigidBody>
 ```
+
+### Collider Examples
+<a href="https://codesandbox.io/s/react-three-rapier-auto-colliders-b4coz1"><img src="misc/example-auto-colliders.jpg" width="240" /></a>
+<a href="https://codesandbox.io/s/react-three-rapier-compound-colliders-ol5ybn"><img src="misc/example-compound-shapes.jpg" width="240" /></a>
 
 ## Instanced Meshes
 
@@ -393,6 +429,9 @@ To detect when a collider enters or leaves another collider, you can use the `on
 </RigidBody>
 ```
 
+### Sensors Example
+<a href="https://codesandbox.io/s/react-three-rapier-sensors-byjmsk"><img src="misc/example-sensors.jpg" width="240" /></a>
+
 ## Attractors
 
 An attractor simulates a source of gravity. Any `RigidBody` within range will be _pulled_ (attracted) toward the attractor.  
@@ -427,6 +466,9 @@ Gravity types:
   - `mass2` is the mass of the rigid-body at the time of calculation. Note that rigid-bodies with colliders will use the mass provided to the collider. This is not a value you can control from the attractor, only from wherever you're creating rigid-body components in the scene.
   - `distance` is the distance between the attractor and rigid-body at the time of calculation
 
+### Attractors Example
+<a href="https://codesandbox.io/s/react-three-rapier-attractors-oyj640"><img src="misc/example-attractors.jpg" width="240" /></a>
+
 ## Configuring Time Step Size
 
 By default, `<Physics>` will simulate the physics world at a fixed rate of 60 frames per second. This can be changed by setting the `timeStep` prop on `<Physics>`:
@@ -455,4 +497,7 @@ step(1 / 60);
 
 ## Joints
 
-WIP
+- WIP
+
+### Joints Example
+<a href="https://codesandbox.io/s/react-three-rapier-sensors-byjmsk"><img src="misc/example-joints.jpg" width="240" /></a>
