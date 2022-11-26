@@ -217,6 +217,7 @@ interface RapierWorldProps {
   /**
    * The update priority at which the physics simulation should run.
    *
+   * @see https://docs.pmnd.rs/react-three-fiber/api/hooks#taking-over-the-render-loop
    * @defaultValue undefined
    */
   updatePriority?: number;
