@@ -182,8 +182,8 @@ If part of our meshes are invisible and you want to include them in the collider
 ```
 
 ### Collider Examples
-<a href="https://codesandbox.io/s/react-three-rapier-auto-colliders-b4coz1"><img src="misc/example-auto-colliders.jpg" width="240" /></a>
-<a href="https://codesandbox.io/s/react-three-rapier-compound-colliders-ol5ybn"><img src="misc/example-compound-shapes.jpg" width="240" /></a>
+<a href="https://codesandbox.io/s/react-three-rapier-auto-colliders-b4coz1"><img src="https://raw.githubusercontent.com/pmndrs/react-three-rapier/HEAD/packages/react-three-rapier/misc/example-auto-colliders.jpg" width="240" /></a>
+<a href="https://codesandbox.io/s/react-three-rapier-compound-colliders-ol5ybn"><img src="https://raw.githubusercontent.com/pmndrs/react-three-rapier/HEAD/packages/react-three-rapier/misc/example-compound-shapes.jpg" width="240" /></a>
 
 ## Instanced Meshes
 
@@ -430,7 +430,7 @@ To detect when a collider enters or leaves another collider, you can use the `on
 ```
 
 ### Sensors Example
-<a href="https://codesandbox.io/s/react-three-rapier-sensors-byjmsk"><img src="misc/example-sensors.jpg" width="240" /></a>
+<a href="https://codesandbox.io/s/react-three-rapier-sensors-byjmsk"><img src="https://raw.githubusercontent.com/pmndrs/react-three-rapier/HEAD/packages/react-three-rapier/misc/example-sensors.jpg" width="240" /></a>
 
 ## Attractors
 
@@ -467,7 +467,7 @@ Gravity types:
   - `distance` is the distance between the attractor and rigid-body at the time of calculation
 
 ### Attractors Example
-<a href="https://codesandbox.io/s/react-three-rapier-attractors-oyj640"><img src="misc/example-attractors.jpg" width="240" /></a>
+<a href="https://codesandbox.io/s/react-three-rapier-attractors-oyj640"><img src="https://raw.githubusercontent.com/pmndrs/react-three-rapier/HEAD/packages/react-three-rapier/misc/example-attractors.jpg" width="240" /></a>
 
 ## Configuring Time Step Size
 
@@ -500,4 +500,4 @@ step(1 / 60);
 - WIP
 
 ### Joints Example
-<a href="https://codesandbox.io/s/react-three-rapier-sensors-byjmsk"><img src="misc/example-joints.jpg" width="240" /></a>
+<a href="https://codesandbox.io/s/react-three-rapier-sensors-byjmsk"><img src="https://raw.githubusercontent.com/pmndrs/react-three-rapier/HEAD/packages/react-three-rapier/misc/example-joints.jpg" width="240" /></a>
