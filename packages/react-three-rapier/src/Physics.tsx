@@ -41,7 +41,11 @@ import {
 
 import { createWorldApi } from "./api";
 import { _matrix4, _position, _rotation, _scale } from "./shared-objects";
-import { rapierQuaternionToQuaternion, vectorArrayToVector3 } from "./utils";
+import {
+  rapierQuaternionToQuaternion,
+  useConst,
+  vectorArrayToVector3
+} from "./utils";
 import {
   applyAttractorForceOnRigidBody,
   AttractorState,
@@ -251,12 +255,14 @@ export const Physics: FC<RapierWorldProps> = ({
     return worldRef.current;
   });
 
-  const [rigidBodyStates] = useState<RigidBodyStateMap>(() => new Map());
-  const [colliderStates] = useState<ColliderStateMap>(() => new Map());
-  const [rigidBodyEvents] = useState<EventMap>(() => new Map());
-  const [colliderEvents] = useState<EventMap>(() => new Map());
-  const [eventQueue] = useState(() => new EventQueue(false));
-  const [attractorStates] = useState<AttractorStateMap>(() => new Map());
+  const rigidBodyStates = useConst<RigidBodyStateMap>(() => new Map());
+  const colliderStates = useConst<ColliderStateMap>(() => new Map());
+  const rigidBodyEvents = useConst<EventMap>(() => new Map());
+  const colliderEvents = useConst<EventMap>(() => new Map());
+  const eventQueue = useConst(() => new EventQueue(false));
+  const attractorStates = useConst<AttractorStateMap>(() => new Map());
+
+  console.log("rander");
 
   // Init world
   useEffect(() => {
