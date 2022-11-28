@@ -2,6 +2,7 @@ import {
   Quaternion as RapierQuaternion,
   Vector3 as RapierVector3
 } from "@dimforge/rapier3d-compat";
+import { useRef } from "react";
 
 import { Euler, Quaternion, Vector3 } from "three";
 import { _euler, _quaternion, _vector3 } from "./shared-objects";
@@ -69,3 +70,16 @@ export const vectorToTuple = (
 
   return [v];
 };
+
+export function useConst<T>(initialValue: T | (() => T)): T {
+  const ref = useRef<{ value: T }>();
+  if (ref.current === undefined) {
+    ref.current = {
+      value:
+        typeof initialValue === "function"
+          ? (initialValue as Function)()
+          : initialValue
+    };
+  }
+  return ref.current.value;
+}
