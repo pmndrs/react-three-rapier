@@ -35,10 +35,12 @@ import Shapes from "./examples/plinko/ShapesExample";
 import { Transforms } from "./examples/transforms/TransformsExample";
 import { LockedTransformsExample } from "./examples/locked-transforms/LockedTransformsExample";
 import { PerformanceExample } from "./examples/performance/PeformanceExample";
+import { DynamicTypeChangeExample } from "./examples/dynamic-type-change/DynamicTypeChangeExample";
 
 const demoContext = createContext<{
   setDebug?(f: boolean): void;
   setPaused?(f: boolean): void;
+  setCameraEnabled?(f: boolean): void;
 }>({});
 
 export const useDemo = () => useContext(demoContext);
@@ -107,7 +109,8 @@ const routes: Record<string, ReactNode> = {
   sensors: <SensorsExample />,
   "manual-step": <ManualStepExample />,
   "locked-transforms": <LockedTransformsExample />,
-  performance: <PerformanceExample />
+  performance: <PerformanceExample />,
+  "dynamic-type-changes": <DynamicTypeChangeExample />
 };
 
 export const App = () => {
@@ -115,6 +118,7 @@ export const App = () => {
   const [perf, setPerf] = useState<boolean>(false);
   const [paused, setPaused] = useState<boolean>(false);
   const [physicsKey, setPhysicsKey] = useState<number>(0);
+  const [cameraEnabled, setCameraEnabled] = useState<boolean>(true);
 
   const updatePhysicsKey = () => {
     setPhysicsKey((current) => current + 1);
@@ -144,12 +148,14 @@ export const App = () => {
                 shadow-bias={-0.0001}
               />
               <Environment preset="apartment" />
-              <OrbitControls />
+
+              <OrbitControls enabled={cameraEnabled} />
 
               <demoContext.Provider
                 value={{
                   setDebug,
-                  setPaused
+                  setPaused,
+                  setCameraEnabled
                 }}
               >
                 <Routes>
