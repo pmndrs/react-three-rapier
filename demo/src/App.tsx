@@ -12,32 +12,35 @@ import {
   useEffect
 } from "react";
 import { NavLink, NavLinkProps, Route, Routes } from "react-router-dom";
-import { AllCollidersExample } from "./all-colliders/AllCollidersExample";
-import { AllShapesExample } from "./all-shapes/AllShapesExample";
-import { ApiUsage } from "./api-usage/ApiUsageExample";
-import { AttractorExample } from "./attractors/AttractorsExample";
-import { Car } from "./car/CarExample";
-import { Cluster } from "./cluster/ClusterExample";
-import { Colliders } from "./colliders/CollidersExample";
-import { CollisionEventsExample } from "./collision-events/CollisionEventsExample";
-import { ComponentsExample } from "./components/ComponentsExample";
-import { ContactForceEventsExample } from "./contact-force-events/ContactForceEventsExample";
-import { CradleExample } from "./cradle/CradleExample";
-import { Damping } from "./damping/DampingExample";
-import { InstancedMeshes } from "./instanced-meshes/InstancedMeshesExample";
-import { InstancedMeshesCompound } from "./instances-meshes-compound/InstancedMeshesCompoundExample";
-import { Joints } from "./joints/JointsExample";
-import { Kinematics } from "./kinematics/KinematicsExample";
-import { ManualStepExample } from "./manual-step/ManualStepExamples";
-import { MeshColliderTest } from "./mesh-collider-test/MeshColliderExample";
-import { SensorsExample } from "./sensors/SensorsExample";
-import Shapes from "./shapes/ShapesExample";
-import { Transforms } from "./transforms/TransformsExample";
-import { LockedTransformsExample } from "./locked-transforms/LockedTransformsExample";
+import { AllCollidersExample } from "./examples/all-colliders/AllCollidersExample";
+import { AllShapesExample } from "./examples/all-shapes/AllShapesExample";
+import { ApiUsage } from "./examples/api-usage/ApiUsageExample";
+import { AttractorExample } from "./examples/attractors/AttractorsExample";
+import { Car } from "./examples/car/CarExample";
+import { Cluster } from "./examples/cluster/ClusterExample";
+import { Colliders } from "./examples/colliders/CollidersExample";
+import { CollisionEventsExample } from "./examples/collision-events/CollisionEventsExample";
+import { ComponentsExample } from "./examples/components/ComponentsExample";
+import { ContactForceEventsExample } from "./examples/contact-force-events/ContactForceEventsExample";
+import { CradleExample } from "./examples/cradle/CradleExample";
+import { Damping } from "./examples/damping/DampingExample";
+import { InstancedMeshes } from "./examples/instanced-meshes/InstancedMeshesExample";
+import { InstancedMeshesCompound } from "./examples/instances-meshes-compound/InstancedMeshesCompoundExample";
+import { Joints } from "./examples/joints/JointsExample";
+import { Kinematics } from "./examples/kinematics/KinematicsExample";
+import { ManualStepExample } from "./examples/manual-step/ManualStepExamples";
+import { MeshColliderTest } from "./examples/mesh-collider-test/MeshColliderExample";
+import { SensorsExample } from "./examples/sensors/SensorsExample";
+import Shapes from "./examples/plinko/ShapesExample";
+import { Transforms } from "./examples/transforms/TransformsExample";
+import { LockedTransformsExample } from "./examples/locked-transforms/LockedTransformsExample";
+import { PerformanceExample } from "./examples/performance/PeformanceExample";
+import { DynamicTypeChangeExample } from "./examples/dynamic-type-change/DynamicTypeChangeExample";
 
 const demoContext = createContext<{
   setDebug?(f: boolean): void;
   setPaused?(f: boolean): void;
+  setCameraEnabled?(f: boolean): void;
 }>({});
 
 export const useDemo = () => useContext(demoContext);
@@ -105,7 +108,9 @@ const routes: Record<string, ReactNode> = {
   "contact-force-events": <ContactForceEventsExample />,
   sensors: <SensorsExample />,
   "manual-step": <ManualStepExample />,
-  "locked-transforms": <LockedTransformsExample />
+  "locked-transforms": <LockedTransformsExample />,
+  performance: <PerformanceExample />,
+  "dynamic-type-changes": <DynamicTypeChangeExample />
 };
 
 export const App = () => {
@@ -113,6 +118,7 @@ export const App = () => {
   const [perf, setPerf] = useState<boolean>(false);
   const [paused, setPaused] = useState<boolean>(false);
   const [physicsKey, setPhysicsKey] = useState<number>(0);
+  const [cameraEnabled, setCameraEnabled] = useState<boolean>(true);
 
   const updatePhysicsKey = () => {
     setPhysicsKey((current) => current + 1);
@@ -142,12 +148,14 @@ export const App = () => {
                 shadow-bias={-0.0001}
               />
               <Environment preset="apartment" />
-              <OrbitControls />
+
+              <OrbitControls enabled={cameraEnabled} />
 
               <demoContext.Provider
                 value={{
                   setDebug,
-                  setPaused
+                  setPaused,
+                  setCameraEnabled
                 }}
               >
                 <Routes>
@@ -179,7 +187,7 @@ export const App = () => {
       >
         {Object.keys(routes).map((key) => (
           <Link key={key} to={key} end>
-            {key.replace(/-/g, " ") || "Shapes"}
+            {key.replace(/-/g, " ") || "Plinko"}
           </Link>
         ))}
 

@@ -17,6 +17,9 @@ export const rigidBodyDescFromOptions = (options: RigidBodyProps) => {
 
   const desc = new RigidBodyDesc(type);
 
+  // Apply immutable options
+  desc.canSleep = options?.canSleep || true;
+
   return desc;
 };
 
@@ -60,7 +63,7 @@ type ImmutableRigidBodyOptions = (keyof RigidBodyProps)[];
 export const immutableRigidBodyOptions: ImmutableRigidBodyOptions = [
   "args",
   "colliders",
-  "type"
+  "canSleep"
 ];
 
 type MutableRigidBodyOptions = {
@@ -100,6 +103,9 @@ const mutableRigidBodyOptions: MutableRigidBodyOptions = {
   },
   userData: (rb: RigidBody, value: { [key: string]: any }) => {
     rb.userData = value;
+  },
+  type(rb, value) {
+    rb.setBodyType(rigidBodyTypeFromString(value));
   },
   position: () => {},
   rotation: () => {},
