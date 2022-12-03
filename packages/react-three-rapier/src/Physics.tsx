@@ -262,8 +262,6 @@ export const Physics: FC<RapierWorldProps> = ({
   const eventQueue = useConst(() => new EventQueue(false));
   const attractorStates = useConst<AttractorStateMap>(() => new Map());
 
-  console.log("rander");
-
   // Init world
   useEffect(() => {
     const world = getWorldRef.current();
