@@ -26,6 +26,7 @@ export const DynamicTypeChangeExample = () => {
     } else {
       document.body.style.cursor = "";
       setCameraEnabled?.(true);
+      s.mouse = null;
     }
   }, [dragging]);
 
@@ -50,7 +51,6 @@ export const DynamicTypeChangeExample = () => {
   useEffect(() => {
     const handleMouseUp = () => {
       setDragging(false);
-      s.mouse = null;
     };
     window.addEventListener("pointerup", handleMouseUp);
 
@@ -75,10 +75,19 @@ export const DynamicTypeChangeExample = () => {
           <meshStandardMaterial color="yellow" />
           <Html
             style={{
-              pointerEvents: "none"
+              pointerEvents: "none",
+              width: 200,
+              marginLeft: -100,
+              marginTop: -100,
+              borderRadius: 4,
+              background: "rgba(255,255,255,.2)",
+              padding: 8,
+              textAlign: "center",
+              backdropFilter: "blur(10px)"
             }}
           >
-            Drag me
+            <div>Drag me!</div>
+            <div>Type: {dragging ? "kinematicPosition" : "dynamic"}</div>
           </Html>
         </mesh>
       </RigidBody>
