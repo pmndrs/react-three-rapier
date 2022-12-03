@@ -1,5 +1,12 @@
 # @react-three/rapier
 
+## 0.11.1
+
+### Patch Changes
+
+- bf15c27: Fix issue with `canSleep` missing from RigidBodyDesc
+- bf15c27: Enable dynamic changing of RigidBody `type`
+
 ## 0.11.0
 
 ### Minor Changes

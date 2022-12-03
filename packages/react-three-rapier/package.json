@@ -1,6 +1,6 @@
 {
   "name": "@react-three/rapier",
-  "version": "0.11.0",
+  "version": "0.11.1",
   "source": "src/index.ts",
   "main": "dist/react-three-rapier.cjs.js",
   "module": "dist/react-three-rapier.esm.js",
