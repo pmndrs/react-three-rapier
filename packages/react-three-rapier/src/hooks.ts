@@ -249,10 +249,10 @@ export const useRevoluteJoint: UseImpulseJoint<RevoluteJointParams> = (
       vectorArrayToVector3(body2Anchor),
       vectorArrayToVector3(axis)
     )
-    if (limits){
-      params.limitsEnabled = true
-      params.limits = limits
-    }
+  if (limits){
+    params.limitsEnabled = true
+    params.limits = limits
+  }
   return useImpulseJoint<RevoluteImpulseJoint>(
     body1,
     body2,
@@ -276,10 +276,10 @@ export const usePrismaticJoint: UseImpulseJoint<PrismaticJointParams> = (
       vectorArrayToVector3(body2Anchor),
       vectorArrayToVector3(axis)
     )
-     if (limits){
-      params.limitsEnabled = true
-      params.limits = limits
-    }
+  if (limits){
+    params.limitsEnabled = true
+    params.limits = limits
+  }
   return useImpulseJoint<PrismaticImpulseJoint>(
     body1,
     body2,
