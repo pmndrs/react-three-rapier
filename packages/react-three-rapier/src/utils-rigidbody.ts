@@ -18,7 +18,7 @@ export const rigidBodyDescFromOptions = (options: RigidBodyProps) => {
   const desc = new RigidBodyDesc(type);
 
   // Apply immutable options
-  desc.canSleep = options?.canSleep || true;
+  desc.canSleep = options?.canSleep ?? true;
 
   return desc;
 };
