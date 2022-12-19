@@ -1,5 +1,3 @@
-import { Attractor } from "./Attractor";
-
 export * from "./types";
 export type { RigidBodyApi, WorldApi, InstancedRigidBodyApi } from "./api";
 export type { RigidBodyProps } from "./RigidBody";
