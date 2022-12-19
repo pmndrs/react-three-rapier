@@ -240,18 +240,23 @@ export const useSphericalJoint: UseImpulseJoint<SphericalJointParams> = (
 export const useRevoluteJoint: UseImpulseJoint<RevoluteJointParams> = (
   body1,
   body2,
-  [body1Anchor, body2Anchor, axis]
+  [body1Anchor, body2Anchor, axis, limits]
 ) => {
   const { rapier } = useRapier();
 
-  return useImpulseJoint<RevoluteImpulseJoint>(
-    body1,
-    body2,
-    rapier.JointData.revolute(
+  const params = rapier.JointData.revolute(
       vectorArrayToVector3(body1Anchor),
       vectorArrayToVector3(body2Anchor),
       vectorArrayToVector3(axis)
     )
+  if (limits){
+    params.limitsEnabled = true
+    params.limits = limits
+  }
+  return useImpulseJoint<RevoluteImpulseJoint>(
+    body1,
+    body2,
+    params
   );
 };
 
@@ -263,17 +268,21 @@ export const useRevoluteJoint: UseImpulseJoint<RevoluteJointParams> = (
 export const usePrismaticJoint: UseImpulseJoint<PrismaticJointParams> = (
   body1,
   body2,
-  [body1Anchor, body2Anchor, axis]
+  [body1Anchor, body2Anchor, axis, limits],
 ) => {
   const { rapier } = useRapier();
-
-  return useImpulseJoint<PrismaticImpulseJoint>(
-    body1,
-    body2,
-    rapier.JointData.prismatic(
+  const params = rapier.JointData.prismatic(
       vectorArrayToVector3(body1Anchor),
       vectorArrayToVector3(body2Anchor),
       vectorArrayToVector3(axis)
     )
+  if (limits){
+    params.limitsEnabled = true
+    params.limits = limits
+  }
+  return useImpulseJoint<PrismaticImpulseJoint>(
+    body1,
+    body2,
+    params
   );
 };

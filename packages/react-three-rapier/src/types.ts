@@ -440,13 +440,15 @@ export type PrismaticJointParams = [
   body1Anchor: Vector3Array,
   body1LocalFrame: Vector3Array,
   body2Anchor: Vector3Array,
-  body2LocalFrame: Vector3Array
+  body2LocalFrame: Vector3Array,
+  limits?: [min: number, max: number] 
 ];
 
 export type RevoluteJointParams = [
   body1Anchor: Vector3Array,
   body2Anchor: Vector3Array,
-  axis: Vector3Array
+  axis: Vector3Array,
+  limits?: [min: number, max: number] 
 ];
 
 export type RigidBodyApiRef = MutableRefObject<undefined | null | RigidBodyApi>;
