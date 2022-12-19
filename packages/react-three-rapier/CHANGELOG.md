@@ -1,5 +1,12 @@
 # @react-three/rapier
 
+## 0.11.2
+
+### Patch Changes
+
+- 5a3f68b: fix(RigidBody): canSleep always true due to using logical OR instead of nullish coalescing operator (@isaac-mason)
+- 46bf448: feat: add support for revolute and prismatic joint limits (@planktonrobo)
+
 ## 0.11.1
 
 ### Patch Changes
