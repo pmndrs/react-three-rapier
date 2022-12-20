@@ -8,7 +8,7 @@ import {
 import { useEffect, useRef } from "react";
 import { useSuzanne } from "../all-shapes/AllShapesExample";
 import { Demo } from "../../App";
-import { RigidBodyApi } from "@react-three/rapier/dist/declarations/src/types";
+import { RigidBodyApi } from "@react-three/rapier";
 
 const COUNT = 10;
 
