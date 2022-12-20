@@ -3,12 +3,12 @@ import {
   BallCollider,
   CuboidCollider,
   Debug,
-  InstancedRigidBodies,
-  InstancedRigidBodyApi
+  InstancedRigidBodies
 } from "@react-three/rapier";
 import { useEffect, useRef } from "react";
 import { useSuzanne } from "../all-shapes/AllShapesExample";
 import { Demo } from "../../App";
+import { RigidBodyApi } from "@react-three/rapier/dist/declarations/src/types";
 
 const COUNT = 10;
 
@@ -17,12 +17,12 @@ export const InstancedMeshesCompound: Demo = () => {
     nodes: { Suzanne }
   } = useSuzanne();
 
-  const api = useRef<InstancedRigidBodyApi>(null);
+  const api = useRef<RigidBodyApi[]>(null);
 
   const handleClickInstance = (evt: ThreeEvent<MouseEvent>) => {
     if (api.current) {
       api.current
-        .at(evt.instanceId!)
+        .at(evt.instanceId!)!
         .applyTorqueImpulse({ x: 0, y: 100, z: 0 });
     }
   };
@@ -44,21 +44,30 @@ export const InstancedMeshesCompound: Demo = () => {
       <InstancedRigidBodies
         ref={api}
         colliders={false}
-        positions={Array.from({ length: COUNT }, () => [
-          Math.random() * 20,
-          Math.random() * 20,
-          Math.random() * 20
-        ])}
-        rotations={Array.from({ length: COUNT }, () => [
-          Math.random() * Math.PI * 2,
-          Math.random() * Math.PI * 2,
-          Math.random() * Math.PI * 2
-        ])}
-        scales={Array.from({ length: COUNT }, () => [
-          0.5 + Math.random(),
-          0.5 + Math.random(),
-          0.5 + Math.random()
-        ])}
+        instances={Array.from({ length: COUNT }).map((_, i) => ({
+          key: i,
+          position: [
+            Math.random() * 20,
+            Math.random() * 20,
+            Math.random() * 20
+          ],
+          rotation: [
+            Math.random() * Math.PI * 2,
+            Math.random() * Math.PI * 2,
+            Math.random() * Math.PI * 2
+          ],
+          scale: [0.5 + Math.random(), 0.5 + Math.random(), 0.5 + Math.random()]
+        }))}
+        colliderNodes={
+          <>
+            <BallCollider args={[1]} />
+            <BallCollider args={[0.5]} position={[1, 0.3, -0.25]} />
+            <CuboidCollider
+              args={[0.5, 0.2, 0.5]}
+              position={[-1, 0.3, -0.25]}
+            />
+          </>
+        }
       >
         <instancedMesh
           castShadow
@@ -67,10 +76,6 @@ export const InstancedMeshesCompound: Demo = () => {
         >
           <meshPhysicalMaterial color={"yellow"} />
         </instancedMesh>
-
-        <BallCollider args={[1]} />
-        <BallCollider args={[0.5]} position={[1, 0.3, -0.25]} />
-        <CuboidCollider args={[0.5, 0.2, 0.5]} position={[-1, 0.3, -0.25]} />
       </InstancedRigidBodies>
     </group>
   );

@@ -1,8 +1,7 @@
 import { useFrame } from "@react-three/fiber";
 import {
-  CuboidCollider,
   InstancedRigidBodies,
-  InstancedRigidBodyApi,
+  InstancedRigidBodiesApi,
   useRapier
 } from "@react-three/rapier";
 import { createRef, useEffect, useRef } from "react";
@@ -11,16 +10,16 @@ import { Demo } from "../../App";
 const BALLS = 1000;
 
 export const Cluster: Demo = () => {
-  const api = useRef<InstancedRigidBodyApi>(null);
+  const api = useRef<InstancedRigidBodiesApi>(null);
 
   const { isPaused } = useRapier();
 
   useFrame(() => {
     if (!isPaused) {
       api.current!.forEach((body) => {
-        const p = body.translation();
+        const p = body!.translation();
         p.normalize().multiplyScalar(-0.01);
-        body.applyImpulse(p);
+        body!.applyImpulse(p);
       });
     }
   });
@@ -29,11 +28,10 @@ export const Cluster: Demo = () => {
     <group>
       <InstancedRigidBodies
         ref={api}
-        positions={Array.from({ length: BALLS }, (_, i) => [
-          Math.floor(i / 30) * 1,
-          (i % 30) * 0.5,
-          0
-        ])}
+        instances={Array.from({ length: BALLS }, (_, i) => ({
+          key: i,
+          position: [Math.floor(i / 30) * 1, (i % 30) * 0.5, 0]
+        }))}
         colliders={"ball"}
         linearDamping={5}
       >

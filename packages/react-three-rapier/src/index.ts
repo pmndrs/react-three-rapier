@@ -1,6 +1,9 @@
 export * from "./types";
 export type { RigidBodyProps } from "./RigidBody";
-export type { InstancedRigidBodiesProps } from "./InstancedRigidBodies";
+export type {
+  InstancedRigidBodiesProps,
+  InstancedRigidBodiesApi
+} from "./InstancedRigidBodies";
 export type {
   CylinderColliderProps,
   BallColliderProps,
@@ -18,12 +21,7 @@ export type { PhysicsProps, RapierContext, WorldStepCallback } from "./Physics";
 export type { MeshColliderProps } from "./MeshCollider";
 export type { AttractorProps, AttractorGravityType } from "./Attractor";
 
-export type {
-  RigidBodyApi,
-  InstancedRigidBodyApi,
-  JointApi,
-  WorldApi
-} from "./api";
+export type { RigidBodyApi, JointApi, WorldApi } from "./api";
 
 export { Physics } from "./Physics";
 export { RigidBody } from "./RigidBody";
