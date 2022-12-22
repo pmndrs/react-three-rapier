@@ -6,7 +6,7 @@ import {
   interactionGroups,
   RigidBody
 } from "@react-three/rapier";
-import { RigidBodyApi } from "@react-three/rapier/dist/declarations/src/types";
+import { RigidBodyApi } from "@react-three/rapier";
 import { createRef, useEffect, useRef } from "react";
 import { Demo } from "../../App";
 

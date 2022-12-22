@@ -10,15 +10,16 @@ import { DynamicDrawUsage, InstancedMesh, Object3D } from "three";
 import { AnyCollider } from "./AnyCollider";
 import { RigidBodyApi } from "./api";
 import { useChildColliderProps, useRapier } from "./hooks";
+import { RigidBodyState } from "./Physics";
 import { RigidBody, RigidBodyProps } from "./RigidBody";
 import { _matrix4 } from "./shared-objects";
 
-type InstancedRigidBody = RigidBodyProps & {
-  key: number;
+export type InstancedRigidBodyProps = RigidBodyProps & {
+  key: string | number;
 };
 
 export interface InstancedRigidBodiesProps extends RigidBodyProps {
-  instances: InstancedRigidBody[];
+  instances: InstancedRigidBodyProps[];
   colliderNodes?: ReactNode;
   children: ReactNode;
 }
@@ -30,6 +31,7 @@ export const InstancedRigidBodies = memo(
     (props, ref) => {
       const { rigidBodyStates } = useRapier();
       const object = useRef<Object3D>(null);
+      const instancedWrapper = useRef<Object3D>(null);
       const {
         // instanced props
         children,
@@ -48,7 +50,7 @@ export const InstancedRigidBodies = memo(
 
       const rigidBodyApis = useRef<(RigidBodyApi | null)[]>([]);
 
-      useImperativeHandle(ref, () => rigidBodyApis.current);
+      useImperativeHandle(ref, () => rigidBodyApis.current, [instances]);
 
       const childColliderProps = useChildColliderProps(object, {
         ...props,
@@ -56,7 +58,7 @@ export const InstancedRigidBodies = memo(
       });
 
       const getInstancedMesh = () => {
-        const firstChild = object.current!.children[0];
+        const firstChild = instancedWrapper.current!.children[0];
 
         if (firstChild && "isInstancedMesh" in firstChild) {
           return firstChild as InstancedMesh;
@@ -78,26 +80,26 @@ export const InstancedRigidBodies = memo(
       }, []);
 
       // Update the RigidBodyStates whenever the instances change
-      useEffect(() => {
+      const applyInstancedState = (state: RigidBodyState, index: number) => {
         const instancedMesh = getInstancedMesh();
 
         if (instancedMesh) {
-          rigidBodyApis.current.forEach((api, index) => {
-            if (api) {
-              const currentState = rigidBodyStates!.get(api.handle)!;
-              rigidBodyStates!.set(api.handle, {
-                ...currentState,
-                object: instancedMesh,
-                getMatrix: (matrix) => {
-                  instancedMesh.getMatrixAt(index, matrix);
-                  return matrix;
-                },
-                setMatrix: (matrix) => instancedMesh.setMatrixAt(index, matrix)
-              });
-            }
-          });
+          return {
+            ...state,
+            getMatrix: (matrix) => {
+              instancedMesh.getMatrixAt(index, matrix);
+              return matrix;
+            },
+            setMatrix: (matrix) => {
+              instancedMesh.setMatrixAt(index, matrix);
+              instancedMesh.instanceMatrix.needsUpdate = true;
+            },
+            meshType: "instancedMesh"
+          } as RigidBodyState;
         }
-      }, [instances]);
+
+        return state;
+      };
 
       return (
         <object3D
@@ -108,23 +110,22 @@ export const InstancedRigidBodies = memo(
           quaternion={quaternion}
           scale={scale}
         >
-          <>
-            {children}
+          <object3D ref={instancedWrapper}>{children}</object3D>
 
-            {instances?.map((instance, i) => (
-              <RigidBody
-                {...rigidBodyProps}
-                {...instance}
-                ref={(api) => (rigidBodyApis.current[i] = api)}
-              >
-                {colliderNodes && colliderNodes}
+          {instances?.map((instance, index) => (
+            <RigidBody
+              {...rigidBodyProps}
+              {...instance}
+              ref={(api) => (rigidBodyApis.current[index] = api)}
+              transformState={(state) => applyInstancedState(state, index)}
+            >
+              {colliderNodes && colliderNodes}
 
-                {childColliderProps.map((colliderProps, index) => (
-                  <AnyCollider key={index} {...colliderProps} />
-                ))}
-              </RigidBody>
-            ))}
-          </>
+              {childColliderProps.map((colliderProps, colliderIndex) => (
+                <AnyCollider key={colliderIndex} {...colliderProps} />
+              ))}
+            </RigidBody>
+          ))}
         </object3D>
       );
     }

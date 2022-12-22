@@ -12,6 +12,7 @@ import { Object3DProps } from "@react-three/fiber";
 import { Object3D } from "three";
 import { ColliderProps } from ".";
 import { RigidBodyApi, JointApi } from "./api";
+import { RigidBodyState } from "./Physics";
 
 export { CoefficientCombineRule as CoefficientCombineRule } from "@dimforge/rapier3d-compat";
 export { RapierRigidBody, RapierCollider };
@@ -418,6 +419,12 @@ export interface RigidBodyOptions extends ColliderProps {
    * Include invisible objects on the collider creation estimation.
    */
   includeInvisible?: boolean;
+
+  /**
+   * Transform the RigidBodyState
+   * @internal
+   */
+  transformState?: (state: RigidBodyState) => RigidBodyState;
 }
 
 // Joints

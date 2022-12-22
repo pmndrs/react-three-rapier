@@ -1,11 +1,14 @@
-import { InstancedRigidBodies } from "@react-three/rapier";
-import { useEffect, useRef } from "react";
+import {
+  InstancedRigidBodies,
+  InstancedRigidBodyProps,
+  RigidBodyApi
+} from "@react-three/rapier";
+import { useEffect, useRef, useState } from "react";
 import { Color, InstancedMesh } from "three";
 import { useSuzanne } from "../all-shapes/AllShapesExample";
 import { Demo } from "../../App";
-import { RigidBodyApi } from "@react-three/rapier/dist/declarations/src/types";
 
-const COUNT = 300;
+const MAX_COUNT = 300;
 
 export const InstancedMeshes: Demo = () => {
   const {
@@ -14,34 +17,25 @@ export const InstancedMeshes: Demo = () => {
 
   const api = useRef<RigidBodyApi[]>([]);
 
-  useEffect(() => {
-    if (api.current) {
-      api.current.forEach((body) => {
-        body.applyImpulse({
-          x: -Math.random() * 5,
-          y: Math.random() * 5,
-          z: -Math.random() * 5
-        });
-      });
-    }
-  }, []);
+  const [bodies, setBodies] = useState<InstancedRigidBodyProps[]>(() => []);
 
   const ref = useRef<InstancedMesh>(null);
 
   useEffect(() => {
     if (ref.current) {
-      for (let i = 0; i < COUNT; i++) {
-        const color = new Color(Math.random() * 0xffffff);
-        ref.current.setColorAt(i, color);
+      for (let i = 0; i < MAX_COUNT; i++) {
+        ref.current!.setColorAt(i, new Color(Math.random() * 0xffffff));
       }
+      ref.current!.instanceColor!.needsUpdate = true;
     }
   }, []);
 
-  return (
-    <group scale={0.7}>
-      <InstancedRigidBodies
-        instances={Array.from({ length: COUNT }).map((_, i) => ({
-          key: i,
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setBodies((bodies) => [
+        ...bodies,
+        {
+          key: Math.random() + "baba",
           position: [
             Math.random() * 10 - 5,
             Math.random() * 10 + 5,
@@ -57,18 +51,27 @@ export const InstancedMeshes: Demo = () => {
             Math.random() * 0.5 + 0.5,
             Math.random() * 0.5 + 0.5
           ]
-        }))}
-        ref={api}
-        colliders="hull"
-      >
+        }
+      ]);
+    }, 1000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
+
+  return (
+    <group>
+      <InstancedRigidBodies instances={bodies} ref={api} colliders="hull">
         <instancedMesh
           ref={ref}
           castShadow
-          args={[Suzanne.geometry, undefined, COUNT]}
+          args={[Suzanne.geometry, undefined, MAX_COUNT]}
+          count={bodies.length}
           onClick={(evt) => {
             api.current![evt.instanceId!].applyTorqueImpulse({
               x: 0,
-              y: 10,
+              y: 50,
               z: 0
             });
           }}

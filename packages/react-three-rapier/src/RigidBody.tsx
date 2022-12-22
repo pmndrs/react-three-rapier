@@ -35,12 +35,13 @@ export const RigidBody = memo(
       scale,
 
       quaternion,
+      transformState,
       ...objectProps
     } = props;
 
     const [object, api, childColliderProps] = useRigidBody<Object3D>(props);
 
-    useImperativeHandle(ref, () => api);
+    useImperativeHandle(ref, () => api, [api]);
 
     const contextValue = useMemo(
       () => ({

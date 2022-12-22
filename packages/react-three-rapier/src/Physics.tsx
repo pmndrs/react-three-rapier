@@ -52,6 +52,7 @@ import {
 } from "./Attractor";
 
 export interface RigidBodyState {
+  meshType: "instancedMesh" | "mesh";
   rigidBody: RigidBody;
   object: Object3D;
   invertedWorldMatrix: Matrix4;
@@ -454,7 +455,11 @@ export const Physics: FC<PhysicsProps> = ({
           state.isSleeping = rigidBody.isSleeping();
         }
 
-        if (!rigidBody || rigidBody.isSleeping() || !state.setMatrix) {
+        if (
+          !rigidBody ||
+          (rigidBody.isSleeping() && !("isInstancedMesh" in state.object)) ||
+          !state.setMatrix
+        ) {
           return;
         }
 
@@ -476,7 +481,7 @@ export const Physics: FC<PhysicsProps> = ({
             .decompose(_position, _rotation, _scale);
 
           // Apply previous tick position
-          if (!(state.object instanceof InstancedMesh)) {
+          if (state.meshType == "mesh") {
             state.object.position.copy(_position);
             state.object.quaternion.copy(_rotation);
           }
@@ -488,9 +493,8 @@ export const Physics: FC<PhysicsProps> = ({
           .premultiply(state.invertedWorldMatrix)
           .decompose(_position, _rotation, _scale);
 
-        if (state.object instanceof InstancedMesh) {
+        if (state.meshType == "instancedMesh") {
           state.setMatrix(_matrix4);
-          state.object.instanceMatrix.needsUpdate = true;
         } else {
           // Interpolate to new position
           state.object.position.lerp(_position, interpolationAlpha);

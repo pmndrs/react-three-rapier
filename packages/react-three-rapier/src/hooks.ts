@@ -116,12 +116,14 @@ export const useRigidBody = <O extends Object3D>(
       ref.current = new Object3D() as O;
     }
 
+    const state = createRigidBodyState({
+      rigidBody,
+      object: ref.current
+    });
+
     rigidBodyStates.set(
       rigidBody.handle,
-      createRigidBodyState({
-        rigidBody,
-        object: ref.current
-      })
+      options.transformState ? options.transformState(state) : state
     );
 
     return () => {

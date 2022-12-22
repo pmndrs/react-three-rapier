@@ -29,6 +29,7 @@ interface CreateRigidBodyStateOptions {
   setMatrix?: (matrix: Matrix4) => void;
   getMatrix?: (matrix: Matrix4) => Matrix4;
   worldScale?: Vector3;
+  meshType?: RigidBodyState["meshType"];
 }
 
 export const createRigidBodyState = ({
@@ -36,7 +37,8 @@ export const createRigidBodyState = ({
   object,
   setMatrix,
   getMatrix,
-  worldScale
+  worldScale,
+  meshType = "mesh"
 }: CreateRigidBodyStateOptions): RigidBodyState => {
   object.updateWorldMatrix(true, false);
   const invertedWorldMatrix = object.parent!.matrixWorld.clone().invert();
@@ -54,7 +56,8 @@ export const createRigidBodyState = ({
       ? getMatrix
       : (matrix: Matrix4) => matrix.copy(object.matrix),
     scale: worldScale || object.getWorldScale(_scale).clone(),
-    isSleeping: false
+    isSleeping: false,
+    meshType
   };
 };
 
