@@ -497,7 +497,14 @@ step(1 / 60);
 
 ## Joints
 
-- WIP
+WIP
+
+- `useFixedJoint`
+- `useSphericalJoint`
+- `useRevoluteJoint`
+- `usePrismaticJoint`
+
+cf. [Rapier Joints](https://rapier.rs/docs/user_guides/javascript/joints) documentation 
 
 ### Joints Example
 <a href="https://codesandbox.io/s/react-three-rapier-joints-mhhbd4"><img src="https://raw.githubusercontent.com/pmndrs/react-three-rapier/HEAD/packages/react-three-rapier/misc/example-joints.jpg" width="240" /></a>
