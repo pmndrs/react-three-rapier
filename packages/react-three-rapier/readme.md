@@ -200,11 +200,15 @@ const Scene = () => {
   const instancedApi = useRef<InstancedRigidBodyApi>(null);
 
   useEffect(() => {
+    if (!instancedApi.current) {
+      return
+    }
+
     // You can access individual instanced by their index
-    instancedApi.at(40).applyImpulse({ x: 0, y: 10, z: 0 });
+    instancedApi.current.at(40).applyImpulse({ x: 0, y: 10, z: 0 });
 
     // Or update all instances as if they were in an array
-    instancedApi.forEach((api) => {
+    instancedApi.current.forEach((api) => {
       api.applyImpulse({ x: 0, y: 10, z: 0 });
     });
   }, []);
