@@ -27,7 +27,7 @@ const App = () => {
             <Torus />
           </RigidBody>
 
-          <CuboidCollider position={[0, -2, 0]} args={[20, .5, 20]}>
+          <CuboidCollider position={[0, -2, 0]} args={[20, .5, 20]} />
 
           <Debug />
         </Physics>
@@ -379,7 +379,7 @@ Contact force events are triggered on `<RigidBody>` and any collider components 
     console.log(`The total force generated was: ${payload.totalForce}`);
   }}>
   <Sphere>
-    <meshPhysicalMaterial color={'grey'}>
+    <meshPhysicalMaterial color={'grey'} />
   </Sphere>
 </RigidBody>
 ```
