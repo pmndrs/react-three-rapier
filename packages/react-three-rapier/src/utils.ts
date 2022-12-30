@@ -4,13 +4,31 @@ import {
 } from "@dimforge/rapier3d-compat";
 import { useRef } from "react";
 
-import { Euler, Quaternion, Vector3 } from "three";
+import { Euler, Quaternion, Shape, Vector3 } from "three";
 import { _euler, _quaternion, _vector3 } from "./shared-objects";
 import { RigidBodyTypeString, Vector3Array } from "./types";
 
 export const vectorArrayToVector3 = (arr: Vector3Array) => {
   const [x, y, z] = arr;
   return new Vector3(x, y, z);
+};
+
+export const tupleToObject = <
+  T extends readonly any[],
+  K extends readonly string[]
+>(
+  tuple: T,
+  keys: K
+) => {
+  return keys.reduce(
+    (obj, key, i) => {
+      obj[key as K[number]] = tuple[i];
+      return obj;
+    },
+    {} as {
+      [Key in K[number]]: T[number];
+    }
+  );
 };
 
 export const vector3ToQuaternion = (v: Vector3) => {
