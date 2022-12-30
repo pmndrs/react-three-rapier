@@ -13,7 +13,7 @@
   },
   "devDependencies": {
     "@react-three/drei": "9.45.0",
-    "@react-three/fiber": "8.9.1",
+    "@react-three/fiber": "8.9.2",
     "@react-three/test-renderer": "^8.0.17",
     "@types/react-dom": "^18.0.2",
     "@types/three": "^0.139.0",
