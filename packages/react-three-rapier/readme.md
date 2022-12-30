@@ -534,9 +534,9 @@ const JointedThing = () => {
     bodyB,
     [
       [0, 0, 0], // Position of the joint in bodyA's local space
-      [0, 0, 0, 0], // Orientation of the joint in bodyA's local space
+      [0, 0, 0, 1], // Orientation of the joint in bodyA's local space
       [0, 0, 0], // Position of the joint in bodyB's local space
-      [0, 0, 0, 0], // Orientation of the joint in bodyB's local space
+      [0, 0, 0, 1], // Orientation of the joint in bodyB's local space
     ]);
 
   return (
