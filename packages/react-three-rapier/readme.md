@@ -27,7 +27,7 @@ const App = () => {
             <Torus />
           </RigidBody>
 
-          <CuboidCollider position={[0, -2, 0]} args={[20, .5, 20]}>
+          <CuboidCollider position={[0, -2, 0]} args={[20, .5, 20]} />
 
           <Debug />
         </Physics>
@@ -200,11 +200,15 @@ const Scene = () => {
   const instancedApi = useRef<InstancedRigidBodyApi>(null);
 
   useEffect(() => {
+    if (!instancedApi.current) {
+      return
+    }
+
     // You can access individual instanced by their index
-    instancedApi.at(40).applyImpulse({ x: 0, y: 10, z: 0 });
+    instancedApi.current.at(40).applyImpulse({ x: 0, y: 10, z: 0 });
 
     // Or update all instances as if they were in an array
-    instancedApi.forEach((api) => {
+    instancedApi.current.forEach((api) => {
       api.applyImpulse({ x: 0, y: 10, z: 0 });
     });
   }, []);
@@ -379,7 +383,7 @@ Contact force events are triggered on `<RigidBody>` and any collider components 
     console.log(`The total force generated was: ${payload.totalForce}`);
   }}>
   <Sphere>
-    <meshPhysicalMaterial color={'grey'}>
+    <meshPhysicalMaterial color={'grey'} />
   </Sphere>
 </RigidBody>
 ```
