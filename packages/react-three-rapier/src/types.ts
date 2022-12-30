@@ -422,7 +422,7 @@ export interface RigidBodyOptions extends ColliderProps {
 
   /**
    * Transform the RigidBodyState
-   * @internal
+   * @internal Do not use. Used internally by the InstancedRigidBodies to alter the RigidBody State
    */
   transformState?: (state: RigidBodyState) => RigidBodyState;
 }
