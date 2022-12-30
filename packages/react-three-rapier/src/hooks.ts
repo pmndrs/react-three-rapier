@@ -38,7 +38,7 @@ import {
 
 import { ColliderProps, RigidBodyProps } from ".";
 import { createJointApi, createRigidBodyApi } from "./api";
-import { vectorArrayToVector3 } from "./utils";
+import { tupleToObject, vectorArrayToVector3 } from "./utils";
 import { createColliderPropsFromChildren } from "./utils-collider";
 import {
   createRigidBodyState,
@@ -202,9 +202,9 @@ export const useFixedJoint: UseImpulseJoint<FixedJointParams> = (
     body2,
     rapier.JointData.fixed(
       vectorArrayToVector3(body1Anchor),
-      { ...vectorArrayToVector3(body1LocalFrame), w: 1 },
+      tupleToObject(body1LocalFrame, ["x", "y", "z", "w"] as const),
       vectorArrayToVector3(body2Anchor),
-      { ...vectorArrayToVector3(body2LocalFrame), w: 1 }
+      tupleToObject(body2LocalFrame, ["x", "y", "z", "w"] as const)
     )
   );
 };
@@ -245,19 +245,15 @@ export const useRevoluteJoint: UseImpulseJoint<RevoluteJointParams> = (
   const { rapier } = useRapier();
 
   const params = rapier.JointData.revolute(
-      vectorArrayToVector3(body1Anchor),
-      vectorArrayToVector3(body2Anchor),
-      vectorArrayToVector3(axis)
-    )
-  if (limits){
-    params.limitsEnabled = true
-    params.limits = limits
-  }
-  return useImpulseJoint<RevoluteImpulseJoint>(
-    body1,
-    body2,
-    params
+    vectorArrayToVector3(body1Anchor),
+    vectorArrayToVector3(body2Anchor),
+    vectorArrayToVector3(axis)
   );
+  if (limits) {
+    params.limitsEnabled = true;
+    params.limits = limits;
+  }
+  return useImpulseJoint<RevoluteImpulseJoint>(body1, body2, params);
 };
 
 /**
@@ -268,21 +264,17 @@ export const useRevoluteJoint: UseImpulseJoint<RevoluteJointParams> = (
 export const usePrismaticJoint: UseImpulseJoint<PrismaticJointParams> = (
   body1,
   body2,
-  [body1Anchor, body2Anchor, axis, limits],
+  [body1Anchor, body2Anchor, axis, limits]
 ) => {
   const { rapier } = useRapier();
   const params = rapier.JointData.prismatic(
-      vectorArrayToVector3(body1Anchor),
-      vectorArrayToVector3(body2Anchor),
-      vectorArrayToVector3(axis)
-    )
-  if (limits){
-    params.limitsEnabled = true
-    params.limits = limits
-  }
-  return useImpulseJoint<PrismaticImpulseJoint>(
-    body1,
-    body2,
-    params
+    vectorArrayToVector3(body1Anchor),
+    vectorArrayToVector3(body2Anchor),
+    vectorArrayToVector3(axis)
   );
+  if (limits) {
+    params.limitsEnabled = true;
+    params.limits = limits;
+  }
+  return useImpulseJoint<PrismaticImpulseJoint>(body1, body2, params);
 };

@@ -7,9 +7,17 @@
   <a href="https://discord.gg/ZZjjNvJ"><img src="https://img.shields.io/discord/740090768164651008?style=for-the-badge&colorA=0099DA&colorB=ffffff&label=discord&logo=discord&logoColor=ffffff" /></a>
 </p>
 
-<p align="center">⚠️ Under heavy development. All APIs are subject to change. ⚠️</p>
+<p align="center">⚠️ Under heavy development. All APIs are subject to change. ⚠️
+<br />
+For contributions, please read the <a href="https://github.com/pmndrs/react-three-rapier/blob/main/packages/react-three-rapier/CONTRIBUTING.md">Contribution Guide</a>.
+</p>
 
-For contributions, please read the [contributing guide](https://github.com/pmndrs/react-three-rapier/blob/main/packages/react-three-rapier/CONTRIBUTING.md).
+---
+
+`react-three/rapier` (or `r3/rapier`) is a wrapper library around the Rapier (https://rapier.rs/docs/user_guides/javascript) WASM-based physics engine, designed to slot seamlessly into a `react-three/fiber` pipeline.
+
+The goal of this library to is to provide a fast physics engine with minimal friction and small, straight forward API.
+
 
 ## Basic Usage
 
@@ -58,6 +66,11 @@ const App = () => {
 - [Configuring Time Step Size](#configuring-time-step-size)
 - [Manual stepping](#manual-stepping)
 - [Joints](#joints)
+  - [Fixed Joint](#fixed-joint)
+  - [Spherical Joint](#spherical-joint)
+  - [Revolute Joint](#revolute-joint)
+  - [Prismatic Joint](#prismatic-joint)
+  - [Joint APIs](#joint-apis)
   - [Joints Example](#joints-example)
 
 ---
@@ -500,8 +513,143 @@ step(1 / 60);
 ```
 
 ## Joints
+Joints can be made between two `RigidBodies` to provide a way to restrict a motion of a body in relation to another.
+> Read more about joints in Rapier: https://rapier.rs/docs/user_guides/javascript/joints
 
-- WIP
+Joints are available in `r3/rapier` as hooks.
+
+There are 4 different joint types available:
+- Fixed (two bodies are fixed together)
+- Spherical (two bodies are connected by a ball and socket, for things like arms or chains)
+- Revolute (two bodies are connected by a hinge, for things like doors or wheels)
+- Prismatic (two bodies are connected by a sliding joint, for things like pistons or sliders)
+
+### Fixed Joint
+A fixed joint ensures that two rigid-bodies don't move relative to each other. Fixed joints are characterized by one local frame (represented by an isometry) on each rigid-body. The fixed-joint makes these frames coincide in world-space.
+
+```tsx
+const JointedThing = () => {
+  const joint = useFixedJoint(
+    bodyA,
+    bodyB,
+    [
+      [0, 0, 0], // Position of the joint in bodyA's local space
+      [0, 0, 0, 1], // Orientation of the joint in bodyA's local space
+      [0, 0, 0], // Position of the joint in bodyB's local space
+      [0, 0, 0, 1], // Orientation of the joint in bodyB's local space
+    ]);
+
+  return (
+    <group>
+      <RigidBody ref={bodyA}>
+        <mesh />
+      </RigidBody>
+      <RigidBody ref={bodyB}>
+        <mesh />
+      </RigidBody>
+    </group>
+  );
+}
+```
+
+### Spherical Joint
+The spherical joint ensures that two points on the local-spaces of two rigid-bodies always coincide (it prevents any relative translational motion at this points).
+
+```tsx
+const JointedThing = () => {
+  const joint = useSphericalJoint(
+    bodyA,
+    bodyB,
+    [
+      [0, 0, 0], // Position of the joint in bodyA's local space
+      [0, 0, 0], // Position of the joint in bodyB's local space
+    ]);
+
+  return (
+    <group>
+      <RigidBody ref={bodyA}>
+        <mesh />
+      </RigidBody>
+      <RigidBody ref={bodyB}>
+        <mesh />
+      </RigidBody>
+    </group>
+  );
+}
+```
+
+### Revolute Joint
+The revolute joint prevents any relative movement between two rigid-bodies, except for relative rotations along one axis. This is typically used to simulate wheels, fans, etc.
+
+```tsx
+const JointedThing = () => {
+  const joint = useRevoluteJoint(
+    bodyA,
+    bodyB,
+    [
+      [0, 0, 0], // Position of the joint in bodyA's local space    
+      [0, 0, 0], // Position of the joint in bodyB's local space
+      [0, 0, 0], // Axis of the joint, expressed in the local-space of the rigid-bodies it is attached to.
+    ]);
+
+  return (
+    <group>
+      <RigidBody ref={bodyA}>
+        <mesh />
+      </RigidBody>
+      <RigidBody ref={bodyB}>
+        <mesh />
+      </RigidBody>
+    </group>
+  );
+}
+```
+
+### Prismatic Joint
+The prismatic joint prevents any relative movement between two rigid-bodies, except for relative translations along one axis.
+
+```tsx
+const JointedThing = () => {
+  const joint = usePrismaticJoint(
+    bodyA,
+    bodyB,
+    [
+      [0, 0, 0], // Position of the joint in bodyA's local space    
+      [0, 0, 0], // Position of the joint in bodyB's local space
+      [0, 0, 0], // Axis of the joint, expressed in the local-space of the rigid-bodies it is attached to.
+    ]);
+
+  return (
+    <group>
+      <RigidBody ref={bodyA}>
+        <mesh />
+      </RigidBody>
+      <RigidBody ref={bodyB}>
+        <mesh />
+      </RigidBody>
+    </group>
+  );
+}
+```
+
+### Joint APIs
+Joints can be controlled imperatively similarily to how `RigidBody` components can be controlled.
+
+```tsx
+const JointedThing = () => { 
+  const joint = useSphericalJoint(...)
+
+  useEffect(() => {
+    joint.configureMotorVelocity(1, 0)
+
+    // Disable contacts between the two joint bodies
+    joint.raw().setContactsEnabled(false)
+  }, [])
+
+  return ...
+}
+```
+
 
 ### Joints Example
 <a href="https://codesandbox.io/s/react-three-rapier-joints-mhhbd4"><img src="https://raw.githubusercontent.com/pmndrs/react-three-rapier/HEAD/packages/react-three-rapier/misc/example-joints.jpg" width="240" /></a>
