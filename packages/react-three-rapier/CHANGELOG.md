@@ -1,5 +1,12 @@
 # @react-three/rapier
 
+## 0.11.3
+
+### Patch Changes
+
+- 09cbbde: Add joints to readme
+- 09cbbde: useFixedJoint now allows `w` to be set for the local space orientation
+
 ## 0.11.2
 
 ### Patch Changes
