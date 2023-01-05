@@ -52,7 +52,9 @@ const App = () => {
 - [Basic Usage](#basic-usage)
 - [Readme Topics](#readme-topics)
 - [The Physics Component](#the-physics-component)
-- [Automatic colliders](#automatic-colliders)
+- [The RigidBody Component](#the-rigidbody-component)
+- [Automatic Colliders](#automatic-colliders)
+- [Collider Components](#collider-components)
   - [Collider Examples](#collider-examples)
 - [Instanced Meshes](#instanced-meshes)
 - [Debug](#debug)
@@ -99,7 +101,71 @@ The `<Physics />` component is the root component of your physics world. It is r
   interpolate?: boolean; // default true
 ```
 
-## Automatic colliders
+## The RigidBody Component
+The `<RigidBody />` component is used to add a `mesh` into the physics world. You use it by wrapping one or more `meshes` and setting desired props. By default, this will automatically generate `Colliders` based on the shape of the wrapped `meshes` (see [Automatic colliders](#automatic-colliders)).
+
+```tsx
+const RigidBodyMesh = () => (
+  <RigidBody>
+    <mesh />
+  </RigidBody>
+);
+```
+
+Available props for a `RigidBody` are:
+- `type`?: `string`  
+Specify the type of this rigid body. Default: "dynamic".
+  - "dynamic": The rigid body is fully dynamic.
+  - "fixed": The rigid body is fully fixed.
+  - "kinematicPosition": The rigid body is kinematic, and its forces are computed by changing position.
+  - "kinematicVelocity": The rigid body is kinematic, and its forced are computed by changing velocit .
+- `canSleep`?: `boolean`  
+  Whether or not this body can sleep. Default: `true`.
+- `linearDamping`?: `number`  
+  The linear damping coefficient of this rigid body. Default: `0.0`.
+- `angularDamping`?: `number`  
+  The angular damping coefficient of this rigid body. Default: `0.0`.
+- `linearVelocity`?: `[number, number, number]`  
+  The initial linear velocity of this body. Default: `[0, 0, 0]`.
+- `angularVelocity`?: `[number, number, number]`  
+  The initial angular velocity of this body. Default: `[0, 0, 0]`.
+- `gravityScale`?: `number` The scaling factor applied to the gravity affecting the rigid body. Default: `1.0`.
+- `ccd`?: `boolean`  
+  Whether or not Continous Collision Detection is enabled for this rigid body. Default: `false`.
+- `position`?: `[number, number, number]` or `Vector3`  
+  Initial position of the RigidBody.
+- `rotation`?: `[number, number, number]` or `Euler`  
+  Initial rotation of the RigidBody.
+- `quaternion`?: `Quaternion`  
+  Initial rotation of the RigidBody. Can be used in place of `rotation`.
+- `colliders`?: `string` or `false`  
+  Automatically generate colliders based on meshes inside this rigid body. See [Automatic colliders](#automatic-colliders).
+- `friction`?: `number`  
+  Set the friction of auto-generated colliders.
+- `restitution`?: `number`  
+  Set the restitution (bounciness) of auto-generated colliders. Does not affect any non-automatic child collider components.
+- `collisionGroups`?: `InteractionGroups`   
+  See [Configuring collision and solver groups](#configuring-collision-and-solver-groups).
+- `solverGroups`?: `InteractionGroups`  
+  See [Configuring collision and solver groups](#configuring-collision-and-solver-groups).
+- `onSleep`?: `function`  
+  Callback function that is called when the rigid body sleeps.
+- `onWake`?: `function`  
+  Callback function that is called when the rigid body wakes up.
+- `enabledRotations`?: `[boolean, boolean, boolean]`  
+  Allow rotation of this rigid body only along specific axes.
+- `enabledTranslations`?: `[boolean, boolean, boolean]`  
+  Allow translation of this rigid body only along specific axes.
+- `userData`?: `any`  
+  Passed down to the object3d representing this collider.
+- `includeInvisible`?: `boolean`  
+  Include invisible objects on the collider creation estimation.
+- `onCollisionEnter`?: `function`  
+  See [Collision Events](#collision-events).
+- `onCollisionExit`?: `function`  
+  See [Collision Events](#collision-events).
+
+## Automatic Colliders
 
 RigidBodies generate automatic colliders by default for all meshes that it contains. You can control the default collider by setting the `colliders` prop on a `<RigidBody />`, or change it globally by setting `colliders` on `<Physics />`. Setting `colliders={false}` disables auto-generation.
 
@@ -140,35 +206,98 @@ const Scene = () => (
     <RigidBody position={[0, 10, 0]} colliders="ball">
       <Sphere />
     </RigidBody>
-
-    {/* Make a compound shape with two custom BallColliders */}
-    <RigidBody position={[0, 10, 0]}>
-      <Sphere />
-      <BallCollider args={[0.5]} />
-      <BallCollider args={[0.5]} position={[1, 0, 0]} />
-    </RigidBody>
-
-    {/* Make a compound shape with two custom BallColliders, an automatic BallCollider,
-        Two automatic MeshColliders, based on two different shape strategies */}
-    <RigidBody position={[0, 10, 0]} colliders='ball'>
-      <MeshCollider type="trimesh">
-        <mesh ... />
-      </MeshCollider>
-
-      <MeshCollider type="hull">
-        <mesh ... />
-      </MeshCollider>
-
-      <Sphere />
-
-      <BallCollider args={[0.5]} />
-      <BallCollider args={[0.5]} position={[1, 0, 0]} />
-    </RigidBody>
   </Physics>
 );
 ```
 
-Objects work inside other transformed objects as well. Simulation runs in world space and is transformed to the objects local space, so that things act as you'd expect.
+## Collider Components
+
+You can also create `Colliders` by hand and add them to a `RigidBody` to create compound colliders. This is useful for creating more complex shapes, for creating simplified shapes for performance reasons, or for detecting collisions on specific parts of a mesh.
+
+Available `Collider` components:
+- `<CuboidCollider args={[halfWidth, halfHeight, halfDepth]} />`
+- `<RoundCuboidCollider args={[halfWidth, halfHeight, halfDepth, borderRadius]} />`
+- `<BallCollider args={[radius]} />`
+- `<CapsuleCollider args={[halfHeight, radius]} />`
+- `<HeightfieldCollider args={[width, height, heights, scale]} />`
+- `<TrimeshCollider args={[vertices, indices]} />`
+- `<ConeCollider args={[halfHeight, radius]} />`
+- `<CylinderCollider args={[halfHeight, radius]} />`
+- `<ConvexHullCollider args={[vertices, indices]} />`
+- `<MeshCollider />` Wraps a mesh and generates an automatic collider.
+
+General collider props:
+- `principalAngularInertia`?: `[number, number, number]`  
+  Principal angular inertia of this collider
+- `restitution`?: `number`  
+  Restitution (bounciness) of this collider
+- restitutionCombineRule?: `CoefficientCombineRule`  
+  What happens when two bodies meet. See https://rapier.rs/docs/user_guides/javascript/colliders#friction.
+- `friction`?: `number`  
+  Friction of this collider
+- frictionCombineRule?: `CoefficientCombineRule`  
+  What happens when two bodies meet. See https://rapier.rs/docs/user_guides/javascript/colliders#friction.
+- `position`?: `[number, number, number]`  or `Vector3`  
+  Position of the collider relative to the rigid body.
+- `rotation`?: `[number, number, number]` or `Euler`  
+  Rotation of the collider relative to the rigid body.
+- `quaternion`?: `[number, number, number, number]` or `Quaternion`  
+  Rotation of the collider relative to the rigid body.
+- `scale`?: `[number, number, number]` or `Vector3`  
+  Scale of the collider relative to the rigid body.
+- onCollisionEnter?: `CollisionEnterHandler`  
+  See [Collision Events](#collision-events).
+- onCollisionExit?: `CollisionExitHandler`  
+  See [Collision Events](#collision-events).
+- `sensor`?: `boolean`  
+  See [Sensors](#sensors).  
+- onIntersectionEnter?: `IntersectionEnterHandler`  
+  See [Sensors](#sensors).  
+- onIntersectionExit?: `IntersectionExitHandler`  
+  See [Sensors](#sensors).  
+- solverGroups?: `InteractionGroups`  
+  See [Solver Groups](#solver-groups).
+- `collisionGroups`?: `InteractionGroups`  
+  See [Collision Groups](#collision-groups).
+- `density`?: `number`  
+  Sets the uniform density of this collider. If this is set, other mass-properties like the angular inertia tensor are computed automatically from the collider's shape. More info https://rapier.rs/docs/user_guides/javascript/colliders#mass-properties
+- `mass`?: `number`  
+  Generally, it's not recommended to adjust the mass properties as it could lead to unexpected behaviors. Cannot be used at the same time as the density or massProperties values. More info https://rapier.rs/docs/user_guides/javascript/colliders#mass-properties
+- `massProperties`?: `{ mass: number; centerOfMass: Vector; principalAngularInertia: Vector angularInertiaLocalFrame: Rotation; }`  
+  The mass properties of this rigid body. Cannot be used at the same time as the density or mass values. More info https://rapier.rs/docs/user_guides/javascript/colliders#mass-properties
+
+
+```tsx
+const Scene = () => (<>
+  {/* Make a compound shape with two custom BallColliders */}
+  <RigidBody position={[0, 10, 0]}>
+    <Sphere />
+    <BallCollider args={[0.5]} />
+    <BallCollider args={[0.5]} position={[1, 0, 0]} />
+  </RigidBody>
+
+  {/* Make a compound shape with two custom BallColliders, an automatic BallCollider,
+      Two automatic MeshColliders, based on two different shape types */}
+  <RigidBody position={[0, 10, 0]} colliders='ball'>
+    <MeshCollider type="trimesh">
+      <mesh ... />
+    </MeshCollider>
+
+    <MeshCollider type="hull">
+      <mesh ... />
+    </MeshCollider>
+
+    <Sphere />
+
+    <BallCollider args={[0.5]} />
+    <BallCollider args={[0.5]} position={[1, 0, 0]} />
+  </RigidBody>
+<>)
+```
+
+RigidBodies work inside other transformed objects as well. Simulation runs in world space and is transformed to the objects local space, so that things act as you'd expect.
+
+> **Note** It's always best to create RigidBodies where the center of gravity is in the center of the object, otherwise you might get some unexpected behavior during simulation interpolation.
 
 ```tsx
 import { Box } from "@react-three/drei";
