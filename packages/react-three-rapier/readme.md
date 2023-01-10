@@ -53,18 +53,20 @@ const App = () => {
 - [Readme Topics](#readme-topics)
 - [The Physics Component](#the-physics-component)
 - [The RigidBody Component](#the-rigidbody-component)
+  - [RigidBody props](#rigidbody-props)
 - [Automatic Colliders](#automatic-colliders)
 - [Collider Components](#collider-components)
-  - [Collider Examples](#collider-examples)
+  - [Collider props](#collider-props)
+  - [🖼 Collider Examples](#-collider-examples)
 - [Instanced Meshes](#instanced-meshes)
 - [Debug](#debug)
 - [Collision Events](#collision-events)
   - [Configuring collision and solver groups](#configuring-collision-and-solver-groups)
 - [Contact force events](#contact-force-events)
 - [Sensors](#sensors)
-  - [Sensors Example](#sensors-example)
+  - [🖼 Sensors Example](#-sensors-example)
 - [Attractors](#attractors)
-  - [Attractors Example](#attractors-example)
+  - [🖼 Attractors Example](#-attractors-example)
 - [Configuring Time Step Size](#configuring-time-step-size)
 - [Manual stepping](#manual-stepping)
 - [Joints](#joints)
@@ -73,7 +75,7 @@ const App = () => {
   - [Revolute Joint](#revolute-joint)
   - [Prismatic Joint](#prismatic-joint)
   - [Joint APIs](#joint-apis)
-  - [Joints Example](#joints-example)
+  - [🖼 Joints Example](#-joints-example)
 
 ---
 
@@ -112,7 +114,7 @@ const RigidBodyMesh = () => (
 );
 ```
 
-Available props for a `RigidBody` are:
+### RigidBody props
 - `type`?: `string`  
 Specify the type of this rigid body. Default: "dynamic".
   - "dynamic": The rigid body is fully dynamic.
@@ -215,18 +217,28 @@ const Scene = () => (
 You can also create `Colliders` by hand and add them to a `RigidBody` to create compound colliders. This is useful for creating more complex shapes, for creating simplified shapes for performance reasons, or for detecting collisions on specific parts of a mesh.
 
 Available `Collider` components:
-- `<CuboidCollider args={[halfWidth, halfHeight, halfDepth]} />`
-- `<RoundCuboidCollider args={[halfWidth, halfHeight, halfDepth, borderRadius]} />`
-- `<BallCollider args={[radius]} />`
-- `<CapsuleCollider args={[halfHeight, radius]} />`
-- `<HeightfieldCollider args={[width, height, heights, scale]} />`
-- `<TrimeshCollider args={[vertices, indices]} />`
-- `<ConeCollider args={[halfHeight, radius]} />`
-- `<CylinderCollider args={[halfHeight, radius]} />`
-- `<ConvexHullCollider args={[vertices, indices]} />`
-- `<MeshCollider />` Wraps a mesh and generates an automatic collider.
+- `<CuboidCollider args={[halfWidth, halfHeight, halfDepth]} />`  
+  A cuboid collider.
+- `<RoundCuboidCollider args={[halfWidth, halfHeight, halfDepth, borderRadius]} />`  
+  A cuboid collider with rounded corners.
+- `<BallCollider args={[radius]} />`  
+  A ball collider.
+- `<CapsuleCollider args={[halfHeight, radius]} />`  
+  A capsule collider. The capsule is centered on the local-space Y axis.
+- `<HeightfieldCollider args={[width, height, heights, scale]} />`  
+  A heightfield collider is a heightmap represented by a grid of heights. The heightmap is centered on the local-space Y axis.
+- `<TrimeshCollider args={[vertices, indices]} />`  
+  A trimesh collider is a concave shape that is automatically computed from a set of points. It is more precise than a convex hull collider, but it is also more expensive to compute and to simulate.
+- `<ConeCollider args={[halfHeight, radius]} />`  
+  A cone collider. The cone is centered on the local-space Y axis.
+- `<CylinderCollider args={[halfHeight, radius]} />`  
+  A cylinder collider. The cylinder is centered on the local-space Y axis.
+- `<ConvexHullCollider args={[vertices, indices]} />`  
+  A convex hull collider is a convex shape that is automatically computed from a set of points. It is a good approximation of a concave shape, but it is not as precise as a trimesh collider. It is also more efficient to compute and to simulate.
+- `<MeshCollider />`   
+  Wraps one or more `meshes` to generate automatic colliders. Useful for combining with other primitive colliders where you need both simple and complex shapes.
 
-General collider props:
+### Collider props
 - `principalAngularInertia`?: `[number, number, number]`  
   Principal angular inertia of this collider
 - `restitution`?: `number`  
@@ -323,7 +335,7 @@ If part of our meshes are invisible and you want to include them in the collider
 </RigidBody>
 ```
 
-### Collider Examples
+### 🖼 Collider Examples
 <a href="https://codesandbox.io/s/react-three-rapier-auto-colliders-b4coz1"><img src="https://raw.githubusercontent.com/pmndrs/react-three-rapier/HEAD/packages/react-three-rapier/misc/example-auto-colliders.jpg" width="240" /></a>
 <a href="https://codesandbox.io/s/react-three-rapier-compound-colliders-ol5ybn"><img src="https://raw.githubusercontent.com/pmndrs/react-three-rapier/HEAD/packages/react-three-rapier/misc/example-compound-shapes.jpg" width="240" /></a>
 
@@ -575,7 +587,7 @@ To detect when a collider enters or leaves another collider, you can use the `on
 </RigidBody>
 ```
 
-### Sensors Example
+### 🖼 Sensors Example
 <a href="https://codesandbox.io/s/react-three-rapier-sensors-byjmsk"><img src="https://raw.githubusercontent.com/pmndrs/react-three-rapier/HEAD/packages/react-three-rapier/misc/example-sensors.jpg" width="240" /></a>
 
 ## Attractors
@@ -612,7 +624,7 @@ Gravity types:
   - `mass2` is the mass of the rigid-body at the time of calculation. Note that rigid-bodies with colliders will use the mass provided to the collider. This is not a value you can control from the attractor, only from wherever you're creating rigid-body components in the scene.
   - `distance` is the distance between the attractor and rigid-body at the time of calculation
 
-### Attractors Example
+### 🖼 Attractors Example
 <a href="https://codesandbox.io/s/react-three-rapier-attractors-oyj640"><img src="https://raw.githubusercontent.com/pmndrs/react-three-rapier/HEAD/packages/react-three-rapier/misc/example-attractors.jpg" width="240" /></a>
 
 ## Configuring Time Step Size
@@ -780,5 +792,5 @@ const JointedThing = () => {
 ```
 
 
-### Joints Example
+### 🖼 Joints Example
 <a href="https://codesandbox.io/s/react-three-rapier-joints-mhhbd4"><img src="https://raw.githubusercontent.com/pmndrs/react-three-rapier/HEAD/packages/react-three-rapier/misc/example-joints.jpg" width="240" /></a>
