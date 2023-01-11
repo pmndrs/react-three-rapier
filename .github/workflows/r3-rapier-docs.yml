@@ -1,5 +1,5 @@
 # Simple workflow for deploying static content to GitHub Pages
-name: Deploy static content to Pages
+name: Deploy @react-three/rapier docs
 
 on:
   # Runs on pushes targeting the default branch
@@ -27,10 +27,10 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    steps:        
+    steps:
       - name: Checkout
         uses: actions/checkout@v3
-        
+
       - name: Setup Node.js environment
         uses: actions/setup-node@v3.6.0
         with:
@@ -38,18 +38,18 @@ jobs:
 
       - name: Install Node Dependencies
         run: yarn
-        
+
       - name: Run typedoc
         run: yarn r3r-docs
-        
+
       - name: Setup Pages
         uses: actions/configure-pages@v2
-        
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
           # Upload docs folder
-          path: './packages/react-three-rapier/docs'
+          path: "./packages/react-three-rapier/docs"
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v1
