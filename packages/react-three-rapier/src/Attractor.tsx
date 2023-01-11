@@ -5,18 +5,10 @@ import { FC, memo, useEffect, useRef } from "react";
 import { Object3D, Vector3 } from "three";
 import { _position, _vector3 } from "./shared-objects";
 import { Object3DProps } from "@react-three/fiber";
-import {
-  BallArgs,
-  BallCollider,
-  interactionGroups,
-  IntersectionEnterHandler,
-  IntersectionExitHandler,
-  UseColliderOptions
-} from ".";
 
-type GravityType = "static" | "linear" | "newtonian";
+export type AttractorGravityType = "static" | "linear" | "newtonian";
 
-interface AttractorProps {
+export interface AttractorProps {
   /**
    * The relative position of this attractor
    */
@@ -45,7 +37,7 @@ interface AttractorProps {
    * - newtonian: The gravity is calculated using the newtonian gravity formula.
    * @default "static"
    */
-  type?: GravityType;
+  type?: AttractorGravityType;
 
   /**
    * The mass of the attractor. Used when type is `newtonian`.

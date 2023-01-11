@@ -9,11 +9,12 @@ import React, {
   MutableRefObject
 } from "react";
 import { Object3D, Vector3, InstancedMesh } from "three";
+import { RigidBodyApi } from "./api";
 import { useRapier } from "./hooks";
 import { useRigidBodyContext, RigidBodyProps } from "./RigidBody";
 import { _euler, _position, _rotation, _scale } from "./shared-objects";
 import {
-  UseColliderOptions,
+  ColliderOptions,
   CuboidArgs,
   RoundCuboidArgs,
   BallArgs,
@@ -22,8 +23,7 @@ import {
   TrimeshArgs,
   ConeArgs,
   CylinderArgs,
-  ConvexHullArgs,
-  RigidBodyApi
+  ConvexHullArgs
 } from "./types";
 import { vectorArrayToVector3 } from "./utils";
 import {
@@ -33,7 +33,7 @@ import {
   useUpdateColliderOptions
 } from "./utils-collider";
 
-export interface ColliderProps extends UseColliderOptions<any> {
+export interface ColliderProps extends ColliderOptions<any> {
   children?: ReactNode;
 }
 
@@ -140,27 +140,26 @@ export const AnyCollider = memo(
   )
 );
 
-type UseColliderOptionsRequiredArgs<T extends unknown[]> = Omit<
-  UseColliderOptions<T>,
+export type ColliderOptionsRequiredArgs<T extends unknown[]> = Omit<
+  ColliderOptions<T>,
   "args"
 > & {
   args: T;
   children?: ReactNode;
 };
 
-export type CuboidColliderProps = UseColliderOptionsRequiredArgs<CuboidArgs>;
+export type CuboidColliderProps = ColliderOptionsRequiredArgs<CuboidArgs>;
 export type RoundCuboidColliderProps =
-  UseColliderOptionsRequiredArgs<RoundCuboidArgs>;
-export type BallColliderProps = UseColliderOptionsRequiredArgs<BallArgs>;
-export type CapsuleColliderProps = UseColliderOptionsRequiredArgs<CapsuleArgs>;
+  ColliderOptionsRequiredArgs<RoundCuboidArgs>;
+export type BallColliderProps = ColliderOptionsRequiredArgs<BallArgs>;
+export type CapsuleColliderProps = ColliderOptionsRequiredArgs<CapsuleArgs>;
 export type HeightfieldColliderProps =
-  UseColliderOptionsRequiredArgs<HeightfieldArgs>;
-export type TrimeshColliderProps = UseColliderOptionsRequiredArgs<TrimeshArgs>;
-export type ConeColliderProps = UseColliderOptionsRequiredArgs<ConeArgs>;
-export type CylinderColliderProps =
-  UseColliderOptionsRequiredArgs<CylinderArgs>;
+  ColliderOptionsRequiredArgs<HeightfieldArgs>;
+export type TrimeshColliderProps = ColliderOptionsRequiredArgs<TrimeshArgs>;
+export type ConeColliderProps = ColliderOptionsRequiredArgs<ConeArgs>;
+export type CylinderColliderProps = ColliderOptionsRequiredArgs<CylinderArgs>;
 export type ConvexHullColliderProps =
-  UseColliderOptionsRequiredArgs<ConvexHullArgs>;
+  ColliderOptionsRequiredArgs<ConvexHullArgs>;
 
 export const CuboidCollider = React.forwardRef(
   (props: CuboidColliderProps, ref: ForwardedRef<Collider[]>) => {

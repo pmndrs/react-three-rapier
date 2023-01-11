@@ -1,7 +1,7 @@
 import { useGLTF } from "@react-three/drei";
 import { GroupProps, useFrame } from "@react-three/fiber";
 import { RigidBody, RigidBodyProps } from "@react-three/rapier";
-import { RigidBodyApi } from "@react-three/rapier/dist/declarations/src/types";
+import { RigidBodyApi } from "@react-three/rapier";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { Mesh } from "three";
 import { GLTF } from "three-stdlib";

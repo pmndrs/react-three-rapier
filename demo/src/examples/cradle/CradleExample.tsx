@@ -5,13 +5,13 @@ import {
   RapierRigidBody,
   RigidBody,
   RigidBodyApi,
-  UseRigidBodyOptions,
+  RigidBodyOptions,
   useSphericalJoint
 } from "@react-three/rapier";
 import { useRef } from "react";
 import { Demo } from "../../App";
 
-const Rod = (props: UseRigidBodyOptions) => {
+const Rod = (props: RigidBodyOptions) => {
   const anchor = useRef<RigidBodyApi>(null);
   const rod = useRef<RigidBodyApi>(null);
 

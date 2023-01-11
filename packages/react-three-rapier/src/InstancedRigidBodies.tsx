@@ -1,31 +1,21 @@
+import { RigidBody as RapierRigidBody } from "@dimforge/rapier3d-compat";
 import {
-  Collider,
-  RigidBody as RapierRigidBody
-} from "@dimforge/rapier3d-compat";
-import React, {
   useRef,
-  useEffect,
   forwardRef,
   useImperativeHandle,
   useMemo,
-  useLayoutEffect,
-  useState
+  useLayoutEffect
 } from "react";
-import {
-  Object3D,
-  InstancedMesh,
-  Matrix4,
-  Vector3,
-  DynamicDrawUsage
-} from "three";
+import { Object3D, InstancedMesh, Matrix4, DynamicDrawUsage } from "three";
 import { AnyCollider } from ".";
 import {
   createInstancedRigidBodiesApi,
   createRigidBodyApi,
-  InstancedRigidBodyApi
+  InstancedRigidBodyApi,
+  RigidBodyApi
 } from "./api";
 import { useChildColliderProps, useRapier } from "./hooks";
-import { RigidBody, RigidBodyContext, RigidBodyProps } from "./RigidBody";
+import { RigidBodyContext, RigidBodyProps } from "./RigidBody";
 import {
   _matrix4,
   _object3d,
@@ -33,12 +23,11 @@ import {
   _rotation,
   _scale
 } from "./shared-objects";
-import { RigidBodyApi, Vector3Array } from "./types";
-import { vector3ToQuaternion, vectorArrayToVector3 } from "./utils";
+import { Vector3Array } from "./types";
+import { vectorArrayToVector3 } from "./utils";
 import {
   createRigidBodyState,
   rigidBodyDescFromOptions,
-  setRigidBodyOptions,
   useRigidBodyEvents,
   useUpdateRigidBodyOptions
 } from "./utils-rigidbody";

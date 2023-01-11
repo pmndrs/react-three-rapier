@@ -18,7 +18,6 @@ For contributions, please read the <a href="https://github.com/pmndrs/react-thre
 
 The goal of this library to is to provide a fast physics engine with minimal friction and small, straight forward API.
 
-
 ## Basic Usage
 
 ```tsx
@@ -53,10 +52,8 @@ const App = () => {
 - [Readme Topics](#readme-topics)
 - [The Physics Component](#the-physics-component)
 - [The RigidBody Component](#the-rigidbody-component)
-  - [RigidBody props](#rigidbody-props)
 - [Automatic Colliders](#automatic-colliders)
 - [Collider Components](#collider-components)
-  - [Collider props](#collider-props)
   - [🖼 Collider Examples](#-collider-examples)
 - [Instanced Meshes](#instanced-meshes)
 - [Debug](#debug)
@@ -114,58 +111,8 @@ const RigidBodyMesh = () => (
 );
 ```
 
-### RigidBody props
-- `type`?: `string`  
-Specify the type of this rigid body. Default: "dynamic".
-  - "dynamic": The rigid body is fully dynamic.
-  - "fixed": The rigid body is fully fixed.
-  - "kinematicPosition": The rigid body is kinematic, and its forces are computed by changing position.
-  - "kinematicVelocity": The rigid body is kinematic, and its forced are computed by changing velocit .
-- `canSleep`?: `boolean`  
-  Whether or not this body can sleep. Default: `true`.
-- `linearDamping`?: `number`  
-  The linear damping coefficient of this rigid body. Default: `0.0`.
-- `angularDamping`?: `number`  
-  The angular damping coefficient of this rigid body. Default: `0.0`.
-- `linearVelocity`?: `[number, number, number]`  
-  The initial linear velocity of this body. Default: `[0, 0, 0]`.
-- `angularVelocity`?: `[number, number, number]`  
-  The initial angular velocity of this body. Default: `[0, 0, 0]`.
-- `gravityScale`?: `number` The scaling factor applied to the gravity affecting the rigid body. Default: `1.0`.
-- `ccd`?: `boolean`  
-  Whether or not Continous Collision Detection is enabled for this rigid body. Default: `false`.
-- `position`?: `[number, number, number]` or `Vector3`  
-  Initial position of the RigidBody.
-- `rotation`?: `[number, number, number]` or `Euler`  
-  Initial rotation of the RigidBody.
-- `quaternion`?: `Quaternion`  
-  Initial rotation of the RigidBody. Can be used in place of `rotation`.
-- `colliders`?: `string` or `false`  
-  Automatically generate colliders based on meshes inside this rigid body. See [Automatic colliders](#automatic-colliders).
-- `friction`?: `number`  
-  Set the friction of auto-generated colliders.
-- `restitution`?: `number`  
-  Set the restitution (bounciness) of auto-generated colliders. Does not affect any non-automatic child collider components.
-- `collisionGroups`?: `InteractionGroups`   
-  See [Configuring collision and solver groups](#configuring-collision-and-solver-groups).
-- `solverGroups`?: `InteractionGroups`  
-  See [Configuring collision and solver groups](#configuring-collision-and-solver-groups).
-- `onSleep`?: `function`  
-  Callback function that is called when the rigid body sleeps.
-- `onWake`?: `function`  
-  Callback function that is called when the rigid body wakes up.
-- `enabledRotations`?: `[boolean, boolean, boolean]`  
-  Allow rotation of this rigid body only along specific axes.
-- `enabledTranslations`?: `[boolean, boolean, boolean]`  
-  Allow translation of this rigid body only along specific axes.
-- `userData`?: `any`  
-  Passed down to the object3d representing this collider.
-- `includeInvisible`?: `boolean`  
-  Include invisible objects on the collider creation estimation.
-- `onCollisionEnter`?: `function`  
-  See [Collision Events](#collision-events).
-- `onCollisionExit`?: `function`  
-  See [Collision Events](#collision-events).
+For available props: see [RigidBody docs](#rigidbody-props)
+
 
 ## Automatic Colliders
 
@@ -215,69 +162,6 @@ const Scene = () => (
 ## Collider Components
 
 You can also create `Colliders` by hand and add them to a `RigidBody` to create compound colliders. This is useful for creating more complex shapes, for creating simplified shapes for performance reasons, or for detecting collisions on specific parts of a mesh.
-
-Available `Collider` components:
-- `<CuboidCollider args={[halfWidth, halfHeight, halfDepth]} />`  
-  A cuboid collider.
-- `<RoundCuboidCollider args={[halfWidth, halfHeight, halfDepth, borderRadius]} />`  
-  A cuboid collider with rounded corners.
-- `<BallCollider args={[radius]} />`  
-  A ball collider.
-- `<CapsuleCollider args={[halfHeight, radius]} />`  
-  A capsule collider. The capsule is centered on the local-space Y axis.
-- `<HeightfieldCollider args={[width, height, heights, scale]} />`  
-  A heightfield collider is a heightmap represented by a grid of heights. The heightmap is centered on the local-space Y axis.
-- `<TrimeshCollider args={[vertices, indices]} />`  
-  A trimesh collider is a concave shape that is automatically computed from a set of points. It is more precise than a convex hull collider, but it is also more expensive to compute and to simulate.
-- `<ConeCollider args={[halfHeight, radius]} />`  
-  A cone collider. The cone is centered on the local-space Y axis.
-- `<CylinderCollider args={[halfHeight, radius]} />`  
-  A cylinder collider. The cylinder is centered on the local-space Y axis.
-- `<ConvexHullCollider args={[vertices, indices]} />`  
-  A convex hull collider is a convex shape that is automatically computed from a set of points. It is a good approximation of a concave shape, but it is not as precise as a trimesh collider. It is also more efficient to compute and to simulate.
-- `<MeshCollider />`   
-  Wraps one or more `meshes` to generate automatic colliders. Useful for combining with other primitive colliders where you need both simple and complex shapes.
-
-### Collider props
-- `principalAngularInertia`?: `[number, number, number]`  
-  Principal angular inertia of this collider
-- `restitution`?: `number`  
-  Restitution (bounciness) of this collider
-- restitutionCombineRule?: `CoefficientCombineRule`  
-  What happens when two bodies meet. See https://rapier.rs/docs/user_guides/javascript/colliders#friction.
-- `friction`?: `number`  
-  Friction of this collider
-- frictionCombineRule?: `CoefficientCombineRule`  
-  What happens when two bodies meet. See https://rapier.rs/docs/user_guides/javascript/colliders#friction.
-- `position`?: `[number, number, number]`  or `Vector3`  
-  Position of the collider relative to the rigid body.
-- `rotation`?: `[number, number, number]` or `Euler`  
-  Rotation of the collider relative to the rigid body.
-- `quaternion`?: `[number, number, number, number]` or `Quaternion`  
-  Rotation of the collider relative to the rigid body.
-- `scale`?: `[number, number, number]` or `Vector3`  
-  Scale of the collider relative to the rigid body.
-- onCollisionEnter?: `CollisionEnterHandler`  
-  See [Collision Events](#collision-events).
-- onCollisionExit?: `CollisionExitHandler`  
-  See [Collision Events](#collision-events).
-- `sensor`?: `boolean`  
-  See [Sensors](#sensors).  
-- onIntersectionEnter?: `IntersectionEnterHandler`  
-  See [Sensors](#sensors).  
-- onIntersectionExit?: `IntersectionExitHandler`  
-  See [Sensors](#sensors).  
-- solverGroups?: `InteractionGroups`  
-  See [Solver Groups](#solver-groups).
-- `collisionGroups`?: `InteractionGroups`  
-  See [Collision Groups](#collision-groups).
-- `density`?: `number`  
-  Sets the uniform density of this collider. If this is set, other mass-properties like the angular inertia tensor are computed automatically from the collider's shape. More info https://rapier.rs/docs/user_guides/javascript/colliders#mass-properties
-- `mass`?: `number`  
-  Generally, it's not recommended to adjust the mass properties as it could lead to unexpected behaviors. Cannot be used at the same time as the density or massProperties values. More info https://rapier.rs/docs/user_guides/javascript/colliders#mass-properties
-- `massProperties`?: `{ mass: number; centerOfMass: Vector; principalAngularInertia: Vector angularInertiaLocalFrame: Rotation; }`  
-  The mass properties of this rigid body. Cannot be used at the same time as the density or mass values. More info https://rapier.rs/docs/user_guides/javascript/colliders#mass-properties
-
 
 ```tsx
 const Scene = () => (<>
