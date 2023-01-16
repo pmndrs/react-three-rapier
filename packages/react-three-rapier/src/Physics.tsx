@@ -35,11 +35,10 @@ import {
   IntersectionEnterHandler,
   IntersectionExitHandler,
   RigidBodyAutoCollider,
-  Vector3Array,
-  WorldApi
+  Vector3Array
 } from "./types";
 
-import { createWorldApi } from "./api";
+import { createWorldApi, WorldApi } from "./api";
 import { _matrix4, _position, _rotation, _scale } from "./shared-objects";
 import {
   rapierQuaternionToQuaternion,
@@ -126,7 +125,7 @@ export interface RapierContext {
   step: (deltaTime: number) => void;
 }
 
-export const RapierContext = createContext<RapierContext | undefined>(
+export const rapierContext = createContext<RapierContext | undefined>(
   undefined
 );
 
@@ -185,7 +184,7 @@ export type EventMapValue = {
 
 export type EventMap = Map<ColliderHandle | RigidBodyHandle, EventMapValue>;
 
-interface RapierWorldProps {
+export interface PhysicsProps {
   children: ReactNode;
   /**
    * Set the gravity of the physics world
@@ -235,7 +234,7 @@ interface RapierWorldProps {
   interpolate?: boolean;
 }
 
-export const Physics: FC<RapierWorldProps> = ({
+export const Physics: FC<PhysicsProps> = ({
   colliders = "cuboid",
   gravity = [0, -9.81, 0],
   children,
@@ -602,6 +601,6 @@ export const Physics: FC<RapierWorldProps> = ({
   );
 
   return (
-    <RapierContext.Provider value={context}>{children}</RapierContext.Provider>
+    <rapierContext.Provider value={context}>{children}</rapierContext.Provider>
   );
 };

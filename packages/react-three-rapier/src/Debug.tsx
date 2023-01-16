@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { memo, useEffect, useState } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { FC, useRef } from "react";
 import { BufferAttribute, LineSegments, Mesh } from "three";
@@ -6,8 +6,6 @@ import { useRapier } from "./hooks";
 import { AttractorState } from "./Attractor";
 import { VertexNormalsHelper } from "three-stdlib";
 import { _vector3 } from "./shared-objects";
-
-interface DebugProps {}
 
 function mapsEqual(map1: Map<string, any>, map2: Map<string, any>) {
   var testVal;
@@ -64,7 +62,7 @@ const AttractorHelper = (props: AttractorState) => {
   );
 };
 
-export const Debug: FC<DebugProps> = () => {
+export const Debug = memo(() => {
   const { world, attractorStates } = useRapier();
   const ref = useRef<LineSegments>(null);
   const [attractors, setAttractors] = useState<AttractorState[]>([]);
@@ -101,4 +99,4 @@ export const Debug: FC<DebugProps> = () => {
       ))}
     </group>
   );
-};
+});

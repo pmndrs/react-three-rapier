@@ -11,12 +11,7 @@ import { Rotation, Vector } from "@dimforge/rapier3d-compat/math";
 import { Object3DProps } from "@react-three/fiber";
 import { Object3D } from "three";
 import { ColliderProps } from ".";
-import {
-  createColliderApi,
-  createJointApi,
-  createRigidBodyApi,
-  createWorldApi
-} from "./api";
+import { RigidBodyApi, JointApi } from "./api";
 
 export { CoefficientCombineRule as CoefficientCombineRule } from "@dimforge/rapier3d-compat";
 export { RapierRigidBody, RapierCollider };
@@ -87,7 +82,7 @@ export type RoundConvexMeshArgs = [
   borderRadius: number
 ];
 
-export type UseBodyOptions = Omit<UseRigidBodyOptions, "shape">;
+export type UseBodyOptions = Omit<RigidBodyOptions, "shape">;
 
 export type RigidBodyTypeString =
   | "fixed"
@@ -115,8 +110,9 @@ export type ColliderShape =
 export type Vector3Array = [x: number, y: number, z: number];
 export type Vector4Array = [x: number, y: number, z: number, w: number];
 export type Boolean3Array = [x: boolean, y: boolean, z: boolean];
+export type Vector3Object = { x: number; y: number; z: number };
 
-export interface UseColliderOptions<ColliderArgs extends Array<unknown>> {
+export interface ColliderOptions<ColliderArgs extends Array<unknown>> {
   /**
    * The optional name passed to THREE's Object3D
    */
@@ -304,7 +300,7 @@ export type IntersectionExitHandler = (
 
 export type ContactForceHandler = (payload: ContactForcePayload) => void;
 
-export interface UseRigidBodyOptions extends ColliderProps {
+export interface RigidBodyOptions extends ColliderProps {
   /**
    * Specify the type of this rigid body
    */
@@ -457,8 +453,3 @@ export type RigidBodyApiRef = MutableRefObject<undefined | null | RigidBodyApi>;
 export interface UseImpulseJoint<P> {
   (body1: RigidBodyApiRef, body2: RigidBodyApiRef, params: P): JointApi;
 }
-
-export type RigidBodyApi = ReturnType<typeof createRigidBodyApi>;
-export type ColliderApi = ReturnType<typeof createColliderApi>;
-export type WorldApi = ReturnType<typeof createWorldApi>;
-export type JointApi = ReturnType<typeof createJointApi>;

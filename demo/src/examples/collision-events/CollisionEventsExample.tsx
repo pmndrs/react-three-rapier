@@ -5,7 +5,7 @@ import {
   HeightfieldCollider,
   interactionGroups,
   RigidBody,
-  UseRigidBodyOptions
+  RigidBodyOptions
 } from "@react-three/rapier";
 import {
   createContext,
@@ -67,7 +67,7 @@ const Explosion = ({ position }: { position: [number, number, number] }) => {
 };
 
 const Collisioner = (
-  props: Omit<UseRigidBodyOptions, "children"> & {
+  props: Omit<RigidBodyOptions, "children"> & {
     children(color: string): ReactNode;
   }
 ) => {

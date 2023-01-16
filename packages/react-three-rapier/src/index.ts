@@ -1,5 +1,4 @@
 export * from "./types";
-export type { RigidBodyApi, WorldApi, InstancedRigidBodyApi } from "./api";
 export type { RigidBodyProps } from "./RigidBody";
 export type { InstancedRigidBodiesProps } from "./InstancedRigidBodies";
 export type {
@@ -11,8 +10,20 @@ export type {
   CuboidColliderProps,
   HeightfieldColliderProps,
   RoundCuboidColliderProps,
-  TrimeshColliderProps
+  TrimeshColliderProps,
+  ColliderOptionsRequiredArgs
 } from "./AnyCollider";
+
+export type { PhysicsProps, RapierContext } from "./Physics";
+export type { MeshColliderProps } from "./MeshCollider";
+export type { AttractorProps, AttractorGravityType } from "./Attractor";
+
+export type {
+  RigidBodyApi,
+  InstancedRigidBodyApi,
+  JointApi,
+  WorldApi
+} from "./api";
 
 export { Physics } from "./Physics";
 export { RigidBody } from "./RigidBody";
@@ -22,5 +33,6 @@ export { InstancedRigidBodies } from "./InstancedRigidBodies";
 export * from "./AnyCollider";
 export { Attractor } from "./Attractor";
 
-export * from "./hooks";
+export * from "./joints";
+export { useRapier } from "./hooks";
 export * from "./interaction-groups";

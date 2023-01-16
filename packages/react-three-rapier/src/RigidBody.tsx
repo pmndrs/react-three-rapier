@@ -7,21 +7,21 @@ import React, {
 } from "react";
 import { forwardRef, ReactNode, useContext, useImperativeHandle } from "react";
 import { Object3D } from "three";
-import { InstancedRigidBodyApi } from "./api";
+import { InstancedRigidBodyApi, RigidBodyApi } from "./api";
 import { useRigidBody } from "./hooks";
 import { InstancedRigidBodiesProps } from "./InstancedRigidBodies";
-import { RigidBodyApi, UseRigidBodyOptions } from "./types";
+import { RigidBodyOptions } from "./types";
 import { AnyCollider } from "./AnyCollider";
 
 export const RigidBodyContext = createContext<{
   ref: RefObject<Object3D> | MutableRefObject<Object3D>;
   api: RigidBodyApi | InstancedRigidBodyApi;
-  options: UseRigidBodyOptions | InstancedRigidBodiesProps;
+  options: RigidBodyOptions | InstancedRigidBodiesProps;
 }>(undefined!);
 
 export const useRigidBodyContext = () => useContext(RigidBodyContext);
 
-export interface RigidBodyProps extends UseRigidBodyOptions {
+export interface RigidBodyProps extends RigidBodyOptions {
   children?: ReactNode;
 }
 

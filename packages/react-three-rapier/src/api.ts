@@ -10,14 +10,13 @@ import {
   World
 } from "@dimforge/rapier3d-compat";
 import { Quaternion, Vector3 } from "three";
-import { RefGetter } from "./types";
+import { RefGetter, Vector3Object } from "./types";
 import { rapierVector3ToVector3 } from "./utils";
-
-type Vector3Object = { x: number; y: number; z: number };
 
 export interface RigidBodyApi {
   /**
    * Get the raw RigidBody
+   * @see https://rapier.rs/javascript3d/classes/RigidBody.html
    */
   raw(): RigidBody;
 
@@ -284,7 +283,15 @@ export const createInstancedRigidBodiesApi = (
   }
 });
 
-// TODO: Flesh this out
+export interface ColliderApi {
+  /**
+   * The Collider
+   * @see https://rapier.rs/javascript3d/classes/Collider.html
+   */
+  raw: () => Collider | undefined;
+  readonly handle: number;
+}
+
 export const createColliderApi = (ref: RefGetter<Collider>) => {
   return {
     raw: () => ref.current(),
@@ -346,8 +353,21 @@ export const createWorldApi = (ref: RefGetter<World>): WorldApi => {
   };
 };
 
-// TODO: Broken currently, waiting for Rapier3D to fix
-export const createJointApi = (ref: RefGetter<ImpulseJoint>) => {
+export interface JointApi {
+  /**
+   * @see https://rapier.rs/javascript3d/classes/ImpulseJoint.html
+   */
+  raw: () => ImpulseJoint | undefined;
+  readonly handle: number;
+  configureMotorPosition: (
+    targetPos: number,
+    stiffness: number,
+    damping: number
+  ) => void;
+  configureMotorVelocity: (targetVel: number, damping: number) => void;
+}
+
+export const createJointApi = (ref: RefGetter<ImpulseJoint>): JointApi => {
   return {
     raw: () => ref.current(),
     get handle() {
