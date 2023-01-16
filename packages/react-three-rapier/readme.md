@@ -7,9 +7,12 @@
   <a href="https://discord.gg/ZZjjNvJ"><img src="https://img.shields.io/discord/740090768164651008?style=for-the-badge&colorA=0099DA&colorB=ffffff&label=discord&logo=discord&logoColor=ffffff" /></a>
 </p>
 
-<p align="center">⚠️ Under heavy development. All APIs are subject to change. ⚠️
+<p align="center">
+⚠️ This library is under development. All APIs are subject to change. ⚠️
 <br />
-For contributions, please read the <a href="https://github.com/pmndrs/react-three-rapier/blob/main/packages/react-three-rapier/CONTRIBUTING.md">Contribution Guide</a>.
+For contributions, please read the <a href="https://github.com/pmndrs/react-three-rapier/blob/main/packages/react-three-rapier/CONTRIBUTING.md">🪧 Contribution Guide</a>.
+<br/>
+For available APIs, see <a href="https://pmndrs.github.io/react-three-rapier/>">🧩 API Docs</a>
 </p>
 
 ---
@@ -46,9 +49,16 @@ const App = () => {
 
 ---
 
+## 📝 Readme note
+Below follows a guide on core concepts for `react-three/rapier`.  
+For full API outline and documentation, see 🧩 [API Docs](https://pmndrs.github.io/react-three-rapier/).
+
+---
+
 ## Readme Topics
 
 - [Basic Usage](#basic-usage)
+- [📝 Readme note](#-readme-note)
 - [Readme Topics](#readme-topics)
 - [The Physics Component](#the-physics-component)
 - [The RigidBody Component](#the-rigidbody-component)
@@ -79,29 +89,30 @@ const App = () => {
 ## The Physics Component
 The `<Physics />` component is the root component of your physics world. It is responsible for creating the physics world and managing the simulation. It relies on lazily initiating `Rapier` and needs to be wrapped in `<Suspense />`.
 
+🧩 See [PhysicsProps docs](https://pmndrs.github.io/react-three-rapier/interfaces/PhysicsProps.html) for available props.
+
 ```tsx
-  // The gravity of the physics workd
-  gravity?: Vector3Array; // default [0, -9.81, 0]
-
-  // Which collider shape to generate for meshes by default
-  colliders?: RigidBodyAutoCollider; // default "cuboid"
-
-  // The number of physics steps per second
-  timeStep?: number | "vary"; // default 1/60
-
-  // Pause the physic simulation
-  paused?: boolean; // default false
-
-  // Which order to run the physics simulation
-  updatePriority?: number;
-
-  // If the physics updates slower than the monitor refreshes,
-  // interpolation will smooth out the steps between frames
-  interpolate?: boolean; // default true
+const Scene = () => {
+  return (
+    <Canvas>
+      <Suspense>
+        <Physics 
+          gravity={[0,1,0]} 
+          interpolation={false} 
+          colliders={false}
+        >
+          ...
+        </Physics>
+      </Suspense>
+    </Canvas>
+  );
+}
 ```
 
 ## The RigidBody Component
 The `<RigidBody />` component is used to add a `mesh` into the physics world. You use it by wrapping one or more `meshes` and setting desired props. By default, this will automatically generate `Colliders` based on the shape of the wrapped `meshes` (see [Automatic colliders](#automatic-colliders)).
+
+🧩 See [RigidBodyProps docs](https://pmndrs.github.io/react-three-rapier/interfaces/RigidBodyProps.html) for available props.
 
 ```tsx
 const RigidBodyMesh = () => (
@@ -110,9 +121,6 @@ const RigidBodyMesh = () => (
   </RigidBody>
 );
 ```
-
-For available props: see [RigidBody docs](#rigidbody-props)
-
 
 ## Automatic Colliders
 
@@ -162,6 +170,8 @@ const Scene = () => (
 ## Collider Components
 
 You can also create `Colliders` by hand and add them to a `RigidBody` to create compound colliders. This is useful for creating more complex shapes, for creating simplified shapes for performance reasons, or for detecting collisions on specific parts of a mesh.
+
+🧩 See [ColliderProps docs](https://pmndrs.github.io/react-three-rapier/interfaces/ColliderProps.html) for available props.
 
 ```tsx
 const Scene = () => (<>
@@ -228,6 +238,8 @@ If part of our meshes are invisible and you want to include them in the collider
 Instanced meshes can also be used and have automatic colliders generated from their mesh.
 
 By wrapping the `InstancedMesh` in `<InstancedRigidBodies />`, each instance will be attached to an individual `RigidBody`.
+
+🧩 See [InstancedRigidBodiesProps docs](https://pmndrs.github.io/react-three-rapier/interfaces/InstancedRigidBodiesProps.html) for available props.
 
 ```tsx
 import { InstancedRigidBodies } from "@react-three/rapier";
@@ -313,6 +325,8 @@ const Scene = () => {
 ## Collision Events
 
 You can subscribe to collision and state events on a RigidBody:
+
+🧩 See [onCollisionEnter / onCollisionExit docs](https://pmndrs.github.io/react-three-rapier/interfaces/RigidBodyProps.html#onCollisionEnter) for more information.
 
 ```tsx
 const RigidBottle = () => {
@@ -459,6 +473,10 @@ A Collider can be set to be a sensor, which means that it will not generate any 
 
 To detect when a collider enters or leaves another collider, you can use the `onIntersectionEnter` and `onIntersectionExit` events on the collider.
 
+🧩 See [onIntersectionEnter / onIntersectionExit docs](https://pmndrs.github.io/react-three-rapier/interfaces/RigidBodyProps.html#onIntersectionEnter) for more information.
+
+```tsx
+
 ```tsx
 <RigidBody>
   <GoalPosts />
@@ -480,6 +498,8 @@ An attractor simulates a source of gravity. Any `RigidBody` within range will be
 Setting the `strength` to a negative value will cause the `RigidBody` to be _pushed_ (repelled) away from the attractor.
 
 The force applied to rigid-bodies within range is calculated differently depending on the `type`.
+
+🧩 See [Attractor docs](https://pmndrs.github.io/react-three-rapier/interfaces/AttractorProps.html) for all available props.
 
 ```tsx
 // Standard attractor
@@ -552,6 +572,8 @@ There are 4 different joint types available:
 ### Fixed Joint
 A fixed joint ensures that two rigid-bodies don't move relative to each other. Fixed joints are characterized by one local frame (represented by an isometry) on each rigid-body. The fixed-joint makes these frames coincide in world-space.
 
+🧩 See [FixedJoint docs](https://pmndrs.github.io/react-three-rapier/functions/useFixedJoint.html) for available options.
+
 ```tsx
 const JointedThing = () => {
   const joint = useFixedJoint(
@@ -580,6 +602,10 @@ const JointedThing = () => {
 ### Spherical Joint
 The spherical joint ensures that two points on the local-spaces of two rigid-bodies always coincide (it prevents any relative translational motion at this points).
 
+🧩 See [SphericalJoint docs](https://pmndrs.github.io/react-three-rapier/functions/useSphericalJoint.html) for available options.
+
+```tsx
+
 ```tsx
 const JointedThing = () => {
   const joint = useSphericalJoint(
@@ -605,6 +631,8 @@ const JointedThing = () => {
 
 ### Revolute Joint
 The revolute joint prevents any relative movement between two rigid-bodies, except for relative rotations along one axis. This is typically used to simulate wheels, fans, etc.
+
+🧩 See [RevoluteJoint docs](https://pmndrs.github.io/react-three-rapier/functions/useRevoluteJoint.html) for available options.
 
 ```tsx
 const JointedThing = () => {
@@ -633,6 +661,10 @@ const JointedThing = () => {
 ### Prismatic Joint
 The prismatic joint prevents any relative movement between two rigid-bodies, except for relative translations along one axis.
 
+🧩 See [PrismaticJoint docs](https://pmndrs.github.io/react-three-rapier/functions/usePrismaticJoint.html) for available options.
+
+```tsx
+
 ```tsx
 const JointedThing = () => {
   const joint = usePrismaticJoint(
@@ -659,6 +691,8 @@ const JointedThing = () => {
 
 ### Joint APIs
 Joints can be controlled imperatively similarily to how `RigidBody` components can be controlled.
+
+🧩 See [Joint API docs](https://pmndrs.github.io/react-three-rapier/interfaces/JointApi.html) for more information.
 
 ```tsx
 const JointedThing = () => { 
