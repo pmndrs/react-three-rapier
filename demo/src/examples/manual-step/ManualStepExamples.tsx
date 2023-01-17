@@ -1,5 +1,10 @@
 import React, { useEffect } from "react";
-import { RigidBody, useRapier } from "@react-three/rapier";
+import {
+  RigidBody,
+  useAfterPhysicsStep,
+  useBeforePhysicsStep,
+  useRapier
+} from "@react-three/rapier";
 import { Box } from "@react-three/drei";
 import { useControls, button } from "leva";
 import { useDemo } from "../../App";
@@ -17,6 +22,14 @@ export const ManualStepExample = () => {
   useEffect(() => {
     setPaused?.(true);
   }, []);
+
+  useBeforePhysicsStep(() => {
+    console.log("before step");
+  });
+
+  useAfterPhysicsStep(() => {
+    console.log("after step");
+  });
 
   return (
     <group>

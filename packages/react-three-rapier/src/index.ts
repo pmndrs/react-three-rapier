@@ -14,7 +14,7 @@ export type {
   ColliderOptionsRequiredArgs
 } from "./AnyCollider";
 
-export type { PhysicsProps, RapierContext } from "./Physics";
+export type { PhysicsProps, RapierContext, WorldStepCallback } from "./Physics";
 export type { MeshColliderProps } from "./MeshCollider";
 export type { AttractorProps, AttractorGravityType } from "./Attractor";
 
@@ -34,5 +34,5 @@ export * from "./AnyCollider";
 export { Attractor } from "./Attractor";
 
 export * from "./joints";
-export { useRapier } from "./hooks";
+export { useRapier, useBeforePhysicsStep, useAfterPhysicsStep } from "./hooks";
 export * from "./interaction-groups";
