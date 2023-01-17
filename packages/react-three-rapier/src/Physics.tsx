@@ -68,7 +68,7 @@ export type RigidBodyStateMap = Map<RigidBody["handle"], RigidBodyState>;
 
 export type WorldStepCallback = (world: World) => void;
 
-export type WorldStepEventSet = Set<WorldStepCallback>;
+export type WorldStepCallbackSet = Set<WorldStepCallback>;
 
 export interface ColliderState {
   collider: Collider;
@@ -125,13 +125,13 @@ export interface RapierContext {
    * Triggered before the physics world is stepped
    * @internal
    */
-  beforeStepEvents: WorldStepEventSet;
+  beforeStepCallbacks: WorldStepCallbackSet;
 
   /**
    * Triggered after the physics world is stepped
    * @internal
    */
-  afterStepEvents: WorldStepEventSet;
+  afterStepCallbacks: WorldStepCallbackSet;
 
   /**
    * Direct access to the Rapier instance
@@ -296,8 +296,8 @@ export const Physics: FC<PhysicsProps> = ({
   const colliderEvents = useConst<EventMap>(() => new Map());
   const eventQueue = useConst(() => new EventQueue(false));
   const attractorStates = useConst<AttractorStateMap>(() => new Map());
-  const beforeStepEvents = useConst<WorldStepEventSet>(() => new Set());
-  const afterStepEvents = useConst<WorldStepEventSet>(() => new Set());
+  const beforeStepCallbacks = useConst<WorldStepCallbackSet>(() => new Set());
+  const afterStepCallbacks = useConst<WorldStepCallbackSet>(() => new Set());
 
   // Init world
   useEffect(() => {
@@ -383,14 +383,14 @@ export const Physics: FC<PhysicsProps> = ({
 
       const stepWorld = () => {
         // Trigger beforeStep callbacks
-        beforeStepEvents.forEach((callback) => {
+        beforeStepCallbacks.forEach((callback) => {
           callback(world);
         });
 
         world.step(eventQueue);
 
         // Trigger afterStep callbacks
-        afterStepEvents.forEach((callback) => {
+        afterStepCallbacks.forEach((callback) => {
           callback(world);
         });
       };
@@ -648,8 +648,8 @@ export const Physics: FC<PhysicsProps> = ({
       rigidBodyEvents,
       colliderEvents,
       attractorStates,
-      beforeStepEvents,
-      afterStepEvents,
+      beforeStepCallbacks: beforeStepCallbacks,
+      afterStepCallbacks: afterStepCallbacks,
       isPaused: paused,
       step
     }),

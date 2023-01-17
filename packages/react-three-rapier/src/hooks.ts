@@ -29,25 +29,25 @@ export const useRapier = () => {
 };
 
 export const useBeforePhysicsStep = (callback: WorldStepCallback) => {
-  const { beforeStepEvents } = useRapier();
+  const { beforeStepCallbacks } = useRapier();
 
   useEffect(() => {
-    beforeStepEvents.add(callback);
+    beforeStepCallbacks.add(callback);
 
     return () => {
-      beforeStepEvents.delete(callback);
+      beforeStepCallbacks.delete(callback);
     };
   }, []);
 };
 
 export const useAfterPhysicsStep = (callback: WorldStepCallback) => {
-  const { afterStepEvents } = useRapier();
+  const { afterStepCallbacks } = useRapier();
 
   useEffect(() => {
-    afterStepEvents.add(callback);
+    afterStepCallbacks.add(callback);
 
     return () => {
-      afterStepEvents.delete(callback);
+      afterStepCallbacks.delete(callback);
     };
   }, []);
 };
