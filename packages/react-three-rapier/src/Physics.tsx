@@ -386,9 +386,6 @@ export const Physics: FC<PhysicsProps> = ({
         beforeStepEvents.forEach((callback) => {
           callback(world);
         });
-        beforeStepEvents.forEach((callback) => {
-          callback(world);
-        });
 
         world.step(eventQueue);
 
