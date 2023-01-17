@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import {
   RigidBody,
   useAfterPhysicsStep,
@@ -13,6 +13,11 @@ export const ManualStepExample = () => {
   const { setPaused } = useDemo();
   const { step } = useRapier();
 
+  const steps = useRef({
+    before: 0,
+    after: 0
+  });
+
   useControls({
     step: button(() => {
       step(1 / 60);
@@ -24,11 +29,13 @@ export const ManualStepExample = () => {
   }, []);
 
   useBeforePhysicsStep(() => {
-    console.log("before step");
+    steps.current.before++;
+    console.log("before step", steps.current.before);
   });
 
   useAfterPhysicsStep(() => {
-    console.log("after step");
+    steps.current.after++;
+    console.log("after step", steps.current.after);
   });
 
   return (
