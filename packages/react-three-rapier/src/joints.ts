@@ -5,7 +5,7 @@ import {
   RevoluteImpulseJoint,
   PrismaticImpulseJoint
 } from "@dimforge/rapier3d-compat";
-import { useRef, useEffect, useMemo } from "react";
+import React, { useRef, useEffect, useMemo } from "react";
 import {
   RigidBodyApiRef,
   useRapier,

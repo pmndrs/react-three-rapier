@@ -1,5 +1,5 @@
 import { RigidBody as RapierRigidBody } from "@dimforge/rapier3d-compat";
-import {
+import React, {
   useRef,
   forwardRef,
   useImperativeHandle,

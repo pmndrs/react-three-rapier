@@ -2,7 +2,7 @@ import {
   Quaternion as RapierQuaternion,
   Vector3 as RapierVector3
 } from "@dimforge/rapier3d-compat";
-import { useRef } from "react";
+import React, { useRef } from "react";
 
 import { Euler, Quaternion, Shape, Vector3 } from "three";
 import { _euler, _quaternion, _vector3 } from "./shared-objects";

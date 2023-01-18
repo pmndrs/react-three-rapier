@@ -1,6 +1,5 @@
-import React, { memo, useEffect, useState } from "react";
+import React, { memo, useEffect, useState, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
-import { FC, useRef } from "react";
 import { BufferAttribute, LineSegments, Mesh } from "three";
 import { useRapier } from "./hooks";
 import { AttractorState } from "./Attractor";
