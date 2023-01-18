@@ -384,6 +384,13 @@ export const Physics: FC<PhysicsProps> = ({
       const clampedDelta = MathUtils.clamp(dt, 0, 0.2);
 
       const stepWorld = () => {
+        // Apply attractors
+        world.forEachRigidBody((body) => {
+          attractorStates.forEach((attractorState) => {
+            applyAttractorForceOnRigidBody(body, attractorState);
+          });
+        });
+
         // Trigger beforeStep callbacks
         beforeStepCallbacks.forEach((callback) => {
           callback(api);
@@ -409,22 +416,17 @@ export const Physics: FC<PhysicsProps> = ({
         steppingState.accumulator += clampedDelta;
 
         while (steppingState.accumulator >= timeStep) {
-          world.forEachRigidBody((body) => {
-            // Set up previous state
-            // needed for accurate interpolations if the world steps more than once
-            if (interpolate) {
-              steppingState.previousState = {};
+          // Set up previous state
+          // needed for accurate interpolations if the world steps more than once
+          if (interpolate) {
+            steppingState.previousState = {};
+            world.forEachRigidBody((body) => {
               steppingState.previousState[body.handle] = {
                 position: body.translation(),
                 rotation: body.rotation()
               };
-            }
-
-            // Apply attractors
-            attractorStates.forEach((attractorState) => {
-              applyAttractorForceOnRigidBody(body, attractorState);
             });
-          });
+          }
 
           stepWorld();
 
