@@ -1,5 +1,12 @@
 # @react-three/rapier
 
+## 0.12.0
+
+### Minor Changes
+
+- 8bc4a3c: Add useBefore- and useAfterPhysicsStep hooks
+- 86482bd: Clean up exported types, add typedoc for generating html docs
+
 ## 0.11.3
 
 ### Patch Changes
