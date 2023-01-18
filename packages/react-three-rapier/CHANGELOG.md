@@ -1,5 +1,11 @@
 # @react-three/rapier
 
+## 0.12.1
+
+### Patch Changes
+
+- a8af66a: Add missing react imports
+
 ## 0.12.0
 
 ### Minor Changes
