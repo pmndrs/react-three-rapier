@@ -66,7 +66,7 @@ export interface RigidBodyState {
 
 export type RigidBodyStateMap = Map<RigidBody["handle"], RigidBodyState>;
 
-export type WorldStepCallback = (world: World) => void;
+export type WorldStepCallback = (worldApi: WorldApi) => void;
 
 export type WorldStepCallbackSet = Set<WorldStepCallback>;
 
@@ -319,6 +319,8 @@ export const Physics: FC<PhysicsProps> = ({
     }
   }, [gravity]);
 
+  const api = useMemo(() => createWorldApi(getWorldRef), []);
+
   const getSourceFromColliderHandle = useCallback((handle: ColliderHandle) => {
     const world = worldRef.current;
     if (world) {
@@ -384,14 +386,14 @@ export const Physics: FC<PhysicsProps> = ({
       const stepWorld = () => {
         // Trigger beforeStep callbacks
         beforeStepCallbacks.forEach((callback) => {
-          callback(world);
+          callback(api);
         });
 
         world.step(eventQueue);
 
         // Trigger afterStep callbacks
         afterStepCallbacks.forEach((callback) => {
-          callback(world);
+          callback(api);
         });
       };
 
@@ -633,8 +635,6 @@ export const Physics: FC<PhysicsProps> = ({
     if (!paused) step(dt);
   }, updatePriority);
 
-  const api = useMemo(() => createWorldApi(getWorldRef), []);
-
   const context = useMemo<RapierContext>(
     () => ({
       rapier,
@@ -648,8 +648,8 @@ export const Physics: FC<PhysicsProps> = ({
       rigidBodyEvents,
       colliderEvents,
       attractorStates,
-      beforeStepCallbacks: beforeStepCallbacks,
-      afterStepCallbacks: afterStepCallbacks,
+      beforeStepCallbacks,
+      afterStepCallbacks,
       isPaused: paused,
       step
     }),
