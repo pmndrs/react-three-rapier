@@ -5,17 +5,13 @@ import React, {
   useMemo,
   useState
 } from "react";
-import { rapierContext, RapierContext } from "./Physics";
+import { rapierContext, RapierContext, WorldStepCallback } from "./Physics";
 import { useRef } from "react";
 import { Object3D } from "three";
 
-export const useRapier = () => {
-  return useContext(rapierContext) as RapierContext;
-};
-
 import { RigidBodyOptions } from "./types";
 
-import { RigidBody } from "@dimforge/rapier3d-compat";
+import { RigidBody, World } from "@dimforge/rapier3d-compat";
 
 import { ColliderProps, RigidBodyProps } from ".";
 import { createRigidBodyApi, RigidBodyApi } from "./api";
@@ -27,6 +23,36 @@ import {
   useUpdateRigidBodyOptions
 } from "./utils-rigidbody";
 
+// External hooks
+export const useRapier = () => {
+  return useContext(rapierContext) as RapierContext;
+};
+
+export const useBeforePhysicsStep = (callback: WorldStepCallback) => {
+  const { beforeStepCallbacks } = useRapier();
+
+  useEffect(() => {
+    beforeStepCallbacks.add(callback);
+
+    return () => {
+      beforeStepCallbacks.delete(callback);
+    };
+  }, []);
+};
+
+export const useAfterPhysicsStep = (callback: WorldStepCallback) => {
+  const { afterStepCallbacks } = useRapier();
+
+  useEffect(() => {
+    afterStepCallbacks.add(callback);
+
+    return () => {
+      afterStepCallbacks.delete(callback);
+    };
+  }, []);
+};
+
+// Internal hooks
 export const useChildColliderProps = <O extends Object3D>(
   ref: MutableRefObject<O | undefined | null>,
   options: RigidBodyProps,

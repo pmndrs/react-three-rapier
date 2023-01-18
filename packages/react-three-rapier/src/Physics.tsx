@@ -66,6 +66,10 @@ export interface RigidBodyState {
 
 export type RigidBodyStateMap = Map<RigidBody["handle"], RigidBodyState>;
 
+export type WorldStepCallback = (worldApi: WorldApi) => void;
+
+export type WorldStepCallbackSet = Set<WorldStepCallback>;
+
 export interface ColliderState {
   collider: Collider;
   object: Object3D;
@@ -80,36 +84,68 @@ export interface ColliderState {
 export type ColliderStateMap = Map<Collider["handle"], ColliderState>;
 
 export interface RapierContext {
-  rapier: typeof Rapier;
-  world: WorldApi;
-
   /**
+   * Used by the world to keep track of RigidBody states
    * @internal
    */
   rigidBodyStates: RigidBodyStateMap;
+
   /**
+   * Used by the world to keep track of Collider states
    * @internal
    */
   colliderStates: ColliderStateMap;
 
   /**
+   * Used by the world to keep track of RigidBody events
    * @internal
    */
   rigidBodyEvents: EventMap;
   /**
+   * Used by the world to keep track of Collider events
    * @internal
    */
   colliderEvents: EventMap;
 
   /**
+   * Used by the world to keep track of Attractor states
    * @internal
    */
   attractorStates: AttractorStateMap;
 
+  /**
+   * Default options for rigid bodies and colliders
+   * @internal
+   */
   physicsOptions: {
     colliders: RigidBodyAutoCollider;
   };
 
+  /**
+   * Triggered before the physics world is stepped
+   * @internal
+   */
+  beforeStepCallbacks: WorldStepCallbackSet;
+
+  /**
+   * Triggered after the physics world is stepped
+   * @internal
+   */
+  afterStepCallbacks: WorldStepCallbackSet;
+
+  /**
+   * Direct access to the Rapier instance
+   */
+  rapier: typeof Rapier;
+
+  /**
+   * The Rapier physics world
+   */
+  world: WorldApi;
+
+  /**
+   * If the physics simulation is paused
+   */
   isPaused: boolean;
 
   /**
@@ -260,6 +296,8 @@ export const Physics: FC<PhysicsProps> = ({
   const colliderEvents = useConst<EventMap>(() => new Map());
   const eventQueue = useConst(() => new EventQueue(false));
   const attractorStates = useConst<AttractorStateMap>(() => new Map());
+  const beforeStepCallbacks = useConst<WorldStepCallbackSet>(() => new Set());
+  const afterStepCallbacks = useConst<WorldStepCallbackSet>(() => new Set());
 
   // Init world
   useEffect(() => {
@@ -280,6 +318,8 @@ export const Physics: FC<PhysicsProps> = ({
       world.gravity = vectorArrayToVector3(gravity);
     }
   }, [gravity]);
+
+  const api = useMemo(() => createWorldApi(getWorldRef), []);
 
   const getSourceFromColliderHandle = useCallback((handle: ColliderHandle) => {
     const world = worldRef.current;
@@ -343,9 +383,24 @@ export const Physics: FC<PhysicsProps> = ({
 
       const clampedDelta = MathUtils.clamp(dt, 0, 0.2);
 
+      const stepWorld = () => {
+        // Trigger beforeStep callbacks
+        beforeStepCallbacks.forEach((callback) => {
+          callback(api);
+        });
+
+        world.step(eventQueue);
+
+        // Trigger afterStep callbacks
+        afterStepCallbacks.forEach((callback) => {
+          callback(api);
+        });
+      };
+
       if (timeStepVariable) {
         world.timestep = clampedDelta;
-        world.step(eventQueue);
+
+        stepWorld();
       } else {
         world.timestep = timeStep;
 
@@ -371,7 +426,8 @@ export const Physics: FC<PhysicsProps> = ({
             });
           });
 
-          world.step(eventQueue);
+          stepWorld();
+
           steppingState.accumulator -= timeStep;
         }
       }
@@ -579,8 +635,6 @@ export const Physics: FC<PhysicsProps> = ({
     if (!paused) step(dt);
   }, updatePriority);
 
-  const api = useMemo(() => createWorldApi(getWorldRef), []);
-
   const context = useMemo<RapierContext>(
     () => ({
       rapier,
@@ -594,6 +648,8 @@ export const Physics: FC<PhysicsProps> = ({
       rigidBodyEvents,
       colliderEvents,
       attractorStates,
+      beforeStepCallbacks,
+      afterStepCallbacks,
       isPaused: paused,
       step
     }),

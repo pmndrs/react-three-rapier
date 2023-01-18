@@ -75,7 +75,6 @@ For full API outline and documentation, see 🧩 [API Docs](https://pmndrs.githu
 - [Attractors](#attractors)
   - [🖼 Attractors Example](#-attractors-example)
 - [Configuring Time Step Size](#configuring-time-step-size)
-- [Manual stepping](#manual-stepping)
 - [Joints](#joints)
   - [Fixed Joint](#fixed-joint)
   - [Spherical Joint](#spherical-joint)
@@ -83,6 +82,8 @@ For full API outline and documentation, see 🧩 [API Docs](https://pmndrs.githu
   - [Prismatic Joint](#prismatic-joint)
   - [Joint APIs](#joint-apis)
   - [🖼 Joints Example](#-joints-example)
+- [Advanced hooks usage](#advanced-hooks-usage)
+  - [Manual stepping](#manual-stepping)
 
 ---
 
@@ -547,16 +548,6 @@ The `timeStep` prop may also be set to `"vary"`, which will cause the simulation
 
 > **Note** This is useful for games that run at variable frame rates, but may cause instability in the simulation. It also prevents the physics simulation from being fully deterministic. Please use with care!
 
-## Manual stepping
-
-You can also manually step the physics simulation by calling the `step` method from the `useRapier` hook.
-
-```tsx
-const { step } = useRapier();
-
-step(1 / 60);
-```
-
 ## Joints
 Joints can be made between two `RigidBodies` to provide a way to restrict a motion of a body in relation to another.
 > Read more about joints in Rapier: https://rapier.rs/docs/user_guides/javascript/joints
@@ -712,3 +703,27 @@ const JointedThing = () => {
 
 ### 🖼 Joints Example
 <a href="https://codesandbox.io/s/react-three-rapier-joints-mhhbd4"><img src="https://raw.githubusercontent.com/pmndrs/react-three-rapier/HEAD/packages/react-three-rapier/misc/example-joints.jpg" width="240" /></a>
+
+## Advanced hooks usage
+
+Advanced users might need granular access to the physics loop and direct access to the `world` instance. This can be done by using the following hooks:
+
+- `useRapier`  
+  Gives you access to the `world`, direct access to `rapier`, and more.  
+  🧩 See [useRapier docs](https://pmndrs.github.io/react-three-rapier/interfaces/RapierContext.html) for more information.
+- `useBeforePhysicsStep`  
+  Allows you to run code before the physics simulation is stepped.  
+  🧩 See [useBeforePhysicsStep docs](https://pmndrs.github.io/react-three-rapier/functions/useBeforePhysicsStep.html) for more information.
+- `useAfterPhysicsStep`
+  Allows you to run code after the physics simulation is stepped.  
+  🧩 See [useAfterPhysicsStep docs](https://pmndrs.github.io/react-three-rapier/functions/useAfterPhysicsStep.html) for more information.
+
+### Manual stepping
+
+You can manually step the physics simulation by calling the `step` method from the `useRapier` hook.
+
+```tsx
+const { step } = useRapier();
+
+step(1 / 60);
+```
