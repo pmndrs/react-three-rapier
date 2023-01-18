@@ -1,5 +1,12 @@
 # @react-three/rapier
 
+## 0.12.2
+
+### Patch Changes
+
+- 2937801: fix: attractors broken when using timeStep="vary" (@isaac-mason)
+- 2937801: fix: previous rigid body positions used for interpolation weren't being populated correctly
+
 ## 0.12.1
 
 ### Patch Changes
