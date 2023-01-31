@@ -1499,10 +1499,10 @@
   dependencies:
     "@jridgewell/trace-mapping" "0.3.9"
 
-"@dimforge/rapier3d-compat@0.10.0":
-  version "0.10.0"
-  resolved "https://registry.yarnpkg.com/@dimforge/rapier3d-compat/-/rapier3d-compat-0.10.0.tgz#d8c3c75ea5183cfdc0db616a6ee9b0983a219d4c"
-  integrity sha512-3SPxyAnPQz9P3cIhgF8VncwJwrqyAW2xsNEYgXbxDhvB2IaIG63eTX7rNIJUnec5FDYqgvVo/nqY1XarzT5T2Q==
+"@dimforge/rapier3d-compat@0.11.1":
+  version "0.11.1"
+  resolved "https://registry.yarnpkg.com/@dimforge/rapier3d-compat/-/rapier3d-compat-0.11.1.tgz#24cdf14ea7c6551242f186133c0b09ada310803d"
+  integrity sha512-Xt3KcvwxnTZxjZ3uA4Qx5S9LoAqCvj4mTzcSwdPnVpM0F/ZPU7cY9bjGiNqB3+/IvUSCQB1eVamAd2IQX7hzTA==
 
 "@esbuild/android-arm@0.15.10":
   version "0.15.10"
@@ -1992,7 +1992,7 @@
     suspend-react "^0.0.8"
     zustand "^3.7.1"
 
-"@react-three/test-renderer@^8.0.17":
+"@react-three/test-renderer@8.0.17":
   version "8.0.17"
   resolved "https://registry.yarnpkg.com/@react-three/test-renderer/-/test-renderer-8.0.17.tgz#1649ed3b5cc3ffb982e96d54765b64b1b7b00f33"
   integrity sha512-QyztaVpEkOOo7F4eJ2aL37WgID5nkVMQxdZcDPPng4eAdgicxHvv9dCPEVPeOWz4ORHG54nDm5rHh1N0TuFRfw==
@@ -2239,10 +2239,10 @@
   resolved "https://registry.yarnpkg.com/@types/qs/-/qs-6.9.7.tgz#63bb7d067db107cc1e457c303bc25d511febf6cb"
   integrity sha512-FGa1F62FT09qcrueBA6qYTrJPVDzah9a+493+o2PCXsesWHIn27G98TsSMs3WPNbZIEj4+VJf6saSFpvD+3Zsw==
 
-"@types/react-dom@^18.0.2":
-  version "18.0.6"
-  resolved "https://registry.yarnpkg.com/@types/react-dom/-/react-dom-18.0.6.tgz#36652900024842b74607a17786b6662dd1e103a1"
-  integrity sha512-/5OFZgfIPSwy+YuIBP/FgJnQnsxhZhjjrnxudMddeblOouIodEQ75X14Rr4wGSG/bknL+Omy9iWlLo1u/9GzAA==
+"@types/react-dom@18.0.2":
+  version "18.0.2"
+  resolved "https://registry.yarnpkg.com/@types/react-dom/-/react-dom-18.0.2.tgz#2d6b46557aa30257e87e67a6d952146d15979d79"
+  integrity sha512-UxeS+Wtj5bvLRREz9tIgsK4ntCuLDo0EcAcACgw3E+9wE8ePDr9uQpq53MfcyxyIS55xJ+0B6mDS8c4qkkHLBg==
   dependencies:
     "@types/react" "*"
 
@@ -2293,7 +2293,7 @@
   resolved "https://registry.yarnpkg.com/@types/semver/-/semver-6.2.3.tgz#5798ecf1bec94eaa64db39ee52808ec0693315aa"
   integrity sha512-KQf+QAMWKMrtBMsB8/24w53tEsxllMj6TuA80TT/5igJalLI/zm0L3oXRbIAl4Ohfc85gyHX/jhMwsVkmhLU4A==
 
-"@types/three@^0.139.0":
+"@types/three@0.139.0":
   version "0.139.0"
   resolved "https://registry.yarnpkg.com/@types/three/-/three-0.139.0.tgz#69af1f0c52f8eea390f513e05478af1dd7f49e6f"
   integrity sha512-4V/jZhyq7Mv05coUzxL3bz8AuBOSi/1F0RY7ujisHTV0Amy/fnYJ+s7TSJ1/hXjZukSkpuFRgV+wvWUEMbsMbQ==
@@ -2335,7 +2335,7 @@
     magic-string "^0.26.7"
     react-refresh "^0.14.0"
 
-"@vitest/ui@^0.25.2":
+"@vitest/ui@0.25.2":
   version "0.25.2"
   resolved "https://registry.yarnpkg.com/@vitest/ui/-/ui-0.25.2.tgz#98e1191b791db94271eb6b9a8e843caded0802be"
   integrity sha512-/pUR88zjiF/5qnzb8Ou9i3+NDgteMcqk7G8VZox/qzcs7Z06dLpNzAxANOANP9m8U/yrJtPNjQqeuMI26HbWwA==
@@ -4063,7 +4063,7 @@ grapheme-splitter@^1.0.4:
   resolved "https://registry.yarnpkg.com/grapheme-splitter/-/grapheme-splitter-1.0.4.tgz#9cf3a665c6247479896834af35cf1dbb4400767e"
   integrity sha512-bzh50DW9kTPM00T8y4o8vQg89Di9oLJVLW/KaOGIXJWP/iqCN6WKYkbNOF04vFLJhwcpYUh9ydh/+5vpOqV4YQ==
 
-happy-dom@^7.5.5:
+happy-dom@7.5.5:
   version "7.5.5"
   resolved "https://registry.yarnpkg.com/happy-dom/-/happy-dom-7.5.5.tgz#ec0aa205610cc316190bc2d04b3d338149859289"
   integrity sha512-VOIZRL7RmNUfz0xbY9XZIjKpmfnQ5evfZ/5YQ3O3KsyndLo2ighZgxqkW72vJU2qhtX1K3J3+2A36REPHW5amA==
@@ -6710,10 +6710,10 @@ three-mesh-bvh@^0.5.15:
   resolved "https://registry.yarnpkg.com/three-mesh-bvh/-/three-mesh-bvh-0.5.16.tgz#ed8518355fb70d7da6a5537558ba43f76a56b067"
   integrity sha512-kN3QGKJNiQQcuiOsjVIkjtPnV3PJa+0Orih2E52afa+kQfs3zfoYt6Kxn6b6RNiAfaQ+7ckwPK0mTVFVl2F2LA==
 
-three-stdlib@^2.15.0:
-  version "2.17.0"
-  resolved "https://registry.yarnpkg.com/three-stdlib/-/three-stdlib-2.17.0.tgz#5915b110ec6dbf07e0e653bd59889293c7b93407"
-  integrity sha512-m19X4+ajh+2EJIVcjB288LgbqTli5b8kFahJlg9oNCBfaL8geCgEoM4OUirgV0Ez6Lr58N1MPBR6LjJt7ALfKQ==
+three-stdlib@2.21.6:
+  version "2.21.6"
+  resolved "https://registry.yarnpkg.com/three-stdlib/-/three-stdlib-2.21.6.tgz#764711f317a355a47138a8a5abe95bff0a0bbd45"
+  integrity sha512-J3DyCVKIpYJw7TWG4mQKKPpMgswq4pRRPMtxgipKedpUj8e4EgGtNLt623ws9RHvphPPamTHXacaEzOrm3dFsA==
   dependencies:
     "@babel/runtime" "^7.16.7"
     "@types/offscreencanvas" "^2019.6.4"
@@ -7051,7 +7051,7 @@ url-parse-lax@^3.0.0:
   dependencies:
     prepend-http "^2.0.0"
 
-use-asset@^1.0.4:
+use-asset@1.0.4:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/use-asset/-/use-asset-1.0.4.tgz#506caafc29f602890593799e58b577b70293a6e2"
   integrity sha512-7/hqDrWa0iMnCoET9W1T07EmD4Eg/Wmoj/X8TGBc++ECRK4m5yTsjP4O6s0yagbxfqIOuUkIxe2/sA+VR2GxZA==
@@ -7127,7 +7127,7 @@ vite@^3.0.0:
   optionalDependencies:
     fsevents "~2.3.2"
 
-vitest@^0.25.2:
+vitest@0.25.2:
   version "0.25.2"
   resolved "https://registry.yarnpkg.com/vitest/-/vitest-0.25.2.tgz#b8afd2ad4ea3c759f383792b5c3a2998ceb15fcc"
   integrity sha512-qqkzfzglEFbQY7IGkgSJkdOhoqHjwAao/OrphnHboeYHC5JzsVFoLCaB2lnAy8krhj7sbrFTVRApzpkTOeuDWQ==

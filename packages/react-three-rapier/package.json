@@ -14,26 +14,26 @@
   "devDependencies": {
     "@react-three/drei": "9.45.0",
     "@react-three/fiber": "8.9.1",
-    "@react-three/test-renderer": "^8.0.17",
-    "@types/react-dom": "^18.0.2",
-    "@types/three": "^0.139.0",
+    "@react-three/test-renderer": "8.0.17",
+    "@types/react-dom": "18.0.2",
+    "@types/three": "0.139.0",
     "@vitejs/plugin-react": "^2.1.0",
-    "@vitest/ui": "^0.25.2",
-    "happy-dom": "^7.5.5",
+    "@vitest/ui": "0.25.2",
+    "happy-dom": "7.5.5",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "three": "0.146.0",
-    "vitest": "^0.25.2"
+    "vitest": "0.25.2"
   },
   "peerDependencies": {
-    "@react-three/fiber": "^8.0.12",
-    "react": "^18.0.0",
+    "@react-three/fiber": "8.9.1",
+    "react": "18.2.0",
     "three": ">=0.139.2"
   },
   "dependencies": {
-    "@dimforge/rapier3d-compat": "0.10.0",
-    "three-stdlib": "^2.15.0",
-    "use-asset": "^1.0.4"
+    "@dimforge/rapier3d-compat": "0.11.1",
+    "three-stdlib": "2.21.6",
+    "use-asset": "1.0.4"
   },
   "repository": "https://github.com/pmndrs/react-three-rapier/tree/master/packages/react-three-rapier"
 }
