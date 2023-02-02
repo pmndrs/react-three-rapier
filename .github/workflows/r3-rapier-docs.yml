@@ -40,7 +40,7 @@ jobs:
         run: yarn
 
       - name: Run typedoc
-        run: yarn r3r-docs
+        run: yarn build:docs
 
       - name: Setup Pages
         uses: actions/configure-pages@v2

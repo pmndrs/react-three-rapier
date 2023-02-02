@@ -105,7 +105,7 @@ const mutableRigidBodyOptions: MutableRigidBodyOptions = {
     rb.userData = value;
   },
   type(rb, value) {
-    rb.setBodyType(rigidBodyTypeFromString(value));
+    rb.setBodyType(rigidBodyTypeFromString(value), true);
   },
   position: () => {},
   rotation: () => {},

@@ -45,14 +45,12 @@ export const rapierQuaternionToQuaternion = ({
   w
 }: RapierQuaternion) => _quaternion.set(x, y, z, w);
 
-const rigidBodyTypeMap: {
-  [key: string]: number;
-} = {
+const rigidBodyTypeMap = {
   fixed: 1,
   dynamic: 0,
   kinematicPosition: 2,
   kinematicVelocity: 3
-};
+} as const;
 
 export const rigidBodyTypeFromString = (type: RigidBodyTypeString) =>
   rigidBodyTypeMap[type];

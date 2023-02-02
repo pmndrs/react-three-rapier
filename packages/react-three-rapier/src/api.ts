@@ -10,8 +10,8 @@ import {
   World
 } from "@dimforge/rapier3d-compat";
 import { Quaternion, Vector3 } from "three";
-import { RefGetter, Vector3Object } from "./types";
-import { rapierVector3ToVector3 } from "./utils";
+import { RefGetter, RigidBodyTypeString, Vector3Object } from "./types";
+import { rapierVector3ToVector3, rigidBodyTypeFromString } from "./utils";
 
 export interface RigidBodyApi {
   /**
@@ -176,6 +176,11 @@ export interface RigidBodyApi {
     z: boolean,
     wakeUp?: boolean
   ): void;
+
+  /**
+   * Change the type of the RigidBody
+   */
+  setBodyType(type: RigidBodyTypeString, wakeUp?: boolean): void;
 }
 
 export const createRigidBodyApi = (ref: RefGetter<RigidBody>): RigidBodyApi => {
@@ -256,7 +261,9 @@ export const createRigidBodyApi = (ref: RefGetter<RigidBody>): RigidBodyApi => {
     setEnabledRotations: (x, y, z, wakeUp = true) =>
       ref.current()!.setEnabledRotations(x, y, z, wakeUp),
     setEnabledTranslations: (x, y, z, wakeUp = true) =>
-      ref.current()!.setEnabledTranslations(x, y, z, wakeUp)
+      ref.current()!.setEnabledTranslations(x, y, z, wakeUp),
+    setBodyType: (type, wakeUp = true) =>
+      ref.current()!.setBodyType(rigidBodyTypeFromString(type), wakeUp)
   };
 };
 

@@ -46,7 +46,7 @@
     "test": "vitest run",
     "test:ui": "vitest --ui",
     "ts": "cd packages/react-three-rapier && yarn ts",
-    "r3r-docs": "typedoc --out ./packages/react-three-rapier/docs ./packages/react-three-rapier/src/index.ts --excludeInternal"
+    "build:docs": "typedoc --out ./packages/react-three-rapier/docs ./packages/react-three-rapier/src/index.ts --excludeInternal"
   },
   "simple-git-hooks": {
     "commit-msg": "npx --no -- commitlint --edit ${1}",
