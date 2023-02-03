@@ -8,4 +8,4 @@ updates:
   - package-ecosystem: "npm"
     directory: "/packages/react-three-rapier" 
     schedule:
-      interval: "daily"
+      interval: "weekly"
