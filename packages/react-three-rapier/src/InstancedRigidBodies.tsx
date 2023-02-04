@@ -1,5 +1,6 @@
 import React, {
   forwardRef,
+  Fragment,
   memo,
   ReactNode,
   useEffect,
@@ -20,7 +21,7 @@ export type InstancedRigidBodyProps = RigidBodyProps & {
 
 export interface InstancedRigidBodiesProps extends RigidBodyProps {
   instances: InstancedRigidBodyProps[];
-  colliderNodes?: ReactNode;
+  colliderNodes?: ReactNode[];
   children: ReactNode;
 }
 
@@ -35,7 +36,7 @@ export const InstancedRigidBodies = memo(
         // instanced props
         children,
         instances,
-        colliderNodes,
+        colliderNodes = [],
 
         // wrapper object props
         position,
@@ -118,11 +119,13 @@ export const InstancedRigidBodies = memo(
               ref={(api) => (rigidBodyApis.current[index] = api)}
               transformState={(state) => applyInstancedState(state, index)}
             >
-              {colliderNodes && colliderNodes}
+              <>
+                {colliderNodes}
 
-              {childColliderProps.map((colliderProps, colliderIndex) => (
-                <AnyCollider key={colliderIndex} {...colliderProps} />
-              ))}
+                {childColliderProps.map((colliderProps, colliderIndex) => (
+                  <AnyCollider key={colliderIndex} {...colliderProps} />
+                ))}
+              </>
             </RigidBody>
           ))}
         </object3D>

@@ -66,7 +66,6 @@ For full API outline and documentation, see 🧩 [API Docs](https://pmndrs.githu
 - [Collider Components](#collider-components)
   - [🖼 Collider Examples](#-collider-examples)
 - [Instanced Meshes](#instanced-meshes)
-- [Debug](#debug)
 - [Collision Events](#collision-events)
   - [Configuring collision and solver groups](#configuring-collision-and-solver-groups)
 - [Contact force events](#contact-force-events)
@@ -238,7 +237,7 @@ If part of our meshes are invisible and you want to include them in the collider
 
 Instanced meshes can also be used and have automatic colliders generated from their mesh.
 
-By wrapping the `InstancedMesh` in `<InstancedRigidBodies />`, each instance will be attached to an individual `RigidBody`.
+By wrapping exactly one `Three.InstancedMesh` in `<InstancedRigidBodies />`, each instance will be attached to an individual `RigidBody`.
 
 🧩 See [InstancedRigidBodiesProps docs](https://pmndrs.github.io/react-three-rapier/interfaces/InstancedRigidBodiesProps.html) for available props.
 
@@ -265,38 +264,71 @@ const Scene = () => {
   }, []);
 
   // We can set the initial positions, and rotations, and scales, of
-  // the instances by providing an array equal to the instance count
-  const positions = Array.from({ length: COUNT }, (_, index) => [index, 0, 0]);
+  // the instances by providing an array of InstancedRigidBodyProps
+  // which is the same as RigidBodyProps, but with an additional "key" prop.
+  const instances = useMemo(() => {
+    const instances: InstancedRigidBodyProps[] = [];
 
-  const rotations = Array.from({ length: COUNT }, (_, index) => [
-    Math.random(),
-    Math.random(),
-    Math.random()
-  ]);
+    for (let i = 0; i < COUNT; i++) {
+      instances.push({
+        key: 'instance_' + Math.random(),
+        position: [Math.random() * 10, Math.random() * 10, Math.random() * 10],
+        rotation: [Math.random(), Math.random(), Math.random()],
+      });
+    }
 
-  const scales = Array.from({ length: COUNT }, (_, index) => [
-    Math.random(),
-    Math.random(),
-    Math.random()
-  ]);
+    return instances;
+  }, []);
 
   return (
     <InstancedRigidBodies
       ref={instancedApi}
-      positions={positions}
-      rotations={rotations}
-      scales={scales}
+      instances={instances}
       colliders="ball"
     >
-      <instancedMesh args={[undefined, undefined, COUNT]}>
-        <sphereGeometry args={[0.2]} />
-        <meshPhysicalGeometry color="blue" />
-
-        <CuboidCollider args={[0.1, 0.2, 0.1]} />
-      </instancedMesh>
+      <instancedMesh args={[undefined, undefined, COUNT]} count={COUNT} />
     </InstancedRigidBodies>
   );
 };
+```
+
+We can also create compound shapes for instanced meshes by providing an array of `Colliders` in the `colliderNodes` prop.
+
+```tsx
+import { InstancedRigidBodies, BoxCollider, SphereCollider } from "@react-three/rapier";
+const COUNT = 500
+
+const Scene = () => {
+  const instances = useMemo(() => {
+    const instances: InstancedRigidBodyProps[] = [];
+
+    for (let i = 0; i < COUNT; i++) {
+      instances.push({
+        key: 'instance_' + Math.random(),
+        position: [Math.random() * 10, Math.random() * 10, Math.random() * 10],
+        rotation: [Math.random(), Math.random(), Math.random()],
+      });
+    }
+
+    return instances;
+  }, []);
+
+  return (
+    <InstancedRigidBodies
+      ref={instancedApi}
+      instances={instances}
+      colliders="ball"
+      colliderNodes={[
+        <BoxCollider args={[0.5, 0.5, 0.5]} />,
+        <SphereCollider args={[0.5]} />,
+      ]}
+    >
+      <instancedMesh args={[undefined, undefined, COUNT]} count={COUNT} />
+    </InstancedRigidBodies>
+  );
+};
+```
+}
 ```
 
 ## Debug
