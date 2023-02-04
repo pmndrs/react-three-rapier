@@ -11,8 +11,8 @@ import { Rotation, Vector } from "@dimforge/rapier3d-compat/math";
 import { Object3DProps } from "@react-three/fiber";
 import { Object3D } from "three";
 import { ColliderProps } from ".";
-import { RigidBodyApi, JointApi } from "./api";
-import { RigidBodyState } from "./Physics";
+import { RigidBodyApi, JointApi } from "./utils/api";
+import { RigidBodyState } from "./components/Physics";
 
 export { CoefficientCombineRule as CoefficientCombineRule } from "@dimforge/rapier3d-compat";
 export { RapierRigidBody, RapierCollider };

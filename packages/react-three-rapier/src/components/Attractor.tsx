@@ -1,9 +1,9 @@
 import React from "react";
 import { InteractionGroups, RigidBody } from "@dimforge/rapier3d-compat";
-import { useRapier } from "./hooks";
+import { useRapier } from "../hooks/hooks";
 import { FC, memo, useEffect, useRef } from "react";
 import { Object3D, Vector3 } from "three";
-import { _position, _vector3 } from "./shared-objects";
+import { _position, _vector3 } from "../utils/shared-objects";
 import { Object3DProps } from "@react-three/fiber";
 
 export type AttractorGravityType = "static" | "linear" | "newtonian";

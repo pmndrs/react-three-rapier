@@ -36,15 +36,20 @@ import {
   IntersectionExitHandler,
   RigidBodyAutoCollider,
   Vector3Array
-} from "./types";
+} from "../types";
 
-import { createWorldApi, WorldApi } from "./api";
-import { _matrix4, _position, _rotation, _scale } from "./shared-objects";
+import { createWorldApi, WorldApi } from "../utils/api";
+import {
+  _matrix4,
+  _position,
+  _rotation,
+  _scale
+} from "../utils/shared-objects";
 import {
   rapierQuaternionToQuaternion,
   useConst,
   vectorArrayToVector3
-} from "./utils";
+} from "../utils/utils";
 import {
   applyAttractorForceOnRigidBody,
   AttractorState,

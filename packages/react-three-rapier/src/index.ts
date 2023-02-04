@@ -1,10 +1,10 @@
 export * from "./types";
-export type { RigidBodyProps } from "./RigidBody";
+export type { RigidBodyProps } from "./components/RigidBody";
 export type {
   InstancedRigidBodiesProps,
   InstancedRigidBodiesApi,
   InstancedRigidBodyProps
-} from "./InstancedRigidBodies";
+} from "./components/InstancedRigidBodies";
 export type {
   CylinderColliderProps,
   BallColliderProps,
@@ -16,22 +16,33 @@ export type {
   RoundCuboidColliderProps,
   TrimeshColliderProps,
   ColliderOptionsRequiredArgs
-} from "./AnyCollider";
+} from "./components/AnyCollider";
 
-export type { PhysicsProps, RapierContext, WorldStepCallback } from "./Physics";
-export type { MeshColliderProps } from "./MeshCollider";
-export type { AttractorProps, AttractorGravityType } from "./Attractor";
+export type {
+  PhysicsProps,
+  RapierContext,
+  WorldStepCallback
+} from "./components/Physics";
+export type { MeshColliderProps } from "./components/MeshCollider";
+export type {
+  AttractorProps,
+  AttractorGravityType
+} from "./components/Attractor";
 
-export type { RigidBodyApi, JointApi, WorldApi } from "./api";
+export type { RigidBodyApi, JointApi, WorldApi } from "./utils/api";
 
-export { Physics } from "./Physics";
-export { RigidBody } from "./RigidBody";
-export { MeshCollider } from "./MeshCollider";
-export { Debug } from "./Debug";
-export { InstancedRigidBodies } from "./InstancedRigidBodies";
-export * from "./AnyCollider";
-export { Attractor } from "./Attractor";
+export { Physics } from "./components/Physics";
+export { RigidBody } from "./components/RigidBody";
+export { MeshCollider } from "./components/MeshCollider";
+export { Debug } from "./components/Debug";
+export { InstancedRigidBodies } from "./components/InstancedRigidBodies";
+export * from "./components/AnyCollider";
+export { Attractor } from "./components/Attractor";
 
-export * from "./joints";
-export { useRapier, useBeforePhysicsStep, useAfterPhysicsStep } from "./hooks";
-export * from "./interaction-groups";
+export * from "./hooks/joints";
+export {
+  useRapier,
+  useBeforePhysicsStep,
+  useAfterPhysicsStep
+} from "./hooks/hooks";
+export * from "./utils/interaction-groups";

@@ -15,9 +15,9 @@ import {
   SphericalJointParams,
   RevoluteJointParams,
   PrismaticJointParams
-} from ".";
-import { createJointApi } from "./api";
-import { vectorArrayToVector3, tupleToObject } from "./utils";
+} from "..";
+import { createJointApi } from "../utils/api";
+import { vectorArrayToVector3, tupleToObject } from "../utils/utils";
 
 import type Rapier from "@dimforge/rapier3d-compat";
 

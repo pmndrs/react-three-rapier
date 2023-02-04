@@ -7,10 +7,10 @@ import React, {
 } from "react";
 import { forwardRef, ReactNode, useContext, useImperativeHandle } from "react";
 import { Object3D } from "three";
-import { useRigidBody } from "./hooks";
-import { RigidBodyOptions } from "./types";
+import { useRigidBody } from "../hooks/hooks";
+import { RigidBodyOptions } from "../types";
 import { AnyCollider } from "./AnyCollider";
-import { RigidBodyApi } from "./api";
+import { RigidBodyApi } from "../utils/api";
 
 export const RigidBodyContext = createContext<{
   ref: RefObject<Object3D> | MutableRefObject<Object3D>;

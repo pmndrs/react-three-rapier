@@ -7,9 +7,13 @@ import {
 import { MutableRefObject, useEffect, useMemo } from "react";
 import { BufferGeometry, Euler, Mesh, Object3D, Vector3 } from "three";
 import { mergeVertices } from "three-stdlib";
-import { ColliderProps, RigidBodyProps } from ".";
+import { ColliderProps, RigidBodyProps } from "..";
 import { WorldApi } from "./api";
-import { ColliderState, ColliderStateMap, EventMap } from "./Physics";
+import {
+  ColliderState,
+  ColliderStateMap,
+  EventMap
+} from "../components/Physics";
 import {
   _matrix4,
   _position,
@@ -17,7 +21,7 @@ import {
   _scale,
   _vector3
 } from "./shared-objects";
-import { ColliderShape, RigidBodyAutoCollider } from "./types";
+import { ColliderShape, RigidBodyAutoCollider } from "../types";
 import { scaleVertices, vectorToTuple } from "./utils";
 
 export const scaleColliderArgs = (

@@ -9,11 +9,11 @@ import React, {
 } from "react";
 import { DynamicDrawUsage, InstancedMesh, Object3D } from "three";
 import { AnyCollider } from "./AnyCollider";
-import { RigidBodyApi } from "./api";
-import { useChildColliderProps, useRapier } from "./hooks";
+import { RigidBodyApi } from "../utils/api";
+import { useChildColliderProps, useRapier } from "../hooks/hooks";
 import { RigidBodyState } from "./Physics";
 import { RigidBody, RigidBodyProps } from "./RigidBody";
-import { _matrix4 } from "./shared-objects";
+import { _matrix4 } from "../utils/shared-objects";
 
 export type InstancedRigidBodyProps = RigidBodyProps & {
   key: string | number;

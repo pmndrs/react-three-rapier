@@ -1,10 +1,10 @@
 import React, { memo, useEffect, useState, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { BufferAttribute, LineSegments, Mesh } from "three";
-import { useRapier } from "./hooks";
+import { useRapier } from "../hooks/hooks";
 import { AttractorState } from "./Attractor";
 import { VertexNormalsHelper } from "three-stdlib";
-import { _vector3 } from "./shared-objects";
+import { _vector3 } from "../utils/shared-objects";
 
 function mapsEqual(map1: Map<string, any>, map2: Map<string, any>) {
   var testVal;

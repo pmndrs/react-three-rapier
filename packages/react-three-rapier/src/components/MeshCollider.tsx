@@ -1,9 +1,9 @@
 import React, { ReactNode, useRef, useMemo, memo } from "react";
 import { Object3D } from "three";
-import { AnyCollider } from ".";
-import { useChildColliderProps, useRapier } from "./hooks";
+import { AnyCollider } from "..";
+import { useChildColliderProps, useRapier } from "../hooks/hooks";
 import { useRigidBodyContext } from "./RigidBody";
-import { RigidBodyAutoCollider } from "./types";
+import { RigidBodyAutoCollider } from "../types";
 
 export interface MeshColliderProps {
   children: ReactNode;

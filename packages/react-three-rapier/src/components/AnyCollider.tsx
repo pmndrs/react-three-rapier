@@ -1,4 +1,4 @@
-import { Collider, ColliderDesc } from "@dimforge/rapier3d-compat";
+import { Collider } from "@dimforge/rapier3d-compat";
 import React, {
   ReactNode,
   useRef,
@@ -8,11 +8,11 @@ import React, {
   useMemo,
   forwardRef
 } from "react";
-import { Object3D, Vector3, InstancedMesh } from "three";
-import { RigidBodyApi } from "./api";
-import { useRapier } from "./hooks";
-import { useRigidBodyContext, RigidBodyProps } from "./RigidBody";
-import { _euler, _position, _rotation, _scale } from "./shared-objects";
+import { Object3D, Vector3 } from "three";
+import { RigidBodyApi } from "../utils/api";
+import { useRapier } from "../hooks/hooks";
+import { useRigidBodyContext } from "./RigidBody";
+import { _euler, _position, _rotation, _scale } from "../utils/shared-objects";
 import {
   ColliderOptions,
   CuboidArgs,
@@ -24,13 +24,13 @@ import {
   ConeArgs,
   CylinderArgs,
   ConvexHullArgs
-} from "./types";
+} from "../types";
 import {
   createColliderFromOptions,
   createColliderState,
   useColliderEvents,
   useUpdateColliderOptions
-} from "./utils-collider";
+} from "../utils/utils-collider";
 
 export interface ColliderProps extends ColliderOptions<any> {
   children?: ReactNode;
@@ -49,8 +49,6 @@ export const AnyCollider = memo(
       const object = ref.current!;
 
       const worldScale = object.getWorldScale(new Vector3());
-
-      const colliders: Collider[] = [];
 
       const collider = createColliderFromOptions(
         props,

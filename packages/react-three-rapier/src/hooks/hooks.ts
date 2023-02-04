@@ -5,23 +5,27 @@ import React, {
   useMemo,
   useState
 } from "react";
-import { rapierContext, RapierContext, WorldStepCallback } from "./Physics";
+import {
+  rapierContext,
+  RapierContext,
+  WorldStepCallback
+} from "../components/Physics";
 import { useRef } from "react";
 import { Object3D } from "three";
 
-import { RigidBodyOptions } from "./types";
+import { RigidBodyOptions } from "../types";
 
 import { RigidBody, World } from "@dimforge/rapier3d-compat";
 
-import { ColliderProps, RigidBodyProps } from ".";
-import { createRigidBodyApi, RigidBodyApi } from "./api";
-import { createColliderPropsFromChildren } from "./utils-collider";
+import { ColliderProps, RigidBodyProps } from "..";
+import { createRigidBodyApi, RigidBodyApi } from "../utils/api";
+import { createColliderPropsFromChildren } from "../utils/utils-collider";
 import {
   createRigidBodyState,
   rigidBodyDescFromOptions,
   useRigidBodyEvents,
   useUpdateRigidBodyOptions
-} from "./utils-rigidbody";
+} from "../utils/utils-rigidbody";
 
 // External hooks
 export const useRapier = () => {

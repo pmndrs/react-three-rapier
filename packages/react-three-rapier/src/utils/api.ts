@@ -10,7 +10,7 @@ import {
   World
 } from "@dimforge/rapier3d-compat";
 import { Quaternion, Vector3 } from "three";
-import { RefGetter, RigidBodyTypeString, Vector3Object } from "./types";
+import { RefGetter, RigidBodyTypeString, Vector3Object } from "../types";
 import { rapierVector3ToVector3, rigidBodyTypeFromString } from "./utils";
 
 export interface RigidBodyApi {
