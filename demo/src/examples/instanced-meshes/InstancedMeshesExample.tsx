@@ -7,8 +7,20 @@ import { useEffect, useRef, useState } from "react";
 import { Color, InstancedMesh } from "three";
 import { useSuzanne } from "../all-shapes/AllShapesExample";
 import { Demo } from "../../App";
+import { button, useControls } from "leva";
 
-const MAX_COUNT = 300;
+const MAX_COUNT = 2000;
+
+const createBody = (): InstancedRigidBodyProps => ({
+  key: Math.random(),
+  position: [Math.random() * 20, Math.random() * 20, Math.random() * 20],
+  rotation: [
+    Math.random() * Math.PI * 2,
+    Math.random() * Math.PI * 2,
+    Math.random() * Math.PI * 2
+  ],
+  scale: [0.5 + Math.random(), 0.5 + Math.random(), 0.5 + Math.random()]
+});
 
 export const InstancedMeshes: Demo = () => {
   const {
@@ -17,7 +29,11 @@ export const InstancedMeshes: Demo = () => {
 
   const api = useRef<RigidBodyApi[]>([]);
 
-  const [bodies, setBodies] = useState<InstancedRigidBodyProps[]>(() => []);
+  const [bodies, setBodies] = useState<InstancedRigidBodyProps[]>(() =>
+    Array.from({
+      length: 100
+    }).map(() => createBody())
+  );
 
   const ref = useRef<InstancedMesh>(null);
 
@@ -30,35 +46,27 @@ export const InstancedMeshes: Demo = () => {
     }
   }, []);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setBodies((bodies) => [
-        ...bodies,
-        {
-          key: Math.random() + "baba",
-          position: [
-            Math.random() * 10 - 5,
-            Math.random() * 10 + 5,
-            Math.random() * 10 - 5
-          ],
-          rotation: [
-            Math.random() * Math.PI,
-            Math.random() * Math.PI,
-            Math.random() * Math.PI
-          ],
-          scale: [
-            Math.random() * 0.5 + 0.5,
-            Math.random() * 0.5 + 0.5,
-            Math.random() * 0.5 + 0.5
-          ]
-        }
-      ]);
-    }, 1000);
+  const addMesh = () => {
+    if (bodies.length < MAX_COUNT) {
+      setBodies((bodies) => [...bodies, createBody()]);
+    }
+  };
 
-    return () => {
-      clearInterval(interval);
-    };
-  }, []);
+  const removeMesh = () => {
+    console.log("removeMesh", bodies.length);
+
+    if (bodies.length > 0) {
+      setBodies((bodies) => bodies.slice(0, bodies.length - 1));
+    }
+  };
+
+  useControls(
+    {
+      "add instanced mesh": button(addMesh),
+      "remove instanced mesh": button(removeMesh)
+    },
+    [bodies]
+  );
 
   return (
     <group>
