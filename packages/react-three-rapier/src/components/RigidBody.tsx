@@ -3,18 +3,26 @@ import React, {
   memo,
   MutableRefObject,
   RefObject,
-  useMemo
+  useEffect,
+  useMemo,
+  useRef
 } from "react";
 import { forwardRef, ReactNode, useContext, useImperativeHandle } from "react";
 import { Object3D } from "three";
-import { useRigidBody } from "../hooks/hooks";
-import { RigidBodyOptions } from "../types";
+import { useChildColliderProps, useRapier } from "../hooks/hooks";
+import { RapierRigidBody, RigidBodyOptions } from "../types";
 import { AnyCollider } from "./AnyCollider";
-import { RigidBodyApi } from "../utils/api";
+import {
+  rigidBodyDescFromOptions,
+  createRigidBodyState,
+  useUpdateRigidBodyOptions,
+  useRigidBodyEvents
+} from "../utils/utils-rigidbody";
+import { useImperativeInstance } from "../hooks/use-imperative-instance";
 
 export const RigidBodyContext = createContext<{
   ref: RefObject<Object3D> | MutableRefObject<Object3D>;
-  api: RigidBodyApi;
+  getRigidBody: () => RapierRigidBody;
   options: RigidBodyOptions;
 }>(undefined!);
 
@@ -25,7 +33,7 @@ export interface RigidBodyProps extends RigidBodyOptions {
 }
 
 export const RigidBody = memo(
-  forwardRef<RigidBodyApi, RigidBodyProps>((props, ref) => {
+  forwardRef<RapierRigidBody, RigidBodyProps>((props, forwardedRef) => {
     const {
       children,
 
@@ -39,23 +47,61 @@ export const RigidBody = memo(
       ...objectProps
     } = props;
 
-    const [object, api, childColliderProps] = useRigidBody<Object3D>(props);
+    const ref = useRef<Object3D>(null);
+    const { world, rigidBodyStates, physicsOptions, rigidBodyEvents } =
+      useRapier();
 
-    useImperativeHandle(ref, () => api, [api]);
+    const mergedOptions = useMemo(() => {
+      return {
+        ...physicsOptions,
+        ...props,
+        children: undefined
+      };
+    }, [physicsOptions, props]);
 
-    const contextValue = useMemo(
-      () => ({
-        ref: object,
-        api,
-        options: props
-      }),
-      [object, api, props]
+    const childColliderProps = useChildColliderProps(ref, mergedOptions);
+
+    // Create rigidbody
+    const getInstance = useImperativeInstance(
+      () => {
+        const desc = rigidBodyDescFromOptions(mergedOptions);
+        const rigidBody = world.createRigidBody(desc);
+
+        const state = createRigidBodyState({
+          rigidBody,
+          object: ref.current!
+        });
+
+        rigidBodyStates.set(
+          rigidBody.handle,
+          props.transformState ? props.transformState(state) : state
+        );
+
+        return rigidBody;
+      },
+      (rigidBody) => {
+        world.removeRigidBody(rigidBody);
+        rigidBodyStates.delete(rigidBody.handle);
+      }
     );
+
+    useUpdateRigidBodyOptions(getInstance, mergedOptions, rigidBodyStates);
+    useRigidBodyEvents(getInstance, mergedOptions, rigidBodyEvents);
+
+    useImperativeHandle(forwardedRef, () => getInstance());
+
+    const contextValue = useMemo(() => {
+      return {
+        ref,
+        getRigidBody: getInstance,
+        options: mergedOptions
+      };
+    }, [mergedOptions]);
 
     return (
       <RigidBodyContext.Provider value={contextValue}>
         <object3D
-          ref={object}
+          ref={ref}
           {...objectProps}
           position={position}
           rotation={rotation}

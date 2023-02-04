@@ -3,21 +3,23 @@ import { useFrame } from "@react-three/fiber";
 import {
   BallCollider,
   CuboidCollider,
-  RigidBody,
-  RigidBodyApi
+  RapierRigidBody,
+  RigidBody
 } from "@react-three/rapier";
 import { useRef } from "react";
-import { Euler, Vector3 } from "three";
 import { Demo } from "../../App";
 
 const Ball = () => {
-  const ball = useRef<RigidBodyApi>(null);
+  const ball = useRef<RapierRigidBody>(null);
 
   useFrame(() => {
     if (ball.current) {
       if (ball.current.translation().y < -10) {
-        ball.current.setTranslation({ x: Math.random() * 2, y: 20, z: 0 });
-        ball.current.setLinvel({ x: 0, y: 0, z: 0 });
+        ball.current.setTranslation(
+          { x: Math.random() * 2, y: 20, z: 0 },
+          true
+        );
+        ball.current.setLinvel({ x: 0, y: 0, z: 0 }, true);
       }
     }
   });

@@ -12,7 +12,7 @@ export interface MeshColliderProps {
 
 export const MeshCollider = memo((props: MeshColliderProps) => {
   const { children, type } = props;
-  const { physicsOptions, world } = useRapier();
+  const { physicsOptions } = useRapier();
   const object = useRef<Object3D>(null);
   const { options } = useRigidBodyContext();
 

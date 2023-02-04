@@ -29,7 +29,7 @@ export type {
   AttractorGravityType
 } from "./components/Attractor";
 
-export type { RigidBodyApi, JointApi, WorldApi } from "./utils/api";
+export type { JointApi, WorldApi } from "./utils/api";
 
 export { Physics } from "./components/Physics";
 export { RigidBody } from "./components/RigidBody";
@@ -46,3 +46,4 @@ export {
   useAfterPhysicsStep
 } from "./hooks/hooks";
 export * from "./utils/interaction-groups";
+export * from "./utils/three-object-helpers";

@@ -11,7 +11,7 @@ import { Rotation, Vector } from "@dimforge/rapier3d-compat/math";
 import { Object3DProps } from "@react-three/fiber";
 import { Object3D } from "three";
 import { ColliderProps } from ".";
-import { RigidBodyApi, JointApi } from "./utils/api";
+import { JointApi } from "./utils/api";
 import { RigidBodyState } from "./components/Physics";
 
 export { CoefficientCombineRule as CoefficientCombineRule } from "@dimforge/rapier3d-compat";
@@ -25,11 +25,6 @@ export type RigidBodyAutoCollider =
   | "hull"
   | "trimesh"
   | false;
-
-export interface UseRigidBodyAPI {
-  rigidBody: RapierRigidBody;
-  collider: RapierCollider;
-}
 
 export type CuboidArgs = [
   halfWidth: number,
@@ -455,7 +450,9 @@ export type RevoluteJointParams = [
   limits?: [min: number, max: number]
 ];
 
-export type RigidBodyApiRef = MutableRefObject<undefined | null | RigidBodyApi>;
+export type RigidBodyApiRef = MutableRefObject<
+  undefined | null | RapierRigidBody
+>;
 
 export interface UseImpulseJoint<P> {
   (body1: RigidBodyApiRef, body2: RigidBodyApiRef, params: P): JointApi;

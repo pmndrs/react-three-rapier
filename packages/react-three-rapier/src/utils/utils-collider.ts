@@ -56,12 +56,13 @@ export const createColliderFromOptions = (
   options: ColliderProps,
   world: WorldApi,
   scale: Vector3,
-  rigidBody?: RigidBody
+  getRigidBody?: () => RigidBody
 ) => {
   const scaledArgs = scaleColliderArgs(options.shape!, options.args, scale);
   // @ts-ignore
   const desc = ColliderDesc[options.shape!](...scaledArgs);
-  return world.createCollider(desc!, rigidBody);
+
+  return world.createCollider(desc!, getRigidBody?.());
 };
 
 type ImmutableColliderOptions = (keyof ColliderProps)[];
@@ -207,7 +208,7 @@ export const setColliderOptions = (
 };
 
 export const useUpdateColliderOptions = (
-  colliderRef: MutableRefObject<Collider | undefined>,
+  getCollider: () => Collider,
   props: ColliderProps,
   states: ColliderStateMap
 ) => {
@@ -221,9 +222,8 @@ export const useUpdateColliderOptions = (
   );
 
   useEffect(() => {
-    if (colliderRef.current) {
-      setColliderOptions(colliderRef.current, props, states);
-    }
+    const collider = getCollider();
+    setColliderOptions(collider, props, states);
   }, mutablePropsAsFlatArray);
 };
 
@@ -381,7 +381,7 @@ export const getColliderArgsFromGeometry = (
 };
 
 export const useColliderEvents = (
-  colliderRef: MutableRefObject<Collider | undefined>,
+  getCollider: () => Collider,
   props: ColliderProps,
   events: EventMap
 ) => {
@@ -394,7 +394,7 @@ export const useColliderEvents = (
   } = props;
 
   useEffect(() => {
-    const collider = colliderRef.current;
+    const collider = getCollider();
 
     if (collider) {
       const hasCollisionEvent = !!(

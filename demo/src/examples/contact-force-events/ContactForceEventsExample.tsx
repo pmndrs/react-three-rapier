@@ -1,13 +1,17 @@
 import { Plane, Sphere } from "@react-three/drei";
 import { MeshPhysicalMaterialProps } from "@react-three/fiber";
-import { RigidBody, RigidBodyApi, RigidBodyProps } from "@react-three/rapier";
+import {
+  RigidBody,
+  RapierRigidBody,
+  RigidBodyProps
+} from "@react-three/rapier";
 import { useRef, useState } from "react";
 import { Color } from "three";
 import { Demo } from "../../App";
 
 type BallProps = { onContactForce: RigidBodyProps["onContactForce"] };
 const Ball = ({ onContactForce }: BallProps) => {
-  const ball = useRef<RigidBodyApi>(null);
+  const ball = useRef<RapierRigidBody>(null);
 
   return (
     <RigidBody
@@ -18,7 +22,7 @@ const Ball = ({ onContactForce }: BallProps) => {
       onContactForce={(payload) => {
         const { totalForceMagnitude } = payload;
         if (totalForceMagnitude < 300) {
-          ball.current?.applyImpulse({ x: 0, y: 65, z: 0 });
+          ball.current?.applyImpulse({ x: 0, y: 65, z: 0 }, true);
         }
         onContactForce?.(payload);
       }}

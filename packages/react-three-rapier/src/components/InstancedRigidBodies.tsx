@@ -9,11 +9,11 @@ import React, {
 } from "react";
 import { DynamicDrawUsage, InstancedMesh, Object3D } from "three";
 import { AnyCollider } from "./AnyCollider";
-import { RigidBodyApi } from "../utils/api";
 import { useChildColliderProps, useRapier } from "../hooks/hooks";
 import { RigidBodyState } from "./Physics";
 import { RigidBody, RigidBodyProps } from "./RigidBody";
 import { _matrix4 } from "../utils/shared-objects";
+import { RapierRigidBody } from "../types";
 
 export type InstancedRigidBodyProps = RigidBodyProps & {
   key: string | number;
@@ -25,10 +25,8 @@ export interface InstancedRigidBodiesProps extends RigidBodyProps {
   children: ReactNode;
 }
 
-export type InstancedRigidBodiesApi = (RigidBodyApi | null)[];
-
 export const InstancedRigidBodies = memo(
-  forwardRef<(RigidBodyApi | null)[], InstancedRigidBodiesProps>(
+  forwardRef<(RapierRigidBody | null)[], InstancedRigidBodiesProps>(
     (props, ref) => {
       const object = useRef<Object3D>(null);
       const instancedWrapper = useRef<Object3D>(null);
@@ -48,7 +46,7 @@ export const InstancedRigidBodies = memo(
         ...rigidBodyProps
       } = props;
 
-      const rigidBodyApis = useRef<(RigidBodyApi | null)[]>([]);
+      const rigidBodyApis = useRef<(RapierRigidBody | null)[]>([]);
 
       useImperativeHandle(ref, () => rigidBodyApis.current, [instances]);
 
@@ -116,11 +114,13 @@ export const InstancedRigidBodies = memo(
             <RigidBody
               {...rigidBodyProps}
               {...instance}
-              ref={(api) => (rigidBodyApis.current[index] = api)}
+              ref={(body) => (rigidBodyApis.current[index] = body)}
               transformState={(state) => applyInstancedState(state, index)}
             >
               <>
-                {colliderNodes}
+                {colliderNodes.map((node, index) => (
+                  <Fragment key={index}>{node}</Fragment>
+                ))}
 
                 {childColliderProps.map((colliderProps, colliderIndex) => (
                   <AnyCollider key={colliderIndex} {...colliderProps} />

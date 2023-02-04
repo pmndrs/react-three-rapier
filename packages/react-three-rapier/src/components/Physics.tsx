@@ -18,14 +18,7 @@ import React, {
   useRef,
   useState
 } from "react";
-import {
-  InstancedMesh,
-  MathUtils,
-  Matrix4,
-  Object3D,
-  Quaternion,
-  Vector3
-} from "three";
+import { MathUtils, Matrix4, Object3D, Quaternion, Vector3 } from "three";
 import { useAsset } from "use-asset";
 import {
   CollisionPayload,

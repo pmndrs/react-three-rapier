@@ -1,7 +1,7 @@
 import {
   InstancedRigidBodies,
   InstancedRigidBodyProps,
-  RigidBodyApi
+  RapierRigidBody
 } from "@react-three/rapier";
 import { useEffect, useRef, useState } from "react";
 import { Color, InstancedMesh } from "three";
@@ -27,7 +27,7 @@ export const InstancedMeshes: Demo = () => {
     nodes: { Suzanne }
   } = useSuzanne();
 
-  const api = useRef<RigidBodyApi[]>([]);
+  const api = useRef<RapierRigidBody[]>([]);
 
   const [bodies, setBodies] = useState<InstancedRigidBodyProps[]>(() =>
     Array.from({
@@ -77,11 +77,14 @@ export const InstancedMeshes: Demo = () => {
           args={[Suzanne.geometry, undefined, MAX_COUNT]}
           count={bodies.length}
           onClick={(evt) => {
-            api.current![evt.instanceId!].applyTorqueImpulse({
-              x: 0,
-              y: 50,
-              z: 0
-            });
+            api.current![evt.instanceId!].applyTorqueImpulse(
+              {
+                x: 0,
+                y: 50,
+                z: 0
+              },
+              true
+            );
           }}
         >
           <meshPhysicalMaterial />

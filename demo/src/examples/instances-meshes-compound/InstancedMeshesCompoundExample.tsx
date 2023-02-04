@@ -8,7 +8,7 @@ import {
 import { useEffect, useRef } from "react";
 import { useSuzanne } from "../all-shapes/AllShapesExample";
 import { Demo } from "../../App";
-import { RigidBodyApi } from "@react-three/rapier";
+import { RapierRigidBody } from "@react-three/rapier";
 
 const COUNT = 300;
 
@@ -17,24 +17,27 @@ export const InstancedMeshesCompound: Demo = () => {
     nodes: { Suzanne }
   } = useSuzanne();
 
-  const api = useRef<RigidBodyApi[]>(null);
+  const api = useRef<RapierRigidBody[]>(null);
 
   const handleClickInstance = (evt: ThreeEvent<MouseEvent>) => {
     if (api.current) {
       api.current
         .at(evt.instanceId!)!
-        .applyTorqueImpulse({ x: 0, y: 100, z: 0 });
+        .applyTorqueImpulse({ x: 0, y: 100, z: 0 }, true);
     }
   };
 
   useEffect(() => {
     if (api.current) {
       api.current.forEach((body) => {
-        body.applyImpulse({
-          x: -Math.random() * 5,
-          y: Math.random() * 5,
-          z: -Math.random() * 5
-        });
+        body.applyImpulse(
+          {
+            x: -Math.random() * 5,
+            y: Math.random() * 5,
+            z: -Math.random() * 5
+          },
+          true
+        );
       });
     }
   }, []);

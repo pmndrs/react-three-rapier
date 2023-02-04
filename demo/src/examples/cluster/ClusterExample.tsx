@@ -2,16 +2,18 @@ import { useFrame } from "@react-three/fiber";
 import {
   InstancedRigidBodies,
   InstancedRigidBodiesApi,
-  useRapier
+  RapierRigidBody,
+  useRapier,
+  vec3
 } from "@react-three/rapier";
 import { createRef, useEffect, useRef } from "react";
-import { Color, InstancedMesh } from "three";
+import { Color, InstancedMesh, Vector3 } from "three";
 import { Demo } from "../../App";
 
 const BALLS = 1000;
 
 export const Cluster: Demo = () => {
-  const api = useRef<InstancedRigidBodiesApi>(null);
+  const api = useRef<RapierRigidBody[]>(null);
 
   const { isPaused } = useRapier();
 
@@ -20,9 +22,9 @@ export const Cluster: Demo = () => {
   useFrame(() => {
     if (!isPaused) {
       api.current!.forEach((body) => {
-        const p = body!.translation();
+        const p = vec3(body!.translation());
         p.normalize().multiplyScalar(-0.01);
-        body!.applyImpulse(p);
+        body!.applyImpulse(p, true);
       });
     }
   });

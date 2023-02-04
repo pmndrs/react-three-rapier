@@ -4,7 +4,6 @@ import {
   CylinderCollider,
   RapierRigidBody,
   RigidBody,
-  RigidBodyApi,
   RigidBodyOptions,
   useSphericalJoint
 } from "@react-three/rapier";
@@ -12,8 +11,8 @@ import { useRef } from "react";
 import { Demo } from "../../App";
 
 const Rod = (props: RigidBodyOptions) => {
-  const anchor = useRef<RigidBodyApi>(null);
-  const rod = useRef<RigidBodyApi>(null);
+  const anchor = useRef<RapierRigidBody>(null);
+  const rod = useRef<RapierRigidBody>(null);
 
   useSphericalJoint(anchor, rod, [
     [0, 0, 0],

@@ -2,9 +2,8 @@ import { Box, Sphere, Text } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import {
   CuboidCollider,
-  interactionGroups,
   RigidBody,
-  RigidBodyApi,
+  RapierRigidBody,
   RigidBodyProps
 } from "@react-three/rapier";
 import { useEffect, useRef, useState } from "react";
@@ -63,11 +62,11 @@ const Goal = (props: RigidBodyProps) => {
 };
 
 const Ball = () => {
-  const rb = useRef<RigidBodyApi>(null);
+  const rb = useRef<RapierRigidBody>(null);
 
   const restartBall = () => {
-    rb.current?.setTranslation({ x: 0, y: -7, z: -8 });
-    rb.current?.setLinvel({ x: 0, y: 0, z: 7 });
+    rb.current?.setTranslation({ x: 0, y: -7, z: -8 }, true);
+    rb.current?.setLinvel({ x: 0, y: 0, z: 7 }, true);
   };
 
   useFrame(() => {

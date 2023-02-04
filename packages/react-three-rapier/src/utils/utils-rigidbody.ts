@@ -158,7 +158,7 @@ export const setRigidBodyOptions = (
 };
 
 export const useUpdateRigidBodyOptions = (
-  rigidBodyRef: MutableRefObject<RigidBody | RigidBody[] | undefined>,
+  getRigidBody: () => RigidBody,
   props: RigidBodyProps,
   states: RigidBodyStateMap,
   updateTranslations: boolean = true
@@ -173,23 +173,13 @@ export const useUpdateRigidBodyOptions = (
   );
 
   useEffect(() => {
-    if (Array.isArray(rigidBodyRef.current)) {
-      for (const rigidBody of rigidBodyRef.current) {
-        setRigidBodyOptions(rigidBody, props, states, updateTranslations);
-      }
-    } else if (rigidBodyRef.current) {
-      setRigidBodyOptions(
-        rigidBodyRef.current,
-        props,
-        states,
-        updateTranslations
-      );
-    }
+    const rigidBody = getRigidBody();
+    setRigidBodyOptions(rigidBody, props, states, updateTranslations);
   }, mutablePropsAsFlatArray);
 };
 
 export const useRigidBodyEvents = (
-  rigidBodyRef: MutableRefObject<RigidBody | RigidBody[] | undefined>,
+  getRigidBody: () => RigidBody,
   props: RigidBodyProps,
   events: EventMap
 ) => {
@@ -212,22 +202,11 @@ export const useRigidBodyEvents = (
   };
 
   useEffect(() => {
-    if (Array.isArray(rigidBodyRef.current)) {
-      for (const rigidBody of rigidBodyRef.current) {
-        events.set(rigidBody.handle, eventHandlers);
-      }
-    } else if (rigidBodyRef.current) {
-      events.set(rigidBodyRef.current.handle, eventHandlers);
-    }
+    const rigidBody = getRigidBody();
+    events.set(rigidBody.handle, eventHandlers);
 
     return () => {
-      if (Array.isArray(rigidBodyRef.current)) {
-        for (const rigidBody of rigidBodyRef.current) {
-          events.delete(rigidBody.handle);
-        }
-      } else if (rigidBodyRef.current) {
-        events.delete(rigidBodyRef.current.handle);
-      }
+      events.delete(rigidBody.handle);
     };
   }, [
     onWake,

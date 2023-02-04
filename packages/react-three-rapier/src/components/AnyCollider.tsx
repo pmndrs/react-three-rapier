@@ -2,14 +2,13 @@ import { Collider } from "@dimforge/rapier3d-compat";
 import React, {
   ReactNode,
   useRef,
-  useEffect,
   memo,
   ForwardedRef,
   useMemo,
-  forwardRef
+  forwardRef,
+  useImperativeHandle
 } from "react";
-import { Object3D, Vector3 } from "three";
-import { RigidBodyApi } from "../utils/api";
+import { Object3D } from "three";
 import { useRapier } from "../hooks/hooks";
 import { useRigidBodyContext } from "./RigidBody";
 import { _euler, _position, _rotation, _scale } from "../utils/shared-objects";
@@ -31,6 +30,8 @@ import {
   useColliderEvents,
   useUpdateColliderOptions
 } from "../utils/utils-collider";
+import { useImperativeInstance } from "../hooks/use-imperative-instance";
+import { vec3 } from "../utils/three-object-helpers";
 
 export interface ColliderProps extends ColliderOptions<any> {
   children?: ReactNode;
@@ -43,45 +44,43 @@ export const AnyCollider = memo(
     const { world, colliderEvents, colliderStates } = useRapier();
     const rigidBodyContext = useRigidBodyContext();
     const ref = useRef<Object3D>(null);
-    const colliderRef = useRef<Collider>();
 
-    useEffect(() => {
-      const object = ref.current!;
+    const getInstance = useImperativeInstance(
+      () => {
+        const worldScale = ref.current!.getWorldScale(vec3());
 
-      const worldScale = object.getWorldScale(new Vector3());
+        const collider = createColliderFromOptions(
+          props,
+          world,
+          worldScale,
+          rigidBodyContext?.getRigidBody
+        );
 
-      const collider = createColliderFromOptions(
-        props,
-        world,
-        worldScale,
-        rigidBodyContext && (rigidBodyContext?.api as RigidBodyApi).raw()
-      );
-      colliderStates.set(
-        collider.handle,
-        createColliderState(collider, object, rigidBodyContext?.ref.current)
-      );
+        colliderStates.set(
+          collider.handle,
+          createColliderState(
+            collider,
+            ref.current!,
+            rigidBodyContext?.ref.current
+          )
+        );
 
-      colliderRef.current = collider;
-
-      if (forwardedRef) {
-        if (typeof forwardedRef === "function") {
-          forwardedRef(colliderRef.current);
-        } else {
-          forwardedRef.current = colliderRef.current;
-        }
-      }
-
-      return () => {
+        return collider;
+      },
+      (collider) => {
+        colliderStates.delete(collider.handle);
         world.removeCollider(collider);
-      };
-    }, []);
+      }
+    );
+
+    useImperativeHandle(forwardedRef, () => getInstance());
 
     const mergedProps = useMemo(() => {
       return { ...rigidBodyContext?.options, ...props };
     }, [props, rigidBodyContext?.options]);
 
-    useUpdateColliderOptions(colliderRef, mergedProps, colliderStates);
-    useColliderEvents(colliderRef, mergedProps, colliderEvents);
+    useUpdateColliderOptions(getInstance, mergedProps, colliderStates);
+    useColliderEvents(getInstance, mergedProps, colliderEvents);
 
     return (
       <object3D

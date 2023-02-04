@@ -2,8 +2,8 @@ import { Box, Cylinder } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import {
   Debug,
+  RapierRigidBody,
   RigidBody,
-  RigidBodyApi,
   RigidBodyApiRef,
   useRevoluteJoint,
   Vector3Array
@@ -33,18 +33,20 @@ const WheelJoint = ({
 };
 
 export const Car: Demo = () => {
-  const bodyRef = useRef<RigidBodyApi>(null);
+  const bodyRef = useRef<RapierRigidBody>(null);
   const wheelPositions: [number, number, number][] = [
     [-3, 0, 2],
     [-3, 0, -2],
     [3, 0, 2],
     [3, 0, -2]
   ];
-  const wheelRefs = useRef(wheelPositions.map(() => createRef<RigidBodyApi>()));
+  const wheelRefs = useRef(
+    wheelPositions.map(() => createRef<RapierRigidBody>())
+  );
 
   useFrame(() => {
     wheelRefs.current.forEach((ref) => {
-      ref.current?.applyTorqueImpulse({ x: 0, y: 0, z: 0.1 });
+      ref.current?.applyTorqueImpulse({ x: 0, y: 0, z: 0.1 }, true);
     });
   });
 

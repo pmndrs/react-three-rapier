@@ -6,14 +6,14 @@ import {
   interactionGroups,
   RigidBody
 } from "@react-three/rapier";
-import { RigidBodyApi } from "@react-three/rapier";
+import { RapierRigidBody } from "@react-three/rapier";
 import { createRef, useEffect, useRef } from "react";
 import { Demo } from "../../App";
 
 const BALLS = 100;
 
 export const AttractorExample: Demo = () => {
-  const api = useRef<RigidBodyApi[]>(null);
+  const api = useRef<RapierRigidBody[]>(null);
 
   return (
     <group>

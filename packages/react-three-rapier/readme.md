@@ -242,12 +242,12 @@ By wrapping exactly one `Three.InstancedMesh` in `<InstancedRigidBodies />`, eac
 🧩 See [InstancedRigidBodiesProps docs](https://pmndrs.github.io/react-three-rapier/interfaces/InstancedRigidBodiesProps.html) for available props.
 
 ```tsx
-import { InstancedRigidBodies } from "@react-three/rapier";
+import { InstancedRigidBodies, RapierRigidBody } from "@react-three/rapier";
 
 const COUNT = 1000;
 
 const Scene = () => {
-  const rigidBodies = useRef<RigidBodyApi[]>(null);
+  const rigidBodies = useRef<RapierRigidBody[]>(null);
 
   useEffect(() => {
     if (!rigidBodies.current) {
