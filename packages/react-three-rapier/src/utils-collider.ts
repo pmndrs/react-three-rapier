@@ -203,7 +203,7 @@ export const setColliderOptions = (
 };
 
 export const useUpdateColliderOptions = (
-  collidersRef: MutableRefObject<Collider[]>,
+  colliderRef: MutableRefObject<Collider | undefined>,
   props: ColliderProps,
   states: ColliderStateMap
 ) => {
@@ -217,9 +217,9 @@ export const useUpdateColliderOptions = (
   );
 
   useEffect(() => {
-    collidersRef.current.forEach((collider) => {
-      setColliderOptions(collider, props, states);
-    });
+    if (colliderRef.current) {
+      setColliderOptions(colliderRef.current, props, states);
+    }
   }, mutablePropsAsFlatArray);
 };
 
@@ -377,7 +377,7 @@ export const getColliderArgsFromGeometry = (
 };
 
 export const useColliderEvents = (
-  collidersRef: MutableRefObject<Collider[] | undefined>,
+  colliderRef: MutableRefObject<Collider | undefined>,
   props: ColliderProps,
   events: EventMap
 ) => {
@@ -390,7 +390,9 @@ export const useColliderEvents = (
   } = props;
 
   useEffect(() => {
-    collidersRef.current?.forEach((collider) => {
+    const collider = colliderRef.current;
+
+    if (collider) {
       const hasCollisionEvent = !!(
         onCollisionEnter ||
         onCollisionExit ||
@@ -416,12 +418,12 @@ export const useColliderEvents = (
         onIntersectionExit,
         onContactForce
       });
-    });
+    }
 
     return () => {
-      collidersRef.current?.forEach((collider) =>
-        events.delete(collider.handle)
-      );
+      if (collider) {
+        events.delete(collider.handle);
+      }
     };
   }, [
     onCollisionEnter,

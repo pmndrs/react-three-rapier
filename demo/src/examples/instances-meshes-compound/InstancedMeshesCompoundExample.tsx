@@ -10,7 +10,7 @@ import { useSuzanne } from "../all-shapes/AllShapesExample";
 import { Demo } from "../../App";
 import { RigidBodyApi } from "@react-three/rapier";
 
-const COUNT = 10;
+const COUNT = 300;
 
 export const InstancedMeshesCompound: Demo = () => {
   const {

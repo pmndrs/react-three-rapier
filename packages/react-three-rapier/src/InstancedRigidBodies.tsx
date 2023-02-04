@@ -29,7 +29,6 @@ export type InstancedRigidBodiesApi = (RigidBodyApi | null)[];
 export const InstancedRigidBodies = memo(
   forwardRef<(RigidBodyApi | null)[], InstancedRigidBodiesProps>(
     (props, ref) => {
-      const { rigidBodyStates } = useRapier();
       const object = useRef<Object3D>(null);
       const instancedWrapper = useRef<Object3D>(null);
       const {
