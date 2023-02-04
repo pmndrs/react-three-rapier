@@ -5,6 +5,7 @@ import {
   useRapier
 } from "@react-three/rapier";
 import { createRef, useEffect, useRef } from "react";
+import { Color, InstancedMesh } from "three";
 import { Demo } from "../../App";
 
 const BALLS = 1000;
@@ -13,6 +14,8 @@ export const Cluster: Demo = () => {
   const api = useRef<InstancedRigidBodiesApi>(null);
 
   const { isPaused } = useRapier();
+
+  const ref = useRef<InstancedMesh>(null);
 
   useFrame(() => {
     if (!isPaused) {
@@ -23,6 +26,15 @@ export const Cluster: Demo = () => {
       });
     }
   });
+
+  useEffect(() => {
+    if (ref.current) {
+      for (let i = 0; i < BALLS; i++) {
+        ref.current!.setColorAt(i, new Color(Math.random() * 0xffffff));
+      }
+      ref.current!.instanceColor!.needsUpdate = true;
+    }
+  }, []);
 
   return (
     <group>
@@ -35,7 +47,11 @@ export const Cluster: Demo = () => {
         colliders={"ball"}
         linearDamping={5}
       >
-        <instancedMesh args={[undefined, undefined, BALLS]} castShadow>
+        <instancedMesh
+          ref={ref}
+          args={[undefined, undefined, BALLS]}
+          castShadow
+        >
           <sphereGeometry args={[0.2]} />
           <meshPhysicalMaterial
             roughness={0}
