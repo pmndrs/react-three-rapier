@@ -247,18 +247,18 @@ import { InstancedRigidBodies } from "@react-three/rapier";
 const COUNT = 1000;
 
 const Scene = () => {
-  const instancedApi = useRef<InstancedRigidBodyApi>(null);
+  const rigidBodies = useRef<RigidBodyApi[]>(null);
 
   useEffect(() => {
-    if (!instancedApi.current) {
+    if (!rigidBodies.current) {
       return
     }
 
     // You can access individual instanced by their index
-    instancedApi.current.at(40).applyImpulse({ x: 0, y: 10, z: 0 });
+    rigidBodies.current.at(40).applyImpulse({ x: 0, y: 10, z: 0 });
 
-    // Or update all instances as if they were in an array
-    instancedApi.current.forEach((api) => {
+    // Or update all instances
+    rigidBodies.current.forEach((api) => {
       api.applyImpulse({ x: 0, y: 10, z: 0 });
     });
   }, []);
