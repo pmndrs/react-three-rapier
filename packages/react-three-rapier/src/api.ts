@@ -267,16 +267,6 @@ export const createRigidBodyApi = (ref: RefGetter<RigidBody>): RigidBodyApi => {
   };
 };
 
-// TODO: Flesh this out
-export const createColliderApi = (ref: RefGetter<Collider>) => {
-  return {
-    raw: () => ref.current(),
-    get handle() {
-      return ref.current()!.handle;
-    }
-  };
-};
-
 export interface WorldApi {
   raw(): World;
   getCollider(handle: number): Collider | undefined;
