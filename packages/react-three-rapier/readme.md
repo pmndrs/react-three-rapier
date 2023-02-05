@@ -592,6 +592,21 @@ There are 4 different joint types available:
 - Revolute (two bodies are connected by a hinge, for things like doors or wheels)
 - Prismatic (two bodies are connected by a sliding joint, for things like pistons or sliders)
 
+Each joint hook returns a RefObject containing the raw reference to the hook instance.  
+```tsx
+const WheelJoint = ({bodyA, bodyB}) => {
+  const joint = useRevoluteJoint(bodyA, bodyB, [[0,0,0],[0,0,0],[0,0,0]])
+
+  useFrame(() => {
+    if (joint.current) {
+      joint.current.configureMotorVelocity(10, 2)
+    }
+  }, [])
+
+  return null
+}
+```
+
 ### Fixed Joint
 A fixed joint ensures that two rigid-bodies don't move relative to each other. Fixed joints are characterized by one local frame (represented by an isometry) on each rigid-body. The fixed-joint makes these frames coincide in world-space.
 
@@ -668,6 +683,12 @@ const JointedThing = () => {
       [0, 0, 0], // Axis of the joint, expressed in the local-space of the rigid-bodies it is attached to.
     ]);
 
+  useEffect(() => {
+    if (joint.current) {
+
+    }
+  }, [])
+
   return (
     <group>
       <RigidBody ref={bodyA}>
@@ -725,7 +746,7 @@ const JointedThing = () => {
     joint.configureMotorVelocity(1, 0)
 
     // Disable contacts between the two joint bodies
-    joint.raw().setContactsEnabled(false)
+    joint.setContactsEnabled(false)
   }, [])
 
   return ...

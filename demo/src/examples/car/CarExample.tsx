@@ -4,11 +4,10 @@ import {
   Debug,
   RapierRigidBody,
   RigidBody,
-  RigidBodyApiRef,
   useRevoluteJoint,
   Vector3Array
 } from "@react-three/rapier";
-import { createRef, useRef } from "react";
+import { createRef, RefObject, useEffect, useRef } from "react";
 import { Demo } from "../../App";
 
 const WheelJoint = ({
@@ -18,8 +17,8 @@ const WheelJoint = ({
   wheelAnchor,
   rotationAxis
 }: {
-  body: RigidBodyApiRef;
-  wheel: RigidBodyApiRef;
+  body: RefObject<RapierRigidBody>;
+  wheel: RefObject<RapierRigidBody>;
   bodyAnchor: Vector3Array;
   wheelAnchor: Vector3Array;
   rotationAxis: Vector3Array;
@@ -29,6 +28,13 @@ const WheelJoint = ({
     wheelAnchor,
     rotationAxis
   ]);
+
+  useFrame(() => {
+    if (joint.current) {
+      joint.current.configureMotorVelocity(20, 10);
+    }
+  });
+
   return null;
 };
 
@@ -43,12 +49,6 @@ export const Car: Demo = () => {
   const wheelRefs = useRef(
     wheelPositions.map(() => createRef<RapierRigidBody>())
   );
-
-  useFrame(() => {
-    wheelRefs.current.forEach((ref) => {
-      ref.current?.applyTorqueImpulse({ x: 0, y: 0, z: 0.1 }, true);
-    });
-  });
 
   return (
     <group>

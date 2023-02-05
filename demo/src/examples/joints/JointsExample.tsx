@@ -1,9 +1,15 @@
 import { Sphere } from "@react-three/drei";
-import { createRef, forwardRef, ReactNode, useEffect, useRef } from "react";
+import {
+  createRef,
+  forwardRef,
+  ReactNode,
+  RefObject,
+  useEffect,
+  useRef
+} from "react";
 import {
   RigidBody,
   RapierRigidBody,
-  RigidBodyApiRef,
   RigidBodyTypeString,
   useSphericalJoint,
   Vector3Array
@@ -43,11 +49,18 @@ const RopeSegment = forwardRef(
   }
 );
 
-const RopeJoint = ({ a, b }: { a: RigidBodyApiRef; b: RigidBodyApiRef }) => {
+const RopeJoint = ({
+  a,
+  b
+}: {
+  a: RefObject<RapierRigidBody>;
+  b: RefObject<RapierRigidBody>;
+}) => {
   const joint = useSphericalJoint(a, b, [
     [-0.5, 0, 0],
     [0.5, 0, 0]
   ]);
+
   return null;
 };
 

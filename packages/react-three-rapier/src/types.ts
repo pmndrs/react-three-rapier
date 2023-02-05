@@ -1,8 +1,9 @@
-import { MutableRefObject } from "react";
+import { MutableRefObject, RefObject } from "react";
 
 import {
   CoefficientCombineRule,
   Collider as RapierCollider,
+  ImpulseJoint,
   InteractionGroups,
   RigidBody as RapierRigidBody,
   TempContactManifold
@@ -11,7 +12,6 @@ import { Rotation, Vector } from "@dimforge/rapier3d-compat/math";
 import { Object3DProps } from "@react-three/fiber";
 import { Object3D } from "three";
 import { ColliderProps } from ".";
-import { JointApi } from "./utils/api";
 import { RigidBodyState } from "./components/Physics";
 
 export { CoefficientCombineRule as CoefficientCombineRule } from "@dimforge/rapier3d-compat";
@@ -450,10 +450,10 @@ export type RevoluteJointParams = [
   limits?: [min: number, max: number]
 ];
 
-export type RigidBodyApiRef = MutableRefObject<
-  undefined | null | RapierRigidBody
->;
-
-export interface UseImpulseJoint<P> {
-  (body1: RigidBodyApiRef, body2: RigidBodyApiRef, params: P): JointApi;
+export interface UseImpulseJoint<JointParams, JointType extends ImpulseJoint> {
+  (
+    body1: RefObject<RapierRigidBody>,
+    body2: RefObject<RapierRigidBody>,
+    params: JointParams
+  ): RefObject<JointType | undefined>;
 }
