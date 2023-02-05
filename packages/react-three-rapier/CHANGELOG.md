@@ -1,5 +1,15 @@
 # @react-three/rapier
 
+## 0.13.0
+
+### Minor Changes
+
+- 02055ed: Removed joints api, replaced with RefObjects containing the joint instances
+- 25c4261: Update rapier to 0.11.1
+- 02055ed: Refreshed InstancedRigidBody component with support for dynamic count and fine-grain control over each instance
+- 02055ed: Remove RigidBody proxy apis for much needed simplification, add helper functions for dealing with Rapier math functions
+- 02055ed: Collider refs now return a single collider rather than an array, as it should be
+
 ## 0.12.2
 
 ### Patch Changes
