@@ -32,6 +32,10 @@ export interface RigidBodyProps extends RigidBodyOptions {
   children?: ReactNode;
 }
 
+/**
+ * A rigid body is a physical object that can be simulated by the physics engine.
+ * @category Components
+ */
 export const RigidBody = memo(
   forwardRef<RapierRigidBody, RigidBodyProps>((props, forwardedRef) => {
     const {

@@ -10,6 +10,10 @@ export interface MeshColliderProps {
   type: RigidBodyAutoCollider;
 }
 
+/**
+ * A mesh collider is a collider that is automatically generated from the geometry of the children.
+ * @category Colliders
+ */
 export const MeshCollider = memo((props: MeshColliderProps) => {
   const { children, type } = props;
   const { physicsOptions } = useRapier();

@@ -1,13 +1,12 @@
 import { useFrame } from "@react-three/fiber";
 import {
   InstancedRigidBodies,
-  InstancedRigidBodiesApi,
   RapierRigidBody,
   useRapier,
   vec3
 } from "@react-three/rapier";
-import { createRef, useEffect, useRef } from "react";
-import { Color, InstancedMesh, Vector3 } from "three";
+import { useEffect, useRef } from "react";
+import { Color, InstancedMesh } from "three";
 import { Demo } from "../../App";
 
 const BALLS = 1000;

@@ -1,13 +1,12 @@
 import { Box, Cylinder } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import {
-  Debug,
   RapierRigidBody,
   RigidBody,
   useRevoluteJoint,
   Vector3Array
 } from "@react-three/rapier";
-import { createRef, RefObject, useEffect, useRef } from "react";
+import { createRef, RefObject, useRef } from "react";
 import { Demo } from "../../App";
 
 const WheelJoint = ({

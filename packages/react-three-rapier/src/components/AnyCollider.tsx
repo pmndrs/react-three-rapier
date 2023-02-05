@@ -38,6 +38,10 @@ export interface ColliderProps extends ColliderOptions<any> {
 }
 
 // Colliders
+/**
+ * A collider is a shape that can be attached to a rigid body to define its physical properties.
+ * @internal
+ */
 export const AnyCollider = memo(
   forwardRef((props: ColliderProps, forwardedRef: ForwardedRef<Collider>) => {
     const { children, position, rotation, quaternion, scale, name } = props;
@@ -118,54 +122,90 @@ export type CylinderColliderProps = ColliderOptionsRequiredArgs<CylinderArgs>;
 export type ConvexHullColliderProps =
   ColliderOptionsRequiredArgs<ConvexHullArgs>;
 
+/**
+ * A cuboid collider shape
+ * @category Colliders
+ */
 export const CuboidCollider = React.forwardRef(
   (props: CuboidColliderProps, ref: ForwardedRef<Collider>) => {
     return <AnyCollider {...props} shape="cuboid" ref={ref} />;
   }
 );
 
+/**
+ * A round cuboid collider shape
+ * @category Colliders
+ */
 export const RoundCuboidCollider = React.forwardRef(
   (props: RoundCuboidColliderProps, ref: ForwardedRef<Collider>) => {
     return <AnyCollider {...props} shape="roundCuboid" ref={ref} />;
   }
 );
 
+/**
+ * A ball collider shape
+ * @category Colliders
+ */
 export const BallCollider = React.forwardRef(
   (props: BallColliderProps, ref: ForwardedRef<Collider>) => {
     return <AnyCollider {...props} shape="ball" ref={ref} />;
   }
 );
 
+/**
+ * A capsule collider shape
+ * @category Colliders
+ */
 export const CapsuleCollider = React.forwardRef(
   (props: CapsuleColliderProps, ref: ForwardedRef<Collider>) => {
     return <AnyCollider {...props} shape="capsule" ref={ref} />;
   }
 );
 
+/**
+ * A heightfield collider shape
+ * @category Colliders
+ */
 export const HeightfieldCollider = React.forwardRef(
   (props: HeightfieldColliderProps, ref: ForwardedRef<Collider>) => {
     return <AnyCollider {...props} shape="heightfield" ref={ref} />;
   }
 );
 
+/**
+ * A trimesh collider shape
+ * @category Colliders
+ */
 export const TrimeshCollider = React.forwardRef(
   (props: TrimeshColliderProps, ref: ForwardedRef<Collider>) => {
     return <AnyCollider {...props} shape="trimesh" ref={ref} />;
   }
 );
 
+/**
+ * A cone collider shape
+ * @category Colliders
+ */
 export const ConeCollider = React.forwardRef(
   (props: ConeColliderProps, ref: ForwardedRef<Collider>) => {
     return <AnyCollider {...props} shape="cone" ref={ref} />;
   }
 );
 
+/**
+ * A cylinder collider shape
+ * @category Colliders
+ */
 export const CylinderCollider = React.forwardRef(
   (props: CylinderColliderProps, ref: ForwardedRef<Collider>) => {
     return <AnyCollider {...props} shape="cylinder" ref={ref} />;
   }
 );
 
+/**
+ * A convex hull collider shape
+ * @category Colliders
+ */
 export const ConvexHullCollider = React.forwardRef(
   (props: ConvexHullColliderProps, ref: ForwardedRef<Collider>) => {
     return <AnyCollider {...props} shape="convexHull" ref={ref} />;

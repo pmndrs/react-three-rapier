@@ -66,6 +66,7 @@ For full API outline and documentation, see 🧩 [API Docs](https://pmndrs.githu
 - [Collider Components](#collider-components)
   - [🖼 Collider Examples](#-collider-examples)
 - [Instanced Meshes](#instanced-meshes)
+- [Moving things around, and applying forces](#moving-things-around-and-applying-forces)
 - [Collision Events](#collision-events)
   - [Configuring collision and solver groups](#configuring-collision-and-solver-groups)
 - [Contact force events](#contact-force-events)
@@ -353,6 +354,87 @@ const Scene = () => {
     </Physics>
   );
 };
+```
+
+## Moving things around, and applying forces
+You can access the instance for a RigidBody by storing its `ref`. This allows you to perform any operation on the underlying physics object directly.
+
+`r3/rapier` exposes a `RapierRigidBody` and `RapierCollider` as aliases for `rapiers` underlying base objects.
+
+For all available methods, see the [Rapier docs](https://rapier.rs/javascript3d/classes/RigidBody.html).
+
+```tsx
+import { 
+  RigidBody, 
+  RapierRigidBody
+} from "@react-three/rapier";
+
+const Scene = () => {
+  const rigidBody = useRef<RapierRigidBody>(null);
+
+  useEffect(() => {
+    if (rigidBody.current) {
+      // A one-off "push"
+      rigidBody.current.applyImpulse({ x: 0, y: 10, z: 0 }, true);
+
+      // A continuous force
+      rigidBody.current.addForce({ x: 0, y: 10, z: 0 }, true);
+
+      // A one-off torque rotation
+      rigidBody.current.applyTorqueImpulse({ x: 0, y: 10, z: 0 }, true);
+
+      // A continuous torque
+      rigidBody.current.addTorque({ x: 0, y: 10, z: 0 }, true);
+    }
+  }, []);
+
+  return (
+    <RigidBody ref={rigidBody}>
+      <mesh>
+        <boxBufferGeometry />
+        <meshStandardMaterial />
+      </mesh>
+    </RigidBody>
+  );
+};
+```
+
+Rapier's API returns quaternions and vectors that are not compatible with Three.js, `r3/rapier` therefore exposes some helper functions (`vec3`, `quat`, `euler`) for quick type conversions. These helper functions can also be used as a shorthand for creating new objects.
+
+```tsx
+import { 
+  RapierRigidBody, 
+  quat, 
+  vec3, 
+  euler 
+} from "@react-three/rapier";
+
+const Scene = () => {
+  const rigidBody = useRef<RapierRigidBody>(null)
+
+  useEffect(() => {
+    if (rigidBody.current) {
+      const position = vec3(rigidBody.current.translation())
+      const quaternion = quat(rigidBody.current.rotation())
+      const eulerRot = euler().setFromQuaternion(quat(rigidBody.current.rotation()))
+
+      // While Rapier's return types need conversion, setting values can be done directly with Three.js types
+      rigidBody.current.setTranslation(position, true)
+      rigidBody.current.setRotation(quaternion, true)
+      rigidBody.current.setAngVel({x: 0, y: 2, z: 0}, true)
+    }
+  }, [])
+
+  return (
+    <RigidBody ref={rigidBody}>
+      <mesh>
+        <boxBufferGeometry />
+        <meshStandardMaterial />
+      </mesh>
+    </RigidBody>
+  );
+}
+
 ```
 
 ## Collision Events

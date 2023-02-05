@@ -2,7 +2,6 @@ export * from "./types";
 export type { RigidBodyProps } from "./components/RigidBody";
 export type {
   InstancedRigidBodiesProps,
-  InstancedRigidBodiesApi,
   InstancedRigidBodyProps
 } from "./components/InstancedRigidBodies";
 export type {
@@ -29,7 +28,7 @@ export type {
   AttractorGravityType
 } from "./components/Attractor";
 
-export type { JointApi, WorldApi } from "./utils/api";
+export type { WorldApi } from "./utils/api";
 
 export { Physics } from "./components/Physics";
 export { RigidBody } from "./components/RigidBody";

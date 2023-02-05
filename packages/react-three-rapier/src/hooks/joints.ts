@@ -27,6 +27,9 @@ import { vectorArrayToVector3, tupleToObject } from "../utils/utils";
 import type Rapier from "@dimforge/rapier3d-compat";
 import { useImperativeInstance } from "./use-imperative-instance";
 
+/**
+ * @internal
+ */
 export const useImpulseJoint = <JointType extends ImpulseJoint>(
   body1: RefObject<RapierRigidBody>,
   body2: RefObject<RapierRigidBody>,
@@ -61,10 +64,11 @@ export const useImpulseJoint = <JointType extends ImpulseJoint>(
 };
 
 /**
- *
  * A fixed joint ensures that two rigid-bodies don't move relative to each other.
  * Fixed joints are characterized by one local frame (represented by an isometry) on each rigid-body.
  * The fixed-joint makes these frames coincide in world-space.
+ *
+ * @category Hooks - Joints
  */
 export const useFixedJoint: UseImpulseJoint<
   FixedJointParams,
@@ -93,6 +97,8 @@ export const useFixedJoint: UseImpulseJoint<
  * translational motion at this points). This is typically used to simulate ragdolls arms, pendulums, etc.
  * They are characterized by one local anchor on each rigid-body. Each anchor represents the location of the
  * points that need to coincide on the local-space of each rigid-body.
+ *
+ * @category Hooks - Joints
  */
 export const useSphericalJoint: UseImpulseJoint<
   SphericalJointParams,
@@ -114,6 +120,8 @@ export const useSphericalJoint: UseImpulseJoint<
  * The revolute joint prevents any relative movement between two rigid-bodies, except for relative
  * rotations along one axis. This is typically used to simulate wheels, fans, etc.
  * They are characterized by one local anchor as well as one local axis on each rigid-body.
+ *
+ * @category Hooks - Joints
  */
 export const useRevoluteJoint: UseImpulseJoint<
   RevoluteJointParams,
@@ -139,6 +147,8 @@ export const useRevoluteJoint: UseImpulseJoint<
  * The prismatic joint prevents any relative movement between two rigid-bodies, except for relative translations along one axis.
  * It is characterized by one local anchor as well as one local axis on each rigid-body. In 3D, an optional
  * local tangent axis can be specified for each rigid-body.
+ *
+ * @category Hooks - Joints
  */
 export const usePrismaticJoint: UseImpulseJoint<
   PrismaticJointParams,

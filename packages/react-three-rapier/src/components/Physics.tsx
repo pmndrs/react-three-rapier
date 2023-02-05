@@ -269,6 +269,10 @@ export interface PhysicsProps {
   interpolate?: boolean;
 }
 
+/**
+ * The main physics component used to create a physics world.
+ * @category Components
+ */
 export const Physics: FC<PhysicsProps> = ({
   colliders = "cuboid",
   gravity = [0, -9.81, 0],
