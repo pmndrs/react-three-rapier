@@ -7,9 +7,13 @@ import {
 import { MutableRefObject, useEffect, useMemo } from "react";
 import { BufferGeometry, Euler, Mesh, Object3D, Vector3 } from "three";
 import { mergeVertices } from "three-stdlib";
-import { ColliderProps, RigidBodyProps } from ".";
+import { ColliderProps, RigidBodyProps } from "..";
 import { WorldApi } from "./api";
-import { ColliderState, ColliderStateMap, EventMap } from "./Physics";
+import {
+  ColliderState,
+  ColliderStateMap,
+  EventMap
+} from "../components/Physics";
 import {
   _matrix4,
   _position,
@@ -17,7 +21,7 @@ import {
   _scale,
   _vector3
 } from "./shared-objects";
-import { ColliderShape, RigidBodyAutoCollider } from "./types";
+import { ColliderShape, RigidBodyAutoCollider } from "../types";
 import { scaleVertices, vectorToTuple } from "./utils";
 
 export const scaleColliderArgs = (
@@ -52,12 +56,13 @@ export const createColliderFromOptions = (
   options: ColliderProps,
   world: WorldApi,
   scale: Vector3,
-  rigidBody?: RigidBody
+  getRigidBody?: () => RigidBody
 ) => {
   const scaledArgs = scaleColliderArgs(options.shape!, options.args, scale);
   // @ts-ignore
   const desc = ColliderDesc[options.shape!](...scaledArgs);
-  return world.createCollider(desc!, rigidBody);
+
+  return world.createCollider(desc!, getRigidBody?.());
 };
 
 type ImmutableColliderOptions = (keyof ColliderProps)[];
@@ -203,7 +208,7 @@ export const setColliderOptions = (
 };
 
 export const useUpdateColliderOptions = (
-  collidersRef: MutableRefObject<Collider[]>,
+  getCollider: () => Collider,
   props: ColliderProps,
   states: ColliderStateMap
 ) => {
@@ -217,9 +222,8 @@ export const useUpdateColliderOptions = (
   );
 
   useEffect(() => {
-    collidersRef.current.forEach((collider) => {
-      setColliderOptions(collider, props, states);
-    });
+    const collider = getCollider();
+    setColliderOptions(collider, props, states);
   }, mutablePropsAsFlatArray);
 };
 
@@ -377,7 +381,7 @@ export const getColliderArgsFromGeometry = (
 };
 
 export const useColliderEvents = (
-  collidersRef: MutableRefObject<Collider[] | undefined>,
+  getCollider: () => Collider,
   props: ColliderProps,
   events: EventMap
 ) => {
@@ -390,7 +394,9 @@ export const useColliderEvents = (
   } = props;
 
   useEffect(() => {
-    collidersRef.current?.forEach((collider) => {
+    const collider = getCollider();
+
+    if (collider) {
       const hasCollisionEvent = !!(
         onCollisionEnter ||
         onCollisionExit ||
@@ -416,12 +422,12 @@ export const useColliderEvents = (
         onIntersectionExit,
         onContactForce
       });
-    });
+    }
 
     return () => {
-      collidersRef.current?.forEach((collider) =>
-        events.delete(collider.handle)
-      );
+      if (collider) {
+        events.delete(collider.handle);
+      }
     };
   }, [
     onCollisionEnter,

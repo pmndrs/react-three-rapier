@@ -66,7 +66,7 @@ For full API outline and documentation, see 🧩 [API Docs](https://pmndrs.githu
 - [Collider Components](#collider-components)
   - [🖼 Collider Examples](#-collider-examples)
 - [Instanced Meshes](#instanced-meshes)
-- [Debug](#debug)
+- [Moving things around, and applying forces](#moving-things-around-and-applying-forces)
 - [Collision Events](#collision-events)
   - [Configuring collision and solver groups](#configuring-collision-and-solver-groups)
 - [Contact force events](#contact-force-events)
@@ -238,65 +238,98 @@ If part of our meshes are invisible and you want to include them in the collider
 
 Instanced meshes can also be used and have automatic colliders generated from their mesh.
 
-By wrapping the `InstancedMesh` in `<InstancedRigidBodies />`, each instance will be attached to an individual `RigidBody`.
+By wrapping exactly one `Three.InstancedMesh` in `<InstancedRigidBodies />`, each instance will be attached to an individual `RigidBody`.
 
 🧩 See [InstancedRigidBodiesProps docs](https://pmndrs.github.io/react-three-rapier/interfaces/InstancedRigidBodiesProps.html) for available props.
 
 ```tsx
-import { InstancedRigidBodies } from "@react-three/rapier";
+import { InstancedRigidBodies, RapierRigidBody } from "@react-three/rapier";
 
 const COUNT = 1000;
 
 const Scene = () => {
-  const instancedApi = useRef<InstancedRigidBodyApi>(null);
+  const rigidBodies = useRef<RapierRigidBody[]>(null);
 
   useEffect(() => {
-    if (!instancedApi.current) {
+    if (!rigidBodies.current) {
       return
     }
 
     // You can access individual instanced by their index
-    instancedApi.current.at(40).applyImpulse({ x: 0, y: 10, z: 0 });
+    rigidBodies.current.at(40).applyImpulse({ x: 0, y: 10, z: 0 });
 
-    // Or update all instances as if they were in an array
-    instancedApi.current.forEach((api) => {
+    // Or update all instances
+    rigidBodies.current.forEach((api) => {
       api.applyImpulse({ x: 0, y: 10, z: 0 });
     });
   }, []);
 
   // We can set the initial positions, and rotations, and scales, of
-  // the instances by providing an array equal to the instance count
-  const positions = Array.from({ length: COUNT }, (_, index) => [index, 0, 0]);
+  // the instances by providing an array of InstancedRigidBodyProps
+  // which is the same as RigidBodyProps, but with an additional "key" prop.
+  const instances = useMemo(() => {
+    const instances: InstancedRigidBodyProps[] = [];
 
-  const rotations = Array.from({ length: COUNT }, (_, index) => [
-    Math.random(),
-    Math.random(),
-    Math.random()
-  ]);
+    for (let i = 0; i < COUNT; i++) {
+      instances.push({
+        key: 'instance_' + Math.random(),
+        position: [Math.random() * 10, Math.random() * 10, Math.random() * 10],
+        rotation: [Math.random(), Math.random(), Math.random()],
+      });
+    }
 
-  const scales = Array.from({ length: COUNT }, (_, index) => [
-    Math.random(),
-    Math.random(),
-    Math.random()
-  ]);
+    return instances;
+  }, []);
 
   return (
     <InstancedRigidBodies
       ref={instancedApi}
-      positions={positions}
-      rotations={rotations}
-      scales={scales}
+      instances={instances}
       colliders="ball"
     >
-      <instancedMesh args={[undefined, undefined, COUNT]}>
-        <sphereGeometry args={[0.2]} />
-        <meshPhysicalGeometry color="blue" />
-
-        <CuboidCollider args={[0.1, 0.2, 0.1]} />
-      </instancedMesh>
+      <instancedMesh args={[undefined, undefined, COUNT]} count={COUNT} />
     </InstancedRigidBodies>
   );
 };
+```
+
+We can also create compound shapes for instanced meshes by providing an array of `Colliders` in the `colliderNodes` prop.
+
+```tsx
+import { InstancedRigidBodies, BoxCollider, SphereCollider } from "@react-three/rapier";
+const COUNT = 500
+
+const Scene = () => {
+  const instances = useMemo(() => {
+    const instances: InstancedRigidBodyProps[] = [];
+
+    for (let i = 0; i < COUNT; i++) {
+      instances.push({
+        key: 'instance_' + Math.random(),
+        position: [Math.random() * 10, Math.random() * 10, Math.random() * 10],
+        rotation: [Math.random(), Math.random(), Math.random()],
+      });
+    }
+
+    return instances;
+  }, []);
+
+  return (
+    <InstancedRigidBodies
+      ref={instancedApi}
+      instances={instances}
+      colliders="ball"
+      colliderNodes={[
+        <BoxCollider args={[0.5, 0.5, 0.5]} />,
+        <SphereCollider args={[0.5]} />,
+      ]}
+    >
+      <instancedMesh args={[undefined, undefined, COUNT]} count={COUNT} />
+    </InstancedRigidBodies>
+  );
+};
+```
+}
 ```
 
 ## Debug
@@ -321,6 +354,87 @@ const Scene = () => {
     </Physics>
   );
 };
+```
+
+## Moving things around, and applying forces
+You can access the instance for a RigidBody by storing its `ref`. This allows you to perform any operation on the underlying physics object directly.
+
+`r3/rapier` exposes a `RapierRigidBody` and `RapierCollider` as aliases for `rapiers` underlying base objects.
+
+For all available methods, see the [Rapier docs](https://rapier.rs/javascript3d/classes/RigidBody.html).
+
+```tsx
+import { 
+  RigidBody, 
+  RapierRigidBody
+} from "@react-three/rapier";
+
+const Scene = () => {
+  const rigidBody = useRef<RapierRigidBody>(null);
+
+  useEffect(() => {
+    if (rigidBody.current) {
+      // A one-off "push"
+      rigidBody.current.applyImpulse({ x: 0, y: 10, z: 0 }, true);
+
+      // A continuous force
+      rigidBody.current.addForce({ x: 0, y: 10, z: 0 }, true);
+
+      // A one-off torque rotation
+      rigidBody.current.applyTorqueImpulse({ x: 0, y: 10, z: 0 }, true);
+
+      // A continuous torque
+      rigidBody.current.addTorque({ x: 0, y: 10, z: 0 }, true);
+    }
+  }, []);
+
+  return (
+    <RigidBody ref={rigidBody}>
+      <mesh>
+        <boxBufferGeometry />
+        <meshStandardMaterial />
+      </mesh>
+    </RigidBody>
+  );
+};
+```
+
+Rapier's API returns quaternions and vectors that are not compatible with Three.js, `r3/rapier` therefore exposes some helper functions (`vec3`, `quat`, `euler`) for quick type conversions. These helper functions can also be used as a shorthand for creating new objects.
+
+```tsx
+import { 
+  RapierRigidBody, 
+  quat, 
+  vec3, 
+  euler 
+} from "@react-three/rapier";
+
+const Scene = () => {
+  const rigidBody = useRef<RapierRigidBody>(null)
+
+  useEffect(() => {
+    if (rigidBody.current) {
+      const position = vec3(rigidBody.current.translation())
+      const quaternion = quat(rigidBody.current.rotation())
+      const eulerRot = euler().setFromQuaternion(quat(rigidBody.current.rotation()))
+
+      // While Rapier's return types need conversion, setting values can be done directly with Three.js types
+      rigidBody.current.setTranslation(position, true)
+      rigidBody.current.setRotation(quaternion, true)
+      rigidBody.current.setAngVel({x: 0, y: 2, z: 0}, true)
+    }
+  }, [])
+
+  return (
+    <RigidBody ref={rigidBody}>
+      <mesh>
+        <boxBufferGeometry />
+        <meshStandardMaterial />
+      </mesh>
+    </RigidBody>
+  );
+}
+
 ```
 
 ## Collision Events
@@ -560,6 +674,21 @@ There are 4 different joint types available:
 - Revolute (two bodies are connected by a hinge, for things like doors or wheels)
 - Prismatic (two bodies are connected by a sliding joint, for things like pistons or sliders)
 
+Each joint hook returns a RefObject containing the raw reference to the hook instance.  
+```tsx
+const WheelJoint = ({bodyA, bodyB}) => {
+  const joint = useRevoluteJoint(bodyA, bodyB, [[0,0,0],[0,0,0],[0,0,0]])
+
+  useFrame(() => {
+    if (joint.current) {
+      joint.current.configureMotorVelocity(10, 2)
+    }
+  }, [])
+
+  return null
+}
+```
+
 ### Fixed Joint
 A fixed joint ensures that two rigid-bodies don't move relative to each other. Fixed joints are characterized by one local frame (represented by an isometry) on each rigid-body. The fixed-joint makes these frames coincide in world-space.
 
@@ -636,6 +765,12 @@ const JointedThing = () => {
       [0, 0, 0], // Axis of the joint, expressed in the local-space of the rigid-bodies it is attached to.
     ]);
 
+  useEffect(() => {
+    if (joint.current) {
+
+    }
+  }, [])
+
   return (
     <group>
       <RigidBody ref={bodyA}>
@@ -693,7 +828,7 @@ const JointedThing = () => {
     joint.configureMotorVelocity(1, 0)
 
     // Disable contacts between the two joint bodies
-    joint.raw().setContactsEnabled(false)
+    joint.setContactsEnabled(false)
   }, [])
 
   return ...

@@ -1,6 +1,6 @@
 import { Box, Html, Sphere, Torus } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import { RigidBody, RigidBodyApi } from "@react-three/rapier";
+import { RigidBody, RapierRigidBody } from "@react-three/rapier";
 import { useControls } from "leva";
 import { useEffect, useRef } from "react";
 import { Demo } from "../../App";

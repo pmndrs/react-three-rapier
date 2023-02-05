@@ -18,14 +18,7 @@ import React, {
   useRef,
   useState
 } from "react";
-import {
-  InstancedMesh,
-  MathUtils,
-  Matrix4,
-  Object3D,
-  Quaternion,
-  Vector3
-} from "three";
+import { MathUtils, Matrix4, Object3D, Quaternion, Vector3 } from "three";
 import { useAsset } from "use-asset";
 import {
   CollisionPayload,
@@ -36,15 +29,20 @@ import {
   IntersectionExitHandler,
   RigidBodyAutoCollider,
   Vector3Array
-} from "./types";
+} from "../types";
 
-import { createWorldApi, WorldApi } from "./api";
-import { _matrix4, _position, _rotation, _scale } from "./shared-objects";
+import { createWorldApi, WorldApi } from "../utils/api";
+import {
+  _matrix4,
+  _position,
+  _rotation,
+  _scale
+} from "../utils/shared-objects";
 import {
   rapierQuaternionToQuaternion,
   useConst,
   vectorArrayToVector3
-} from "./utils";
+} from "../utils/utils";
 import {
   applyAttractorForceOnRigidBody,
   AttractorState,
@@ -52,6 +50,7 @@ import {
 } from "./Attractor";
 
 export interface RigidBodyState {
+  meshType: "instancedMesh" | "mesh";
   rigidBody: RigidBody;
   object: Object3D;
   invertedWorldMatrix: Matrix4;
@@ -270,6 +269,10 @@ export interface PhysicsProps {
   interpolate?: boolean;
 }
 
+/**
+ * The main physics component used to create a physics world.
+ * @category Components
+ */
 export const Physics: FC<PhysicsProps> = ({
   colliders = "cuboid",
   gravity = [0, -9.81, 0],
@@ -454,7 +457,11 @@ export const Physics: FC<PhysicsProps> = ({
           state.isSleeping = rigidBody.isSleeping();
         }
 
-        if (!rigidBody || rigidBody.isSleeping() || !state.setMatrix) {
+        if (
+          !rigidBody ||
+          (rigidBody.isSleeping() && !("isInstancedMesh" in state.object)) ||
+          !state.setMatrix
+        ) {
           return;
         }
 
@@ -476,7 +483,7 @@ export const Physics: FC<PhysicsProps> = ({
             .decompose(_position, _rotation, _scale);
 
           // Apply previous tick position
-          if (!(state.object instanceof InstancedMesh)) {
+          if (state.meshType == "mesh") {
             state.object.position.copy(_position);
             state.object.quaternion.copy(_rotation);
           }
@@ -488,9 +495,8 @@ export const Physics: FC<PhysicsProps> = ({
           .premultiply(state.invertedWorldMatrix)
           .decompose(_position, _rotation, _scale);
 
-        if (state.object instanceof InstancedMesh) {
+        if (state.meshType == "instancedMesh") {
           state.setMatrix(_matrix4);
-          state.object.instanceMatrix.needsUpdate = true;
         } else {
           // Interpolate to new position
           state.object.position.lerp(_position, interpolationAlpha);

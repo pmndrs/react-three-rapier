@@ -1,7 +1,7 @@
 import { useGLTF } from "@react-three/drei";
 import { GroupProps, useFrame } from "@react-three/fiber";
 import { RigidBody, RigidBodyProps } from "@react-three/rapier";
-import { RigidBodyApi } from "@react-three/rapier";
+import { RapierRigidBody } from "@react-three/rapier";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { Mesh } from "three";
 import { GLTF } from "three-stdlib";
@@ -27,7 +27,7 @@ const Monkae = ({
     nodes: { Suzanne }
   } = useSuzanne();
 
-  const monmon = useRef<RigidBodyApi>(null);
+  const monmon = useRef<RapierRigidBody>(null);
 
   useFrame(() => {
     if (monmon.current && monmon.current.translation().y < -10) {

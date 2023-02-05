@@ -6,7 +6,7 @@ import React, { useRef } from "react";
 
 import { Euler, Quaternion, Shape, Vector3 } from "three";
 import { _euler, _quaternion, _vector3 } from "./shared-objects";
-import { RigidBodyTypeString, Vector3Array } from "./types";
+import { RigidBodyTypeString, Vector3Array } from "../types";
 
 export const vectorArrayToVector3 = (arr: Vector3Array) => {
   const [x, y, z] = arr;

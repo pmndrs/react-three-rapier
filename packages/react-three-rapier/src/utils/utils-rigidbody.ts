@@ -1,8 +1,12 @@
 import { RigidBody, RigidBodyDesc } from "@dimforge/rapier3d-compat";
 import React, { MutableRefObject, useEffect, useMemo } from "react";
 import { Matrix4, Object3D, Vector3 } from "three";
-import { Boolean3Array, RigidBodyProps, Vector3Array } from ".";
-import { EventMap, RigidBodyState, RigidBodyStateMap } from "./Physics";
+import { Boolean3Array, RigidBodyProps, Vector3Array } from "..";
+import {
+  EventMap,
+  RigidBodyState,
+  RigidBodyStateMap
+} from "../components/Physics";
 import {
   _matrix4,
   _position,
@@ -29,6 +33,7 @@ interface CreateRigidBodyStateOptions {
   setMatrix?: (matrix: Matrix4) => void;
   getMatrix?: (matrix: Matrix4) => Matrix4;
   worldScale?: Vector3;
+  meshType?: RigidBodyState["meshType"];
 }
 
 export const createRigidBodyState = ({
@@ -36,7 +41,8 @@ export const createRigidBodyState = ({
   object,
   setMatrix,
   getMatrix,
-  worldScale
+  worldScale,
+  meshType = "mesh"
 }: CreateRigidBodyStateOptions): RigidBodyState => {
   object.updateWorldMatrix(true, false);
   const invertedWorldMatrix = object.parent!.matrixWorld.clone().invert();
@@ -54,7 +60,8 @@ export const createRigidBodyState = ({
       ? getMatrix
       : (matrix: Matrix4) => matrix.copy(object.matrix),
     scale: worldScale || object.getWorldScale(_scale).clone(),
-    isSleeping: false
+    isSleeping: false,
+    meshType
   };
 };
 
@@ -151,7 +158,7 @@ export const setRigidBodyOptions = (
 };
 
 export const useUpdateRigidBodyOptions = (
-  rigidBodyRef: MutableRefObject<RigidBody | RigidBody[] | undefined>,
+  getRigidBody: () => RigidBody,
   props: RigidBodyProps,
   states: RigidBodyStateMap,
   updateTranslations: boolean = true
@@ -166,23 +173,13 @@ export const useUpdateRigidBodyOptions = (
   );
 
   useEffect(() => {
-    if (Array.isArray(rigidBodyRef.current)) {
-      for (const rigidBody of rigidBodyRef.current) {
-        setRigidBodyOptions(rigidBody, props, states, updateTranslations);
-      }
-    } else if (rigidBodyRef.current) {
-      setRigidBodyOptions(
-        rigidBodyRef.current,
-        props,
-        states,
-        updateTranslations
-      );
-    }
+    const rigidBody = getRigidBody();
+    setRigidBodyOptions(rigidBody, props, states, updateTranslations);
   }, mutablePropsAsFlatArray);
 };
 
 export const useRigidBodyEvents = (
-  rigidBodyRef: MutableRefObject<RigidBody | RigidBody[] | undefined>,
+  getRigidBody: () => RigidBody,
   props: RigidBodyProps,
   events: EventMap
 ) => {
@@ -205,22 +202,11 @@ export const useRigidBodyEvents = (
   };
 
   useEffect(() => {
-    if (Array.isArray(rigidBodyRef.current)) {
-      for (const rigidBody of rigidBodyRef.current) {
-        events.set(rigidBody.handle, eventHandlers);
-      }
-    } else if (rigidBodyRef.current) {
-      events.set(rigidBodyRef.current.handle, eventHandlers);
-    }
+    const rigidBody = getRigidBody();
+    events.set(rigidBody.handle, eventHandlers);
 
     return () => {
-      if (Array.isArray(rigidBodyRef.current)) {
-        for (const rigidBody of rigidBodyRef.current) {
-          events.delete(rigidBody.handle);
-        }
-      } else if (rigidBodyRef.current) {
-        events.delete(rigidBodyRef.current.handle);
-      }
+      events.delete(rigidBody.handle);
     };
   }, [
     onWake,

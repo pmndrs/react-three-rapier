@@ -1,7 +1,11 @@
 import React, { FC, memo, useEffect, useRef, useState } from "react";
 
 import { Box, Html, Sphere, useGLTF } from "@react-three/drei";
-import { CylinderCollider, RigidBody, RigidBodyApi } from "@react-three/rapier";
+import {
+  CylinderCollider,
+  RigidBody,
+  RapierRigidBody
+} from "@react-three/rapier";
 import Plinko from "./Plinko";
 import { Mesh, Vector3 } from "three";
 import { useControls, button } from "leva";
@@ -45,12 +49,12 @@ const Label = ({ label }: { label: string }) => {
 const RigidBox = memo(() => {
   const color = useRandomColor();
 
-  const box = useRef<RigidBodyApi>(null);
+  const box = useRef<RapierRigidBody>(null);
 
   useEffect(() => {
     const api = box.current;
     if (api) {
-      api.applyTorqueImpulse({ x: 0, y: 0, z: 0.2 });
+      api.applyTorqueImpulse({ x: 0, y: 0, z: 0.2 }, true);
     }
   }, []);
 

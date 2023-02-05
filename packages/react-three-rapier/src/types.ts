@@ -1,8 +1,9 @@
-import { MutableRefObject } from "react";
+import { MutableRefObject, RefObject } from "react";
 
 import {
   CoefficientCombineRule,
   Collider as RapierCollider,
+  ImpulseJoint,
   InteractionGroups,
   RigidBody as RapierRigidBody,
   TempContactManifold
@@ -11,7 +12,7 @@ import { Rotation, Vector } from "@dimforge/rapier3d-compat/math";
 import { Object3DProps } from "@react-three/fiber";
 import { Object3D } from "three";
 import { ColliderProps } from ".";
-import { RigidBodyApi, JointApi } from "./api";
+import { RigidBodyState } from "./components/Physics";
 
 export { CoefficientCombineRule as CoefficientCombineRule } from "@dimforge/rapier3d-compat";
 export { RapierRigidBody, RapierCollider };
@@ -24,11 +25,6 @@ export type RigidBodyAutoCollider =
   | "hull"
   | "trimesh"
   | false;
-
-export interface UseRigidBodyAPI {
-  rigidBody: RapierRigidBody;
-  collider: RapierCollider;
-}
 
 export type CuboidArgs = [
   halfWidth: number,
@@ -418,6 +414,12 @@ export interface RigidBodyOptions extends ColliderProps {
    * Include invisible objects on the collider creation estimation.
    */
   includeInvisible?: boolean;
+
+  /**
+   * Transform the RigidBodyState
+   * @internal Do not use. Used internally by the InstancedRigidBodies to alter the RigidBody State
+   */
+  transformState?: (state: RigidBodyState) => RigidBodyState;
 }
 
 // Joints
@@ -448,8 +450,10 @@ export type RevoluteJointParams = [
   limits?: [min: number, max: number]
 ];
 
-export type RigidBodyApiRef = MutableRefObject<undefined | null | RigidBodyApi>;
-
-export interface UseImpulseJoint<P> {
-  (body1: RigidBodyApiRef, body2: RigidBodyApiRef, params: P): JointApi;
+export interface UseImpulseJoint<JointParams, JointType extends ImpulseJoint> {
+  (
+    body1: RefObject<RapierRigidBody>,
+    body2: RefObject<RapierRigidBody>,
+    params: JointParams
+  ): RefObject<JointType | undefined>;
 }
