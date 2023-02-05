@@ -12,7 +12,7 @@
 <br />
 For contributions, please read the <a href="https://github.com/pmndrs/react-three-rapier/blob/main/packages/react-three-rapier/CONTRIBUTING.md">🪧 Contribution Guide</a>.
 <br/>
-For available APIs, see <a href="https://pmndrs.github.io/react-three-rapier/>">🧩 API Docs</a>
+For available APIs, see <a href="https://pmndrs.github.io/react-three-rapier/">🧩 API Docs</a>
 </p>
 
 ---
@@ -80,7 +80,6 @@ For full API outline and documentation, see 🧩 [API Docs](https://pmndrs.githu
   - [Spherical Joint](#spherical-joint)
   - [Revolute Joint](#revolute-joint)
   - [Prismatic Joint](#prismatic-joint)
-  - [Joint APIs](#joint-apis)
   - [🖼 Joints Example](#-joints-example)
 - [Advanced hooks usage](#advanced-hooks-usage)
   - [Manual stepping](#manual-stepping)
@@ -674,7 +673,7 @@ There are 4 different joint types available:
 - Revolute (two bodies are connected by a hinge, for things like doors or wheels)
 - Prismatic (two bodies are connected by a sliding joint, for things like pistons or sliders)
 
-Each joint hook returns a RefObject containing the raw reference to the hook instance.  
+Each joint hook returns a RefObject containing the raw reference to the joint instance.  
 ```tsx
 const WheelJoint = ({bodyA, bodyB}) => {
   const joint = useRevoluteJoint(bodyA, bodyB, [[0,0,0],[0,0,0],[0,0,0]])
@@ -814,27 +813,6 @@ const JointedThing = () => {
   );
 }
 ```
-
-### Joint APIs
-Joints can be controlled imperatively similarily to how `RigidBody` components can be controlled.
-
-🧩 See [Joint API docs](https://pmndrs.github.io/react-three-rapier/interfaces/JointApi.html) for more information.
-
-```tsx
-const JointedThing = () => { 
-  const joint = useSphericalJoint(...)
-
-  useEffect(() => {
-    joint.configureMotorVelocity(1, 0)
-
-    // Disable contacts between the two joint bodies
-    joint.setContactsEnabled(false)
-  }, [])
-
-  return ...
-}
-```
-
 
 ### 🖼 Joints Example
 <a href="https://codesandbox.io/s/react-three-rapier-joints-mhhbd4"><img src="https://raw.githubusercontent.com/pmndrs/react-three-rapier/HEAD/packages/react-three-rapier/misc/example-joints.jpg" width="240" /></a>
