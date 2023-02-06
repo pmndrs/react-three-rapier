@@ -6,7 +6,8 @@ import React, {
   ForwardedRef,
   useMemo,
   forwardRef,
-  useImperativeHandle
+  useImperativeHandle,
+  useEffect
 } from "react";
 import { Object3D } from "three";
 import { useRapier } from "../hooks/hooks";
@@ -60,22 +61,29 @@ export const AnyCollider = memo(
           rigidBodyContext?.getRigidBody
         );
 
-        colliderStates.set(
-          collider.handle,
-          createColliderState(
-            collider,
-            ref.current!,
-            rigidBodyContext?.ref.current
-          )
-        );
-
         return collider;
       },
       (collider) => {
-        colliderStates.delete(collider.handle);
         world.removeCollider(collider);
       }
     );
+
+    useEffect(() => {
+      const collider = getInstance();
+
+      colliderStates.set(
+        collider.handle,
+        createColliderState(
+          collider,
+          ref.current!,
+          rigidBodyContext?.ref.current
+        )
+      );
+
+      return () => {
+        colliderStates.delete(collider.handle);
+      };
+    }, []);
 
     useImperativeHandle(forwardedRef, () => getInstance());
 

@@ -1,9 +1,11 @@
 import ReactThreeTestRenderer from "@react-three/test-renderer";
 import {
+  ConeCollider,
   CuboidCollider,
   CuboidColliderProps,
   interactionGroups,
-  Physics
+  Physics,
+  RapierCollider
 } from "../src";
 import React, { MutableRefObject, useEffect, useRef } from "react";
 import {
@@ -421,6 +423,22 @@ describe("colliders", () => {
       expect(setDensity).toBeCalledTimes(1);
       expect(setMass).not.toBeCalled();
       expect(setMassProperties).not.toBeCalled();
+    });
+  });
+
+  describe("refs", () => {
+    it("should be able to get ref to collider", async () => {
+      const ref = React.createRef<RapierCollider>();
+
+      await ReactThreeTestRenderer.act(async () => {
+        await ReactThreeTestRenderer.create(
+          <Physics>
+            <ConeCollider ref={ref} args={[1, 2]} />
+          </Physics>
+        );
+      });
+
+      expect(ref.current).to.be.instanceOf(Collider);
     });
   });
 });

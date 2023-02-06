@@ -10,11 +10,13 @@ import {
   RoundCuboidCollider,
   ConeCollider,
   useRapier,
-  RigidBodyProps
+  RigidBodyProps,
+  RapierCollider
 } from "@react-three/rapier";
 import { useSuzanne } from "../all-shapes/AllShapesExample";
 import { RoundedBoxGeometry } from "three-stdlib";
 import { PlaneGeometry } from "three";
+import { useEffect, useRef } from "react";
 
 const CuteBox = (props: Omit<MeshProps, "args">) => (
   <Box castShadow receiveShadow {...props}>
@@ -72,6 +74,11 @@ const roundBoxGeometry = new RoundedBoxGeometry(1.4, 1.4, 1.4, 8, 0.2);
 
 export const AllCollidersExample = () => {
   const { rapier } = useRapier();
+  const roundCuboidCollider = useRef<RapierCollider>(null);
+
+  useEffect(() => {
+    console.log("roundCuboidCollider", roundCuboidCollider.current);
+  }, []);
 
   return (
     <group>
@@ -86,7 +93,10 @@ export const AllCollidersExample = () => {
         <mesh geometry={roundBoxGeometry} castShadow receiveShadow>
           <meshPhysicalMaterial color="orange" />
         </mesh>
-        <RoundCuboidCollider args={[0.5, 0.5, 0.5, 0.2]} />
+        <RoundCuboidCollider
+          ref={roundCuboidCollider}
+          args={[0.5, 0.5, 0.5, 0.2]}
+        />
 
         <Html>RoundCuboidCollider</Html>
       </RigidBody>
