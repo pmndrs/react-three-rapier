@@ -3,10 +3,11 @@ import { useFrame } from "@react-three/fiber";
 import {
   BallCollider,
   CuboidCollider,
+  RapierCollider,
   RapierRigidBody,
   RigidBody
 } from "@react-three/rapier";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { Demo } from "../../App";
 
 const Ball = () => {
@@ -38,6 +39,12 @@ const Ball = () => {
 };
 
 export const Colliders: Demo = () => {
+  const cuboid = useRef<RapierCollider>(null);
+
+  useEffect(() => {
+    console.log(cuboid.current);
+  }, []);
+
   return (
     <group>
       <Ball />
@@ -51,6 +58,7 @@ export const Colliders: Demo = () => {
           args={[10, 1, 10]}
           position={[0, 0, 0]}
           rotation={[0.1, 0.1, 0.2]}
+          ref={cuboid}
         />
         <BallCollider args={[3]} position={[1, 2, 1]} />
       </group>

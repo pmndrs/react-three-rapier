@@ -65,29 +65,37 @@ export const RigidBody = memo(
 
     const childColliderProps = useChildColliderProps(ref, mergedOptions);
 
-    // Create rigidbody
+    // Provide a way to eagerly create rigidbody
     const getInstance = useImperativeInstance(
       () => {
         const desc = rigidBodyDescFromOptions(mergedOptions);
         const rigidBody = world.createRigidBody(desc);
 
-        const state = createRigidBodyState({
-          rigidBody,
-          object: ref.current!
-        });
-
-        rigidBodyStates.set(
-          rigidBody.handle,
-          props.transformState ? props.transformState(state) : state
-        );
-
         return rigidBody;
       },
       (rigidBody) => {
         world.removeRigidBody(rigidBody);
-        rigidBodyStates.delete(rigidBody.handle);
       }
     );
+
+    // Only provide a object state after the ref has been set
+    useEffect(() => {
+      const rigidBody = getInstance();
+
+      const state = createRigidBodyState({
+        rigidBody,
+        object: ref.current!
+      });
+
+      rigidBodyStates.set(
+        rigidBody.handle,
+        props.transformState ? props.transformState(state) : state
+      );
+
+      return () => {
+        rigidBodyStates.delete(rigidBody.handle);
+      };
+    }, []);
 
     useUpdateRigidBodyOptions(getInstance, mergedOptions, rigidBodyStates);
     useRigidBodyEvents(getInstance, mergedOptions, rigidBodyEvents);
