@@ -14,7 +14,7 @@
   "devDependencies": {
     "@react-three/drei": "9.45.0",
     "@react-three/fiber": "8.9.1",
-    "@react-three/test-renderer": "8.0.17",
+    "@react-three/test-renderer": "8.1.2",
     "@types/react-dom": "18.0.2",
     "@types/three": "0.139.0",
     "@vitejs/plugin-react": "^2.1.0",
