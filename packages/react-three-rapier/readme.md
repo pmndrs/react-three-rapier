@@ -66,6 +66,7 @@ For full API outline and documentation, see 🧩 [API Docs](https://pmndrs.githu
 - [Collider Components](#collider-components)
   - [🖼 Collider Examples](#-collider-examples)
 - [Instanced Meshes](#instanced-meshes)
+- [Debug](#debug)
 - [Moving things around, and applying forces](#moving-things-around-and-applying-forces)
 - [Collision Events](#collision-events)
   - [Configuring collision and solver groups](#configuring-collision-and-solver-groups)
@@ -255,11 +256,12 @@ const Scene = () => {
     }
 
     // You can access individual instanced by their index
-    rigidBodies.current.at(40).applyImpulse({ x: 0, y: 10, z: 0 });
+    rigidBodies.current[40].applyImpulse({ x: 0, y: 10, z: 0 }, true);
+    rigidBodies.at(100).applyImpulse({ x: 0, y: 10, z: 0 }, true);
 
     // Or update all instances
     rigidBodies.current.forEach((api) => {
-      api.applyImpulse({ x: 0, y: 10, z: 0 });
+      api.applyImpulse({ x: 0, y: 10, z: 0 }, true);
     });
   }, []);
 
@@ -327,8 +329,6 @@ const Scene = () => {
     </InstancedRigidBodies>
   );
 };
-```
-}
 ```
 
 ## Debug
@@ -590,8 +590,6 @@ To detect when a collider enters or leaves another collider, you can use the `on
 🧩 See [onIntersectionEnter / onIntersectionExit docs](https://pmndrs.github.io/react-three-rapier/interfaces/RigidBodyProps.html#onIntersectionEnter) for more information.
 
 ```tsx
-
-```tsx
 <RigidBody>
   <GoalPosts />
 
@@ -674,6 +672,7 @@ There are 4 different joint types available:
 - Prismatic (two bodies are connected by a sliding joint, for things like pistons or sliders)
 
 Each joint hook returns a RefObject containing the raw reference to the joint instance.  
+
 ```tsx
 const WheelJoint = ({bodyA, bodyB}) => {
   const joint = useRevoluteJoint(bodyA, bodyB, [[0,0,0],[0,0,0],[0,0,0]])
@@ -722,8 +721,6 @@ const JointedThing = () => {
 The spherical joint ensures that two points on the local-spaces of two rigid-bodies always coincide (it prevents any relative translational motion at this points).
 
 🧩 See [SphericalJoint docs](https://pmndrs.github.io/react-three-rapier/functions/useSphericalJoint.html) for available options.
-
-```tsx
 
 ```tsx
 const JointedThing = () => {
@@ -787,8 +784,6 @@ const JointedThing = () => {
 The prismatic joint prevents any relative movement between two rigid-bodies, except for relative translations along one axis.
 
 🧩 See [PrismaticJoint docs](https://pmndrs.github.io/react-three-rapier/functions/usePrismaticJoint.html) for available options.
-
-```tsx
 
 ```tsx
 const JointedThing = () => {
