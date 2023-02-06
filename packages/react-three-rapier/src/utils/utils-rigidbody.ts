@@ -87,6 +87,9 @@ const mutableRigidBodyOptions: MutableRigidBodyOptions = {
   angularDamping: (rb: RigidBody, value: number) => {
     rb.setAngularDamping(value);
   },
+  dominanceGroup: (rb: RigidBody, value: number) => {
+    rb.setDominanceGroup(value);
+  },
   enabledRotations: (rb: RigidBody, [x, y, z]: Boolean3Array) => {
     rb.setEnabledRotations(x, y, z, true);
   },
