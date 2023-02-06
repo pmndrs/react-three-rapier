@@ -1,5 +1,11 @@
 # @react-three/rapier
 
+## 0.13.1
+
+### Patch Changes
+
+- 0104039: feat: change callbacks for `useBeforePhysicsStep` and `useAfterPhysicsStep` to be mutable (@isaac-mason)
+
 ## 0.13.0
 
 ### Minor Changes
