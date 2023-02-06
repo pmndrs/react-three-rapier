@@ -67,7 +67,7 @@ export type RigidBodyStateMap = Map<RigidBody["handle"], RigidBodyState>;
 
 export type WorldStepCallback = (worldApi: WorldApi) => void;
 
-export type WorldStepCallbackSet = Set<WorldStepCallback>;
+export type WorldStepCallbackSet = Set<{ current: WorldStepCallback }>;
 
 export interface ColliderState {
   collider: Collider;
@@ -396,14 +396,14 @@ export const Physics: FC<PhysicsProps> = ({
 
         // Trigger beforeStep callbacks
         beforeStepCallbacks.forEach((callback) => {
-          callback(api);
+          callback.current(api);
         });
 
         world.step(eventQueue);
 
         // Trigger afterStep callbacks
         afterStepCallbacks.forEach((callback) => {
-          callback(api);
+          callback.current(api);
         });
       };
 

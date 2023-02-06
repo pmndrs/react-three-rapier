@@ -2,6 +2,7 @@ import React, {
   MutableRefObject,
   useContext,
   useEffect,
+  useRef,
   useState
 } from "react";
 import {
@@ -13,6 +14,15 @@ import { Object3D } from "three";
 
 import { ColliderProps, RigidBodyProps } from "..";
 import { createColliderPropsFromChildren } from "../utils/utils-collider";
+
+// Utils
+const useMutableCallback = <T>(fn: T) => {
+  const ref = useRef<T>(fn);
+  useEffect(() => {
+    ref.current = fn;
+  }, [fn]);
+  return ref;
+};
 
 // External hooks
 /**
@@ -30,11 +40,13 @@ export const useRapier = () => {
 export const useBeforePhysicsStep = (callback: WorldStepCallback) => {
   const { beforeStepCallbacks } = useRapier();
 
+  const ref = useMutableCallback(callback);
+
   useEffect(() => {
-    beforeStepCallbacks.add(callback);
+    beforeStepCallbacks.add(ref);
 
     return () => {
-      beforeStepCallbacks.delete(callback);
+      beforeStepCallbacks.delete(ref);
     };
   }, []);
 };
@@ -46,11 +58,13 @@ export const useBeforePhysicsStep = (callback: WorldStepCallback) => {
 export const useAfterPhysicsStep = (callback: WorldStepCallback) => {
   const { afterStepCallbacks } = useRapier();
 
+  const ref = useMutableCallback(callback);
+
   useEffect(() => {
-    afterStepCallbacks.add(callback);
+    afterStepCallbacks.add(ref);
 
     return () => {
-      afterStepCallbacks.delete(callback);
+      afterStepCallbacks.delete(ref);
     };
   }, []);
 };
