@@ -1,5 +1,11 @@
 # @react-three/rapier
 
+## 0.13.2
+
+### Patch Changes
+
+- d27d688: Fix eager initiation of Rapier objects when called before ref-objects are available
+
 ## 0.13.1
 
 ### Patch Changes
