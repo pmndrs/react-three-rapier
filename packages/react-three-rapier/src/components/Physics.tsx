@@ -255,7 +255,7 @@ export interface PhysicsProps {
   /**
    * The update priority at which the physics simulation should run.
    *
-   * @see https://docs.pmnd.rs/react-three-fiber/api/hooks#taking-over-the-render-loop
+   * @see {@link https://docs.pmnd.rs/react-three-fiber/api/hooks#taking-over-the-render-loop}
    * @defaultValue undefined
    */
   updatePriority?: number;
@@ -264,7 +264,7 @@ export interface PhysicsProps {
    * Interpolate the world transform using the frame delta times.
    * Has no effect if timeStep is set to "vary".
    *
-   * @default true
+   * @defaultValue true
    **/
   interpolate?: boolean;
 }
