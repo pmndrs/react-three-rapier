@@ -18,14 +18,14 @@ export interface AttractorProps {
    * The strength of the attractor.
    * Positive values attract, negative values repel.
    *
-   * @default 1
+   * @defaultValue 1
    */
   strength?: number;
 
   /**
    * The range of the attractor. Will not affect objects outside of this range.
    *
-   * @default 10
+   * @defaultValue 10
    * @min 0
    */
   range?: number;
@@ -35,13 +35,13 @@ export interface AttractorProps {
    * - static: The gravity is constant and does not change over time.
    * - linear: The gravity is linearly interpolated the closer the object is to the attractor.
    * - newtonian: The gravity is calculated using the newtonian gravity formula.
-   * @default "static"
+   * @defaultValue "static"
    */
   type?: AttractorGravityType;
 
   /**
    * The mass of the attractor. Used when type is `newtonian`.
-   * @default 6.673e-11
+   * @defaultValue 6.673e-11
    */
   gravitationalConstant?: number;
 

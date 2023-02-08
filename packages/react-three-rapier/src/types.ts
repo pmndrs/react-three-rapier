@@ -302,8 +302,9 @@ export interface RigidBodyOptions extends ColliderProps {
    */
   type?: RigidBodyTypeString;
 
-  /** Whether or not this body can sleep.
-   * default: true
+  /**
+   * Whether or not this body can sleep.
+   * @defaultValue true
    */
   canSleep?: boolean;
 
@@ -313,26 +314,28 @@ export interface RigidBodyOptions extends ColliderProps {
   /** The angular damping coefficient of this rigid-body.*/
   angularDamping?: number;
 
-  /** The initial linear velocity of this body.
-   * default: zero velocity
+  /**
+   * The initial linear velocity of this body.
+   * @defaultValue [0,0,0]
    */
   linearVelocity?: Vector3Array;
 
-  /** The initial angular velocity of this body.
-   * Default: zero velocity.
+  /**
+   * The initial angular velocity of this body.
+   * @defaultValue [0,0,0]
    */
   angularVelocity?: Vector3Array;
 
   /**
    * The scaling factor applied to the gravity affecting the rigid-body.
-   * Default: 1.0
+   * @defaultValue 1.0
    */
   gravityScale?: number;
 
   /**
    * Whether or not Continous Collision Detection is enabled for this rigid-body.
    * https://rapier.rs/docs/user_guides/javascript/rigid_bodies#continuous-collision-detection
-   * @default false
+   * @defaultValue false
    */
   ccd?: boolean;
 
