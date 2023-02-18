@@ -143,20 +143,27 @@ interface InstanceProps extends RigidBodyProps {
 const Instance = memo<InstanceProps>(({
   apis, applyInstancedState, colliderNodes, childColliderProps, uuid, index,
   ...props
-}) => (
-  <RigidBody
-    {...props}
-    ref={(body) => apis.current.set(uuid, body)}
-    transformState={(state) => applyInstancedState(state, index)}
-  >
-    {colliderNodes.map((node, index) => (
-      <Fragment key={index}>{node}</Fragment>
-    ))}
+}) => {
 
-    {childColliderProps.map((colliderProps, colliderIndex) => (
-      <AnyCollider key={colliderIndex} {...colliderProps} />
-    ))}
-  </RigidBody>
-));
+  useEffect(()=>{
+    return () => {
+      apis.current.delete(uuid);
+    }
+  }, [])
+
+  return <RigidBody
+  {...props}
+  ref={(body) => apis.current.set(uuid, body)}
+  transformState={(state) => applyInstancedState(state, index)}
+>
+  {colliderNodes.map((node, index) => (
+    <Fragment key={index}>{node}</Fragment>
+  ))}
+
+  {childColliderProps.map((colliderProps, colliderIndex) => (
+    <AnyCollider key={colliderIndex} {...colliderProps} />
+  ))}
+</RigidBody>
+});
 
 InstancedRigidBodies.displayName = "InstancedRigidBodies";
