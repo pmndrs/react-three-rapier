@@ -1,7 +1,9 @@
 export * from "./types";
-export type { RigidBodyApi, WorldApi, InstancedRigidBodyApi } from "./api";
-export type { RigidBodyProps } from "./RigidBody";
-export type { InstancedRigidBodiesProps } from "./InstancedRigidBodies";
+export type { RigidBodyProps } from "./components/RigidBody";
+export type {
+  InstancedRigidBodiesProps,
+  InstancedRigidBodyProps
+} from "./components/InstancedRigidBodies";
 export type {
   CylinderColliderProps,
   BallColliderProps,
@@ -11,15 +13,36 @@ export type {
   CuboidColliderProps,
   HeightfieldColliderProps,
   RoundCuboidColliderProps,
-  TrimeshColliderProps
-} from "./AnyCollider";
+  TrimeshColliderProps,
+  ColliderOptionsRequiredArgs
+} from "./components/AnyCollider";
 
-export { Physics } from "./Physics";
-export { RigidBody } from "./RigidBody";
-export { MeshCollider } from "./MeshCollider";
-export { Debug } from "./Debug";
-export { InstancedRigidBodies } from "./InstancedRigidBodies";
-export * from "./AnyCollider";
+export type {
+  PhysicsProps,
+  RapierContext,
+  WorldStepCallback
+} from "./components/Physics";
+export type { MeshColliderProps } from "./components/MeshCollider";
+export type {
+  AttractorProps,
+  AttractorGravityType
+} from "./components/Attractor";
 
-export * from "./hooks";
-export * from "./bitmasks";
+export type { WorldApi } from "./utils/api";
+
+export { Physics } from "./components/Physics";
+export { RigidBody } from "./components/RigidBody";
+export { MeshCollider } from "./components/MeshCollider";
+export { Debug } from "./components/Debug";
+export { InstancedRigidBodies } from "./components/InstancedRigidBodies";
+export * from "./components/AnyCollider";
+export { Attractor } from "./components/Attractor";
+
+export * from "./hooks/joints";
+export {
+  useRapier,
+  useBeforePhysicsStep,
+  useAfterPhysicsStep
+} from "./hooks/hooks";
+export * from "./utils/interaction-groups";
+export * from "./utils/three-object-helpers";

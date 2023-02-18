@@ -108,3 +108,5 @@ dist
 
 # OSX
 .DS_Store
+
+packages/react-three-rapier/docs

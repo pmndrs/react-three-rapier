@@ -1,6 +1,6 @@
 import { Box, Environment, OrbitControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
-import { Debug, Physics, RigidBody } from "@react-three/rapier";
+import { Debug, Physics, RigidBody, useRapier } from "@react-three/rapier";
 import { Perf } from "r3f-perf";
 import {
   createContext,
@@ -8,32 +8,39 @@ import {
   Suspense,
   useContext,
   useState,
-  StrictMode
+  StrictMode,
+  useEffect
 } from "react";
 import { NavLink, NavLinkProps, Route, Routes } from "react-router-dom";
-import { AllCollidersExample } from "./all-colliders/AllCollidersExample";
-import { AllShapesExample } from "./all-shapes/AllShapesExample";
-import { ApiUsage } from "./api-usage/ApiUsageExample";
-import { Car } from "./car/CarExample";
-import { Cluster } from "./cluster/ClusterExample";
-import { Colliders } from "./colliders/CollidersExample";
-import { CollisionEventsExample } from "./collision-events/CollisionEventsExample";
-import { ComponentsExample } from "./components/ComponentsExample";
-import { ContactForceEventsExample } from "./contact-force-events/ContactForceEventsExample";
-import { CradleExample } from "./cradle/CradleExample";
-import { Damping } from "./damping/DampingExample";
-import { InstancedMeshes } from "./instanced-meshes/InstancedMeshesExample";
-import { InstancedMeshesCompound } from "./instances-meshes-compound/InstancedMeshesCompoundExample";
-import { Joints } from "./joints/JointsExample";
-import { Kinematics } from "./kinematics/KinematicsExample";
-import { MeshColliderTest } from "./mesh-collider-test/MeshColliderExample";
-import { SensorsExample } from "./sensors/SensorsExample";
-import Shapes from "./shapes/ShapesExample";
-import { Transforms } from "./transforms/TransformsExample";
+import { AllCollidersExample } from "./examples/all-colliders/AllCollidersExample";
+import { AllShapesExample } from "./examples/all-shapes/AllShapesExample";
+import { ApiUsage } from "./examples/api-usage/ApiUsageExample";
+import { AttractorExample } from "./examples/attractors/AttractorsExample";
+import { Car } from "./examples/car/CarExample";
+import { Cluster } from "./examples/cluster/ClusterExample";
+import { Colliders } from "./examples/colliders/CollidersExample";
+import { CollisionEventsExample } from "./examples/collision-events/CollisionEventsExample";
+import { ComponentsExample } from "./examples/components/ComponentsExample";
+import { ContactForceEventsExample } from "./examples/contact-force-events/ContactForceEventsExample";
+import { CradleExample } from "./examples/cradle/CradleExample";
+import { Damping } from "./examples/damping/DampingExample";
+import { InstancedMeshes } from "./examples/instanced-meshes/InstancedMeshesExample";
+import { InstancedMeshesCompound } from "./examples/instances-meshes-compound/InstancedMeshesCompoundExample";
+import { Joints } from "./examples/joints/JointsExample";
+import { Kinematics } from "./examples/kinematics/KinematicsExample";
+import { ManualStepExample } from "./examples/manual-step/ManualStepExamples";
+import { MeshColliderTest } from "./examples/mesh-collider-test/MeshColliderExample";
+import { SensorsExample } from "./examples/sensors/SensorsExample";
+import Shapes from "./examples/plinko/ShapesExample";
+import { Transforms } from "./examples/transforms/TransformsExample";
+import { LockedTransformsExample } from "./examples/locked-transforms/LockedTransformsExample";
+import { PerformanceExample } from "./examples/performance/PeformanceExample";
+import { DynamicTypeChangeExample } from "./examples/dynamic-type-change/DynamicTypeChangeExample";
 
 const demoContext = createContext<{
   setDebug?(f: boolean): void;
-  setUI?(n: ReactNode): void;
+  setPaused?(f: boolean): void;
+  setCameraEnabled?(f: boolean): void;
 }>({});
 
 export const useDemo = () => useContext(demoContext);
@@ -87,6 +94,7 @@ const routes: Record<string, ReactNode> = {
   transforms: <Transforms />,
   cluster: <Cluster />,
   "all-shapes": <AllShapesExample />,
+  attractors: <AttractorExample />,
   car: <Car />,
   "api-usage": <ApiUsage />,
   kinematics: <Kinematics />,
@@ -98,15 +106,19 @@ const routes: Record<string, ReactNode> = {
   "all-colliders": <AllCollidersExample />,
   "collision-events": <CollisionEventsExample />,
   "contact-force-events": <ContactForceEventsExample />,
-  sensors: <SensorsExample />
+  sensors: <SensorsExample />,
+  "manual-step": <ManualStepExample />,
+  "locked-transforms": <LockedTransformsExample />,
+  performance: <PerformanceExample />,
+  "dynamic-type-changes": <DynamicTypeChangeExample />
 };
 
 export const App = () => {
-  const [ui, setUI] = useState<ReactNode>(null);
   const [debug, setDebug] = useState<boolean>(false);
   const [perf, setPerf] = useState<boolean>(false);
   const [paused, setPaused] = useState<boolean>(false);
   const [physicsKey, setPhysicsKey] = useState<number>(0);
+  const [cameraEnabled, setCameraEnabled] = useState<boolean>(true);
 
   const updatePhysicsKey = () => {
     setPhysicsKey((current) => current + 1);
@@ -136,12 +148,14 @@ export const App = () => {
                 shadow-bias={-0.0001}
               />
               <Environment preset="apartment" />
-              <OrbitControls />
+
+              <OrbitControls enabled={cameraEnabled} />
 
               <demoContext.Provider
                 value={{
-                  setUI,
-                  setDebug
+                  setDebug,
+                  setPaused,
+                  setCameraEnabled
                 }}
               >
                 <Routes>
@@ -173,7 +187,7 @@ export const App = () => {
       >
         {Object.keys(routes).map((key) => (
           <Link key={key} to={key} end>
-            {key.replace(/-/g, " ") || "Shapes"}
+            {key.replace(/-/g, " ") || "Plinko"}
           </Link>
         ))}
 
@@ -193,16 +207,6 @@ export const App = () => {
           onClick={() => setPaused((v) => !v)}
         />
         <ToggleButton label="Reset" value={false} onClick={updatePhysicsKey} />
-      </div>
-
-      <div
-        style={{
-          position: "absolute",
-          top: 24,
-          left: 24
-        }}
-      >
-        {ui}
       </div>
     </div>
   );

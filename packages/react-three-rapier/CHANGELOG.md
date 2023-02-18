@@ -1,5 +1,90 @@
 # @react-three/rapier
 
+## 0.13.2
+
+### Patch Changes
+
+- d27d688: Fix eager initiation of Rapier objects when called before ref-objects are available
+
+## 0.13.1
+
+### Patch Changes
+
+- 0104039: feat: change callbacks for `useBeforePhysicsStep` and `useAfterPhysicsStep` to be mutable (@isaac-mason)
+
+## 0.13.0
+
+### Minor Changes
+
+- 02055ed: Removed joints api, replaced with RefObjects containing the joint instances
+- 25c4261: Update rapier to 0.11.1
+- 02055ed: Refreshed InstancedRigidBody component with support for dynamic count and fine-grain control over each instance
+- 02055ed: Remove RigidBody proxy apis for much needed simplification, add helper functions for dealing with Rapier math functions
+- 02055ed: Collider refs now return a single collider rather than an array, as it should be
+
+## 0.12.2
+
+### Patch Changes
+
+- 2937801: fix: attractors broken when using timeStep="vary" (@isaac-mason)
+- 2937801: fix: previous rigid body positions used for interpolation weren't being populated correctly
+
+## 0.12.1
+
+### Patch Changes
+
+- a8af66a: Add missing react imports
+
+## 0.12.0
+
+### Minor Changes
+
+- 8bc4a3c: Add useBefore- and useAfterPhysicsStep hooks
+- 86482bd: Clean up exported types, add typedoc for generating html docs
+
+## 0.11.3
+
+### Patch Changes
+
+- 09cbbde: Add joints to readme
+- 09cbbde: useFixedJoint now allows `w` to be set for the local space orientation
+
+## 0.11.2
+
+### Patch Changes
+
+- 5a3f68b: fix(RigidBody): canSleep always true due to using logical OR instead of nullish coalescing operator (@isaac-mason)
+- 46bf448: feat: add support for revolute and prismatic joint limits (@planktonrobo)
+
+## 0.11.1
+
+### Patch Changes
+
+- bf15c27: Fix issue with `canSleep` missing from RigidBodyDesc
+- bf15c27: Enable dynamic changing of RigidBody `type`
+
+## 0.11.0
+
+### Minor Changes
+
+- 7638b8a: Update to @dimforge/rapier3d-compat@0.10.0
+
+### Patch Changes
+
+- 7638b8a: Add lockedRotations, lockedTranslations to RB mutable props
+
+## 0.10.0
+
+### Minor Changes
+
+- fcd9ac6: Add Attractor (@AlexWarnes, @wiledal)
+
+### Patch Changes
+
+- 30c30b6: feat(CollisionEvents): include data from both affected objects (@RodrigoHamuy, @wiledal)
+- fcd9ac6: Solve free-standing colliders having incorrect world translations (@wiledal)
+- f10368a: Expose a manual step function (@wiledal, @firtoz)
+
 ## 0.9.0
 
 ### Minor Changes

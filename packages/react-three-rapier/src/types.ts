@@ -1,8 +1,9 @@
-import { MutableRefObject } from "react";
+import { MutableRefObject, RefObject } from "react";
 
 import {
   CoefficientCombineRule,
   Collider as RapierCollider,
+  ImpulseJoint,
   InteractionGroups,
   RigidBody as RapierRigidBody,
   TempContactManifold
@@ -11,12 +12,7 @@ import { Rotation, Vector } from "@dimforge/rapier3d-compat/math";
 import { Object3DProps } from "@react-three/fiber";
 import { Object3D } from "three";
 import { ColliderProps } from ".";
-import {
-  createColliderApi,
-  createJointApi,
-  createRigidBodyApi,
-  createWorldApi
-} from "./api";
+import { RigidBodyState } from "./components/Physics";
 
 export { CoefficientCombineRule as CoefficientCombineRule } from "@dimforge/rapier3d-compat";
 export { RapierRigidBody, RapierCollider };
@@ -29,11 +25,6 @@ export type RigidBodyAutoCollider =
   | "hull"
   | "trimesh"
   | false;
-
-export interface UseRigidBodyAPI {
-  rigidBody: RapierRigidBody;
-  collider: RapierCollider;
-}
 
 export type CuboidArgs = [
   halfWidth: number,
@@ -87,7 +78,7 @@ export type RoundConvexMeshArgs = [
   borderRadius: number
 ];
 
-export type UseBodyOptions = Omit<UseRigidBodyOptions, "shape">;
+export type UseBodyOptions = Omit<RigidBodyOptions, "shape">;
 
 export type RigidBodyTypeString =
   | "fixed"
@@ -113,13 +104,15 @@ export type ColliderShape =
   | "roundConvexMesh";
 
 export type Vector3Array = [x: number, y: number, z: number];
+export type Vector4Array = [x: number, y: number, z: number, w: number];
 export type Boolean3Array = [x: boolean, y: boolean, z: boolean];
+export type Vector3Object = { x: number; y: number; z: number };
 
-export interface UseColliderOptions<ColliderArgs extends Array<unknown>> {
+export interface ColliderOptions<ColliderArgs extends Array<unknown>> {
   /**
    * The optional name passed to THREE's Object3D
    */
-  name?: string,
+  name?: string;
 
   /**
    * The shape of your collider
@@ -248,25 +241,41 @@ export interface UseColliderOptions<ColliderArgs extends Array<unknown>> {
   sensor?: boolean;
 }
 
-export type BaseCollisionPayload = {
+export type CollisionTarget = {
   rigidBody?: RapierRigidBody;
   collider: RapierCollider;
   rigidBodyObject?: Object3D;
   colliderObject?: Object3D;
 };
 
-export type CollisionEnterPayload = BaseCollisionPayload & {
+export type CollisionPayload = {
+  /** the object firing the event */
+  target: CollisionTarget;
+  /** the other object involved in the event */
+  other: CollisionTarget;
+
+  /** deprecated use `payload.other.rigidBody` instead */
+  rigidBody?: RapierRigidBody;
+  /** deprecated use `payload.other.collider` instead */
+  collider: RapierCollider;
+  /** deprecated use `payload.other.rigidBodyObject` instead */
+  rigidBodyObject?: Object3D;
+  /** deprecated use `payload.other.colliderObject` instead */
+  colliderObject?: Object3D;
+};
+
+export type CollisionEnterPayload = CollisionPayload & {
   manifold: TempContactManifold;
   flipped: boolean;
 };
 
-export type CollisionExitPayload = BaseCollisionPayload;
+export type CollisionExitPayload = CollisionPayload;
 
-export type IntersectionEnterPayload = BaseCollisionPayload;
+export type IntersectionEnterPayload = CollisionPayload;
 
-export type IntersectionExitPayload = BaseCollisionPayload;
+export type IntersectionExitPayload = CollisionPayload;
 
-export type ContactForcePayload = BaseCollisionPayload & {
+export type ContactForcePayload = CollisionPayload & {
   totalForce: Vector;
   totalForceMagnitude: number;
   maxForceDirection: Vector;
@@ -287,14 +296,15 @@ export type IntersectionExitHandler = (
 
 export type ContactForceHandler = (payload: ContactForcePayload) => void;
 
-export interface UseRigidBodyOptions extends ColliderProps {
+export interface RigidBodyOptions extends ColliderProps {
   /**
    * Specify the type of this rigid body
    */
   type?: RigidBodyTypeString;
 
-  /** Whether or not this body can sleep.
-   * default: true
+  /**
+   * Whether or not this body can sleep.
+   * @defaultValue true
    */
   canSleep?: boolean;
 
@@ -304,26 +314,28 @@ export interface UseRigidBodyOptions extends ColliderProps {
   /** The angular damping coefficient of this rigid-body.*/
   angularDamping?: number;
 
-  /** The initial linear velocity of this body.
-   * default: zero velocity
+  /**
+   * The initial linear velocity of this body.
+   * @defaultValue [0,0,0]
    */
   linearVelocity?: Vector3Array;
 
-  /** The initial angular velocity of this body.
-   * Default: zero velocity.
+  /**
+   * The initial angular velocity of this body.
+   * @defaultValue [0,0,0]
    */
   angularVelocity?: Vector3Array;
 
   /**
    * The scaling factor applied to the gravity affecting the rigid-body.
-   * Default: 1.0
+   * @defaultValue 1.0
    */
   gravityScale?: number;
 
   /**
    * Whether or not Continous Collision Detection is enabled for this rigid-body.
    * https://rapier.rs/docs/user_guides/javascript/rigid_bodies#continuous-collision-detection
-   * @default false
+   * @defaultValue false
    */
   ccd?: boolean;
 
@@ -405,6 +417,12 @@ export interface UseRigidBodyOptions extends ColliderProps {
    * Include invisible objects on the collider creation estimation.
    */
   includeInvisible?: boolean;
+
+  /**
+   * Transform the RigidBodyState
+   * @internal Do not use. Used internally by the InstancedRigidBodies to alter the RigidBody State
+   */
+  transformState?: (state: RigidBodyState) => RigidBodyState;
 }
 
 // Joints
@@ -415,31 +433,30 @@ export type SphericalJointParams = [
 
 export type FixedJointParams = [
   body1Anchor: Vector3Array,
-  body1LocalFrame: Vector3Array,
+  body1LocalFrame: Vector4Array,
   body2Anchor: Vector3Array,
-  body2LocalFrame: Vector3Array
+  body2LocalFrame: Vector4Array
 ];
 
 export type PrismaticJointParams = [
   body1Anchor: Vector3Array,
   body1LocalFrame: Vector3Array,
   body2Anchor: Vector3Array,
-  body2LocalFrame: Vector3Array
+  body2LocalFrame: Vector3Array,
+  limits?: [min: number, max: number]
 ];
 
 export type RevoluteJointParams = [
   body1Anchor: Vector3Array,
   body2Anchor: Vector3Array,
-  axis: Vector3Array
+  axis: Vector3Array,
+  limits?: [min: number, max: number]
 ];
 
-export type RigidBodyApiRef = MutableRefObject<undefined | null | RigidBodyApi>;
-
-export interface UseImpulseJoint<P> {
-  (body1: RigidBodyApiRef, body2: RigidBodyApiRef, params: P): JointApi;
+export interface UseImpulseJoint<JointParams, JointType extends ImpulseJoint> {
+  (
+    body1: RefObject<RapierRigidBody>,
+    body2: RefObject<RapierRigidBody>,
+    params: JointParams
+  ): RefObject<JointType | undefined>;
 }
-
-export type RigidBodyApi = ReturnType<typeof createRigidBodyApi>;
-export type ColliderApi = ReturnType<typeof createColliderApi>;
-export type WorldApi = ReturnType<typeof createWorldApi>;
-export type JointApi = ReturnType<typeof createJointApi>;
