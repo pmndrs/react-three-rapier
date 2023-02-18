@@ -25,8 +25,10 @@ export interface InstancedRigidBodiesProps extends RigidBodyProps {
   children: ReactNode;
 }
 
+export type InstancedRigidBodiesRef = Map<string|number, RapierRigidBody|null>;
+
 export const InstancedRigidBodies = memo(
-  forwardRef<(RapierRigidBody | null)[], InstancedRigidBodiesProps>(
+  forwardRef<InstancedRigidBodiesRef, InstancedRigidBodiesProps>(
     (props, ref) => {
       const object = useRef<Object3D>(null);
       const instancedWrapper = useRef<Object3D>(null);
@@ -48,9 +50,9 @@ export const InstancedRigidBodies = memo(
 
       const memoColliderNodes = useMemo(()=>colliderNodes || [], [colliderNodes]);
 
-      const rigidBodyApis = useRef(new Map<string|number, RapierRigidBody|null>());
+      const rigidBodyApis = useRef<InstancedRigidBodiesRef>(new Map());
 
-      useImperativeHandle(ref, () => Array.from(rigidBodyApis.current.values()), [instances]);
+      useImperativeHandle(ref, () => rigidBodyApis.current, [instances]);
 
       const childColliderProps = useChildColliderProps(object, {
         ...props,
@@ -133,7 +135,7 @@ export const InstancedRigidBodies = memo(
 InstancedRigidBodies.displayName = "InstancedRigidBodies";
 
 interface InstanceProps extends RigidBodyProps {
-  apis: MutableRefObject<Map<string|number, RapierRigidBody|null>>;
+  apis: MutableRefObject<InstancedRigidBodiesRef>;
   applyInstancedState: (state: RigidBodyState, index: number) => RigidBodyState;
   colliderNodes: ReactNode[];
   childColliderProps: ColliderProps[];

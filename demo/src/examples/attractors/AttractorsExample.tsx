@@ -1,24 +1,19 @@
-import { Box, Html, Sphere } from "@react-three/drei";
-import { useFrame } from "@react-three/fiber";
+import { Html, Sphere } from "@react-three/drei";
 import {
   Attractor,
   InstancedRigidBodies,
   interactionGroups,
   RigidBody
 } from "@react-three/rapier";
-import { RapierRigidBody } from "@react-three/rapier";
-import { createRef, useEffect, useRef } from "react";
 import { Demo } from "../../App";
 
 const BALLS = 100;
 
 export const AttractorExample: Demo = () => {
-  const api = useRef<RapierRigidBody[]>(null);
 
   return (
     <group>
       <InstancedRigidBodies
-        ref={api}
         instances={Array.from({ length: BALLS }, (_, i) => ({
           key: i,
           position: [Math.floor(i / 30) * 1, (i % 30) * 0.5, 0]

@@ -1,7 +1,7 @@
 import { useFrame } from "@react-three/fiber";
 import {
   InstancedRigidBodies,
-  RapierRigidBody,
+  InstancedRigidBodiesRef,
   useRapier,
   vec3
 } from "@react-three/rapier";
@@ -12,7 +12,7 @@ import { Demo } from "../../App";
 const BALLS = 1000;
 
 export const Cluster: Demo = () => {
-  const api = useRef<RapierRigidBody[]>(null);
+  const api = useRef<InstancedRigidBodiesRef>(null);
 
   const { isPaused } = useRapier();
 

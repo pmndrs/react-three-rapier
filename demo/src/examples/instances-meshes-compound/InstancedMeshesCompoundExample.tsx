@@ -1,14 +1,14 @@
 import { ThreeEvent } from "@react-three/fiber";
 import {
   BallCollider,
-  CuboidCollider,
-  Debug,
-  InstancedRigidBodies
+  CuboidCollider, InstancedRigidBodies,
+  InstancedRigidBodiesProps,
+  InstancedRigidBodiesRef,
+  InstancedRigidBodyProps
 } from "@react-three/rapier";
 import { useEffect, useRef } from "react";
-import { useSuzanne } from "../all-shapes/AllShapesExample";
 import { Demo } from "../../App";
-import { RapierRigidBody } from "@react-three/rapier";
+import { useSuzanne } from "../all-shapes/AllShapesExample";
 
 const COUNT = 300;
 
@@ -17,12 +17,26 @@ export const InstancedMeshesCompound: Demo = () => {
     nodes: { Suzanne }
   } = useSuzanne();
 
-  const api = useRef<RapierRigidBody[]>(null);
+  const api = useRef<InstancedRigidBodiesRef>(null);
+
+  const bodies : InstancedRigidBodyProps[] = Array.from({ length: COUNT }).map((_, i) => ({
+    key: i,
+    position: [
+      Math.random() * 20,
+      Math.random() * 20,
+      Math.random() * 20
+    ],
+    rotation: [
+      Math.random() * Math.PI * 2,
+      Math.random() * Math.PI * 2,
+      Math.random() * Math.PI * 2
+    ],
+    scale: [0.5 + Math.random(), 0.5 + Math.random(), 0.5 + Math.random()]
+  }));
 
   const handleClickInstance = (evt: ThreeEvent<MouseEvent>) => {
     if (api.current) {
-      api.current
-        .at(evt.instanceId!)!
+      api.current.get(bodies[evt.instanceId!].key)!
         .applyTorqueImpulse({ x: 0, y: 100, z: 0 }, true);
     }
   };
@@ -30,6 +44,7 @@ export const InstancedMeshesCompound: Demo = () => {
   useEffect(() => {
     if (api.current) {
       api.current.forEach((body) => {
+        if(!body) return;
         body.applyImpulse(
           {
             x: -Math.random() * 5,
@@ -47,20 +62,7 @@ export const InstancedMeshesCompound: Demo = () => {
       <InstancedRigidBodies
         ref={api}
         colliders={false}
-        instances={Array.from({ length: COUNT }).map((_, i) => ({
-          key: i,
-          position: [
-            Math.random() * 20,
-            Math.random() * 20,
-            Math.random() * 20
-          ],
-          rotation: [
-            Math.random() * Math.PI * 2,
-            Math.random() * Math.PI * 2,
-            Math.random() * Math.PI * 2
-          ],
-          scale: [0.5 + Math.random(), 0.5 + Math.random(), 0.5 + Math.random()]
-        }))}
+        instances={bodies}
         colliderNodes={[
           <BallCollider args={[1]} />,
           <BallCollider args={[0.5]} position={[1, 0.3, -0.25]} />,

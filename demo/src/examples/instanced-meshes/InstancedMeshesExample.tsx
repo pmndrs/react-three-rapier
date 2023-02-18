@@ -1,5 +1,6 @@
 import {
   InstancedRigidBodies,
+  InstancedRigidBodiesRef,
   InstancedRigidBodyProps,
   RapierRigidBody
 } from "@react-three/rapier";
@@ -27,7 +28,7 @@ export const InstancedMeshes: Demo = () => {
     nodes: { Suzanne }
   } = useSuzanne();
 
-  const api = useRef<RapierRigidBody[]>([]);
+  const api = useRef<InstancedRigidBodiesRef>(null);
 
   const [bodies, setBodies] = useState<InstancedRigidBodyProps[]>(() =>
     Array.from({
@@ -77,7 +78,7 @@ export const InstancedMeshes: Demo = () => {
           args={[Suzanne.geometry, undefined, MAX_COUNT]}
           count={bodies.length}
           onClick={(evt) => {
-            api.current![evt.instanceId!].applyTorqueImpulse(
+            api.current!.get(bodies[evt.instanceId!].key)!.applyTorqueImpulse(
               {
                 x: 0,
                 y: 50,

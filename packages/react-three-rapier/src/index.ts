@@ -2,7 +2,8 @@ export * from "./types";
 export type { RigidBodyProps } from "./components/RigidBody";
 export type {
   InstancedRigidBodiesProps,
-  InstancedRigidBodyProps
+  InstancedRigidBodyProps,
+  InstancedRigidBodiesRef
 } from "./components/InstancedRigidBodies";
 export type {
   CylinderColliderProps,
