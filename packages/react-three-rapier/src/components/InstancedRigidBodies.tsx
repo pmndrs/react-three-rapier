@@ -1,4 +1,4 @@
-import React, {
+import {
   forwardRef,
   Fragment,
   memo,
@@ -6,16 +6,14 @@ import React, {
   ReactNode,
   useCallback,
   useEffect,
-  useImperativeHandle,
-  useRef
+  useImperativeHandle, useMemo, useRef
 } from "react";
 import { DynamicDrawUsage, InstancedMesh, Object3D } from "three";
+import { useChildColliderProps } from "../hooks/hooks";
+import { RapierRigidBody } from "../types";
 import { AnyCollider, ColliderProps } from "./AnyCollider";
-import { useChildColliderProps, useRapier } from "../hooks/hooks";
 import { RigidBodyState } from "./Physics";
 import { RigidBody, RigidBodyProps } from "./RigidBody";
-import { _matrix4 } from "../utils/shared-objects";
-import { RapierRigidBody } from "../types";
 
 export type InstancedRigidBodyProps = RigidBodyProps & {
   key: string | number;
@@ -36,7 +34,7 @@ export const InstancedRigidBodies = memo(
         // instanced props
         children,
         instances,
-        colliderNodes = [],
+        colliderNodes,
 
         // wrapper object props
         position,
@@ -47,6 +45,8 @@ export const InstancedRigidBodies = memo(
         // rigid body specific props, and r3f-object props
         ...rigidBodyProps
       } = props;
+
+      const memoColliderNodes = useMemo(()=>colliderNodes || [], [colliderNodes]);
 
       const rigidBodyApis = useRef(new Map<string|number, RapierRigidBody|null>());
 
@@ -120,7 +120,7 @@ export const InstancedRigidBodies = memo(
               index={index}
               apis={rigidBodyApis}
               applyInstancedState={applyInstancedState}
-              colliderNodes={colliderNodes}
+              colliderNodes={memoColliderNodes}
               childColliderProps={childColliderProps}
             />
           ))}
@@ -129,6 +129,8 @@ export const InstancedRigidBodies = memo(
     }
   )
 );
+
+InstancedRigidBodies.displayName = "InstancedRigidBodies";
 
 interface InstanceProps extends RigidBodyProps {
   apis: MutableRefObject<Map<string|number, RapierRigidBody|null>>;
