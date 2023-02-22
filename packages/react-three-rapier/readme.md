@@ -758,7 +758,7 @@ const JointedThing = () => {
     [
       [0, 0, 0], // Position of the joint in bodyA's local space    
       [0, 0, 0], // Position of the joint in bodyB's local space
-      [0, 0, 0], // Axis of the joint, expressed in the local-space of the rigid-bodies it is attached to.
+      [0, 1, 0], // Axis of the joint, expressed in the local-space of the rigid-bodies it is attached to. Cannot be [0,0,0].
     ]);
 
   useEffect(() => {
@@ -793,7 +793,7 @@ const JointedThing = () => {
     [
       [0, 0, 0], // Position of the joint in bodyA's local space    
       [0, 0, 0], // Position of the joint in bodyB's local space
-      [0, 0, 0], // Axis of the joint, expressed in the local-space of the rigid-bodies it is attached to.
+      [0, 1, 0], // Axis of the joint, expressed in the local-space of the rigid-bodies it is attached to. Cannot be [0,0,0].
     ]);
 
   return (
