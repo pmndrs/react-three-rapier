@@ -131,7 +131,7 @@ Supported values:
 
 - `"cuboid"`, creates a CuboidCollider based on the bounding box of the mesh
 - `"ball"`, creates a SphereCollider based on the bounding sphere of the mesh
-- `"trimesh"`, creates a TrimeshCollider based on the mesh's geometry -- note trimeshes are massless by default (https://rapier.rs/docs/user_guides/javascript/common_mistakes#rigid-body-isnt-affected-by-gravity)
+- `"trimesh"`, creates a TrimeshCollider based on the mesh's geometry
 - `"hull"`, creates a ConvexHullCollider based on the mesh's geometry
 - `false`, disables auto-generation
 

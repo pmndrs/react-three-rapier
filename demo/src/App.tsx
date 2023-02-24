@@ -134,7 +134,7 @@ export const App = () => {
       }}
     >
       <Suspense fallback="Loading...">
-        <Canvas shadows>
+        <Canvas shadows frameloop="demand">
           <StrictMode>
             <Physics paused={paused} key={physicsKey}>
               <directionalLight

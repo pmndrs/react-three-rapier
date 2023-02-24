@@ -7,7 +7,7 @@ import {
   RigidBodyHandle,
   World
 } from "@dimforge/rapier3d-compat";
-import { useFrame } from "@react-three/fiber";
+import { useThree } from "@react-three/fiber";
 import React, {
   createContext,
   FC,
@@ -43,6 +43,7 @@ import {
   useConst,
   vectorArrayToVector3
 } from "../utils/utils";
+import { useRaf } from "../utils/utils-physics";
 import {
   applyAttractorForceOnRigidBody,
   AttractorState,
@@ -283,6 +284,7 @@ export const Physics: FC<PhysicsProps> = ({
   interpolate = true
 }) => {
   const rapier = useAsset(importRapier);
+  const { invalidate } = useThree();
 
   const worldRef = useRef<World>();
   const getWorldRef = useRef(() => {
@@ -635,13 +637,17 @@ export const Physics: FC<PhysicsProps> = ({
           maxForceMagnitude: event.maxForceMagnitude()
         });
       });
+
+      world.forEachActiveRigidBody((body) => {
+        invalidate();
+      });
     },
     [paused, timeStep, interpolate]
   );
 
-  useFrame((_, dt) => {
+  useRaf((dt) => {
     if (!paused) step(dt);
-  }, updatePriority);
+  });
 
   const context = useMemo<RapierContext>(
     () => ({
