@@ -84,6 +84,7 @@ For full API outline and documentation, see 🧩 [API Docs](https://pmndrs.githu
   - [🖼 Joints Example](#-joints-example)
 - [Advanced hooks usage](#advanced-hooks-usage)
   - [Manual stepping](#manual-stepping)
+  - [On-demand rendering](#on-demand-rendering)
 
 ---
 
@@ -835,3 +836,6 @@ const { step } = useRapier();
 
 step(1 / 60);
 ```
+
+### On-demand rendering
+`@react-three/rapier` runs the physics simulation independently from the render loop, and will tell `@react-three/fiber` to render if the scene has active (non-sleeping) RigidBodies. This allows you to use the `<Canvas frameloop="demand" />` (https://docs.pmnd.rs/react-three-fiber/advanced/scaling-performance#on-demand-rendering) strategy to only render the scene when needed.
