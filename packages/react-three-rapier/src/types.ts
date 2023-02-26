@@ -333,6 +333,14 @@ export interface RigidBodyOptions extends ColliderProps {
   gravityScale?: number;
 
   /**
+   * The dominance group of this RigidBody.  If a rigid body has a higher domiance group,
+   * on collision it will be immune to forces originating from the other bodies.
+   * https://rapier.rs/docs/user_guides/javascript/rigid_bodies#dominance
+   * Default: 0
+   */
+  dominanceGroup?: number;
+
+  /**
    * Whether or not Continous Collision Detection is enabled for this rigid-body.
    * https://rapier.rs/docs/user_guides/javascript/rigid_bodies#continuous-collision-detection
    * @defaultValue false
