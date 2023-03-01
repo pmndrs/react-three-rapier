@@ -12,7 +12,7 @@
     "@react-three/csg": "1.1.5",
     "@react-three/drei": "9.45.0",
     "@react-three/fiber": "8.9.1",
-    "@react-three/rapier": "*",
+    "@react-three/rapier": "0.14.0-rc.0",
     "leva": "0.9.34",
     "r3f-perf": "6.4.2",
     "react": "18.2.0",

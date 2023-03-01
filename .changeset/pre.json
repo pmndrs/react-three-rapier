@@ -5,5 +5,10 @@
     "demo": "0.0.0",
     "@react-three/rapier": "0.13.2"
   },
-  "changesets": []
+  "changesets": [
+    "friendly-adults-flash",
+    "light-garlics-smell",
+    "orange-ghosts-move",
+    "strange-geese-pretend"
+  ]
 }

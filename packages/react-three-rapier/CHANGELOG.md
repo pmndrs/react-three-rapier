@@ -1,5 +1,17 @@
 # @react-three/rapier
 
+## 0.14.0-rc.0
+
+### Minor Changes
+
+- eabf8b1: Add on-demand rendering for usage with the r3f 'demand' frameloop strategy.
+- 4f88218: Add dominance group to RigidBody (@vynetic)
+- eabf8b1: Removes `updatePriority`, as the physics loop now runs independently from the `useFrame`
+
+### Patch Changes
+
+- 6547d0e: Fix tsdoc typo (@balraj-johal)
+
 ## 0.13.2
 
 ### Patch Changes
