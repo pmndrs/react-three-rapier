@@ -46,7 +46,9 @@
     "test": "vitest run",
     "test:ui": "vitest --ui",
     "ts": "cd packages/react-three-rapier && yarn ts",
-    "build:docs": "typedoc --out ./packages/react-three-rapier/docs ./packages/react-three-rapier/src/index.ts --excludeInternal"
+    "build:docs": "typedoc --out ./packages/react-three-rapier/docs ./packages/react-three-rapier/src/index.ts --excludeInternal",
+    "prerelease:enter": "changeset pre enter rc",
+    "prerelease:exit": "changeset pre exit"
   },
   "simple-git-hooks": {
     "commit-msg": "npx --no -- commitlint --edit ${1}",
