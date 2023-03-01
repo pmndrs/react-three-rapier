@@ -7,7 +7,7 @@ import {
   RigidBodyHandle,
   World
 } from "@dimforge/rapier3d-compat";
-import { useFrame } from "@react-three/fiber";
+import { useThree } from "@react-three/fiber";
 import React, {
   createContext,
   FC,
@@ -43,6 +43,7 @@ import {
   useConst,
   vectorArrayToVector3
 } from "../utils/utils";
+import { useRaf } from "../utils/utils-physics";
 import {
   applyAttractorForceOnRigidBody,
   AttractorState,
@@ -253,14 +254,6 @@ export interface PhysicsProps {
   paused?: boolean;
 
   /**
-   * The update priority at which the physics simulation should run.
-   *
-   * @see {@link https://docs.pmnd.rs/react-three-fiber/api/hooks#taking-over-the-render-loop}
-   * @defaultValue undefined
-   */
-  updatePriority?: number;
-
-  /**
    * Interpolate the world transform using the frame delta times.
    * Has no effect if timeStep is set to "vary".
    *
@@ -279,10 +272,10 @@ export const Physics: FC<PhysicsProps> = ({
   children,
   timeStep = 1 / 60,
   paused = false,
-  updatePriority,
   interpolate = true
 }) => {
   const rapier = useAsset(importRapier);
+  const { invalidate } = useThree();
 
   const worldRef = useRef<World>();
   const getWorldRef = useRef(() => {
@@ -635,13 +628,17 @@ export const Physics: FC<PhysicsProps> = ({
           maxForceMagnitude: event.maxForceMagnitude()
         });
       });
+
+      world.forEachActiveRigidBody((body) => {
+        invalidate();
+      });
     },
     [paused, timeStep, interpolate]
   );
 
-  useFrame((_, dt) => {
+  useRaf((dt) => {
     if (!paused) step(dt);
-  }, updatePriority);
+  });
 
   const context = useMemo<RapierContext>(
     () => ({

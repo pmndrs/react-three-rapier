@@ -84,6 +84,7 @@ For full API outline and documentation, see 🧩 [API Docs](https://pmndrs.githu
   - [🖼 Joints Example](#-joints-example)
 - [Advanced hooks usage](#advanced-hooks-usage)
   - [Manual stepping](#manual-stepping)
+  - [On-demand rendering](#on-demand-rendering)
 
 ---
 
@@ -131,7 +132,7 @@ Supported values:
 
 - `"cuboid"`, creates a CuboidCollider based on the bounding box of the mesh
 - `"ball"`, creates a SphereCollider based on the bounding sphere of the mesh
-- `"trimesh"`, creates a TrimeshCollider based on the mesh's geometry -- note trimeshes are massless by default (https://rapier.rs/docs/user_guides/javascript/common_mistakes#rigid-body-isnt-affected-by-gravity)
+- `"trimesh"`, creates a TrimeshCollider based on the mesh's geometry
 - `"hull"`, creates a ConvexHullCollider based on the mesh's geometry
 - `false`, disables auto-generation
 
@@ -835,3 +836,6 @@ const { step } = useRapier();
 
 step(1 / 60);
 ```
+
+### On-demand rendering
+`@react-three/rapier` runs the physics simulation independently from the render loop, and will tell `@react-three/fiber` to render if the scene has active (non-sleeping) RigidBodies. This allows you to use the `<Canvas frameloop="demand" />` (https://docs.pmnd.rs/react-three-fiber/advanced/scaling-performance#on-demand-rendering) strategy to only render the scene when needed.

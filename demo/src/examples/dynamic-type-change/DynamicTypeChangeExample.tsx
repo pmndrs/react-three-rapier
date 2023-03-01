@@ -37,14 +37,11 @@ export const DynamicTypeChangeExample = () => {
       } else {
         const { x, y } = monkee.current?.translation() || { x: 0, y: 0 };
 
-        monkee.current?.setTranslation(
-          {
-            x: x + (mouse.x - s.mouse.x) * 10,
-            y: y + (mouse.y - s.mouse.y) * 10,
-            z: 0
-          },
-          true
-        );
+        monkee.current?.setNextKinematicTranslation({
+          x: x + (mouse.x - s.mouse.x) * 10,
+          y: y + (mouse.y - s.mouse.y) * 10,
+          z: 0
+        });
 
         s.mouse = { x: mouse.x, y: mouse.y };
       }
