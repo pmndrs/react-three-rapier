@@ -412,7 +412,7 @@ export interface RigidBodyOptions extends ColliderProps {
   enabledRotations?: Boolean3Array;
 
   /**
-   * Allow rotation of this rigid-body only along specific axes.
+   * Allow translation of this rigid-body only along specific axes.
    */
   enabledTranslations?: Boolean3Array;
 
