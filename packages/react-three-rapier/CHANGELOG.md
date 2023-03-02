@@ -1,5 +1,11 @@
 # @react-three/rapier
 
+## 0.14.0-rc.1
+
+### Patch Changes
+
+- 1f41278: Fix collision events firing multiple times on RigidBodies
+
 ## 0.14.0-rc.0
 
 ### Minor Changes
