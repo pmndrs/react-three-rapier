@@ -192,7 +192,8 @@ export const useRigidBodyEvents = (
     onCollisionEnter,
     onCollisionExit,
     onIntersectionEnter,
-    onIntersectionExit
+    onIntersectionExit,
+    onContactForce
   } = props;
 
   const eventHandlers = {
@@ -201,7 +202,8 @@ export const useRigidBodyEvents = (
     onCollisionEnter,
     onCollisionExit,
     onIntersectionEnter,
-    onIntersectionExit
+    onIntersectionExit,
+    onContactForce
   };
 
   useEffect(() => {
@@ -217,6 +219,7 @@ export const useRigidBodyEvents = (
     onCollisionEnter,
     onCollisionExit,
     onIntersectionEnter,
-    onIntersectionExit
+    onIntersectionExit,
+    onContactForce
   ]);
 };

@@ -26,8 +26,10 @@ import {
   ConvexHullArgs
 } from "../types";
 import {
+  cleanRigidBodyPropsForCollider,
   createColliderFromOptions,
   createColliderState,
+  getActiveCollisionEventsFromProps,
   useColliderEvents,
   useUpdateColliderOptions
 } from "../utils/utils-collider";
@@ -88,11 +90,19 @@ export const AnyCollider = memo(
     useImperativeHandle(forwardedRef, () => getInstance());
 
     const mergedProps = useMemo(() => {
-      return { ...rigidBodyContext?.options, ...props };
+      return {
+        ...cleanRigidBodyPropsForCollider(rigidBodyContext?.options),
+        ...props
+      };
     }, [props, rigidBodyContext?.options]);
 
     useUpdateColliderOptions(getInstance, mergedProps, colliderStates);
-    useColliderEvents(getInstance, mergedProps, colliderEvents);
+    useColliderEvents(
+      getInstance,
+      mergedProps,
+      colliderEvents,
+      getActiveCollisionEventsFromProps(rigidBodyContext?.options)
+    );
 
     return (
       <object3D
