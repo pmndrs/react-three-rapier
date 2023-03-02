@@ -264,7 +264,7 @@ interface CreateColliderPropsFromChildren {
 
 export const createColliderPropsFromChildren: CreateColliderPropsFromChildren =
   ({ object, ignoreMeshColliders = true, options }): ColliderProps[] => {
-    const colliderProps: ColliderProps[] = [];
+    const childColliderProps: ColliderProps[] = [];
 
     object.updateWorldMatrix(true, false);
     const invertedParentMatrixWorld = object.matrixWorld.clone().invert();
@@ -292,8 +292,8 @@ export const createColliderPropsFromChildren: CreateColliderPropsFromChildren =
           options.colliders || "cuboid"
         );
 
-        colliderProps.push({
-          ...options,
+        const colliderProps: ColliderProps = {
+          ...cleanRigidBodyPropsForCollider(options),
           args: args,
           shape: shape,
           rotation: [rotationEuler.x, rotationEuler.y, rotationEuler.z],
@@ -303,7 +303,9 @@ export const createColliderPropsFromChildren: CreateColliderPropsFromChildren =
             _position.z + offset.z * worldScale.z
           ],
           scale: [worldScale.x, worldScale.y, worldScale.z]
-        });
+        };
+
+        childColliderProps.push(colliderProps);
       }
     };
 
@@ -313,7 +315,7 @@ export const createColliderPropsFromChildren: CreateColliderPropsFromChildren =
       object.traverseVisible(colliderFromChild);
     }
 
-    return colliderProps;
+    return childColliderProps;
   };
 
 export const getColliderArgsFromGeometry = (
@@ -380,10 +382,29 @@ export const getColliderArgsFromGeometry = (
   return { args: [], offset: new Vector3() };
 };
 
+export const getActiveCollisionEventsFromProps = (props?: ColliderProps) => {
+  return {
+    collision: !!(
+      props?.onCollisionEnter ||
+      props?.onCollisionExit ||
+      props?.onIntersectionEnter ||
+      props?.onIntersectionExit
+    ),
+    contactForce: !!props?.onContactForce
+  };
+};
+
 export const useColliderEvents = (
   getCollider: () => Collider,
   props: ColliderProps,
-  events: EventMap
+  events: EventMap,
+  /**
+   * The RigidBody can pass down active events to the collider without attaching the event listners
+   */
+  activeEvents: {
+    collision?: boolean;
+    contactForce?: boolean;
+  } = {}
 ) => {
   const {
     onCollisionEnter,
@@ -397,13 +418,14 @@ export const useColliderEvents = (
     const collider = getCollider();
 
     if (collider) {
-      const hasCollisionEvent = !!(
-        onCollisionEnter ||
-        onCollisionExit ||
-        onIntersectionEnter ||
-        onIntersectionExit
-      );
-      const hasContactForceEvent = !!onContactForce;
+      const {
+        collision: collisionEventsActive,
+        contactForce: contactForceEventsActive
+      } = getActiveCollisionEventsFromProps(props);
+
+      const hasCollisionEvent = collisionEventsActive || activeEvents.collision;
+      const hasContactForceEvent =
+        contactForceEventsActive || activeEvents.contactForce;
 
       if (hasCollisionEvent && hasContactForceEvent) {
         collider.setActiveEvents(
@@ -434,6 +456,28 @@ export const useColliderEvents = (
     onCollisionExit,
     onIntersectionEnter,
     onIntersectionExit,
-    onContactForce
+    onContactForce,
+    activeEvents
   ]);
+};
+
+export const cleanRigidBodyPropsForCollider = (props: RigidBodyProps = {}) => {
+  const {
+    mass,
+    linearDamping,
+    angularDamping,
+    type,
+    onCollisionEnter,
+    onCollisionExit,
+    onIntersectionEnter,
+    onIntersectionExit,
+    onContactForce,
+    children,
+    canSleep,
+    ccd,
+    gravityScale,
+    ...rest
+  } = props;
+
+  return rest;
 };

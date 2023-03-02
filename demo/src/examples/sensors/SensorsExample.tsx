@@ -54,7 +54,9 @@ const Goal = (props: RigidBodyProps) => {
         position={[0, 0, 1]}
         args={[5, 3, 1]}
         sensor
-        onIntersectionEnter={() => setIntersection(true)}
+        onIntersectionEnter={() => {
+          setIntersection(true);
+        }}
         onIntersectionExit={() => setIntersection(false)}
       />
     </RigidBody>
@@ -65,7 +67,7 @@ const Ball = () => {
   const rb = useRef<RapierRigidBody>(null);
 
   const restartBall = () => {
-    rb.current?.setTranslation({ x: 0, y: -7, z: -8 }, true);
+    rb.current?.setTranslation({ x: 0, y: -7, z: -24 }, true);
     rb.current?.setLinvel({ x: 0, y: 0, z: 7 }, true);
   };
 
@@ -82,7 +84,7 @@ const Ball = () => {
   });
 
   return (
-    <RigidBody ref={rb} colliders="ball">
+    <RigidBody ref={rb} colliders="ball" restitution={1.5}>
       <Sphere material={material} castShadow />
     </RigidBody>
   );
