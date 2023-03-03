@@ -1,10 +1,14 @@
-import React, { Suspense, useEffect } from "react";
+import React, { ReactNode, Suspense, useEffect } from "react";
 import ReactThreeTestRenderer from "@react-three/test-renderer";
 import { describe, expect, it, vi } from "vitest";
 import { Physics, useRapier } from "../src";
 import { createRigidBody, TestRigidBody } from "./test-utils";
 
-const Mounter = ({ ready }: { ready: (number) => void }) => {
+const Mounter = ({
+  ready
+}: {
+  ready: (step: (num: number) => void) => void;
+}) => {
   const { step } = useRapier();
 
   useEffect(() => {
@@ -14,12 +18,12 @@ const Mounter = ({ ready }: { ready: (number) => void }) => {
   return null;
 };
 
-const awaitReady = async (children) => {
-  const step = await new Promise<(number) => void>(async (resolve) => {
+const awaitReady = async (children: ReactNode) => {
+  const step = await new Promise<(num: number) => void>(async (resolve) => {
     await ReactThreeTestRenderer.create(
       <Physics paused>
         {children}
-        <Mounter ready={resolve as (number) => void} />
+        <Mounter ready={resolve} />
       </Physics>
     );
   });

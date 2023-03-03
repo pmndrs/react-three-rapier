@@ -302,9 +302,9 @@ describe("colliders", () => {
     it("should mount and unmount a colliders and rigidbodies", async () => {
       type TestSceneResult = {
         world: World;
-        step: (number) => void;
-        setShowCollider: (boolean) => void;
-        setShowRigidBody: (boolean) => void;
+        step: (delta: number) => void;
+        setShowCollider: (flag: boolean) => void;
+        setShowRigidBody: (flag: boolean) => void;
       };
 
       const TestScene = ({
