@@ -5,9 +5,10 @@ import {
   CuboidColliderProps,
   interactionGroups,
   Physics,
-  RapierCollider
+  RigidBody,
+  useRapier
 } from "../src";
-import React, { MutableRefObject, useEffect, useRef } from "react";
+import React, { MutableRefObject, useEffect, useRef, useState } from "react";
 import {
   expect,
   describe,
@@ -17,8 +18,13 @@ import {
   SpyInstance,
   afterEach
 } from "vitest";
-import { Collider, CoefficientCombineRule } from "@dimforge/rapier3d-compat";
+import {
+  Collider,
+  CoefficientCombineRule,
+  World
+} from "@dimforge/rapier3d-compat";
 import { Vector } from "@dimforge/rapier3d-compat/math";
+import { createCollider } from "./test-utils";
 
 type SpyHelper<
   T extends { prototype: Record<string, any> },
@@ -29,49 +35,16 @@ type SpyHelper<
 >;
 
 describe("colliders", () => {
-  const TestComponent = ({
-    ready,
-    ...rest
-  }: { ready: (colliders: Collider) => void } & Pick<
-    CuboidColliderProps,
-    "args"
-  > &
-    Partial<CuboidColliderProps>) => {
-    const ref = useRef() as MutableRefObject<Collider>;
-
-    useEffect(() => {
-      ready(ref.current);
-    }, []);
-
-    return (
-      <>
-        <CuboidCollider ref={ref} {...rest} />
-      </>
-    );
-  };
-
   describe("mutable collider options", () => {
     it(`should have sensor property correctly assigned`, async () => {
       for (let value of [true, false, undefined]) {
         const spy = vi.spyOn(Collider.prototype, "setSensor");
+
         try {
-          const collider = await new Promise<Collider>(
-            async (resolve, reject) => {
-              try {
-                await ReactThreeTestRenderer.create(
-                  <Physics>
-                    <TestComponent
-                      ready={resolve}
-                      args={[1, 2, 3]}
-                      sensor={value}
-                    />
-                  </Physics>
-                );
-              } catch (e) {
-                reject(e);
-              }
-            }
-          );
+          const collider = await createCollider({
+            args: [1, 2, 3],
+            sensor: value
+          });
 
           if (value === undefined) {
             expect(collider.isSensor()).to.equal(false);
@@ -99,23 +72,10 @@ describe("colliders", () => {
         for (let value of interactionGroupsValues) {
           const spy = vi.spyOn(Collider.prototype, "setCollisionGroups");
           try {
-            const collider = await new Promise<Collider>(
-              async (resolve, reject) => {
-                try {
-                  await ReactThreeTestRenderer.create(
-                    <Physics>
-                      <TestComponent
-                        ready={resolve}
-                        args={[1, 2, 3]}
-                        collisionGroups={value}
-                      />
-                    </Physics>
-                  );
-                } catch (e) {
-                  reject(e);
-                }
-              }
-            );
+            const collider = await createCollider({
+              args: [1, 2, 3],
+              collisionGroups: value
+            });
 
             expect(collider.collisionGroups()).to.equal(value);
 
@@ -131,23 +91,10 @@ describe("colliders", () => {
         for (let value of interactionGroupsValues) {
           const spy = vi.spyOn(Collider.prototype, "setSolverGroups");
           try {
-            const collider = await new Promise<Collider>(
-              async (resolve, reject) => {
-                try {
-                  await ReactThreeTestRenderer.create(
-                    <Physics>
-                      <TestComponent
-                        ready={resolve}
-                        args={[1, 2, 3]}
-                        solverGroups={value}
-                      />
-                    </Physics>
-                  );
-                } catch (e) {
-                  reject(e);
-                }
-              }
-            );
+            const collider = await createCollider({
+              args: [1, 2, 3],
+              solverGroups: value
+            });
 
             expect(collider.solverGroups()).to.equal(value);
 
@@ -164,23 +111,10 @@ describe("colliders", () => {
       for (let value of [1, 2, 5]) {
         const spy = vi.spyOn(Collider.prototype, "setFriction");
         try {
-          const collider = await new Promise<Collider>(
-            async (resolve, reject) => {
-              try {
-                await ReactThreeTestRenderer.create(
-                  <Physics>
-                    <TestComponent
-                      ready={resolve}
-                      args={[1, 2, 3]}
-                      friction={value}
-                    />
-                  </Physics>
-                );
-              } catch (e) {
-                reject(e);
-              }
-            }
-          );
+          const collider = await createCollider({
+            args: [1, 2, 3],
+            friction: value
+          });
 
           expect(collider.friction()).to.equal(value);
 
@@ -199,24 +133,12 @@ describe("colliders", () => {
         CoefficientCombineRule.Average
       ]) {
         const spy = vi.spyOn(Collider.prototype, "setFrictionCombineRule");
+
         try {
-          const collider = await new Promise<Collider>(
-            async (resolve, reject) => {
-              try {
-                await ReactThreeTestRenderer.create(
-                  <Physics>
-                    <TestComponent
-                      ready={resolve}
-                      args={[1, 2, 3]}
-                      frictionCombineRule={value}
-                    />
-                  </Physics>
-                );
-              } catch (e) {
-                reject(e);
-              }
-            }
-          );
+          const collider = await createCollider({
+            args: [1, 2, 3],
+            frictionCombineRule: value
+          });
 
           expect(collider.frictionCombineRule()).to.equal(value);
 
@@ -236,23 +158,10 @@ describe("colliders", () => {
       ]) {
         const spy = vi.spyOn(Collider.prototype, "setRestitutionCombineRule");
         try {
-          const collider = await new Promise<Collider>(
-            async (resolve, reject) => {
-              try {
-                await ReactThreeTestRenderer.create(
-                  <Physics>
-                    <TestComponent
-                      ready={resolve}
-                      args={[1, 2, 3]}
-                      restitutionCombineRule={value}
-                    />
-                  </Physics>
-                );
-              } catch (e) {
-                reject(e);
-              }
-            }
-          );
+          const collider = await createCollider({
+            args: [1, 2, 3],
+            restitutionCombineRule: value
+          });
 
           expect(collider.restitutionCombineRule()).to.equal(value);
 
@@ -267,23 +176,10 @@ describe("colliders", () => {
       for (let value of [1, 2, 5]) {
         const spy = vi.spyOn(Collider.prototype, "setRestitution");
         try {
-          const collider = await new Promise<Collider>(
-            async (resolve, reject) => {
-              try {
-                await ReactThreeTestRenderer.create(
-                  <Physics>
-                    <TestComponent
-                      ready={resolve}
-                      args={[1, 2, 3]}
-                      restitution={value}
-                    />
-                  </Physics>
-                );
-              } catch (e) {
-                reject(e);
-              }
-            }
-          );
+          const collider = await createCollider({
+            args: [1, 2, 3],
+            restitution: value
+          });
 
           expect(collider.restitution()).to.equal(value);
 
@@ -318,23 +214,10 @@ describe("colliders", () => {
 
       for (let value of [1, 2, 5, undefined]) {
         it(`should work with value ${value}`, async () => {
-          const collider = await new Promise<Collider>(
-            async (resolve, reject) => {
-              try {
-                await ReactThreeTestRenderer.create(
-                  <Physics>
-                    <TestComponent
-                      ready={resolve}
-                      args={[1, 2, 3]}
-                      mass={value}
-                    />
-                  </Physics>
-                );
-              } catch (e) {
-                reject(e);
-              }
-            }
-          );
+          const collider = await createCollider({
+            args: [1, 2, 3],
+            mass: value
+          });
 
           // Calculated with 1 density if undefined.
           const expectedMassValue = value === undefined ? 48 : value;
@@ -365,24 +248,13 @@ describe("colliders", () => {
       const principalAngularInertia = { x: 0.3, y: 0.2, z: 0.1 };
       const angularInertiaLocalFrame = { w: 1.0, x: 0.0, y: 0.0, z: 0.0 };
 
-      const collider = await new Promise<Collider>(async (resolve, reject) => {
-        try {
-          await ReactThreeTestRenderer.create(
-            <Physics>
-              <TestComponent
-                ready={resolve}
-                args={[1, 2, 3]}
-                massProperties={{
-                  mass: wantedMass,
-                  centerOfMass: centerOfMass,
-                  principalAngularInertia: principalAngularInertia,
-                  angularInertiaLocalFrame: angularInertiaLocalFrame
-                }}
-              />
-            </Physics>
-          );
-        } catch (e) {
-          reject(e);
+      const collider = await createCollider({
+        args: [1, 2, 3],
+        massProperties: {
+          mass: wantedMass,
+          centerOfMass: centerOfMass,
+          principalAngularInertia: principalAngularInertia,
+          angularInertiaLocalFrame: angularInertiaLocalFrame
         }
       });
 
@@ -405,16 +277,9 @@ describe("colliders", () => {
     });
 
     it("should have density property correctly assigned", async () => {
-      const collider = await new Promise<Collider>(async (resolve, reject) => {
-        try {
-          await ReactThreeTestRenderer.create(
-            <Physics>
-              <TestComponent ready={resolve} args={[1, 2, 3]} density={1} />
-            </Physics>
-          );
-        } catch (e) {
-          reject(e);
-        }
+      const collider = await createCollider({
+        args: [1, 2, 3],
+        density: 1
       });
 
       expect(collider.mass()).to.eq(48);
@@ -428,17 +293,93 @@ describe("colliders", () => {
 
   describe("refs", () => {
     it("should be able to get ref to collider", async () => {
-      const ref = React.createRef<RapierCollider>();
+      const collider = await createCollider({ args: [1, 2, 3] });
+      expect(collider).toBeInstanceOf(Collider);
+    });
+  });
+
+  describe("mounting and unmounting", () => {
+    it("should mount and unmount a colliders and rigidbodies", async () => {
+      type TestSceneResult = {
+        world: World;
+        step: (number) => void;
+        setShowCollider: (boolean) => void;
+        setShowRigidBody: (boolean) => void;
+      };
+
+      const TestScene = ({
+        onMount
+      }: {
+        onMount: (result: TestSceneResult) => void;
+      }) => {
+        const { world, step } = useRapier();
+        const [showCollider, setShowCollider] = useState(false);
+        const [showRigidBody, setShowRigidBody] = useState(false);
+
+        useEffect(() => {
+          onMount({
+            step,
+            world: world.raw(),
+            setShowCollider,
+            setShowRigidBody
+          });
+        }, []);
+
+        return (
+          <group>
+            {showRigidBody && (
+              <RigidBody>
+                <CuboidCollider args={[1, 1, 1]} />
+                <CuboidCollider args={[1, 1, 1]} position={[1, 1, 1]} />
+              </RigidBody>
+            )}
+            {showCollider && <ConeCollider args={[1, 2]} />}
+          </group>
+        );
+      };
+
+      const { world, step, setShowCollider, setShowRigidBody } =
+        await new Promise<TestSceneResult>((resolve) => {
+          ReactThreeTestRenderer.create(
+            <Physics paused>
+              <TestScene onMount={resolve} />
+            </Physics>
+          );
+        });
+
+      expect(world.colliders.len()).to.equal(0);
 
       await ReactThreeTestRenderer.act(async () => {
-        await ReactThreeTestRenderer.create(
-          <Physics>
-            <ConeCollider ref={ref} args={[1, 2]} />
-          </Physics>
-        );
+        step(1 / 60);
+        setShowCollider(true);
       });
 
-      expect(ref.current).to.be.instanceOf(Collider);
+      expect(world.colliders.len()).to.equal(1);
+      expect(world.bodies.len()).to.equal(0);
+
+      await ReactThreeTestRenderer.act(async () => {
+        step(1 / 60);
+        setShowRigidBody(true);
+      });
+
+      expect(world.colliders.len()).to.equal(3);
+      expect(world.bodies.len()).to.equal(1);
+
+      await ReactThreeTestRenderer.act(async () => {
+        step(1 / 60);
+        setShowCollider(false);
+      });
+
+      expect(world.colliders.len()).to.equal(2);
+      expect(world.bodies.len()).to.equal(1);
+
+      await ReactThreeTestRenderer.act(async () => {
+        step(1 / 60);
+        setShowRigidBody(false);
+      });
+
+      expect(world.colliders.len()).to.equal(0);
+      expect(world.bodies.len()).to.equal(0);
     });
   });
 });
