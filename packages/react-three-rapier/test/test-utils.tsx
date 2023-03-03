@@ -18,7 +18,7 @@ export const pause = (ms: number) =>
 export const UseRapierMounter = ({
   ready
 }: {
-  ready: (RapierContext) => void;
+  ready: (context: RapierContext) => void;
 }) => {
   const result = useRapier();
 
