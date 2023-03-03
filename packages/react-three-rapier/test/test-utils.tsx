@@ -6,17 +6,33 @@ import {
   Physics,
   RapierRigidBody,
   RigidBodyProps,
-  RigidBody
+  RigidBody,
+  RapierContext,
+  useRapier
 } from "../src";
 import ReactThreeTestRenderer from "@react-three/test-renderer";
+
+export const pause = (ms: number) =>
+  new Promise((resolve) => setTimeout(resolve, ms));
+
+export const UseRapierMounter = ({
+  ready
+}: {
+  ready: (RapierContext) => void;
+}) => {
+  const result = useRapier();
+
+  useEffect(() => {
+    ready(result);
+  }, []);
+
+  return null;
+};
 
 export const TestCollider = ({
   ready,
   ...rest
-}: { ready: (colliders: Collider) => void } & Pick<
-  CuboidColliderProps,
-  "args"
-> &
+}: { ready: (collider: Collider) => void } & Pick<CuboidColliderProps, "args"> &
   Partial<CuboidColliderProps>) => {
   const ref = useRef() as MutableRefObject<Collider>;
 

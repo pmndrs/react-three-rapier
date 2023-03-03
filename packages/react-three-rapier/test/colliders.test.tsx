@@ -1,11 +1,14 @@
 import ReactThreeTestRenderer from "@react-three/test-renderer";
 import {
+  ConeCollider,
   CuboidCollider,
   CuboidColliderProps,
   interactionGroups,
-  Physics
+  Physics,
+  RigidBody,
+  useRapier
 } from "../src";
-import React, { MutableRefObject, useEffect, useRef } from "react";
+import React, { MutableRefObject, useEffect, useRef, useState } from "react";
 import {
   expect,
   describe,
@@ -15,7 +18,11 @@ import {
   SpyInstance,
   afterEach
 } from "vitest";
-import { Collider, CoefficientCombineRule } from "@dimforge/rapier3d-compat";
+import {
+  Collider,
+  CoefficientCombineRule,
+  World
+} from "@dimforge/rapier3d-compat";
 import { Vector } from "@dimforge/rapier3d-compat/math";
 import { createCollider } from "./test-utils";
 
@@ -288,6 +295,91 @@ describe("colliders", () => {
     it("should be able to get ref to collider", async () => {
       const collider = await createCollider({ args: [1, 2, 3] });
       expect(collider).toBeInstanceOf(Collider);
+    });
+  });
+
+  describe("mounting and unmounting", () => {
+    it("should mount and unmount a colliders and rigidbodies", async () => {
+      type TestSceneResult = {
+        world: World;
+        step: (number) => void;
+        setShowCollider: (boolean) => void;
+        setShowRigidBody: (boolean) => void;
+      };
+
+      const TestScene = ({
+        onMount
+      }: {
+        onMount: (result: TestSceneResult) => void;
+      }) => {
+        const { world, step } = useRapier();
+        const [showCollider, setShowCollider] = useState(false);
+        const [showRigidBody, setShowRigidBody] = useState(false);
+
+        useEffect(() => {
+          onMount({
+            step,
+            world: world.raw(),
+            setShowCollider,
+            setShowRigidBody
+          });
+        }, []);
+
+        return (
+          <group>
+            {showRigidBody && (
+              <RigidBody>
+                <CuboidCollider args={[1, 1, 1]} />
+                <CuboidCollider args={[1, 1, 1]} position={[1, 1, 1]} />
+              </RigidBody>
+            )}
+            {showCollider && <ConeCollider args={[1, 2]} />}
+          </group>
+        );
+      };
+
+      const { world, step, setShowCollider, setShowRigidBody } =
+        await new Promise<TestSceneResult>((resolve) => {
+          ReactThreeTestRenderer.create(
+            <Physics paused>
+              <TestScene onMount={resolve} />
+            </Physics>
+          );
+        });
+
+      expect(world.colliders.len()).to.equal(0);
+
+      await ReactThreeTestRenderer.act(async () => {
+        step(1 / 60);
+        setShowCollider(true);
+      });
+
+      expect(world.colliders.len()).to.equal(1);
+      expect(world.bodies.len()).to.equal(0);
+
+      await ReactThreeTestRenderer.act(async () => {
+        step(1 / 60);
+        setShowRigidBody(true);
+      });
+
+      expect(world.colliders.len()).to.equal(3);
+      expect(world.bodies.len()).to.equal(1);
+
+      await ReactThreeTestRenderer.act(async () => {
+        step(1 / 60);
+        setShowCollider(false);
+      });
+
+      expect(world.colliders.len()).to.equal(2);
+      expect(world.bodies.len()).to.equal(1);
+
+      await ReactThreeTestRenderer.act(async () => {
+        step(1 / 60);
+        setShowRigidBody(false);
+      });
+
+      expect(world.colliders.len()).to.equal(0);
+      expect(world.bodies.len()).to.equal(0);
     });
   });
 });
