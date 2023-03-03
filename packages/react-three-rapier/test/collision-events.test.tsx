@@ -88,4 +88,28 @@ describe("collision events", () => {
       expect(contactForceFn).toBeCalledTimes(1);
     });
   });
+
+  describe("contact forces and collisions", () => {
+    it("should trigger a contact force event", async () => {
+      const callbackFn = vi.fn();
+
+      const step = await awaitReady(
+        <>
+          <TestRigidBody
+            position={[0, 1.1, 0]}
+            onContactForce={callbackFn}
+            onCollisionEnter={callbackFn}
+            linearVelocity={[0, -2, 0]}
+          />
+          <TestRigidBody />
+        </>
+      );
+
+      await ReactThreeTestRenderer.act(async () => {
+        step(1 / 60);
+      });
+
+      expect(callbackFn).toBeCalledTimes(2);
+    });
+  });
 });
