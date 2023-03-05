@@ -1,5 +1,11 @@
 # @react-three/rapier
 
+## 0.14.0-rc.2
+
+### Minor Changes
+
+- 92423f1: Allow users to control if the update loop runs independently or on useFrame
+
 ## 0.14.0-rc.1
 
 ### Patch Changes
