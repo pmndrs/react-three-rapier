@@ -1,5 +1,11 @@
 # @react-three/rapier
 
+## 0.14.0-rc.3
+
+### Patch Changes
+
+- 668659f: Fix missing React import
+
 ## 0.14.0-rc.2
 
 ### Minor Changes
