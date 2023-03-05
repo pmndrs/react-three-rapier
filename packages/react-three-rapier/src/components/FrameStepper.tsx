@@ -1,5 +1,5 @@
 import { useFrame } from "@react-three/fiber";
-import { memo } from "react";
+import React, { memo } from "react";
 import { useRaf } from "../utils/utils-physics";
 import { PhysicsProps } from "./Physics";
 
