@@ -23,7 +23,7 @@ export const StutteringExample: Demo = () => {
       pos.y += 15;
       pos.z += 15;
       camera.position.lerp(pos, 0.04);
-      camera.lookAt(bodyModel.current?.getWorldPosition(vec3()));
+      camera.lookAt(bodyModel.current?.getWorldPosition(vec3())!);
     }
   });
 

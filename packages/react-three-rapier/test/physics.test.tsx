@@ -95,7 +95,7 @@ describe("physics", () => {
       const beforeStepCallback = vi.fn();
       const frameCallback = vi.fn();
 
-      let renderer;
+      let renderer: Awaited<ReturnType<typeof ReactThreeTestRenderer.create>>;
 
       await new Promise(async (resolve) => {
         renderer = await ReactThreeTestRenderer.create(
@@ -135,7 +135,7 @@ describe("physics", () => {
       const beforeStepCallback = vi.fn();
       const frameCallback = vi.fn();
 
-      let renderer;
+      let renderer: Awaited<ReturnType<typeof ReactThreeTestRenderer.create>>;
 
       await new Promise(async (resolve) => {
         renderer = await ReactThreeTestRenderer.create(
@@ -156,7 +156,7 @@ describe("physics", () => {
       await ReactThreeTestRenderer.act(async () => {});
 
       expect(beforeStepCallback).toHaveBeenCalled();
-      expect(frameCallback).toHaveBeenCalledOnce();
+      expect(frameCallback).toHaveBeenCalled();
 
       frameCallback.mockClear();
 

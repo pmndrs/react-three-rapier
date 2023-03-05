@@ -266,7 +266,7 @@ export interface PhysicsProps {
    * The update priority at which the physics simulation should run.
    * Only used when `updateLoop` is set to "follow".
    *
-   * @see {@link https://docs.pmnd.rs/react-three-fiber/api/hooks#taking-over-the-render-loop}
+   * @see https://docs.pmnd.rs/react-three-fiber/api/hooks#taking-over-the-render-loop
    * @defaultValue undefined
    */
   updatePriority?: number;
@@ -275,15 +275,15 @@ export interface PhysicsProps {
    * Set the update loop strategy for the physics world.
    *
    * If set to "follow", the physics world will be stepped
-   * in the same loop as the render loop as managed by @react-three/fiber.
+   * in a `useFrame` callback, managed by @react-three/fiber.
+   * You can use `updatePriority` prop to manage the scheduling.
    *
    * If set to "independent", the physics world will be stepped
    * in a separate loop, not tied to the render loop.
-   *
    * This is useful when using the "demand" `frameloop` strategy for the
    * @react-three/fiber `<Canvas />`.
    *
-   *
+   * @see https://docs.pmnd.rs/react-three-fiber/advanced/scaling-performance#on-demand-rendering
    * @defaultValue "follow"
    */
   updateLoop?: "follow" | "independent";
