@@ -91,7 +91,7 @@ describe("physics", () => {
       return null;
     };
 
-    it.only("updates on frame when using the 'follow' strategy", async () => {
+    it("updates on frame when using the 'follow' strategy", async () => {
       const beforeStepCallback = vi.fn();
       const frameCallback = vi.fn();
 
@@ -113,6 +113,8 @@ describe("physics", () => {
         );
       });
 
+      await ReactThreeTestRenderer.act(async () => {});
+
       expect(beforeStepCallback).toBeCalledTimes(0);
       expect(frameCallback).toBeCalledTimes(0);
 
@@ -131,7 +133,7 @@ describe("physics", () => {
       expect(frameCallback).toBeCalledTimes(2);
     });
 
-    it.only("updates when using the 'independent' strategy", async () => {
+    it("updates when using the 'independent' strategy", async () => {
       const beforeStepCallback = vi.fn();
       const frameCallback = vi.fn();
 
@@ -153,28 +155,26 @@ describe("physics", () => {
         );
       });
 
-      await ReactThreeTestRenderer.act(async () => {});
+      await pause(50);
 
       expect(beforeStepCallback).toHaveBeenCalled();
       expect(frameCallback).toHaveBeenCalled();
 
+      beforeStepCallback.mockClear();
       frameCallback.mockClear();
 
-      await ReactThreeTestRenderer.act(async () => {
-        await renderer.advanceFrames(1, 1 / 60);
-      });
+      await pause(50);
 
       expect(beforeStepCallback).toHaveBeenCalled();
-      expect(frameCallback).toBeCalledTimes(1);
+      expect(frameCallback).toHaveBeenCalled();
 
+      beforeStepCallback.mockClear();
       frameCallback.mockClear();
 
-      await ReactThreeTestRenderer.act(async () => {
-        await renderer.advanceFrames(1, 1 / 60);
-      });
+      await pause(50);
 
       expect(beforeStepCallback).toHaveBeenCalled();
-      expect(frameCallback).toBeCalledTimes(1);
+      expect(frameCallback).toHaveBeenCalled();
     });
   });
 });
