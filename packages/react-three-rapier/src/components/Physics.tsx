@@ -7,7 +7,7 @@ import {
   RigidBodyHandle,
   World
 } from "@dimforge/rapier3d-compat";
-import { useThree } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 import React, {
   createContext,
   FC,
@@ -49,6 +49,7 @@ import {
   AttractorState,
   AttractorStateMap
 } from "./Attractor";
+import FrameStepper from "./FrameStepper";
 
 export interface RigidBodyState {
   meshType: "instancedMesh" | "mesh";
@@ -260,6 +261,32 @@ export interface PhysicsProps {
    * @defaultValue true
    **/
   interpolate?: boolean;
+
+  /**
+   * The update priority at which the physics simulation should run.
+   * Only used when `updateLoop` is set to "follow".
+   *
+   * @see https://docs.pmnd.rs/react-three-fiber/api/hooks#taking-over-the-render-loop
+   * @defaultValue undefined
+   */
+  updatePriority?: number;
+
+  /**
+   * Set the update loop strategy for the physics world.
+   *
+   * If set to "follow", the physics world will be stepped
+   * in a `useFrame` callback, managed by @react-three/fiber.
+   * You can use `updatePriority` prop to manage the scheduling.
+   *
+   * If set to "independent", the physics world will be stepped
+   * in a separate loop, not tied to the render loop.
+   * This is useful when using the "demand" `frameloop` strategy for the
+   * @react-three/fiber `<Canvas />`.
+   *
+   * @see https://docs.pmnd.rs/react-three-fiber/advanced/scaling-performance#on-demand-rendering
+   * @defaultValue "follow"
+   */
+  updateLoop?: "follow" | "independent";
 }
 
 /**
@@ -272,7 +299,9 @@ export const Physics: FC<PhysicsProps> = ({
   children,
   timeStep = 1 / 60,
   paused = false,
-  interpolate = true
+  interpolate = true,
+  updatePriority,
+  updateLoop = "follow"
 }) => {
   const rapier = useAsset(importRapier);
   const { invalidate } = useThree();
@@ -629,16 +658,12 @@ export const Physics: FC<PhysicsProps> = ({
         });
       });
 
-      world.forEachActiveRigidBody((body) => {
+      world.forEachActiveRigidBody(() => {
         invalidate();
       });
     },
     [paused, timeStep, interpolate]
   );
-
-  useRaf((dt) => {
-    if (!paused) step(dt);
-  });
 
   const context = useMemo<RapierContext>(
     () => ({
@@ -661,7 +686,23 @@ export const Physics: FC<PhysicsProps> = ({
     [paused, step]
   );
 
+  const stepCallback = useCallback(
+    (delta: number) => {
+      if (!paused) {
+        step(delta);
+      }
+    },
+    [paused, step]
+  );
+
   return (
-    <rapierContext.Provider value={context}>{children}</rapierContext.Provider>
+    <rapierContext.Provider value={context}>
+      <FrameStepper
+        onStep={stepCallback}
+        type={updateLoop}
+        updatePriority={updatePriority}
+      />
+      {children}
+    </rapierContext.Provider>
   );
 };

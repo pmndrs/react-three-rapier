@@ -838,4 +838,14 @@ step(1 / 60);
 ```
 
 ### On-demand rendering
-`@react-three/rapier` runs the physics simulation independently from the render loop, and will tell `@react-three/fiber` to render if the scene has active (non-sleeping) RigidBodies. This allows you to use the `<Canvas frameloop="demand" />` (https://docs.pmnd.rs/react-three-fiber/advanced/scaling-performance#on-demand-rendering) strategy to only render the scene when needed.
+By default `@react-three/rapier` will update the physics simulation when a frame renders. This is fine for most cases, but if you want to only render the scene when things have changed, you need to run the physics simulation independently from the render loop.
+
+- See https://docs.pmnd.rs/react-three-fiber/advanced/scaling-performance#on-demand-rendering, for info on on-demand rendering in `@react-tree/fiber`.
+
+Setting `<Physics updateLoop="independent" />` will make the physics simulation run in it's own `requestAnimationFrame` loop, and call `invalidate` on the canvas only when there are active (moving) bodies.
+
+```tsx
+<Canvas frameloop="demand">
+  <Physics updateLoop="independent">...</Physics>
+</Canvas>
+```
