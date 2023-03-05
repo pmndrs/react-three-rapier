@@ -36,6 +36,7 @@ import { Transforms } from "./examples/transforms/TransformsExample";
 import { LockedTransformsExample } from "./examples/locked-transforms/LockedTransformsExample";
 import { PerformanceExample } from "./examples/performance/PeformanceExample";
 import { DynamicTypeChangeExample } from "./examples/dynamic-type-change/DynamicTypeChangeExample";
+import { StutteringExample } from "./examples/stuttering/StutteringExample";
 
 const demoContext = createContext<{
   setDebug?(f: boolean): void;
@@ -110,13 +111,15 @@ const routes: Record<string, ReactNode> = {
   "manual-step": <ManualStepExample />,
   "locked-transforms": <LockedTransformsExample />,
   performance: <PerformanceExample />,
-  "dynamic-type-changes": <DynamicTypeChangeExample />
+  "dynamic-type-changes": <DynamicTypeChangeExample />,
+  stuttering: <StutteringExample />
 };
 
 export const App = () => {
   const [debug, setDebug] = useState<boolean>(false);
   const [perf, setPerf] = useState<boolean>(false);
   const [paused, setPaused] = useState<boolean>(false);
+  const [interpolate, setInterpolate] = useState<boolean>(true);
   const [physicsKey, setPhysicsKey] = useState<number>(0);
   const [cameraEnabled, setCameraEnabled] = useState<boolean>(true);
 
@@ -136,7 +139,7 @@ export const App = () => {
       <Suspense fallback="Loading...">
         <Canvas shadows>
           <StrictMode>
-            <Physics paused={paused} key={physicsKey}>
+            <Physics paused={paused} key={physicsKey} interpolate={interpolate}>
               <directionalLight
                 castShadow
                 position={[10, 10, 10]}
@@ -205,6 +208,11 @@ export const App = () => {
           label="Paused"
           value={paused}
           onClick={() => setPaused((v) => !v)}
+        />
+        <ToggleButton
+          label="Interpolate"
+          value={interpolate}
+          onClick={() => setInterpolate((v) => !v)}
         />
         <ToggleButton label="Reset" value={false} onClick={updatePhysicsKey} />
       </div>
