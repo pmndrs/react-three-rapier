@@ -1,5 +1,20 @@
 # @react-three/rapier
 
+## 0.14.0
+
+### Minor Changes
+
+- eabf8b1: Add on-demand rendering for usage with the r3f 'demand' frameloop strategy.
+- 4f88218: Add dominance group to RigidBody (@vynetic)
+- 6ddace8: Update @dimforge/rapier3d-compat to 0.11.2
+- 92423f1: Allow users to control if the update loop runs independently or on useFrame
+
+### Patch Changes
+
+- 668659f: Fix missing React import
+- 6547d0e: Fix tsdoc typo (@balraj-johal)
+- 1f41278: Fix collision events firing multiple times on RigidBodies
+
 ## 0.14.0-rc.4
 
 ### Minor Changes
