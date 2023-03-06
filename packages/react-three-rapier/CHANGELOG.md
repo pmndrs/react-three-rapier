@@ -1,5 +1,11 @@
 # @react-three/rapier
 
+## 0.14.0-rc.4
+
+### Minor Changes
+
+- 6ddace8: Update @dimforge/rapier3d-compat to 0.11.2
+
 ## 0.14.0-rc.3
 
 ### Patch Changes
