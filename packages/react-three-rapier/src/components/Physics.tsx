@@ -43,13 +43,8 @@ import {
   useConst,
   vectorArrayToVector3
 } from "../utils/utils";
-import { useRaf } from "../utils/utils-physics";
-import {
-  applyAttractorForceOnRigidBody,
-  AttractorState,
-  AttractorStateMap
-} from "./Attractor";
 import FrameStepper from "./FrameStepper";
+import { Debug } from "./Debug";
 
 export interface RigidBodyState {
   meshType: "instancedMesh" | "mesh";
@@ -109,12 +104,6 @@ export interface RapierContext {
   colliderEvents: EventMap;
 
   /**
-   * Used by the world to keep track of Attractor states
-   * @internal
-   */
-  attractorStates: AttractorStateMap;
-
-  /**
    * Default options for rigid bodies and colliders
    * @internal
    */
@@ -160,6 +149,11 @@ export interface RapierContext {
    * ```
    */
   step: (deltaTime: number) => void;
+
+  /**
+   * Is debug mode enabled
+   */
+  isDebug: boolean;
 }
 
 export const rapierContext = createContext<RapierContext | undefined>(
@@ -287,6 +281,12 @@ export interface PhysicsProps {
    * @defaultValue "follow"
    */
   updateLoop?: "follow" | "independent";
+
+  /**
+   * Enable debug rendering of the physics world.
+   * @defaultValue false
+   */
+  debug?: boolean;
 }
 
 /**
@@ -301,7 +301,8 @@ export const Physics: FC<PhysicsProps> = ({
   paused = false,
   interpolate = true,
   updatePriority,
-  updateLoop = "follow"
+  updateLoop = "follow",
+  debug = false
 }) => {
   const rapier = useAsset(importRapier);
   const { invalidate } = useThree();
@@ -320,7 +321,6 @@ export const Physics: FC<PhysicsProps> = ({
   const rigidBodyEvents = useConst<EventMap>(() => new Map());
   const colliderEvents = useConst<EventMap>(() => new Map());
   const eventQueue = useConst(() => new EventQueue(false));
-  const attractorStates = useConst<AttractorStateMap>(() => new Map());
   const beforeStepCallbacks = useConst<WorldStepCallbackSet>(() => new Set());
   const afterStepCallbacks = useConst<WorldStepCallbackSet>(() => new Set());
 
@@ -409,13 +409,6 @@ export const Physics: FC<PhysicsProps> = ({
       const clampedDelta = MathUtils.clamp(dt, 0, 0.2);
 
       const stepWorld = () => {
-        // Apply attractors
-        world.forEachRigidBody((body) => {
-          attractorStates.forEach((attractorState) => {
-            applyAttractorForceOnRigidBody(body, attractorState);
-          });
-        });
-
         // Trigger beforeStep callbacks
         beforeStepCallbacks.forEach((callback) => {
           callback.current(api);
@@ -677,13 +670,13 @@ export const Physics: FC<PhysicsProps> = ({
       colliderStates,
       rigidBodyEvents,
       colliderEvents,
-      attractorStates,
       beforeStepCallbacks,
       afterStepCallbacks,
       isPaused: paused,
+      isDebug: debug,
       step
     }),
-    [paused, step]
+    [paused, step, debug, colliders, gravity]
   );
 
   const stepCallback = useCallback(
@@ -702,6 +695,7 @@ export const Physics: FC<PhysicsProps> = ({
         type={updateLoop}
         updatePriority={updatePriority}
       />
+      {debug && <Debug />}
       {children}
     </rapierContext.Provider>
   );

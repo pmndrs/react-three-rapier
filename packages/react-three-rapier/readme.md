@@ -32,14 +32,12 @@ const App = () => {
   return (
     <Canvas>
       <Suspense>
-        <Physics>
+        <Physics debug>
           <RigidBody colliders={"hull"} restitution={2}>
             <Torus />
           </RigidBody>
 
           <CuboidCollider position={[0, -2, 0]} args={[20, .5, 20]} />
-
-          <Debug />
         </Physics>
       </Suspense>
     </Canvas>
@@ -334,17 +332,15 @@ const Scene = () => {
 
 ## Debug
 
-Use the Debug component to see live representations of all colliders in a scene, using the live debug buffer from the physics engine.
+Set the `debug` prop on `<Physics />` to see live representations of all colliders in a scene, using the live debug buffer from the physics engine.
 
 ```tsx
 import { Box, Sphere } from "@react-three/drei";
-import { RigidBody, Debug } from "@react-three/rapier";
+import { RigidBody } from "@react-three/rapier";
 
 const Scene = () => {
   return (
-    <Physics>
-      <Debug />
-
+    <Physics debug>
       <RigidBody>
         <Box />
       </RigidBody>

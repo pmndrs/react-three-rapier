@@ -1,7 +1,6 @@
 import { Box, Html, Sphere } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import {
-  Attractor,
   InstancedRigidBodies,
   interactionGroups,
   RigidBody
@@ -9,6 +8,7 @@ import {
 import { RapierRigidBody } from "@react-three/rapier";
 import { createRef, useEffect, useRef } from "react";
 import { Demo } from "../../App";
+import { Attractor } from "@react-three/rapier-addons";
 
 const BALLS = 100;
 
@@ -45,7 +45,7 @@ export const AttractorExample: Demo = () => {
         <Attractor strength={4} collisionGroups={interactionGroups(1, 2)} />
       </RigidBody>
 
-      <group position={[20, 0, 0]}>
+      {/* <group position={[20, 0, 0]}>
         <Attractor range={20} strength={-2} />
         <Html>Repeller</Html>
       </group>
@@ -53,7 +53,7 @@ export const AttractorExample: Demo = () => {
       <group position={[-20, 0, 0]}>
         <Attractor range={20} strength={10} />
         <Html>Attractor</Html>
-      </group>
+      </group> */}
     </group>
   );
 };

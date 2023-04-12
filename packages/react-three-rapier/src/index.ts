@@ -23,20 +23,13 @@ export type {
   WorldStepCallback
 } from "./components/Physics";
 export type { MeshColliderProps } from "./components/MeshCollider";
-export type {
-  AttractorProps,
-  AttractorGravityType
-} from "./components/Attractor";
-
 export type { WorldApi } from "./utils/api";
 
 export { Physics } from "./components/Physics";
 export { RigidBody } from "./components/RigidBody";
 export { MeshCollider } from "./components/MeshCollider";
-export { Debug } from "./components/Debug";
 export { InstancedRigidBodies } from "./components/InstancedRigidBodies";
 export * from "./components/AnyCollider";
-export { Attractor } from "./components/Attractor";
 
 export * from "./hooks/joints";
 export {

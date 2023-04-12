@@ -1,6 +1,6 @@
 import { Box, Environment, OrbitControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
-import { Debug, Physics, RigidBody, useRapier } from "@react-three/rapier";
+import { Physics, RigidBody, useRapier } from "@react-three/rapier";
 import { Perf } from "r3f-perf";
 import {
   createContext,
@@ -139,7 +139,12 @@ export const App = () => {
       <Suspense fallback="Loading...">
         <Canvas shadows>
           <StrictMode>
-            <Physics paused={paused} key={physicsKey} interpolate={interpolate}>
+            <Physics
+              paused={paused}
+              key={physicsKey}
+              interpolate={interpolate}
+              debug={debug}
+            >
               <directionalLight
                 castShadow
                 position={[10, 10, 10]}
@@ -170,7 +175,6 @@ export const App = () => {
 
               <Floor />
 
-              {debug && <Debug />}
               {perf && <Perf />}
             </Physics>
           </StrictMode>
