@@ -4,7 +4,7 @@
   "initialVersions": {
     "demo": "0.0.0",
     "@react-three/rapier": "0.14.0",
-    "@react-three/rapier-addons": "1.0.0"
+    "@react-three/rapier-addons": "0.1.0"
   },
   "changesets": []
 }

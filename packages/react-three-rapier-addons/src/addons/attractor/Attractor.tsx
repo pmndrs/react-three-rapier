@@ -147,10 +147,6 @@ export const Attractor: FC<AttractorProps> = memo((props) => {
   const object = useRef<Object3D>(null);
   const { isDebug } = useRapier();
 
-  useEffect(() => {
-    console.log("is debuug", isDebug);
-  }, [isDebug]);
-
   useBeforePhysicsStep((world) => {
     if (object.current) {
       world.raw().bodies.forEach((body) => {
