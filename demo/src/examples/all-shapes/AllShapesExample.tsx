@@ -6,7 +6,6 @@ import {
   ConeCollider,
   ConvexHullCollider,
   CuboidCollider,
-  Debug,
   RigidBody,
   TrimeshCollider
 } from "@react-three/rapier";

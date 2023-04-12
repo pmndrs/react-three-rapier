@@ -2,7 +2,6 @@ import { ThreeEvent } from "@react-three/fiber";
 import {
   BallCollider,
   CuboidCollider,
-  Debug,
   InstancedRigidBodies
 } from "@react-three/rapier";
 import { useEffect, useRef } from "react";

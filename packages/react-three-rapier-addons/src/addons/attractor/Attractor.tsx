@@ -64,8 +64,6 @@ export interface AttractorState
   collisionGroups?: InteractionGroups;
 }
 
-export type AttractorStateMap = Map<Object3D["uuid"], AttractorState>;
-
 const calcForceByType = {
   static: (s: number, m2: number, r: number, d: number, G: number) => s,
   linear: (s: number, m2: number, r: number, d: number, G: number) =>
