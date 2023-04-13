@@ -12,7 +12,7 @@ import { AttractorState } from "./Attractor";
 
 const _v3 = new Vector3();
 
-export const AttractorHelper = (
+export const AttractorDebugHelper = (
   props: AttractorState & {
     object: RefObject<Object3D>;
   }

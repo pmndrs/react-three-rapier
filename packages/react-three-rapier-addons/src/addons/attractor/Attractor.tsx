@@ -11,7 +11,7 @@ import {
   _vector3
 } from "@react-three/rapier/src/utils/shared-objects";
 import { Object3DProps } from "@react-three/fiber";
-import { AttractorHelper } from "./AttractorDebugHelper";
+import { AttractorDebugHelper } from "./AttractorDebugHelper";
 
 export type AttractorGravityType = "static" | "linear" | "newtonian";
 
@@ -166,7 +166,7 @@ export const Attractor: FC<AttractorProps> = memo((props) => {
     <>
       <object3D ref={object} position={position} />
       {isDebug && (
-        <AttractorHelper
+        <AttractorDebugHelper
           strength={strength}
           gravitationalConstant={gravitationalConstant}
           range={range}

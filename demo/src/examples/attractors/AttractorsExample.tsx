@@ -45,7 +45,7 @@ export const AttractorExample: Demo = () => {
         <Attractor strength={4} collisionGroups={interactionGroups(1, 2)} />
       </RigidBody>
 
-      {/* <group position={[20, 0, 0]}>
+      <group position={[20, 0, 0]}>
         <Attractor range={20} strength={-2} />
         <Html>Repeller</Html>
       </group>
@@ -53,7 +53,7 @@ export const AttractorExample: Demo = () => {
       <group position={[-20, 0, 0]}>
         <Attractor range={20} strength={10} />
         <Html>Attractor</Html>
-      </group> */}
+      </group>
     </group>
   );
 };
