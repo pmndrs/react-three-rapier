@@ -1,10 +1,17 @@
 import React from "react";
 import { InteractionGroups, RigidBody } from "@dimforge/rapier3d-compat";
-import { useRapier } from "../hooks/hooks";
+import {
+  useBeforePhysicsStep,
+  useRapier
+} from "@react-three/rapier/src/hooks/hooks";
 import { FC, memo, useEffect, useRef } from "react";
 import { Object3D, Vector3 } from "three";
-import { _position, _vector3 } from "../utils/shared-objects";
+import {
+  _position,
+  _vector3
+} from "@react-three/rapier/src/utils/shared-objects";
 import { Object3DProps } from "@react-three/fiber";
+import { AttractorDebugHelper } from "./AttractorDebugHelper";
 
 export type AttractorGravityType = "static" | "linear" | "newtonian";
 
@@ -54,11 +61,8 @@ export interface AttractorProps {
 
 export interface AttractorState
   extends Required<Omit<AttractorProps, "position" | "collisionGroups">> {
-  object: Object3D;
   collisionGroups?: InteractionGroups;
 }
-
-export type AttractorStateMap = Map<Object3D["uuid"], AttractorState>;
 
 const calcForceByType = {
   static: (s: number, m2: number, r: number, d: number, G: number) => s,
@@ -77,7 +81,9 @@ export const applyAttractorForceOnRigidBody = (
     gravitationalConstant,
     collisionGroups,
     type
-  }: AttractorState
+  }: AttractorState & {
+    object: Object3D;
+  }
 ) => {
   const rbPosition = rigidBody.translation();
   _position.set(rbPosition.x, rbPosition.y, rbPosition.z);
@@ -136,27 +142,39 @@ export const Attractor: FC<AttractorProps> = memo((props) => {
     gravitationalConstant = 6.673e-11,
     collisionGroups
   } = props;
-  const { attractorStates } = useRapier();
   const object = useRef<Object3D>(null);
+  const { isDebug } = useRapier();
 
-  useEffect(() => {
-    let uuid = object.current?.uuid || "_";
-
+  useBeforePhysicsStep((world) => {
     if (object.current) {
-      attractorStates.set(uuid, {
-        object: object.current,
-        strength,
-        range,
-        type,
-        gravitationalConstant,
-        collisionGroups
+      world.raw().bodies.forEach((body) => {
+        if (body.isDynamic()) {
+          applyAttractorForceOnRigidBody(body, {
+            object: object.current!,
+            strength,
+            range,
+            type,
+            gravitationalConstant,
+            collisionGroups
+          });
+        }
       });
     }
+  });
 
-    return () => {
-      attractorStates.delete(uuid);
-    };
-  }, [props]);
-
-  return <object3D ref={object} position={position} />;
+  return (
+    <>
+      <object3D ref={object} position={position} />
+      {isDebug && (
+        <AttractorDebugHelper
+          strength={strength}
+          gravitationalConstant={gravitationalConstant}
+          range={range}
+          type={type}
+          collisionGroups={collisionGroups}
+          object={object}
+        />
+      )}
+    </>
+  );
 });

@@ -21,6 +21,7 @@ For available APIs, see <a href="https://pmndrs.github.io/react-three-rapier/">�
 
 The goal of this library to is to provide a fast physics engine with minimal friction and small, straight forward API.
 
+<!-- omit from toc -->
 ## Basic Usage
 
 ```tsx
@@ -32,14 +33,12 @@ const App = () => {
   return (
     <Canvas>
       <Suspense>
-        <Physics>
+        <Physics debug>
           <RigidBody colliders={"hull"} restitution={2}>
             <Torus />
           </RigidBody>
 
           <CuboidCollider position={[0, -2, 0]} args={[20, .5, 20]} />
-
-          <Debug />
         </Physics>
       </Suspense>
     </Canvas>
@@ -49,17 +48,16 @@ const App = () => {
 
 ---
 
+<!-- omit from toc -->
 ## 📝 Readme note
 Below follows a guide on core concepts for `react-three/rapier`.  
 For full API outline and documentation, see 🧩 [API Docs](https://pmndrs.github.io/react-three-rapier/).
 
 ---
 
+<!-- omit from toc -->
 ## Readme Topics
 
-- [Basic Usage](#basic-usage)
-- [📝 Readme note](#-readme-note)
-- [Readme Topics](#readme-topics)
 - [The Physics Component](#the-physics-component)
 - [The RigidBody Component](#the-rigidbody-component)
 - [Automatic Colliders](#automatic-colliders)
@@ -73,8 +71,6 @@ For full API outline and documentation, see 🧩 [API Docs](https://pmndrs.githu
 - [Contact force events](#contact-force-events)
 - [Sensors](#sensors)
   - [🖼 Sensors Example](#-sensors-example)
-- [Attractors](#attractors)
-  - [🖼 Attractors Example](#-attractors-example)
 - [Configuring Time Step Size](#configuring-time-step-size)
 - [Joints](#joints)
   - [Fixed Joint](#fixed-joint)
@@ -334,17 +330,15 @@ const Scene = () => {
 
 ## Debug
 
-Use the Debug component to see live representations of all colliders in a scene, using the live debug buffer from the physics engine.
+Set the `debug` prop on `<Physics />` to see live representations of all colliders in a scene, using the live debug buffer from the physics engine.
 
 ```tsx
 import { Box, Sphere } from "@react-three/drei";
-import { RigidBody, Debug } from "@react-three/rapier";
+import { RigidBody } from "@react-three/rapier";
 
 const Scene = () => {
   return (
-    <Physics>
-      <Debug />
-
+    <Physics debug>
       <RigidBody>
         <Box />
       </RigidBody>
@@ -604,45 +598,6 @@ To detect when a collider enters or leaves another collider, you can use the `on
 
 ### 🖼 Sensors Example
 <a href="https://codesandbox.io/s/react-three-rapier-sensors-byjmsk"><img src="https://raw.githubusercontent.com/pmndrs/react-three-rapier/HEAD/packages/react-three-rapier/misc/example-sensors.jpg" width="240" /></a>
-
-## Attractors
-
-An attractor simulates a source of gravity. Any `RigidBody` within range will be _pulled_ (attracted) toward the attractor.  
-Setting the `strength` to a negative value will cause the `RigidBody` to be _pushed_ (repelled) away from the attractor.
-
-The force applied to rigid-bodies within range is calculated differently depending on the `type`.
-
-🧩 See [Attractor docs](https://pmndrs.github.io/react-three-rapier/interfaces/AttractorProps.html) for all available props.
-
-```tsx
-// Standard attractor
-<Attractor range={10} strength={5} type="linear" position={[5, -5, 0]} />
-
-// An attractor with negative strength, repels RigidBodies
-<Attractor range={10} strength={-5} position={[5, -5, 0]} />
-
-// You can also assign InteractionGroups.
-// An attractor belonging to group 0 only affecting bodies in group 2, and 3
-<Attractor range={10} strength={10} position={[5, -5, 0]} collisionGroups={interactionGroups(0, [2,3])} />
-```
-
-Gravity types:
-
-- "static" (Default)  
-  Static gravity means that the same force (`strength`) is applied on all rigid-bodies within range, regardless of distance.
-
-- "linear"  
-  Linear gravity means that force is calculated as `strength * distance / range`. That means the force applied decreases the farther a rigid-body is from the attractor position.
-
-- "newtonian"  
-  Newtonian gravity uses the traditional method of calculating gravitational force (`F = GMm/r^2`) and as such force is calculated as `gravitationalConstant * mass1 * mass2 / Math.pow(distance, 2)`.
-  - `gravitationalConstant` defaults to 6.673e-11 but you can provide your own
-  - `mass1` here is the "mass" of the Attractor, which is just the `strength` property
-  - `mass2` is the mass of the rigid-body at the time of calculation. Note that rigid-bodies with colliders will use the mass provided to the collider. This is not a value you can control from the attractor, only from wherever you're creating rigid-body components in the scene.
-  - `distance` is the distance between the attractor and rigid-body at the time of calculation
-
-### 🖼 Attractors Example
-<a href="https://codesandbox.io/s/react-three-rapier-attractors-oyj640"><img src="https://raw.githubusercontent.com/pmndrs/react-three-rapier/HEAD/packages/react-three-rapier/misc/example-attractors.jpg" width="240" /></a>
 
 ## Configuring Time Step Size
 

@@ -1,11 +1,6 @@
 import { Box, Sphere } from "@react-three/drei";
-import {
-  CuboidCollider,
-  Debug,
-  RigidBody,
-  RigidBodyAutoCollider
-} from "@react-three/rapier";
-import { useEffect, useRef } from "react";
+import { RigidBody } from "@react-three/rapier";
+import { useRef } from "react";
 import { Group } from "three";
 import { Demo } from "../../App";
 

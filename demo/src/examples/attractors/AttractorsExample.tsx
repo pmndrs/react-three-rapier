@@ -1,7 +1,6 @@
 import { Box, Html, Sphere } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import {
-  Attractor,
   InstancedRigidBodies,
   interactionGroups,
   RigidBody
@@ -9,6 +8,7 @@ import {
 import { RapierRigidBody } from "@react-three/rapier";
 import { createRef, useEffect, useRef } from "react";
 import { Demo } from "../../App";
+import { Attractor } from "@react-three/rapier-addons";
 
 const BALLS = 100;
 

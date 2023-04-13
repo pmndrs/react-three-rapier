@@ -7,7 +7,7 @@ import {
   RigidBodyOptions,
   useSphericalJoint
 } from "@react-three/rapier";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { Demo } from "../../App";
 
 const Rod = (props: RigidBodyOptions) => {
@@ -22,6 +22,7 @@ const Rod = (props: RigidBodyOptions) => {
   return (
     <group>
       <RigidBody ref={anchor} {...props} />
+
       <RigidBody ref={rod} {...props} colliders={false}>
         <Cylinder
           scale={[0.05, 2, 0.05]}
