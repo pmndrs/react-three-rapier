@@ -1,15 +1,8 @@
 import React from "react";
 import { InteractionGroups, RigidBody } from "@dimforge/rapier3d-compat";
-import {
-  useBeforePhysicsStep,
-  useRapier
-} from "@react-three/rapier/src/hooks/hooks";
-import { FC, memo, useEffect, useRef } from "react";
+import { useBeforePhysicsStep, useRapier } from "@react-three/rapier";
+import { FC, memo, useRef } from "react";
 import { Object3D, Vector3 } from "three";
-import {
-  _position,
-  _vector3
-} from "@react-three/rapier/src/utils/shared-objects";
 import { Object3DProps } from "@react-three/fiber";
 import { AttractorDebugHelper } from "./AttractorDebugHelper";
 
@@ -71,6 +64,9 @@ const calcForceByType = {
   newtonian: (s: number, m2: number, r: number, d: number, G: number) =>
     (G * s * m2) / Math.pow(d, 2)
 };
+
+const _position = new Vector3();
+const _vector3 = new Vector3();
 
 export const applyAttractorForceOnRigidBody = (
   rigidBody: RigidBody,
