@@ -1,5 +1,11 @@
 # @react-three/rapier-addons
 
+## 1.0.0-canary.1
+
+### Patch Changes
+
+- 97d82c5: Fix broken imports from source instead of package
+
 ## 1.0.0-canary.0
 
 ### Major Changes
