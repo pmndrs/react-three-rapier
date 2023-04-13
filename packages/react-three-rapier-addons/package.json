@@ -1,6 +1,6 @@
 {
   "name": "@react-three/rapier-addons",
-  "version": "1.0.0-canary.0",
+  "version": "1.0.0-canary.1",
   "main": "dist/react-three-rapier-addons.cjs.js",
   "module": "dist/react-three-rapier-addons.esm.js",
   "license": "MIT",
