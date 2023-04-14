@@ -1,5 +1,12 @@
 # @react-three/rapier
 
+## 0.15.0
+
+### Minor Changes
+
+- 3d8f152: Removes the `<Debug />` component, in favor of setting `debug={true}` on the `<Physics />` component instead
+- 3d8f152: Move `<Attractor />` to @react-three/rapier-addons
+
 ## 0.15.0-canary.0
 
 ### Minor Changes
