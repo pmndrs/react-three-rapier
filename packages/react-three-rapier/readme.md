@@ -654,10 +654,14 @@ const JointedThing = () => {
     bodyA,
     bodyB,
     [
-      [0, 0, 0], // Position of the joint in bodyA's local space
-      [0, 0, 0, 1], // Orientation of the joint in bodyA's local space
-      [0, 0, 0], // Position of the joint in bodyB's local space
-      [0, 0, 0, 1], // Orientation of the joint in bodyB's local space
+      // Position of the joint in bodyA's local space
+      [0, 0, 0], 
+      // Orientation of the joint in bodyA's local space
+      [0, 0, 0, 1], 
+      // Position of the joint in bodyB's local space
+      [0, 0, 0], 
+       // Orientation of the joint in bodyB's local space
+      [0, 0, 0, 1],
     ]);
 
   return (
@@ -684,8 +688,10 @@ const JointedThing = () => {
     bodyA,
     bodyB,
     [
-      [0, 0, 0], // Position of the joint in bodyA's local space
-      [0, 0, 0], // Position of the joint in bodyB's local space
+      // Position of the joint in bodyA's local space
+      [0, 0, 0], 
+      // Position of the joint in bodyB's local space
+      [0, 0, 0], 
     ]);
 
   return (
@@ -712,16 +718,14 @@ const JointedThing = () => {
     bodyA,
     bodyB,
     [
-      [0, 0, 0], // Position of the joint in bodyA's local space    
-      [0, 0, 0], // Position of the joint in bodyB's local space
-      [0, 1, 0], // Axis of the joint, expressed in the local-space of the rigid-bodies it is attached to. Cannot be [0,0,0].
+      // Position of the joint in bodyA's local space    
+      [0, 0, 0], 
+      // Position of the joint in bodyB's local space
+      [0, 0, 0], 
+      // Axis of the joint, expressed in the local-space of 
+      // the rigid-bodies it is attached to. Cannot be [0,0,0].
+      [0, 1, 0], 
     ]);
-
-  useEffect(() => {
-    if (joint.current) {
-
-    }
-  }, [])
 
   return (
     <group>
@@ -747,9 +751,13 @@ const JointedThing = () => {
     bodyA,
     bodyB,
     [
-      [0, 0, 0], // Position of the joint in bodyA's local space    
-      [0, 0, 0], // Position of the joint in bodyB's local space
-      [0, 1, 0], // Axis of the joint, expressed in the local-space of the rigid-bodies it is attached to. Cannot be [0,0,0].
+      // Position of the joint in bodyA's local space    
+      [0, 0, 0], 
+      // Position of the joint in bodyB's local space
+      [0, 0, 0], 
+      // Axis of the joint, expressed in the local-space of 
+      // the rigid-bodies it is attached to. Cannot be [0,0,0].
+      [0, 1, 0], 
     ]);
 
   return (
