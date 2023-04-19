@@ -27,7 +27,7 @@ The goal of this library to is to provide a fast physics engine with minimal fri
 ```tsx
 import { Box, Torus } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
-import { Physics, RigidBody, Debug } from "@react-three/rapier";
+import { Physics, RigidBody, Debug, CuboidCollider } from "@react-three/rapier";
 
 const App = () => {
   return (
