@@ -4,7 +4,7 @@ import {
   SphericalImpulseJoint,
   RevoluteImpulseJoint,
   PrismaticImpulseJoint
-} from "@dimforge/rapier3d-compat";
+} from "@dimforge/rapier3d";
 import React, {
   useRef,
   useEffect,
@@ -24,7 +24,7 @@ import {
 } from "..";
 import { vectorArrayToVector3, tupleToObject } from "../utils/utils";
 
-import type Rapier from "@dimforge/rapier3d-compat";
+import type Rapier from "@dimforge/rapier3d";
 import { useImperativeInstance } from "./use-imperative-instance";
 
 /**

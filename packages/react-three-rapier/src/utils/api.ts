@@ -8,7 +8,7 @@ import {
   RigidBody,
   RigidBodyDesc,
   World
-} from "@dimforge/rapier3d-compat";
+} from "@dimforge/rapier3d";
 import { Quaternion, Vector3 } from "three";
 import { RefGetter, RigidBodyTypeString, Vector3Object } from "../types";
 

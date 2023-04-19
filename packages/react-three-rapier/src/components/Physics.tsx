@@ -1,4 +1,4 @@
-import type Rapier from "@dimforge/rapier3d-compat";
+import type Rapier from "@dimforge/rapier3d";
 import {
   Collider,
   ColliderHandle,
@@ -6,7 +6,7 @@ import {
   RigidBody,
   RigidBodyHandle,
   World
-} from "@dimforge/rapier3d-compat";
+} from "@dimforge/rapier3d";
 import { useFrame, useThree } from "@react-three/fiber";
 import React, {
   createContext,
@@ -198,9 +198,7 @@ const getCollisionPayloadFromSource = (
 });
 
 const importRapier = async () => {
-  let r = await import("@dimforge/rapier3d-compat");
-  await r.init();
-  return r;
+  return await import("@dimforge/rapier3d");
 };
 
 export type EventMapValue = {

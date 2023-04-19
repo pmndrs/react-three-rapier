@@ -3,7 +3,7 @@ import {
   ColliderDesc,
   ActiveEvents,
   RigidBody
-} from "@dimforge/rapier3d-compat";
+} from "@dimforge/rapier3d";
 import { MutableRefObject, useEffect, useMemo } from "react";
 import { BufferGeometry, Euler, Mesh, Object3D, Vector3 } from "three";
 import { mergeVertices } from "three-stdlib";

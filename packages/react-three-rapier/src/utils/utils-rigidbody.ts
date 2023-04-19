@@ -1,4 +1,4 @@
-import { RigidBody, RigidBodyDesc } from "@dimforge/rapier3d-compat";
+import { RigidBody, RigidBodyDesc } from "@dimforge/rapier3d";
 import React, { MutableRefObject, useEffect, useMemo } from "react";
 import { Matrix4, Object3D, Vector3 } from "three";
 import { Boolean3Array, RigidBodyProps, Vector3Array } from "..";

@@ -1,4 +1,4 @@
-import { Collider } from "@dimforge/rapier3d-compat";
+import { Collider } from "@dimforge/rapier3d";
 import React, { useRef, MutableRefObject, useEffect } from "react";
 import {
   CuboidColliderProps,

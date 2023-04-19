@@ -2,13 +2,12 @@ import ReactThreeTestRenderer from "@react-three/test-renderer";
 import {
   ConeCollider,
   CuboidCollider,
-  CuboidColliderProps,
   interactionGroups,
   Physics,
   RigidBody,
   useRapier
 } from "../src";
-import React, { MutableRefObject, useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   expect,
   describe,
@@ -18,12 +17,9 @@ import {
   SpyInstance,
   afterEach
 } from "vitest";
-import {
-  Collider,
-  CoefficientCombineRule,
-  World
-} from "@dimforge/rapier3d-compat";
-import { Vector } from "@dimforge/rapier3d-compat/math";
+const { Collider, CoefficientCombineRule } = await import("@dimforge/rapier3d");
+import type { World } from "@dimforge/rapier3d";
+import type { Vector } from "@dimforge/rapier3d/math";
 import { createCollider } from "./test-utils";
 
 type SpyHelper<

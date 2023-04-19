@@ -1,5 +1,5 @@
 import React from "react";
-import { InteractionGroups, RigidBody } from "@dimforge/rapier3d-compat";
+import { InteractionGroups, RigidBody } from "@dimforge/rapier3d";
 import { useBeforePhysicsStep, useRapier } from "@react-three/rapier";
 import { FC, memo, useRef } from "react";
 import { Object3D, Vector3 } from "three";

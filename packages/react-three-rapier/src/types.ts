@@ -7,14 +7,14 @@ import {
   InteractionGroups,
   RigidBody as RapierRigidBody,
   TempContactManifold
-} from "@dimforge/rapier3d-compat";
-import { Rotation, Vector } from "@dimforge/rapier3d-compat/math";
+} from "@dimforge/rapier3d";
+import { Rotation, Vector } from "@dimforge/rapier3d/math";
 import { Object3DProps } from "@react-three/fiber";
 import { Object3D } from "three";
 import { ColliderProps } from ".";
 import { RigidBodyState } from "./components/Physics";
 
-export { CoefficientCombineRule as CoefficientCombineRule } from "@dimforge/rapier3d-compat";
+export { CoefficientCombineRule as CoefficientCombineRule } from "@dimforge/rapier3d";
 export { RapierRigidBody, RapierCollider };
 
 export type RefGetter<T> = MutableRefObject<() => T | undefined>;

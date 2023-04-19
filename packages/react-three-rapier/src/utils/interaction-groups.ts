@@ -1,4 +1,4 @@
-import { InteractionGroups } from "@dimforge/rapier3d-compat";
+import { InteractionGroups } from "@dimforge/rapier3d";
 
 /**
  * Calculates an InteractionGroup bitmask for use in the `collisionGroups` or `solverGroups`
