@@ -1,5 +1,11 @@
 # @react-three/rapier
 
+## 0.15.1
+
+### Patch Changes
+
+- 35ee03b: Loosen peer deps in attempt to solve npm install conflicts
+
 ## 0.15.0
 
 ### Minor Changes
