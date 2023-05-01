@@ -5,7 +5,8 @@ import { useEffect, useMemo, useRef } from "react";
  */
 export const useImperativeInstance = <InstanceType>(
   createFn: () => InstanceType,
-  destroyFn: (instance: InstanceType) => void
+  destroyFn: (instance: InstanceType) => void,
+  dependencyList: any[] = []
 ) => {
   const ref = useRef<InstanceType>();
 
@@ -17,17 +18,19 @@ export const useImperativeInstance = <InstanceType>(
 
       return ref.current;
     },
-    []
+    dependencyList
   );
 
   useEffect(() => {
+    // Save the destroy function and instance
     const instance = refGetter();
+    const destroy = () => destroyFn(instance);
 
     return () => {
-      destroyFn(instance);
+      destroy();
       ref.current = undefined;
     };
-  }, []);
+  }, dependencyList);
 
   return refGetter;
 };

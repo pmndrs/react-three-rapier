@@ -2,34 +2,7 @@ import React, { ReactNode, Suspense, useEffect } from "react";
 import ReactThreeTestRenderer from "@react-three/test-renderer";
 import { describe, expect, it, vi } from "vitest";
 import { Physics, useRapier } from "../src";
-import { createRigidBody, TestRigidBody } from "./test-utils";
-
-const Mounter = ({
-  ready
-}: {
-  ready: (step: (num: number) => void) => void;
-}) => {
-  const { step } = useRapier();
-
-  useEffect(() => {
-    ready(step);
-  }, []);
-
-  return null;
-};
-
-const awaitReady = async (children: ReactNode) => {
-  const step = await new Promise<(num: number) => void>(async (resolve) => {
-    await ReactThreeTestRenderer.create(
-      <Physics paused>
-        {children}
-        <Mounter ready={resolve} />
-      </Physics>
-    );
-  });
-
-  return step;
-};
+import { awaitReady, createRigidBody, TestRigidBody } from "./test-utils";
 
 describe("collision events", () => {
   describe("collisions", () => {
