@@ -2,6 +2,7 @@ import { Box, Sphere } from "@react-three/drei";
 import {
   CapsuleCollider,
   CollisionEnterHandler,
+  HeightfieldArgs,
   HeightfieldCollider,
   interactionGroups,
   RigidBody,
@@ -82,12 +83,6 @@ const Collisioner = (
     ({ manifold, other, target }) => {
       setColor("red");
 
-      // console.log(
-      //   target.rigidBodyObject?.name,
-      //   "collided with",
-      //   other.rigidBodyObject?.name
-      // );
-
       const contact = manifold?.solverContactPoint(0) as {
         x: number;
         y: number;
@@ -121,6 +116,17 @@ const Collisioner = (
     </RigidBody>
   );
 };
+
+const heightFieldArgs: HeightfieldArgs = [
+  heightFieldWidth - 1,
+  heightFieldWidth - 1,
+  heightField,
+  {
+    x: heightFieldWidth,
+    y: 1,
+    z: heightFieldWidth
+  }
+];
 
 const Collisioners = memo(() => {
   return (
@@ -189,18 +195,7 @@ const Collisioners = memo(() => {
               <meshPhysicalMaterial side={2} color={color} />
             </mesh>
 
-            <HeightfieldCollider
-              args={[
-                heightFieldWidth - 1,
-                heightFieldWidth - 1,
-                heightField,
-                {
-                  x: heightFieldWidth,
-                  y: 1,
-                  z: heightFieldWidth
-                }
-              ]}
-            />
+            <HeightfieldCollider args={heightFieldArgs} />
           </>
         )}
       </Collisioner>

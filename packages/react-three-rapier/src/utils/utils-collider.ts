@@ -138,7 +138,7 @@ const mutableColliderOptions: MutableColliderOptions = {
   restitutionCombineRule: (collider, value) => {
     collider.setRestitutionCombineRule(value);
   },
-  // To make sure the options all mutalbe options are listed
+  // To make sure the options all mutable options are listed
   quaternion: () => {},
   position: () => {},
   rotation: () => {},
@@ -224,7 +224,7 @@ export const useUpdateColliderOptions = (
   useEffect(() => {
     const collider = getCollider();
     setColliderOptions(collider, props, states);
-  }, mutablePropsAsFlatArray);
+  }, [...mutablePropsAsFlatArray, getCollider]);
 };
 
 const isChildOfMeshCollider = (child: Mesh) => {

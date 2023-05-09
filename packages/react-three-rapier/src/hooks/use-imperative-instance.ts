@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 
 /**
  * Initiate an instance and return a safe getter
@@ -10,7 +10,7 @@ export const useImperativeInstance = <InstanceType>(
 ) => {
   const ref = useRef<InstanceType>();
 
-  const refGetter = useMemo(
+  const getInstance = useMemo(
     () => () => {
       if (!ref.current) {
         ref.current = createFn();
@@ -21,9 +21,9 @@ export const useImperativeInstance = <InstanceType>(
     dependencyList
   );
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     // Save the destroy function and instance
-    const instance = refGetter();
+    const instance = getInstance();
     const destroy = () => destroyFn(instance);
 
     return () => {
@@ -32,5 +32,5 @@ export const useImperativeInstance = <InstanceType>(
     };
   }, dependencyList);
 
-  return refGetter;
+  return getInstance;
 };

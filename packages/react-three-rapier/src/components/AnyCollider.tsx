@@ -30,6 +30,7 @@ import {
   createColliderFromOptions,
   createColliderState,
   getActiveCollisionEventsFromProps,
+  immutableColliderOptions,
   useColliderEvents,
   useUpdateColliderOptions
 } from "../utils/utils-collider";
@@ -51,6 +52,11 @@ export const AnyCollider = memo(
     const rigidBodyContext = useRigidBodyContext();
     const ref = useRef<Object3D>(null);
 
+    // We spread the props out here to make sure that the ref is updated when the props change.
+    const immutablePropArray = immutableColliderOptions.flatMap((key) =>
+      Array.isArray(props[key]) ? [...props[key]] : props[key]
+    );
+
     const getInstance = useImperativeInstance(
       () => {
         const worldScale = ref.current!.getWorldScale(vec3());
@@ -66,7 +72,8 @@ export const AnyCollider = memo(
       },
       (collider) => {
         world.removeCollider(collider);
-      }
+      },
+      immutablePropArray
     );
 
     useEffect(() => {
@@ -84,9 +91,9 @@ export const AnyCollider = memo(
       return () => {
         colliderStates.delete(collider.handle);
       };
-    }, []);
+    }, immutablePropArray);
 
-    useImperativeHandle(forwardedRef, () => getInstance());
+    useImperativeHandle(forwardedRef, () => getInstance(), [getInstance]);
 
     const mergedProps = useMemo(() => {
       return {

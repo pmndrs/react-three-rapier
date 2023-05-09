@@ -9,7 +9,7 @@ const catcher =
       [
         "Multiple instances of Three.js being imported.",
         "was not wrapped in act(...)"
-      ].some((m) => args[0]?.includes(m))
+      ].some((m) => args[0]?.includes?.(m))
     ) {
       return;
     }

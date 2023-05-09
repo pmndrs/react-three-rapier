@@ -16,7 +16,8 @@ import {
   rigidBodyDescFromOptions,
   createRigidBodyState,
   useUpdateRigidBodyOptions,
-  useRigidBodyEvents
+  useRigidBodyEvents,
+  immutableRigidBodyOptions
 } from "../utils/utils-rigidbody";
 import { useImperativeInstance } from "../hooks/use-imperative-instance";
 
@@ -65,6 +66,12 @@ export const RigidBody = memo(
 
     const childColliderProps = useChildColliderProps(ref, mergedOptions);
 
+    const immutablePropArray = immutableRigidBodyOptions.flatMap((key) => {
+      return Array.isArray(mergedOptions[key])
+        ? [...mergedOptions[key]]
+        : mergedOptions[key];
+    });
+
     // Provide a way to eagerly create rigidbody
     const getInstance = useImperativeInstance(
       () => {
@@ -75,7 +82,8 @@ export const RigidBody = memo(
       },
       (rigidBody) => {
         world.removeRigidBody(rigidBody);
-      }
+      },
+      immutablePropArray
     );
 
     // Only provide a object state after the ref has been set
@@ -95,12 +103,12 @@ export const RigidBody = memo(
       return () => {
         rigidBodyStates.delete(rigidBody.handle);
       };
-    }, []);
+    }, immutablePropArray);
 
     useUpdateRigidBodyOptions(getInstance, mergedOptions, rigidBodyStates);
     useRigidBodyEvents(getInstance, mergedOptions, rigidBodyEvents);
 
-    useImperativeHandle(forwardedRef, () => getInstance());
+    useImperativeHandle(forwardedRef, () => getInstance(), [getInstance]);
 
     const contextValue = useMemo(() => {
       return {
