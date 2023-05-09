@@ -91,7 +91,7 @@ export const AnyCollider = memo(
       return () => {
         colliderStates.delete(collider.handle);
       };
-    }, immutablePropArray);
+    }, [getInstance]);
 
     useImperativeHandle(forwardedRef, () => getInstance(), [getInstance]);
 

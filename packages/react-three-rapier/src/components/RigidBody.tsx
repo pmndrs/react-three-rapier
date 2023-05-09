@@ -103,7 +103,7 @@ export const RigidBody = memo(
       return () => {
         rigidBodyStates.delete(rigidBody.handle);
       };
-    }, immutablePropArray);
+    }, [getInstance]);
 
     useUpdateRigidBodyOptions(getInstance, mergedOptions, rigidBodyStates);
     useRigidBodyEvents(getInstance, mergedOptions, rigidBodyEvents);
@@ -116,7 +116,7 @@ export const RigidBody = memo(
         getRigidBody: getInstance,
         options: mergedOptions
       };
-    }, [mergedOptions]);
+    }, [mergedOptions, getInstance]);
 
     return (
       <RigidBodyContext.Provider value={contextValue}>
