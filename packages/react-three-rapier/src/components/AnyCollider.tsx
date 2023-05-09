@@ -40,7 +40,6 @@ export interface ColliderProps extends ColliderOptions<any> {
   children?: ReactNode;
 }
 
-// Colliders
 /**
  * A collider is a shape that can be attached to a rigid body to define its physical properties.
  * @internal
@@ -149,93 +148,92 @@ export const CuboidCollider = React.forwardRef(
     return <AnyCollider {...props} shape="cuboid" ref={ref} />;
   }
 );
+CuboidCollider.displayName = "CuboidCollider";
 
 /**
  * A round cuboid collider shape
  * @category Colliders
  */
 export const RoundCuboidCollider = React.forwardRef(
-  (props: RoundCuboidColliderProps, ref: ForwardedRef<Collider>) => {
-    return <AnyCollider {...props} shape="roundCuboid" ref={ref} />;
-  }
+  (props: RoundCuboidColliderProps, ref: ForwardedRef<Collider>) => (
+    <AnyCollider {...props} shape="roundCuboid" ref={ref} />
+  )
 );
+RoundCuboidCollider.displayName = "RoundCuboidCollider";
 
 /**
  * A ball collider shape
  * @category Colliders
  */
 export const BallCollider = React.forwardRef(
-  (props: BallColliderProps, ref: ForwardedRef<Collider>) => {
-    return <AnyCollider {...props} shape="ball" ref={ref} />;
-  }
+  (props: BallColliderProps, ref: ForwardedRef<Collider>) => (
+    <AnyCollider {...props} shape="ball" ref={ref} />
+  )
 );
+BallCollider.displayName = "BallCollider";
 
 /**
  * A capsule collider shape
  * @category Colliders
  */
 export const CapsuleCollider = React.forwardRef(
-  (props: CapsuleColliderProps, ref: ForwardedRef<Collider>) => {
-    return <AnyCollider {...props} shape="capsule" ref={ref} />;
-  }
+  (props: CapsuleColliderProps, ref: ForwardedRef<Collider>) => (
+    <AnyCollider {...props} shape="capsule" ref={ref} />
+  )
 );
+CapsuleCollider.displayName = "CapsuleCollider";
 
 /**
  * A heightfield collider shape
  * @category Colliders
  */
 export const HeightfieldCollider = React.forwardRef(
-  (props: HeightfieldColliderProps, ref: ForwardedRef<Collider>) => {
-    return <AnyCollider {...props} shape="heightfield" ref={ref} />;
-  }
+  (props: HeightfieldColliderProps, ref: ForwardedRef<Collider>) => (
+    <AnyCollider {...props} shape="heightfield" ref={ref} />
+  )
 );
+HeightfieldCollider.displayName = "HeightfieldCollider";
 
 /**
  * A trimesh collider shape
  * @category Colliders
  */
 export const TrimeshCollider = React.forwardRef(
-  (props: TrimeshColliderProps, ref: ForwardedRef<Collider>) => {
-    return <AnyCollider {...props} shape="trimesh" ref={ref} />;
-  }
+  (props: TrimeshColliderProps, ref: ForwardedRef<Collider>) => (
+    <AnyCollider {...props} shape="trimesh" ref={ref} />
+  )
 );
+TrimeshCollider.displayName = "TrimeshCollider";
 
 /**
  * A cone collider shape
  * @category Colliders
  */
 export const ConeCollider = React.forwardRef(
-  (props: ConeColliderProps, ref: ForwardedRef<Collider>) => {
-    return <AnyCollider {...props} shape="cone" ref={ref} />;
-  }
+  (props: ConeColliderProps, ref: ForwardedRef<Collider>) => (
+    <AnyCollider {...props} shape="cone" ref={ref} />
+  )
 );
+ConeCollider.displayName = "ConeCollider";
 
 /**
  * A cylinder collider shape
  * @category Colliders
  */
 export const CylinderCollider = React.forwardRef(
-  (props: CylinderColliderProps, ref: ForwardedRef<Collider>) => {
-    return <AnyCollider {...props} shape="cylinder" ref={ref} />;
-  }
+  (props: CylinderColliderProps, ref: ForwardedRef<Collider>) => (
+    <AnyCollider {...props} shape="cylinder" ref={ref} />
+  )
 );
+CylinderCollider.displayName = "CylinderCollider";
 
 /**
  * A convex hull collider shape
  * @category Colliders
  */
 export const ConvexHullCollider = React.forwardRef(
-  (props: ConvexHullColliderProps, ref: ForwardedRef<Collider>) => {
-    return <AnyCollider {...props} shape="convexHull" ref={ref} />;
-  }
+  (props: ConvexHullColliderProps, ref: ForwardedRef<Collider>) => (
+    <AnyCollider {...props} shape="convexHull" ref={ref} />
+  )
 );
-
-CuboidCollider.displayName = "CuboidCollider";
-RoundCuboidCollider.displayName = "RoundCuboidCollider";
-BallCollider.displayName = "BallCollider";
-CapsuleCollider.displayName = "CapsuleCollider";
-HeightfieldCollider.displayName = "HeightfieldCollider";
-TrimeshCollider.displayName = "TrimeshCollider";
-ConeCollider.displayName = "ConeCollider";
-CylinderCollider.displayName = "CylinderCollider";
 ConvexHullCollider.displayName = "ConvexHullCollider";

@@ -103,10 +103,25 @@ export type ColliderShape =
   | "roundConvexHull"
   | "roundConvexMesh";
 
-export type Vector3Array = [x: number, y: number, z: number];
-export type Vector4Array = [x: number, y: number, z: number, w: number];
-export type Boolean3Array = [x: boolean, y: boolean, z: boolean];
+export type Vector3Tuple = [x: number, y: number, z: number];
+export type Vector4Tuple = [x: number, y: number, z: number, w: number];
+export type Boolean3Tuple = [x: boolean, y: boolean, z: boolean];
 export type Vector3Object = { x: number; y: number; z: number };
+
+/**
+ * @deprecated use Vector3Tuple instead
+ */
+export type Vector3Array = Vector3Tuple;
+
+/**
+ * @deprecated use Vector4Tuple instead
+ * */
+export type Vector4Array = Vector4Tuple;
+
+/**
+ * @deprecated use Boolean3Tuple instead
+ * */
+export type Boolean3Array = Boolean3Tuple;
 
 export interface ColliderOptions<ColliderArgs extends Array<unknown>> {
   /**
@@ -127,7 +142,7 @@ export interface ColliderOptions<ColliderArgs extends Array<unknown>> {
   /**
    * Principal angular inertia of this rigid body
    */
-  principalAngularInertia?: Vector3Array;
+  principalAngularInertia?: Vector3Tuple;
 
   /**
    * Restitution controls how elastic (aka. bouncy) a contact is. Le elasticity of a contact is controlled by the restitution coefficient
@@ -318,13 +333,13 @@ export interface RigidBodyOptions extends ColliderProps {
    * The initial linear velocity of this body.
    * @defaultValue [0,0,0]
    */
-  linearVelocity?: Vector3Array;
+  linearVelocity?: Vector3Tuple;
 
   /**
    * The initial angular velocity of this body.
    * @defaultValue [0,0,0]
    */
-  angularVelocity?: Vector3Array;
+  angularVelocity?: Vector3Tuple;
 
   /**
    * The scaling factor applied to the gravity affecting the rigid-body.
@@ -409,12 +424,12 @@ export interface RigidBodyOptions extends ColliderProps {
   /**
    * Allow rotation of this rigid-body only along specific axes.
    */
-  enabledRotations?: Boolean3Array;
+  enabledRotations?: Boolean3Tuple;
 
   /**
    * Allow translation of this rigid-body only along specific axes.
    */
-  enabledTranslations?: Boolean3Array;
+  enabledTranslations?: Boolean3Tuple;
 
   /**
    * Passed down to the object3d representing this collider.
@@ -435,29 +450,29 @@ export interface RigidBodyOptions extends ColliderProps {
 
 // Joints
 export type SphericalJointParams = [
-  body1Anchor: Vector3Array,
-  body2Anchor: Vector3Array
+  body1Anchor: Vector3Tuple,
+  body2Anchor: Vector3Tuple
 ];
 
 export type FixedJointParams = [
-  body1Anchor: Vector3Array,
-  body1LocalFrame: Vector4Array,
-  body2Anchor: Vector3Array,
-  body2LocalFrame: Vector4Array
+  body1Anchor: Vector3Tuple,
+  body1LocalFrame: Vector4Tuple,
+  body2Anchor: Vector3Tuple,
+  body2LocalFrame: Vector4Tuple
 ];
 
 export type PrismaticJointParams = [
-  body1Anchor: Vector3Array,
-  body1LocalFrame: Vector3Array,
-  body2Anchor: Vector3Array,
-  body2LocalFrame: Vector3Array,
+  body1Anchor: Vector3Tuple,
+  body1LocalFrame: Vector3Tuple,
+  body2Anchor: Vector3Tuple,
+  body2LocalFrame: Vector3Tuple,
   limits?: [min: number, max: number]
 ];
 
 export type RevoluteJointParams = [
-  body1Anchor: Vector3Array,
-  body2Anchor: Vector3Array,
-  axis: Vector3Array,
+  body1Anchor: Vector3Tuple,
+  body2Anchor: Vector3Tuple,
+  axis: Vector3Tuple,
   limits?: [min: number, max: number]
 ];
 

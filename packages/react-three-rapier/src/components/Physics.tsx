@@ -28,7 +28,7 @@ import {
   IntersectionEnterHandler,
   IntersectionExitHandler,
   RigidBodyAutoCollider,
-  Vector3Array
+  Vector3Tuple
 } from "../types";
 
 import { createWorldApi, WorldApi } from "../utils/api";
@@ -221,7 +221,7 @@ export interface PhysicsProps {
    * Set the gravity of the physics world
    * @defaultValue [0, -9.81, 0]
    */
-  gravity?: Vector3Array;
+  gravity?: Vector3Tuple;
 
   /**
    * Set the base automatic colliders for this physics world
