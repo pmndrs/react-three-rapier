@@ -281,7 +281,7 @@ const Scene = () => {
 
   return (
     <InstancedRigidBodies
-      ref={instancedApi}
+      ref={rigidBodies}
       instances={instances}
       colliders="ball"
     >
@@ -314,7 +314,6 @@ const Scene = () => {
 
   return (
     <InstancedRigidBodies
-      ref={instancedApi}
       instances={instances}
       colliders="ball"
       colliderNodes={[
