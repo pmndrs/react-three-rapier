@@ -254,7 +254,7 @@ const Scene = () => {
 
     // You can access individual instanced by their index
     rigidBodies.current[40].applyImpulse({ x: 0, y: 10, z: 0 }, true);
-    rigidBodies.at(100).applyImpulse({ x: 0, y: 10, z: 0 }, true);
+    rigidBodies.current.at(100).applyImpulse({ x: 0, y: 10, z: 0 }, true);
 
     // Or update all instances
     rigidBodies.current.forEach((api) => {
