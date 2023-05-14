@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
+import { DependencyList, useCallback, useEffect, useMemo, useRef } from "react";
 
 /**
  * Initiate an instance and return a safe getter
@@ -6,22 +6,19 @@ import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 export const useImperativeInstance = <InstanceType>(
   createFn: () => InstanceType,
   destroyFn: (instance: InstanceType) => void,
-  dependencyList: any[] = []
+  dependencyList: DependencyList
 ) => {
   const ref = useRef<InstanceType>();
 
-  const getInstance = useMemo(
-    () => () => {
-      if (!ref.current) {
-        ref.current = createFn();
-      }
+  const getInstance = useCallback(() => {
+    if (!ref.current) {
+      ref.current = createFn();
+    }
 
-      return ref.current;
-    },
-    dependencyList
-  );
+    return ref.current;
+  }, dependencyList);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     // Save the destroy function and instance
     const instance = getInstance();
     const destroy = () => destroyFn(instance);
@@ -30,7 +27,7 @@ export const useImperativeInstance = <InstanceType>(
       destroy();
       ref.current = undefined;
     };
-  }, dependencyList);
+  }, [getInstance]);
 
   return getInstance;
 };

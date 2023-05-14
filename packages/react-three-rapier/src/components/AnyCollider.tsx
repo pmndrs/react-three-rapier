@@ -73,7 +73,7 @@ export const AnyCollider = memo(
       (collider) => {
         world.removeCollider(collider);
       },
-      immutablePropArray
+      [...immutablePropArray, rigidBodyContext]
     );
 
     useEffect(() => {
@@ -134,17 +134,6 @@ export type ColliderOptionsRequiredArgs<T extends unknown[]> = Omit<
 };
 
 export type CuboidColliderProps = ColliderOptionsRequiredArgs<CuboidArgs>;
-export type RoundCuboidColliderProps =
-  ColliderOptionsRequiredArgs<RoundCuboidArgs>;
-export type BallColliderProps = ColliderOptionsRequiredArgs<BallArgs>;
-export type CapsuleColliderProps = ColliderOptionsRequiredArgs<CapsuleArgs>;
-export type HeightfieldColliderProps =
-  ColliderOptionsRequiredArgs<HeightfieldArgs>;
-export type TrimeshColliderProps = ColliderOptionsRequiredArgs<TrimeshArgs>;
-export type ConeColliderProps = ColliderOptionsRequiredArgs<ConeArgs>;
-export type CylinderColliderProps = ColliderOptionsRequiredArgs<CylinderArgs>;
-export type ConvexHullColliderProps =
-  ColliderOptionsRequiredArgs<ConvexHullArgs>;
 
 /**
  * A cuboid collider shape
@@ -157,6 +146,9 @@ export const CuboidCollider = React.forwardRef(
 );
 CuboidCollider.displayName = "CuboidCollider";
 
+export type RoundCuboidColliderProps =
+  ColliderOptionsRequiredArgs<RoundCuboidArgs>;
+
 /**
  * A round cuboid collider shape
  * @category Colliders
@@ -168,6 +160,7 @@ export const RoundCuboidCollider = React.forwardRef(
 );
 RoundCuboidCollider.displayName = "RoundCuboidCollider";
 
+export type BallColliderProps = ColliderOptionsRequiredArgs<BallArgs>;
 /**
  * A ball collider shape
  * @category Colliders
@@ -178,6 +171,8 @@ export const BallCollider = React.forwardRef(
   )
 );
 BallCollider.displayName = "BallCollider";
+
+export type CapsuleColliderProps = ColliderOptionsRequiredArgs<CapsuleArgs>;
 
 /**
  * A capsule collider shape
@@ -190,6 +185,9 @@ export const CapsuleCollider = React.forwardRef(
 );
 CapsuleCollider.displayName = "CapsuleCollider";
 
+export type HeightfieldColliderProps =
+  ColliderOptionsRequiredArgs<HeightfieldArgs>;
+
 /**
  * A heightfield collider shape
  * @category Colliders
@@ -201,6 +199,7 @@ export const HeightfieldCollider = React.forwardRef(
 );
 HeightfieldCollider.displayName = "HeightfieldCollider";
 
+export type TrimeshColliderProps = ColliderOptionsRequiredArgs<TrimeshArgs>;
 /**
  * A trimesh collider shape
  * @category Colliders
@@ -211,6 +210,8 @@ export const TrimeshCollider = React.forwardRef(
   )
 );
 TrimeshCollider.displayName = "TrimeshCollider";
+
+export type ConeColliderProps = ColliderOptionsRequiredArgs<ConeArgs>;
 
 /**
  * A cone collider shape
@@ -223,6 +224,8 @@ export const ConeCollider = React.forwardRef(
 );
 ConeCollider.displayName = "ConeCollider";
 
+export type CylinderColliderProps = ColliderOptionsRequiredArgs<CylinderArgs>;
+
 /**
  * A cylinder collider shape
  * @category Colliders
@@ -233,6 +236,9 @@ export const CylinderCollider = React.forwardRef(
   )
 );
 CylinderCollider.displayName = "CylinderCollider";
+
+export type ConvexHullColliderProps =
+  ColliderOptionsRequiredArgs<ConvexHullArgs>;
 
 /**
  * A convex hull collider shape

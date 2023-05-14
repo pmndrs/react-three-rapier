@@ -77,7 +77,7 @@ type MutableRigidBodyOptions = {
   [Prop in keyof RigidBodyProps]: (rb: RigidBody, value: any) => void;
 };
 
-const mutableRigidBodyOptions: MutableRigidBodyOptions = {
+export const mutableRigidBodyOptions: MutableRigidBodyOptions = {
   gravityScale: (rb: RigidBody, value: number) => {
     rb.setGravityScale(value, true);
   },
