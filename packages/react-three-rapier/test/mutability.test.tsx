@@ -57,7 +57,7 @@ describe("RigidBody mutability", async () => {
     "should create a new rigid body when immutable props change",
     async () => {
       let _ref: RefObject<RapierRigidBody>;
-      let _setProps;
+      let _setProps: (props: RigidBodyProps) => void;
 
       await awaitReady(
         <RigidBodyArgsChanger
@@ -140,7 +140,7 @@ describe("Collider mutability", async () => {
     "should create a new collider when immutable props change",
     async () => {
       let _ref: RefObject<RapierCollider>;
-      let _setProps;
+      let _setProps: (props: CuboidColliderProps) => void;
 
       await awaitReady(
         <ColliderArgsChanger
@@ -159,7 +159,6 @@ describe("Collider mutability", async () => {
 
       await ReactThreeTestRenderer.act(async () => {
         _setProps({
-          type: "fixed",
           position: [1, 0, 0],
           args: [2, 1, 1]
         });
@@ -174,7 +173,6 @@ describe("Collider mutability", async () => {
 
       await ReactThreeTestRenderer.act(async () => {
         _setProps({
-          type: "kinematic",
           position: [2, 0, 0],
           args: [3, 1, 1]
         });

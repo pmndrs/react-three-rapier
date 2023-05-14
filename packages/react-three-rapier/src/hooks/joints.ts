@@ -57,7 +57,8 @@ export const useImpulseJoint = <JointType extends ImpulseJoint>(
         jointRef.current = undefined;
         world.removeImpulseJoint(joint);
       }
-    }
+    },
+    []
   );
 
   return jointRef;

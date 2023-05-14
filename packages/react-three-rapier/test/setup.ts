@@ -3,8 +3,8 @@ global.IS_REACT_ACT_ENVIRONMENT = true;
 
 // Ignore all warnings that are repetitive and not helpful
 const catcher =
-  (logger) =>
-  (...args) => {
+  (logger: any) =>
+  (...args: any) => {
     if (
       [
         "Multiple instances of Three.js being imported.",
