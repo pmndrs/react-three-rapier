@@ -16,7 +16,8 @@ import {
   rigidBodyDescFromOptions,
   createRigidBodyState,
   useUpdateRigidBodyOptions,
-  useRigidBodyEvents
+  useRigidBodyEvents,
+  immutableRigidBodyOptions
 } from "../utils/utils-rigidbody";
 import { useImperativeInstance } from "../hooks/use-imperative-instance";
 
@@ -63,10 +64,16 @@ export const RigidBody = memo(
       };
     }, [physicsOptions, props]);
 
+    const immutablePropArray = immutableRigidBodyOptions.flatMap((key) => {
+      return Array.isArray(mergedOptions[key])
+        ? [...mergedOptions[key]]
+        : mergedOptions[key];
+    });
+
     const childColliderProps = useChildColliderProps(ref, mergedOptions);
 
     // Provide a way to eagerly create rigidbody
-    const getInstance = useImperativeInstance(
+    const getRigidBody = useImperativeInstance(
       () => {
         const desc = rigidBodyDescFromOptions(mergedOptions);
         const rigidBody = world.createRigidBody(desc);
@@ -75,12 +82,13 @@ export const RigidBody = memo(
       },
       (rigidBody) => {
         world.removeRigidBody(rigidBody);
-      }
+      },
+      immutablePropArray
     );
 
     // Only provide a object state after the ref has been set
     useEffect(() => {
-      const rigidBody = getInstance();
+      const rigidBody = getRigidBody();
 
       const state = createRigidBodyState({
         rigidBody,
@@ -95,20 +103,20 @@ export const RigidBody = memo(
       return () => {
         rigidBodyStates.delete(rigidBody.handle);
       };
-    }, []);
+    }, [getRigidBody]);
 
-    useUpdateRigidBodyOptions(getInstance, mergedOptions, rigidBodyStates);
-    useRigidBodyEvents(getInstance, mergedOptions, rigidBodyEvents);
+    useUpdateRigidBodyOptions(getRigidBody, mergedOptions, rigidBodyStates);
+    useRigidBodyEvents(getRigidBody, mergedOptions, rigidBodyEvents);
 
-    useImperativeHandle(forwardedRef, () => getInstance());
+    useImperativeHandle(forwardedRef, () => getRigidBody(), [getRigidBody]);
 
     const contextValue = useMemo(() => {
       return {
         ref,
-        getRigidBody: getInstance,
+        getRigidBody: getRigidBody,
         options: mergedOptions
       };
-    }, [mergedOptions]);
+    }, [getRigidBody]);
 
     return (
       <RigidBodyContext.Provider value={contextValue}>

@@ -4,10 +4,9 @@ import {
   ColliderHandle,
   EventQueue,
   RigidBody,
-  RigidBodyHandle,
-  World
+  RigidBodyHandle
 } from "@dimforge/rapier3d-compat";
-import { useFrame, useThree } from "@react-three/fiber";
+import { useThree } from "@react-three/fiber";
 import React, {
   createContext,
   FC,
@@ -15,7 +14,6 @@ import React, {
   useCallback,
   useEffect,
   useMemo,
-  useRef,
   useState
 } from "react";
 import { MathUtils, Matrix4, Object3D, Quaternion, Vector3 } from "three";
@@ -28,7 +26,7 @@ import {
   IntersectionEnterHandler,
   IntersectionExitHandler,
   RigidBodyAutoCollider,
-  Vector3Array
+  Vector3Tuple
 } from "../types";
 
 import { createWorldApi, WorldApi } from "../utils/api";
@@ -45,6 +43,7 @@ import {
 } from "../utils/utils";
 import FrameStepper from "./FrameStepper";
 import { Debug } from "./Debug";
+import { useImperativeInstance } from "../hooks/use-imperative-instance";
 
 export interface RigidBodyState {
   meshType: "instancedMesh" | "mesh";
@@ -221,7 +220,7 @@ export interface PhysicsProps {
    * Set the gravity of the physics world
    * @defaultValue [0, -9.81, 0]
    */
-  gravity?: Vector3Array;
+  gravity?: Vector3Tuple;
 
   /**
    * Set the base automatic colliders for this physics world
@@ -307,14 +306,16 @@ export const Physics: FC<PhysicsProps> = ({
   const rapier = useAsset(importRapier);
   const { invalidate } = useThree();
 
-  const worldRef = useRef<World>();
-  const getWorldRef = useRef(() => {
-    if (!worldRef.current) {
-      const world = new rapier.World(vectorArrayToVector3(gravity));
-      worldRef.current = world;
-    }
-    return worldRef.current;
-  });
+  // Init World
+  const getWorld = useImperativeInstance(
+    () => {
+      return new rapier.World(vectorArrayToVector3(gravity));
+    },
+    (world) => {
+      world.free();
+    },
+    []
+  );
 
   const rigidBodyStates = useConst<RigidBodyStateMap>(() => new Map());
   const colliderStates = useConst<ColliderStateMap>(() => new Map());
@@ -324,64 +325,51 @@ export const Physics: FC<PhysicsProps> = ({
   const beforeStepCallbacks = useConst<WorldStepCallbackSet>(() => new Set());
   const afterStepCallbacks = useConst<WorldStepCallbackSet>(() => new Set());
 
-  // Init world
-  useEffect(() => {
-    const world = getWorldRef.current();
-
-    return () => {
-      if (world) {
-        world.free();
-        worldRef.current = undefined;
-      }
-    };
-  }, []);
-
   // Update gravity
   useEffect(() => {
-    const world = worldRef.current;
+    const world = getWorld();
     if (world) {
       world.gravity = vectorArrayToVector3(gravity);
     }
   }, [gravity]);
 
-  const api = useMemo(() => createWorldApi(getWorldRef), []);
+  const api = useMemo(() => createWorldApi(getWorld), []);
 
   const getSourceFromColliderHandle = useCallback((handle: ColliderHandle) => {
-    const world = worldRef.current;
-    if (world) {
-      const collider = world.getCollider(handle);
-      const colEvents = colliderEvents.get(handle);
-      const colliderState = colliderStates.get(handle);
+    const world = getWorld();
 
-      const rigidBodyHandle = collider?.parent()?.handle;
-      const rigidBody =
-        rigidBodyHandle !== undefined
-          ? world.getRigidBody(rigidBodyHandle)
-          : undefined;
-      const rbEvents =
-        rigidBody && rigidBodyHandle !== undefined
-          ? rigidBodyEvents.get(rigidBodyHandle)
-          : undefined;
-      const rigidBodyState =
-        rigidBodyHandle !== undefined
-          ? rigidBodyStates.get(rigidBodyHandle)
-          : undefined;
+    const collider = world.getCollider(handle);
+    const colEvents = colliderEvents.get(handle);
+    const colliderState = colliderStates.get(handle);
 
-      const source: CollisionSource = {
-        collider: {
-          object: collider,
-          events: colEvents,
-          state: colliderState
-        },
-        rigidBody: {
-          object: rigidBody,
-          events: rbEvents,
-          state: rigidBodyState
-        }
-      };
+    const rigidBodyHandle = collider?.parent()?.handle;
+    const rigidBody =
+      rigidBodyHandle !== undefined
+        ? world.getRigidBody(rigidBodyHandle)
+        : undefined;
+    const rbEvents =
+      rigidBody && rigidBodyHandle !== undefined
+        ? rigidBodyEvents.get(rigidBodyHandle)
+        : undefined;
+    const rigidBodyState =
+      rigidBodyHandle !== undefined
+        ? rigidBodyStates.get(rigidBodyHandle)
+        : undefined;
 
-      return source;
-    }
+    const source: CollisionSource = {
+      collider: {
+        object: collider,
+        events: colEvents,
+        state: colliderState
+      },
+      rigidBody: {
+        object: rigidBody,
+        events: rbEvents,
+        state: rigidBodyState
+      }
+    };
+
+    return source;
   }, []);
 
   const [steppingState] = useState<{
@@ -394,8 +382,7 @@ export const Physics: FC<PhysicsProps> = ({
 
   const step = useCallback(
     (dt: number) => {
-      const world = worldRef.current;
-      if (!world) return;
+      const world = getWorld();
 
       /* Check if the timestep is supposed to be variable. We'll do this here
         once so we don't have to string-check every frame. */

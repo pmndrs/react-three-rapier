@@ -4,13 +4,11 @@ import {
   DebugRenderBuffers,
   ImpulseJoint,
   JointData,
-  PrismaticImpulseJoint,
   RigidBody,
   RigidBodyDesc,
   World
 } from "@dimforge/rapier3d-compat";
-import { Quaternion, Vector3 } from "three";
-import { RefGetter, RigidBodyTypeString, Vector3Object } from "../types";
+import { Vector3 } from "three";
 
 export interface WorldApi {
   raw(): World;
@@ -32,34 +30,34 @@ export interface WorldApi {
   debugRender(): DebugRenderBuffers;
 }
 
-export const createWorldApi = (ref: RefGetter<World>): WorldApi => {
+export const createWorldApi = (getWorld: () => World): WorldApi => {
   return {
-    raw: () => ref.current()!,
-    getCollider: (handle) => ref.current()!.getCollider(handle),
-    getRigidBody: (handle) => ref.current()!.getRigidBody(handle),
-    createRigidBody: (desc) => ref.current()!.createRigidBody(desc),
+    raw: () => getWorld(),
+    getCollider: (handle) => getWorld().getCollider(handle),
+    getRigidBody: (handle) => getWorld().getRigidBody(handle),
+    createRigidBody: (desc) => getWorld().createRigidBody(desc),
     createCollider: (desc, rigidBody) =>
-      ref.current()!.createCollider(desc, rigidBody),
+      getWorld().createCollider(desc, rigidBody),
     removeRigidBody: (rigidBody) => {
-      if (!ref.current()!.bodies.contains(rigidBody.handle)) return;
+      if (!getWorld().bodies.contains(rigidBody.handle)) return;
 
-      ref.current()!.removeRigidBody(rigidBody);
+      getWorld().removeRigidBody(rigidBody);
     },
     removeCollider: (collider, wakeUp = true) => {
-      if (!ref.current()!.colliders.contains(collider.handle)) return;
+      if (!getWorld().colliders.contains(collider.handle)) return;
 
-      ref.current()!.removeCollider(collider, wakeUp);
+      getWorld().removeCollider(collider, wakeUp);
     },
     createImpulseJoint: (params, rigidBodyA, rigidBodyB, wakeUp = true) =>
-      ref.current()!.createImpulseJoint(params, rigidBodyA, rigidBodyB, wakeUp),
+      getWorld().createImpulseJoint(params, rigidBodyA, rigidBodyB, wakeUp),
     removeImpulseJoint: (joint, wakeUp = true) => {
-      if (!ref.current()!.impulseJoints.contains(joint.handle)) return;
+      if (!getWorld().impulseJoints.contains(joint.handle)) return;
 
-      ref.current()!.removeImpulseJoint(joint, wakeUp);
+      getWorld().removeImpulseJoint(joint, wakeUp);
     },
     forEachCollider: (callback: (collider: Collider) => void) =>
-      ref.current()!.forEachCollider(callback),
-    setGravity: ({ x, y, z }) => (ref.current()!.gravity = { x, y, z }),
-    debugRender: () => ref.current()!.debugRender()
+      getWorld().forEachCollider(callback),
+    setGravity: ({ x, y, z }) => (getWorld().gravity = { x, y, z }),
+    debugRender: () => getWorld().debugRender()
   };
 };

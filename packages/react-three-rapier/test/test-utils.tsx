@@ -1,5 +1,5 @@
 import { Collider } from "@dimforge/rapier3d-compat";
-import React, { useRef, MutableRefObject, useEffect } from "react";
+import React, { useRef, MutableRefObject, useEffect, ReactNode } from "react";
 import {
   CuboidColliderProps,
   CuboidCollider,
@@ -83,3 +83,30 @@ export const createRigidBody = (props: RigidBodyProps) =>
         );
       })
   );
+
+const Mounter = ({
+  ready
+}: {
+  ready: (step: (num: number) => void) => void;
+}) => {
+  const { step } = useRapier();
+
+  useEffect(() => {
+    ready(step);
+  }, []);
+
+  return null;
+};
+
+export const awaitReady = async (children: ReactNode) => {
+  const step = await new Promise<(num: number) => void>(async (resolve) => {
+    await ReactThreeTestRenderer.create(
+      <Physics paused>
+        {children}
+        <Mounter ready={resolve} />
+      </Physics>
+    );
+  });
+
+  return step;
+};

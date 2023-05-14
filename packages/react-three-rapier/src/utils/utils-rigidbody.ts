@@ -1,7 +1,7 @@
 import { RigidBody, RigidBodyDesc } from "@dimforge/rapier3d-compat";
 import React, { MutableRefObject, useEffect, useMemo } from "react";
 import { Matrix4, Object3D, Vector3 } from "three";
-import { Boolean3Array, RigidBodyProps, Vector3Array } from "..";
+import { Boolean3Tuple, RigidBodyProps, Vector3Tuple } from "..";
 import {
   EventMap,
   RigidBodyState,
@@ -77,7 +77,7 @@ type MutableRigidBodyOptions = {
   [Prop in keyof RigidBodyProps]: (rb: RigidBody, value: any) => void;
 };
 
-const mutableRigidBodyOptions: MutableRigidBodyOptions = {
+export const mutableRigidBodyOptions: MutableRigidBodyOptions = {
   gravityScale: (rb: RigidBody, value: number) => {
     rb.setGravityScale(value, true);
   },
@@ -90,10 +90,10 @@ const mutableRigidBodyOptions: MutableRigidBodyOptions = {
   dominanceGroup: (rb: RigidBody, value: number) => {
     rb.setDominanceGroup(value);
   },
-  enabledRotations: (rb: RigidBody, [x, y, z]: Boolean3Array) => {
+  enabledRotations: (rb: RigidBody, [x, y, z]: Boolean3Tuple) => {
     rb.setEnabledRotations(x, y, z, true);
   },
-  enabledTranslations: (rb: RigidBody, [x, y, z]: Boolean3Array) => {
+  enabledTranslations: (rb: RigidBody, [x, y, z]: Boolean3Tuple) => {
     rb.setEnabledTranslations(x, y, z, true);
   },
   lockRotations: (rb: RigidBody, value: boolean) => {
@@ -102,10 +102,10 @@ const mutableRigidBodyOptions: MutableRigidBodyOptions = {
   lockTranslations: (rb: RigidBody, value: boolean) => {
     rb.lockTranslations(value, true);
   },
-  angularVelocity: (rb: RigidBody, [x, y, z]: Vector3Array) => {
+  angularVelocity: (rb: RigidBody, [x, y, z]: Vector3Tuple) => {
     rb.setAngvel({ x, y, z }, true);
   },
-  linearVelocity: (rb: RigidBody, [x, y, z]: Vector3Array) => {
+  linearVelocity: (rb: RigidBody, [x, y, z]: Vector3Tuple) => {
     rb.setLinvel({ x, y, z }, true);
   },
   ccd: (rb: RigidBody, value: boolean) => {

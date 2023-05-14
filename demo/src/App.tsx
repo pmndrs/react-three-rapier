@@ -37,6 +37,7 @@ import { LockedTransformsExample } from "./examples/locked-transforms/LockedTran
 import { PerformanceExample } from "./examples/performance/PeformanceExample";
 import { DynamicTypeChangeExample } from "./examples/dynamic-type-change/DynamicTypeChangeExample";
 import { StutteringExample } from "./examples/stuttering/StutteringExample";
+import { ImmutablePropsExample } from "./examples/immutable-props/ImmutablePropsExample";
 
 const demoContext = createContext<{
   setDebug?(f: boolean): void;
@@ -74,7 +75,7 @@ export interface Demo {
 
 const Floor = () => {
   return (
-    <RigidBody type="fixed" colliders="cuboid">
+    <RigidBody type="fixed" colliders="cuboid" name="floor">
       <Box
         position={[0, -12.55 - 5, 0]}
         scale={[200, 10, 200]}
@@ -112,7 +113,8 @@ const routes: Record<string, ReactNode> = {
   "locked-transforms": <LockedTransformsExample />,
   performance: <PerformanceExample />,
   "dynamic-type-changes": <DynamicTypeChangeExample />,
-  stuttering: <StutteringExample />
+  stuttering: <StutteringExample />,
+  "immutable-props": <ImmutablePropsExample />
 };
 
 export const App = () => {
