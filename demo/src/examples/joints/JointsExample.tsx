@@ -25,24 +25,16 @@ const ShadowElement = forwardRef((_, ref) => (
   </Sphere>
 ));
 
-const RopeSegment = forwardRef(
-  (
-    {
-      position,
-      component,
-      type
-    }: {
-      position: Vector3Array;
-      component: ReactNode;
-      type: RigidBodyTypeString;
-    },
-    ref
-  ) => {
-    const rb = useRef<RapierRigidBody>(null);
-    useImperativeHandle(ref, () => rb.current);
+type RopeSegmentProps = {
+  position: Vector3Array;
+  component: ReactNode;
+  type: RigidBodyTypeString;
+};
 
+const RopeSegment = forwardRef<RapierRigidBody, RopeSegmentProps>(
+  ({ position, component, type }, ref) => {
     return (
-      <RigidBody ref={rb} type={type} position={position}>
+      <RigidBody ref={ref} type={type} position={position}>
         {component}
       </RigidBody>
     );

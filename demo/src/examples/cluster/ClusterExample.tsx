@@ -30,6 +30,8 @@ export const Cluster: Demo = () => {
 
   useEffect(() => {
     if (ref.current) {
+      console.log(api);
+
       for (let i = 0; i < BALLS; i++) {
         ref.current!.setColorAt(i, new Color(Math.random() * 0xffffff));
       }

@@ -49,6 +49,8 @@ export const useImpulseJoint = <JointType extends ImpulseJoint>(
 
         jointRef.current = newJoint;
 
+        // console.log(body1.current, body2.current, newJoint);
+
         return newJoint;
       }
     },
