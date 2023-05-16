@@ -11,7 +11,9 @@ import {
   ConeCollider,
   useRapier,
   RigidBodyProps,
-  RapierCollider
+  RapierCollider,
+  RoundConeCollider,
+  RoundCylinderCollider
 } from "@react-three/rapier";
 import { useSuzanne } from "../all-shapes/AllShapesExample";
 import { RoundedBoxGeometry } from "three-stdlib";
@@ -154,6 +156,22 @@ export const AllCollidersExample = () => {
         </Cone>
         <ConeCollider args={[1, 0.5]} />
         <Html>ConeCollider</Html>
+      </RigidBody>
+
+      <RigidBody colliders={false} position={[0, 3, 0]}>
+        <Cone args={[0.5, 2]} castShadow receiveShadow>
+          <meshPhysicalMaterial color="orange" />
+        </Cone>
+        <RoundConeCollider args={[1, 0.5, 0.1]} />
+        <Html>RoundConeCollider</Html>
+      </RigidBody>
+
+      <RigidBody colliders={false} position={[3, 3, 0]}>
+        <Cylinder args={[0.5, 0.5, 2]} castShadow receiveShadow>
+          <meshPhysicalMaterial color="orange" />
+        </Cylinder>
+        <RoundCylinderCollider args={[1, 0.4, 0.1]} />
+        <Html>RoundCylinderCollider</Html>
       </RigidBody>
 
       <RigidBody colliders={false} position={[0, -8, 0]}>

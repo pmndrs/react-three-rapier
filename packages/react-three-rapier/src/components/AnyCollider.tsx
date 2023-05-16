@@ -23,7 +23,8 @@ import {
   TrimeshArgs,
   ConeArgs,
   CylinderArgs,
-  ConvexHullArgs
+  ConvexHullArgs,
+  RoundCylinderArgs
 } from "../types";
 import {
   cleanRigidBodyPropsForCollider,
@@ -36,6 +37,7 @@ import {
 } from "../utils/utils-collider";
 import { useImperativeInstance } from "../hooks/use-imperative-instance";
 import { vec3 } from "../utils/three-object-helpers";
+import { RoundConeArgs } from "../types";
 
 export interface ColliderProps extends ColliderOptions<any> {
   children?: ReactNode;
@@ -224,6 +226,19 @@ export const ConeCollider = React.forwardRef(
 );
 ConeCollider.displayName = "ConeCollider";
 
+export type RoundConeColliderProps = ColliderOptionsRequiredArgs<RoundConeArgs>;
+
+/**
+ * A round cylinder collider shape
+ * @category Colliders
+ */
+export const RoundConeCollider = React.forwardRef(
+  (props: RoundConeColliderProps, ref: ForwardedRef<Collider>) => (
+    <AnyCollider {...props} shape="roundCone" ref={ref} />
+  )
+);
+RoundConeCollider.displayName = "RoundConeCollider";
+
 export type CylinderColliderProps = ColliderOptionsRequiredArgs<CylinderArgs>;
 
 /**
@@ -236,6 +251,20 @@ export const CylinderCollider = React.forwardRef(
   )
 );
 CylinderCollider.displayName = "CylinderCollider";
+
+export type RoundCylinderColliderProps =
+  ColliderOptionsRequiredArgs<RoundCylinderArgs>;
+
+/**
+ * A round cylinder collider shape
+ * @category Colliders
+ */
+export const RoundCylinderCollider = React.forwardRef(
+  (props: RoundConeColliderProps, ref: ForwardedRef<Collider>) => (
+    <AnyCollider {...props} shape="roundCylinder" ref={ref} />
+  )
+);
+CylinderCollider.displayName = "RoundCylinderCollider";
 
 export type ConvexHullColliderProps =
   ColliderOptionsRequiredArgs<ConvexHullArgs>;
