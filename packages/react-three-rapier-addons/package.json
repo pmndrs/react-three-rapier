@@ -1,13 +1,13 @@
 {
   "name": "@react-three/rapier-addons",
-  "version": "2.0.0-canary.0",
+  "version": "1.0.2-canary.0",
   "main": "dist/react-three-rapier-addons.cjs.js",
   "module": "dist/react-three-rapier-addons.esm.js",
   "license": "MIT",
   "sideEffects": false,
   "peerDependencies": {
     "@react-three/fiber": "*",
-    "@react-three/rapier": ">=0.16.0-canary.0",
+    "@react-three/rapier": ">=0.15.0",
     "react": ">=18.0.0",
     "three": "*"
   },
@@ -16,7 +16,7 @@
   },
   "devDependencies": {
     "@react-three/fiber": "8.9.1",
-    "@react-three/rapier": "0.16.0-canary.0",
+    "@react-three/rapier": "^0.16.0-canary.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "three": "0.146.0"

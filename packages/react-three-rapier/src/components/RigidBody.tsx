@@ -20,6 +20,7 @@ import {
   immutableRigidBodyOptions
 } from "../utils/utils-rigidbody";
 import { useImperativeInstance } from "../hooks/use-imperative-instance";
+import { useForwardedRef } from "../hooks/use-forwarded-ref";
 
 export const RigidBodyContext = createContext<{
   ref: RefObject<Object3D> | MutableRefObject<Object3D>;
@@ -52,7 +53,8 @@ export const RigidBody = memo(
       ...objectProps
     } = props;
 
-    const ref = useRef<Object3D>(null);
+    const objectRef = useRef<Object3D>(null);
+    const rigidBodyRef = useForwardedRef(forwardedRef);
     const { world, rigidBodyStates, physicsOptions, rigidBodyEvents } =
       useRapier();
 
@@ -70,13 +72,18 @@ export const RigidBody = memo(
         : mergedOptions[key];
     });
 
-    const childColliderProps = useChildColliderProps(ref, mergedOptions);
+    const childColliderProps = useChildColliderProps(objectRef, mergedOptions);
 
     // Provide a way to eagerly create rigidbody
     const getRigidBody = useImperativeInstance(
       () => {
         const desc = rigidBodyDescFromOptions(mergedOptions);
         const rigidBody = world.createRigidBody(desc);
+
+        if (typeof forwardedRef === "function") {
+          forwardedRef(rigidBody);
+        }
+        rigidBodyRef.current = rigidBody;
 
         return rigidBody;
       },
@@ -92,7 +99,7 @@ export const RigidBody = memo(
 
       const state = createRigidBodyState({
         rigidBody,
-        object: ref.current!
+        object: objectRef.current!
       });
 
       rigidBodyStates.set(
@@ -108,11 +115,9 @@ export const RigidBody = memo(
     useUpdateRigidBodyOptions(getRigidBody, mergedOptions, rigidBodyStates);
     useRigidBodyEvents(getRigidBody, mergedOptions, rigidBodyEvents);
 
-    useImperativeHandle(forwardedRef, () => getRigidBody(), [getRigidBody]);
-
     const contextValue = useMemo(() => {
       return {
-        ref,
+        ref: objectRef,
         getRigidBody: getRigidBody,
         options: mergedOptions
       };
@@ -121,7 +126,7 @@ export const RigidBody = memo(
     return (
       <RigidBodyContext.Provider value={contextValue}>
         <object3D
-          ref={ref}
+          ref={objectRef}
           {...objectProps}
           position={position}
           rotation={rotation}

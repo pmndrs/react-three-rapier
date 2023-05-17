@@ -38,6 +38,7 @@ import {
 import { useImperativeInstance } from "../hooks/use-imperative-instance";
 import { vec3 } from "../utils/three-object-helpers";
 import { RoundConeArgs } from "../types";
+import { useForwardedRef } from "../hooks/use-forwarded-ref";
 
 export interface ColliderProps extends ColliderOptions<any> {
   children?: ReactNode;
@@ -52,7 +53,8 @@ export const AnyCollider = memo(
     const { children, position, rotation, quaternion, scale, name } = props;
     const { world, colliderEvents, colliderStates } = useRapier();
     const rigidBodyContext = useRigidBodyContext();
-    const ref = useRef<Object3D>(null);
+    const colliderRef = useForwardedRef(forwardedRef);
+    const objectRef = useRef<Object3D>(null);
 
     // We spread the props out here to make sure that the ref is updated when the props change.
     const immutablePropArray = immutableColliderOptions.flatMap((key) =>
@@ -61,7 +63,7 @@ export const AnyCollider = memo(
 
     const getInstance = useImperativeInstance(
       () => {
-        const worldScale = ref.current!.getWorldScale(vec3());
+        const worldScale = objectRef.current!.getWorldScale(vec3());
 
         const collider = createColliderFromOptions(
           props,
@@ -69,6 +71,11 @@ export const AnyCollider = memo(
           worldScale,
           rigidBodyContext?.getRigidBody
         );
+
+        if (typeof forwardedRef == "function") {
+          forwardedRef(collider);
+        }
+        colliderRef.current = collider;
 
         return collider;
       },
@@ -85,7 +92,7 @@ export const AnyCollider = memo(
         collider.handle,
         createColliderState(
           collider,
-          ref.current!,
+          objectRef.current!,
           rigidBodyContext?.ref.current
         )
       );
@@ -94,8 +101,6 @@ export const AnyCollider = memo(
         colliderStates.delete(collider.handle);
       };
     }, [getInstance]);
-
-    useImperativeHandle(forwardedRef, () => getInstance(), [getInstance]);
 
     const mergedProps = useMemo(() => {
       return {
@@ -118,7 +123,7 @@ export const AnyCollider = memo(
         rotation={rotation}
         quaternion={quaternion}
         scale={scale}
-        ref={ref}
+        ref={objectRef}
         name={name}
       >
         {children}

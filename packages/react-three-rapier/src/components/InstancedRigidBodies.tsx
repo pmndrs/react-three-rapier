@@ -14,6 +14,7 @@ import { RigidBodyState } from "./Physics";
 import { RigidBody, RigidBodyProps } from "./RigidBody";
 import { _matrix4 } from "../utils/shared-objects";
 import { RapierRigidBody } from "../types";
+import { useForwardedRef } from "../hooks/use-forwarded-ref";
 
 export type InstancedRigidBodyProps = RigidBodyProps & {
   key: string | number;
@@ -26,10 +27,15 @@ export interface InstancedRigidBodiesProps extends RigidBodyProps {
 }
 
 export const InstancedRigidBodies = memo(
-  forwardRef<(RapierRigidBody | null)[], InstancedRigidBodiesProps>(
-    (props, ref) => {
-      const object = useRef<Object3D>(null);
-      const instancedWrapper = useRef<Object3D>(null);
+  forwardRef<(RapierRigidBody | null)[] | null, InstancedRigidBodiesProps>(
+    (props, forwardedRef) => {
+      const rigidBodiesRef = useForwardedRef<(RapierRigidBody | null)[]>(
+        forwardedRef,
+        []
+      );
+
+      const objectRef = useRef<Object3D>(null);
+      const instanceWrapperRef = useRef<Object3D>(null);
       const {
         // instanced props
         children,
@@ -46,17 +52,13 @@ export const InstancedRigidBodies = memo(
         ...rigidBodyProps
       } = props;
 
-      const rigidBodyApis = useRef<(RapierRigidBody | null)[]>([]);
-
-      useImperativeHandle(ref, () => rigidBodyApis.current, [instances]);
-
-      const childColliderProps = useChildColliderProps(object, {
+      const childColliderProps = useChildColliderProps(objectRef, {
         ...props,
         children: undefined
       });
 
       const getInstancedMesh = () => {
-        const firstChild = instancedWrapper.current!.children[0];
+        const firstChild = instanceWrapperRef.current!.children[0];
 
         if (firstChild && "isInstancedMesh" in firstChild) {
           return firstChild as InstancedMesh;
@@ -101,20 +103,20 @@ export const InstancedRigidBodies = memo(
 
       return (
         <object3D
-          ref={object}
+          ref={objectRef}
           {...rigidBodyProps}
           position={position}
           rotation={rotation}
           quaternion={quaternion}
           scale={scale}
         >
-          <object3D ref={instancedWrapper}>{children}</object3D>
+          <object3D ref={instanceWrapperRef}>{children}</object3D>
 
           {instances?.map((instance, index) => (
             <RigidBody
               {...rigidBodyProps}
               {...instance}
-              ref={(body) => (rigidBodyApis.current[index] = body)}
+              ref={(body) => (rigidBodiesRef.current[index] = body)}
               transformState={(state) => applyInstancedState(state, index)}
             >
               <>
