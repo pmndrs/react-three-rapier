@@ -53,59 +53,56 @@ const RigidBodyArgsChanger = ({
 };
 
 describe("RigidBody mutability", async () => {
-  it.fails(
-    "should create a new rigid body when immutable props change",
-    async () => {
-      let _ref: RefObject<RapierRigidBody>;
-      let _setProps: (props: RigidBodyProps) => void;
+  it("should create a new rigid body when immutable props change", async () => {
+    let _ref: RefObject<RapierRigidBody>;
+    let _setProps: (props: RigidBodyProps) => void;
 
-      await awaitReady(
-        <RigidBodyArgsChanger
-          onReady={({ ref, setProps }) => {
-            _ref = ref;
-            _setProps = setProps;
-          }}
-        />
-      );
+    await awaitReady(
+      <RigidBodyArgsChanger
+        onReady={({ ref, setProps }) => {
+          _ref = ref;
+          _setProps = setProps;
+        }}
+      />
+    );
 
-      let ref = _ref!.current!;
-      const firstHandle = ref.handle;
+    let ref = _ref!.current!;
+    const firstHandle = ref.handle;
 
-      expect(ref).toBeDefined();
-      expect(ref.translation().x).toEqual(0);
-      expect(ref.bodyType()).toBe(0);
+    expect(ref).toBeDefined();
+    expect(ref.translation().x).toEqual(0);
+    expect(ref.bodyType()).toBe(0);
 
-      await ReactThreeTestRenderer.act(async () => {
-        _setProps({
-          type: "fixed",
-          position: [1, 0, 0],
-          canSleep: true
-        });
+    await ReactThreeTestRenderer.act(async () => {
+      _setProps({
+        type: "fixed",
+        position: [1, 0, 0],
+        canSleep: true
       });
+    });
 
-      // This is the same rigidbody, but with new type
-      ref = _ref!.current!;
+    // This is the same rigidbody, but with new type
+    ref = _ref!.current!;
 
-      expect(ref.handle).toBe(firstHandle);
-      expect(ref.translation().x).toEqual(1);
-      expect(ref.bodyType()).toBe(1);
+    expect(ref.handle).toBe(firstHandle);
+    expect(ref.translation().x).toEqual(1);
+    expect(ref.bodyType()).toBe(1);
 
-      await ReactThreeTestRenderer.act(async () => {
-        _setProps({
-          type: "kinematicPosition",
-          position: [1, 0, 0],
-          canSleep: false
-        });
+    await ReactThreeTestRenderer.act(async () => {
+      _setProps({
+        type: "kinematicPosition",
+        position: [1, 0, 0],
+        canSleep: false
       });
+    });
 
-      // This is now a new rigidbody
-      ref = _ref!.current!;
+    // This is now a new rigidbody
+    ref = _ref!.current!;
 
-      expect(ref.handle).not.toBe(firstHandle);
-      expect(ref.translation().x).toEqual(1);
-      expect(ref.bodyType()).toBe(2);
-    }
-  );
+    expect(ref.handle).not.toBe(firstHandle);
+    expect(ref.translation().x).toEqual(1);
+    expect(ref.bodyType()).toBe(2);
+  });
 });
 
 const ColliderArgsChanger = ({
@@ -136,54 +133,51 @@ const ColliderArgsChanger = ({
 };
 
 describe("Collider mutability", async () => {
-  it.fails(
-    "should create a new collider when immutable props change",
-    async () => {
-      let _ref: RefObject<RapierCollider>;
-      let _setProps: (props: CuboidColliderProps) => void;
+  it("should create a new collider when immutable props change", async () => {
+    let _ref: RefObject<RapierCollider>;
+    let _setProps: (props: CuboidColliderProps) => void;
 
-      await awaitReady(
-        <ColliderArgsChanger
-          onReady={({ ref, setProps }) => {
-            _ref = ref;
-            _setProps = setProps;
-          }}
-        />
-      );
+    await awaitReady(
+      <ColliderArgsChanger
+        onReady={({ ref, setProps }) => {
+          _ref = ref;
+          _setProps = setProps;
+        }}
+      />
+    );
 
-      let ref = _ref!.current!;
-      let shape = ref.shape as Cuboid;
+    let ref = _ref!.current!;
+    let shape = ref.shape as Cuboid;
 
-      expect(shape.halfExtents.x).toBe(1);
-      const firstHandle = ref.handle;
+    expect(shape.halfExtents.x).toBe(1);
+    const firstHandle = ref.handle;
 
-      await ReactThreeTestRenderer.act(async () => {
-        _setProps({
-          position: [1, 0, 0],
-          args: [2, 1, 1]
-        });
+    await ReactThreeTestRenderer.act(async () => {
+      _setProps({
+        position: [1, 0, 0],
+        args: [2, 1, 1]
       });
+    });
 
-      // This is a new collider
-      ref = _ref!.current!;
-      shape = ref.shape as Cuboid;
+    // This is a new collider
+    ref = _ref!.current!;
+    shape = ref.shape as Cuboid;
 
-      expect(ref.handle).not.toBe(firstHandle);
-      expect(shape.halfExtents.x).toBe(2);
+    expect(ref.handle).not.toBe(firstHandle);
+    expect(shape.halfExtents.x).toBe(2);
 
-      await ReactThreeTestRenderer.act(async () => {
-        _setProps({
-          position: [2, 0, 0],
-          args: [3, 1, 1]
-        });
+    await ReactThreeTestRenderer.act(async () => {
+      _setProps({
+        position: [2, 0, 0],
+        args: [3, 1, 1]
       });
+    });
 
-      // This is yet another new collider
-      ref = _ref!.current!;
-      shape = ref.shape as Cuboid;
+    // This is yet another new collider
+    ref = _ref!.current!;
+    shape = ref.shape as Cuboid;
 
-      expect(ref.handle).not.toBe(firstHandle);
-      expect(shape.halfExtents.x).toBe(3);
-    }
-  );
+    expect(ref.handle).not.toBe(firstHandle);
+    expect(shape.halfExtents.x).toBe(3);
+  });
 });

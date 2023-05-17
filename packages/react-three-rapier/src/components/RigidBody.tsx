@@ -80,6 +80,9 @@ export const RigidBody = memo(
         const desc = rigidBodyDescFromOptions(mergedOptions);
         const rigidBody = world.createRigidBody(desc);
 
+        if (typeof forwardedRef === "function") {
+          forwardedRef(rigidBody);
+        }
         rigidBodyRef.current = rigidBody;
 
         return rigidBody;

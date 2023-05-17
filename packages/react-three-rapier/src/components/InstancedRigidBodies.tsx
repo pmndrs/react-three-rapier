@@ -27,7 +27,7 @@ export interface InstancedRigidBodiesProps extends RigidBodyProps {
 }
 
 export const InstancedRigidBodies = memo(
-  forwardRef<(RapierRigidBody | null)[], InstancedRigidBodiesProps>(
+  forwardRef<(RapierRigidBody | null)[] | null, InstancedRigidBodiesProps>(
     (props, forwardedRef) => {
       const rigidBodiesRef = useForwardedRef<(RapierRigidBody | null)[]>(
         forwardedRef,

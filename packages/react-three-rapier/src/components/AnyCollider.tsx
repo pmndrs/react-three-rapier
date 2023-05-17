@@ -72,6 +72,9 @@ export const AnyCollider = memo(
           rigidBodyContext?.getRigidBody
         );
 
+        if (typeof forwardedRef == "function") {
+          forwardedRef(collider);
+        }
         colliderRef.current = collider;
 
         return collider;
