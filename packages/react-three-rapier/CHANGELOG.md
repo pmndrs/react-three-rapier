@@ -1,5 +1,11 @@
 # @react-three/rapier
 
+## 0.16.0-canary.1
+
+### Patch Changes
+
+- 3057f3c: Fix initiation to only happen in mount effects, never render, for increased stability (@wiledal)
+
 ## 0.16.0-canary.0
 
 ### Minor Changes
