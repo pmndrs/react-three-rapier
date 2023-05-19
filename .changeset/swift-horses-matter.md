@@ -2,4 +2,4 @@
 "@react-three/rapier": patch
 ---
 
-Internal refactor regarding instances
+Internal refactor regarding instances (@wiledal)
