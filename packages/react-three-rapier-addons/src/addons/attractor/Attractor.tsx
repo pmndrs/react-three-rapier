@@ -143,7 +143,7 @@ export const Attractor: FC<AttractorProps> = memo((props) => {
 
   useBeforePhysicsStep((world) => {
     if (object.current) {
-      world.raw().bodies.forEach((body) => {
+      world.bodies.forEach((body) => {
         if (body.isDynamic()) {
           applyAttractorForceOnRigidBody(body, {
             object: object.current!,

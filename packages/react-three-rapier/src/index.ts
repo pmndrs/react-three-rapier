@@ -23,7 +23,6 @@ export type {
   WorldStepCallback
 } from "./components/Physics";
 export type { MeshColliderProps } from "./components/MeshCollider";
-export type { WorldApi } from "./utils/api";
 
 export { Physics } from "./components/Physics";
 export { RigidBody } from "./components/RigidBody";
