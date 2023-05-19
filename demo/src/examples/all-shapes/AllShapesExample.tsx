@@ -85,25 +85,25 @@ export const AllShapesExample: Demo = () => {
           <Html>Auto Trimesh</Html>
         </RigidBody>
 
-        <RigidBody position={[0, 4, 0]}>
+        <RigidBody colliders={false} position={[0, 4, 0]}>
           <Suzanne />
           <CuboidCollider args={[1, 1, 1]} />
           <Html>Custom Cuboid</Html>
         </RigidBody>
 
-        <RigidBody position={[4.1, 4, 0]}>
+        <RigidBody colliders={false} position={[4.1, 4, 0]}>
           <Suzanne />
           <BallCollider args={[1]} />
           <Html>Custom BallCollider</Html>
         </RigidBody>
 
-        <RigidBody position={[8, 4, 0]}>
+        <RigidBody colliders={false} position={[8, 4, 0]}>
           <Suzanne />
           <ConeCollider args={[1, 1]} />
           <Html>Custom ConeCollider</Html>
         </RigidBody>
 
-        <RigidBody position={[5, 8, 0]}>
+        <RigidBody colliders={false} position={[5, 8, 0]}>
           <Suzanne />
           <TrimeshCollider
             args={[
@@ -115,7 +115,7 @@ export const AllShapesExample: Demo = () => {
           <Html>Custom TrimeshCollider</Html>
         </RigidBody>
 
-        <RigidBody position={[0, 8, 0]}>
+        <RigidBody colliders={false} position={[0, 8, 0]}>
           <Suzanne />
           <ConvexHullCollider
             args={[nodes.Suzanne.geometry.attributes.position.array]}
@@ -123,7 +123,7 @@ export const AllShapesExample: Demo = () => {
           <Html>Custom TrimeshCollider</Html>
         </RigidBody>
 
-        <RigidBody position={[8, 8, 0]}>
+        <RigidBody colliders={false} position={[8, 8, 0]}>
           <Suzanne />
           <Html>Custom Combound shape</Html>
 
@@ -131,7 +131,7 @@ export const AllShapesExample: Demo = () => {
           <BallCollider args={[0.5]} position={[-1, -1, 1]} />
         </RigidBody>
 
-        <RigidBody position={[4, 10, 0]} colliders={"ball"}>
+        <RigidBody colliders={"ball"} position={[4, 10, 0]}>
           <Suzanne />
           <Html>Auto and Custom Combound shape</Html>
 
