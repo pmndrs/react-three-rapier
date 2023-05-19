@@ -5,6 +5,7 @@ import {
   RapierRigidBody,
   RigidBody,
   RigidBodyOptions,
+  useRapier,
   useSphericalJoint
 } from "@react-three/rapier";
 import { useEffect, useRef } from "react";
@@ -18,6 +19,12 @@ const Rod = (props: RigidBodyOptions) => {
     [0, 0, 0],
     [0, 0, 0]
   ]);
+
+  const { world } = useRapier();
+
+  useEffect(() => {
+    world.maxStabilizationIterations = 10;
+  }, []);
 
   return (
     <group>

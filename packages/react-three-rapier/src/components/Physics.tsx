@@ -4,7 +4,8 @@ import {
   ColliderHandle,
   EventQueue,
   RigidBody,
-  RigidBodyHandle
+  RigidBodyHandle,
+  World
 } from "@dimforge/rapier3d-compat";
 import { useThree } from "@react-three/fiber";
 import React, {
@@ -14,6 +15,7 @@ import React, {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState
 } from "react";
 import { MathUtils, Matrix4, Object3D, Quaternion, Vector3 } from "three";
@@ -29,7 +31,6 @@ import {
   Vector3Tuple
 } from "../types";
 
-import { createWorldApi, WorldApi } from "../utils/api";
 import {
   _matrix4,
   _position,
@@ -44,6 +45,7 @@ import {
 import FrameStepper from "./FrameStepper";
 import { Debug } from "./Debug";
 import { useImperativeInstance } from "../hooks/use-imperative-instance";
+import { createSingletonProxy } from "../utils/singleton-proxy";
 
 export interface RigidBodyState {
   meshType: "instancedMesh" | "mesh";
@@ -61,7 +63,7 @@ export interface RigidBodyState {
 
 export type RigidBodyStateMap = Map<RigidBody["handle"], RigidBodyState>;
 
-export type WorldStepCallback = (worldApi: WorldApi) => void;
+export type WorldStepCallback = (world: World) => void;
 
 export type WorldStepCallbackSet = Set<{ current: WorldStepCallback }>;
 
@@ -130,7 +132,7 @@ export interface RapierContext {
   /**
    * The Rapier physics world
    */
-  world: WorldApi;
+  world: World;
 
   /**
    * If the physics simulation is paused
@@ -306,17 +308,6 @@ export const Physics: FC<PhysicsProps> = ({
   const rapier = useAsset(importRapier);
   const { invalidate } = useThree();
 
-  // Init World
-  const getWorld = useImperativeInstance(
-    () => {
-      return new rapier.World(vectorArrayToVector3(gravity));
-    },
-    (world) => {
-      world.free();
-    },
-    []
-  );
-
   const rigidBodyStates = useConst<RigidBodyStateMap>(() => new Map());
   const colliderStates = useConst<ColliderStateMap>(() => new Map());
   const rigidBodyEvents = useConst<EventMap>(() => new Map());
@@ -325,27 +316,37 @@ export const Physics: FC<PhysicsProps> = ({
   const beforeStepCallbacks = useConst<WorldStepCallbackSet>(() => new Set());
   const afterStepCallbacks = useConst<WorldStepCallbackSet>(() => new Set());
 
+  /**
+   * Initiate the world
+   * This creates a singleton proxy, so that the world is only created when
+   * something within it is accessed.
+   */
+  const { proxy: worldProxy, reset: resetWorldProxy } = useConst(() =>
+    createSingletonProxy<World>(
+      () => new rapier.World(vectorArrayToVector3(gravity))
+    )
+  );
+  useEffect(() => {
+    return () => {
+      worldProxy.free();
+      resetWorldProxy();
+    };
+  }, []);
+
   // Update gravity
   useEffect(() => {
-    const world = getWorld();
-    if (world) {
-      world.gravity = vectorArrayToVector3(gravity);
-    }
+    worldProxy.gravity = vectorArrayToVector3(gravity);
   }, [gravity]);
 
-  const api = useMemo(() => createWorldApi(getWorld), []);
-
   const getSourceFromColliderHandle = useCallback((handle: ColliderHandle) => {
-    const world = getWorld();
-
-    const collider = world.getCollider(handle);
+    const collider = worldProxy.getCollider(handle);
     const colEvents = colliderEvents.get(handle);
     const colliderState = colliderStates.get(handle);
 
     const rigidBodyHandle = collider?.parent()?.handle;
     const rigidBody =
       rigidBodyHandle !== undefined
-        ? world.getRigidBody(rigidBodyHandle)
+        ? worldProxy.getRigidBody(rigidBodyHandle)
         : undefined;
     const rbEvents =
       rigidBody && rigidBodyHandle !== undefined
@@ -382,7 +383,7 @@ export const Physics: FC<PhysicsProps> = ({
 
   const step = useCallback(
     (dt: number) => {
-      const world = getWorld();
+      const world = worldProxy;
 
       /* Check if the timestep is supposed to be variable. We'll do this here
         once so we don't have to string-check every frame. */
@@ -398,14 +399,14 @@ export const Physics: FC<PhysicsProps> = ({
       const stepWorld = () => {
         // Trigger beforeStep callbacks
         beforeStepCallbacks.forEach((callback) => {
-          callback.current(api);
+          callback.current(worldProxy);
         });
 
         world.step(eventQueue);
 
         // Trigger afterStep callbacks
         afterStepCallbacks.forEach((callback) => {
-          callback.current(api);
+          callback.current(worldProxy);
         });
       };
 
@@ -648,7 +649,7 @@ export const Physics: FC<PhysicsProps> = ({
   const context = useMemo<RapierContext>(
     () => ({
       rapier,
-      world: api,
+      world: worldProxy,
       physicsOptions: {
         colliders,
         gravity

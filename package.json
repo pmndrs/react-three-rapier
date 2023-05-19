@@ -43,9 +43,8 @@
     "watch": "preconstruct watch",
     "demo": "cd demo && yarn dev",
     "release": "yarn build && changeset publish",
-    "test": "vitest run",
+    "test": "tsc && vitest run",
     "test:ui": "vitest --ui",
-    "ts": "cd packages/react-three-rapier && yarn ts",
     "docs:build": "typedoc --out ./packages/react-three-rapier/docs ./packages/react-three-rapier/src/index.ts --excludeInternal",
     "canary:enter": "changeset pre enter canary",
     "canary:exit": "changeset pre exit"

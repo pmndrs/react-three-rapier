@@ -319,7 +319,7 @@ describe("colliders", () => {
         useEffect(() => {
           onMount({
             step,
-            world: world.raw(),
+            world,
             setShowCollider,
             setShowRigidBody
           });

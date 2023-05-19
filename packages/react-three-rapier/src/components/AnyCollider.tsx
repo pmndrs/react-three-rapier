@@ -80,7 +80,7 @@ export const AnyCollider = memo(
         return collider;
       },
       (collider) => {
-        world.removeCollider(collider);
+        world.removeCollider(collider, true);
       },
       [...immutablePropArray, rigidBodyContext]
     );
