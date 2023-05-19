@@ -2,13 +2,13 @@ import {
   Collider,
   ColliderDesc,
   ActiveEvents,
-  RigidBody
+  RigidBody,
+  World
 } from "@dimforge/rapier3d-compat";
-import { MutableRefObject, useEffect, useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { BufferGeometry, Euler, Mesh, Object3D, Vector3 } from "three";
 import { mergeVertices } from "three-stdlib";
 import { ColliderProps, RigidBodyProps } from "..";
-import { WorldApi } from "./api";
 import {
   ColliderState,
   ColliderStateMap,
@@ -54,7 +54,7 @@ export const scaleColliderArgs = (
 
 export const createColliderFromOptions = (
   options: ColliderProps,
-  world: WorldApi,
+  world: World,
   scale: Vector3,
   getRigidBody?: () => RigidBody
 ) => {
