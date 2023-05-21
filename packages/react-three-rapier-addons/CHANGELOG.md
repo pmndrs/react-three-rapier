@@ -1,5 +1,12 @@
 # @react-three/rapier-addons
 
+## 2.0.0-canary.1
+
+### Patch Changes
+
+- Updated dependencies [6c764cc]
+  - @react-three/rapier@1.0.0-canary.2
+
 ## 1.0.2-canary.0
 
 ### Patch Changes
