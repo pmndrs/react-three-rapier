@@ -4,7 +4,7 @@
 
 Remove WorldApi, replace with singleton instance proxy (@wiledal)
 
-BREAKING CHANGE: The zWorldApiz has been removed. Instead, you can now get a proxied singleton instance of the world from `@react-three/rapier`. This is a breaking change, but it should be easy to migrate to.
+BREAKING CHANGE: The `WorldApi` has been removed. Instead, you can now get a proxied singleton instance of the world from `@react-three/rapier`. This is a breaking change, but it should be easy to migrate to.
 
 Before:
 ```tsx
@@ -15,7 +15,7 @@ const Component = () => {
 
   useEffect(() => {
     // Access to the WorldApi (limited)
-    world.bodies.forEach(() => {
+    world.raw().bodies.forEach(() => {
       // Do something
     })
 
