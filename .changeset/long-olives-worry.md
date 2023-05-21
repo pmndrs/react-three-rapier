@@ -4,7 +4,7 @@
 
 Remove WorldApi, replace with singleton instance proxy (@wiledal)
 
-BREAKING CHANGE: The WorldApi has been removed. Instead, you can now import the singleton instance of the world from @react-three/rapier. This is a breaking change, but it should be easy to migrate to.
+BREAKING CHANGE: The zWorldApiz has been removed. Instead, you can now get a proxied singleton instance of the world from `@react-three/rapier`. This is a breaking change, but it should be easy to migrate to.
 
 Before:
 ```tsx
@@ -43,7 +43,7 @@ const Component = () => {
 }
 ```
 
-Note: it is best to avoid accessing properties and methods on the world outside of `useEffect`, or `useLayoutEffect` in order for the world to be properly synchronized with the React component lifecycle.
+Note: it is best to avoid accessing properties and methods on the world outside of `useEffect` in order for the world to be properly synchronized with the React component lifecycle.
 ```tsx
 // bad
 const Component = () => {
