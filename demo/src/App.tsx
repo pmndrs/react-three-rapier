@@ -146,6 +146,7 @@ export const App = () => {
               key={physicsKey}
               interpolate={interpolate}
               debug={debug}
+              // erp={0.2}
             >
               <directionalLight
                 castShadow

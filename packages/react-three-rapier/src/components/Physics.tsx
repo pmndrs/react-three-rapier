@@ -225,6 +225,48 @@ export interface PhysicsProps {
   gravity?: Vector3Tuple;
 
   /**
+   * The maximum velocity iterations the velocity-based constraint solver can make to attempt
+   * to remove the energy introduced by constraint stabilization.
+   *
+   * @defaultValue 1
+   */
+  maxStabilizationIterations?: number;
+
+  /**
+   * The maximum velocity iterations the velocity-based friction constraint solver can make.
+   *
+   * The greater this value is, the most realistic friction will be.
+   * However a greater number of iterations is more computationally intensive.
+   *
+   * @defaultValue 8
+   */
+  maxVelocityFrictionIterations?: number;
+
+  /**
+   * The maximum velocity iterations the velocity-based force constraint solver can make.
+   *
+   * The greater this value is, the most rigid and realistic the physics simulation will be.
+   * However a greater number of iterations is more computationally intensive.
+   *
+   * @defaultValue 4
+   */
+  maxVelocityIterations?: number;
+
+  /**
+   * The maximal distance separating two objects that will generate predictive contacts
+   *
+   * @defaultValue 0.002
+   *
+   */
+  predictionDistance?: number;
+
+  /**
+   * The Error Reduction Parameter in between 0 and 1, is the proportion of the positional error to be corrected at each time step
+   * @defaultValue 0.8
+   */
+  erp?: number;
+
+  /**
    * Set the base automatic colliders for this physics world
    * All Meshes inside RigidBodies will generate a collider
    * based on this value, if not overridden.
@@ -294,17 +336,24 @@ export interface PhysicsProps {
  * The main physics component used to create a physics world.
  * @category Components
  */
-export const Physics: FC<PhysicsProps> = ({
-  colliders = "cuboid",
-  gravity = [0, -9.81, 0],
-  children,
-  timeStep = 1 / 60,
-  paused = false,
-  interpolate = true,
-  updatePriority,
-  updateLoop = "follow",
-  debug = false
-}) => {
+export const Physics: FC<PhysicsProps> = (props) => {
+  const {
+    colliders = "cuboid",
+    children,
+    timeStep = 1 / 60,
+    paused = false,
+    interpolate = true,
+    updatePriority,
+    updateLoop = "follow",
+    debug = false,
+
+    gravity = [0, -9.81, 0],
+    maxStabilizationIterations = 1,
+    maxVelocityFrictionIterations = 8,
+    maxVelocityIterations = 4,
+    predictionDistance = 0.002,
+    erp = 0.8
+  } = props;
   const rapier = useAsset(importRapier);
   const { invalidate } = useThree();
 
@@ -333,10 +382,26 @@ export const Physics: FC<PhysicsProps> = ({
     };
   }, []);
 
-  // Update gravity
+  // Update mutable props
   useEffect(() => {
     worldProxy.gravity = vectorArrayToVector3(gravity);
-  }, [gravity]);
+    worldProxy.integrationParameters.maxStabilizationIterations =
+      maxStabilizationIterations;
+    worldProxy.integrationParameters.maxVelocityFrictionIterations =
+      maxVelocityFrictionIterations;
+    worldProxy.integrationParameters.maxVelocityIterations =
+      maxVelocityIterations;
+    worldProxy.integrationParameters.predictionDistance = predictionDistance;
+    worldProxy.integrationParameters.erp = erp;
+  }, [
+    worldProxy,
+    ...gravity,
+    maxStabilizationIterations,
+    maxVelocityIterations,
+    maxVelocityFrictionIterations,
+    predictionDistance,
+    erp
+  ]);
 
   const getSourceFromColliderHandle = useCallback((handle: ColliderHandle) => {
     const collider = worldProxy.getCollider(handle);

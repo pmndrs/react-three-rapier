@@ -88,7 +88,9 @@ export const RigidBody = memo(
         return rigidBody;
       },
       (rigidBody) => {
-        world.removeRigidBody(rigidBody);
+        if (world.getRigidBody(rigidBody.handle)) {
+          world.removeRigidBody(rigidBody);
+        }
       },
       immutablePropArray
     );
