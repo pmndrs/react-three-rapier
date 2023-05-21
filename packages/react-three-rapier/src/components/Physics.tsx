@@ -253,6 +253,20 @@ export interface PhysicsProps {
   maxVelocityIterations?: number;
 
   /**
+   * The maximal distance separating two objects that will generate predictive contacts
+   *
+   * @defaultValue 0.002
+   *
+   */
+  predictionDistance?: number;
+
+  /**
+   * The Error Reduction Parameter in between 0 and 1, is the proportion of the positional error to be corrected at each time step
+   * @defaultValue 0.8
+   */
+  erp?: number;
+
+  /**
    * Set the base automatic colliders for this physics world
    * All Meshes inside RigidBodies will generate a collider
    * based on this value, if not overridden.
@@ -336,7 +350,9 @@ export const Physics: FC<PhysicsProps> = (props) => {
     gravity = [0, -9.81, 0],
     maxStabilizationIterations = 1,
     maxVelocityFrictionIterations = 8,
-    maxVelocityIterations = 4
+    maxVelocityIterations = 4,
+    predictionDistance = 0.002,
+    erp = 0.8
   } = props;
   const rapier = useAsset(importRapier);
   const { invalidate } = useThree();
@@ -375,12 +391,16 @@ export const Physics: FC<PhysicsProps> = (props) => {
       maxVelocityFrictionIterations;
     worldProxy.integrationParameters.maxVelocityIterations =
       maxVelocityIterations;
+    worldProxy.integrationParameters.predictionDistance = predictionDistance;
+    worldProxy.integrationParameters.erp = erp;
   }, [
     worldProxy,
     ...gravity,
     maxStabilizationIterations,
     maxVelocityIterations,
-    maxVelocityFrictionIterations
+    maxVelocityFrictionIterations,
+    predictionDistance,
+    erp
   ]);
 
   const getSourceFromColliderHandle = useCallback((handle: ColliderHandle) => {
