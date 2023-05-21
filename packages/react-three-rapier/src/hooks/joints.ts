@@ -50,15 +50,15 @@ export const useImpulseJoint = <JointType extends ImpulseJoint>(
 
         jointRef.current = newJoint;
 
-        // console.log(body1.current, body2.current, newJoint);
-
         return newJoint;
       }
     },
     (joint) => {
       if (joint) {
         jointRef.current = undefined;
-        world.removeImpulseJoint(joint, true);
+        if (world.getImpulseJoint(joint.handle)) {
+          world.removeImpulseJoint(joint, true);
+        }
       }
     },
     []
