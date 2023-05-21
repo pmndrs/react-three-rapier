@@ -1,5 +1,87 @@
 # @react-three/rapier
 
+## 1.0.0
+
+### Major Changes
+
+- 6c764cc: Remove WorldApi, replace with singleton instance proxy (@wiledal)
+
+  BREAKING CHANGE: The `WorldApi` has been removed. Instead, you can now get a proxied singleton instance of the world from `@react-three/rapier`. This is a breaking change, but it should be easy to migrate to.
+
+  Before:
+
+  ```tsx
+  import { useRapier } from "@react-three/rapier";
+
+  const Component = () => {
+    const { world } = useRapier();
+
+    useEffect(() => {
+      // Access to the WorldApi (limited)
+      world.raw().bodies.forEach(() => {
+        // Do something
+      });
+
+      // Access the raw Rapier World instance
+      const rawWorldInstance = world.raw();
+      rawWorldInstance.raw().setGravity(new Vector3(0, -9.81, 0));
+    }, []);
+  };
+  ```
+
+  Now:
+
+  ```tsx
+  import { useRapier } from "@react-three/rapier";
+
+  const Component = () => {
+    const { world } = useRapier();
+
+    useEffect(() => {
+      // Access the Rapier World instance directly
+      world.bodies.forEach(() => {
+        // Do something
+      });
+      world.setGravity(new Vector3(0, -9.81, 0));
+    }, []);
+  };
+  ```
+
+  Note: it is best to avoid accessing properties and methods on the world outside of `useEffect` in order for the world to be properly synchronized with the React component lifecycle.
+
+  ```tsx
+  // bad
+  const Component = () => {
+    const {world} = useRapier()
+
+    world.setGravity(...)
+
+    return null
+  }
+
+  // good
+  const Component = () => {
+    const {world} = useRapier()
+
+    useEffect(() => {
+      world.setGravity(...)
+    }, [])
+
+    return null
+  }
+  ```
+
+### Minor Changes
+
+- 93c7e8c: Add missing RoundCylinderCollider and RoundConeCollider (@wiledal)
+- c4d2446: Deprecate Vector3Array for Vector3Tuple (@wiledal)
+- af27f83: Add integrationProperties as mutable props on Physics (@wiledal)
+
+### Patch Changes
+
+- 3057f3c: Fix initiation to only happen in mount effects, never render, for increased stability (@wiledal)
+- c4d2446: Internal refactor regarding instances (@wiledal)
+
 ## 1.0.0-canary.2
 
 ### Major Changes
