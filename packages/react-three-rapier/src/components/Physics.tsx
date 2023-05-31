@@ -459,29 +459,26 @@ export const Physics: FC<PhysicsProps> = (props) => {
        * @see https://gafferongames.com/post/fix_your_timestep/
        */
 
-      const clampedDelta = MathUtils.clamp(dt, 0, 0.2);
+      const clampedDelta = MathUtils.clamp(dt, 0, 0.5);
 
-      const stepWorld = () => {
+      const stepWorld = (delta: number) => {
         // Trigger beforeStep callbacks
         beforeStepCallbacks.forEach((callback) => {
-          callback.current(worldProxy);
+          callback.current(world);
         });
 
+        world.timestep = delta;
         world.step(eventQueue);
 
         // Trigger afterStep callbacks
         afterStepCallbacks.forEach((callback) => {
-          callback.current(worldProxy);
+          callback.current(world);
         });
       };
 
       if (timeStepVariable) {
-        world.timestep = clampedDelta;
-
-        stepWorld();
+        stepWorld(clampedDelta);
       } else {
-        world.timestep = timeStep;
-
         // don't step time forwards if paused
         // Increase accumulator
         steppingState.accumulator += clampedDelta;
@@ -499,7 +496,7 @@ export const Physics: FC<PhysicsProps> = (props) => {
             });
           }
 
-          stepWorld();
+          stepWorld(timeStep);
 
           steppingState.accumulator -= timeStep;
         }
@@ -708,7 +705,7 @@ export const Physics: FC<PhysicsProps> = (props) => {
         invalidate();
       });
     },
-    [paused, timeStep, interpolate]
+    [paused, timeStep, interpolate, worldProxy]
   );
 
   const context = useMemo<RapierContext>(
