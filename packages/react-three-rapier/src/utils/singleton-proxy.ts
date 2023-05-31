@@ -21,6 +21,12 @@ export const createSingletonProxy = <
         instance = createInstance();
       }
       return Reflect.get(instance!, prop);
+    },
+    set(target, prop, value) {
+      if (!instance) {
+        instance = createInstance();
+      }
+      return Reflect.set(instance!, prop, value);
     }
   };
 
