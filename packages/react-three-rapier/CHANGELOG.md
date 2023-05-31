@@ -1,5 +1,11 @@
 # @react-three/rapier
 
+## 1.0.1
+
+### Patch Changes
+
+- 787462d: Fix world settings not updating when being set (@wiledal)
+
 ## 1.0.0
 
 ### Major Changes
