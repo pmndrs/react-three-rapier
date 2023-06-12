@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "@dimforge/rapier3d-compat": "0.11.2",
-    "three-stdlib": "2.21.6",
+    "three-stdlib": "2.23.9",
     "use-asset": "1.0.4"
   },
   "repository": "https://github.com/pmndrs/react-three-rapier/tree/master/packages/react-three-rapier"
