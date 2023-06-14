@@ -1,11 +1,15 @@
 <!-- omit from toc -->
+
 # @React-Three/Rapier-Addons
 
 This package contains a collection of helpers and extensions to for use with [@react-three/rapier](https://github.com/pmndrs/react-three-rapier).
 
 ---
+
 <!-- omit from toc -->
+
 ## Addons index
+
 - [Attractors](#attractors)
   - [🖼 Attractors Example](#-attractors-example)
 
@@ -61,9 +65,11 @@ type AttractorProps = {
    * If not specified, the attractor will apply effects to all RigidBodies.
    */
   collisionGroups?: InteractionGroups;
-}
+};
 ```
+
 a
+
 ```tsx
 import { Attractor } from "@react-three/rapier-addons"
 
@@ -94,6 +100,5 @@ Gravity types:
   - `distance` is the distance between the attractor and rigid-body at the time of calculation
 
 #### 🖼 Attractors Example
+
 <a href="https://codesandbox.io/s/react-three-rapier-attractors-oyj640"><img src="https://raw.githubusercontent.com/pmndrs/react-three-rapier/HEAD/packages/react-three-rapier/misc/example-attractors.jpg" width="240" /></a>
-
-

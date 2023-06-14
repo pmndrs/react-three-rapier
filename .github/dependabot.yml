@@ -6,6 +6,6 @@
 version: 2
 updates:
   - package-ecosystem: "npm"
-    directory: "/packages/react-three-rapier" 
+    directory: "/packages/react-three-rapier"
     schedule:
       interval: "weekly"

@@ -38,7 +38,7 @@ const App = () => {
             <Torus />
           </RigidBody>
 
-          <CuboidCollider position={[0, -2, 0]} args={[20, .5, 20]} />
+          <CuboidCollider position={[0, -2, 0]} args={[20, 0.5, 20]} />
         </Physics>
       </Suspense>
     </Canvas>
@@ -50,6 +50,7 @@ const App = () => {
 
 <!-- omit from toc -->
 ## 📝 Readme note
+
 Below follows a guide on core concepts for `react-three/rapier`.  
 For full API outline and documentation, see 🧩 [API Docs](https://pmndrs.github.io/react-three-rapier/).
 
@@ -85,6 +86,7 @@ For full API outline and documentation, see 🧩 [API Docs](https://pmndrs.githu
 ---
 
 ## The Physics Component
+
 The `<Physics />` component is the root component of your physics world. It is responsible for creating the physics world and managing the simulation. It relies on lazily initiating `Rapier` and needs to be wrapped in `<Suspense />`.
 
 🧩 See [PhysicsProps docs](https://pmndrs.github.io/react-three-rapier/interfaces/PhysicsProps.html) for available props.
@@ -94,20 +96,17 @@ const Scene = () => {
   return (
     <Canvas>
       <Suspense>
-        <Physics 
-          gravity={[0,1,0]} 
-          interpolation={false} 
-          colliders={false}
-        >
+        <Physics gravity={[0, 1, 0]} interpolation={false} colliders={false}>
           ...
         </Physics>
       </Suspense>
     </Canvas>
   );
-}
+};
 ```
 
 ## The RigidBody Component
+
 The `<RigidBody />` component is used to add a `mesh` into the physics world. You use it by wrapping one or more `meshes` and setting desired props. By default, this will automatically generate `Colliders` based on the shape of the wrapped `meshes` (see [Automatic colliders](#automatic-colliders)).
 
 🧩 See [RigidBodyProps docs](https://pmndrs.github.io/react-three-rapier/interfaces/RigidBodyProps.html) for available props.
@@ -228,6 +227,7 @@ If part of our meshes are invisible and you want to include them in the collider
 ```
 
 ### 🖼 Collider Examples
+
 <a href="https://codesandbox.io/s/react-three-rapier-auto-colliders-b4coz1"><img src="https://raw.githubusercontent.com/pmndrs/react-three-rapier/HEAD/packages/react-three-rapier/misc/example-auto-colliders.jpg" width="240" /></a>
 <a href="https://codesandbox.io/s/react-three-rapier-compound-colliders-ol5ybn"><img src="https://raw.githubusercontent.com/pmndrs/react-three-rapier/HEAD/packages/react-three-rapier/misc/example-compound-shapes.jpg" width="240" /></a>
 
@@ -249,7 +249,7 @@ const Scene = () => {
 
   useEffect(() => {
     if (!rigidBodies.current) {
-      return
+      return;
     }
 
     // You can access individual instanced by their index
@@ -270,9 +270,9 @@ const Scene = () => {
 
     for (let i = 0; i < COUNT; i++) {
       instances.push({
-        key: 'instance_' + Math.random(),
+        key: "instance_" + Math.random(),
         position: [Math.random() * 10, Math.random() * 10, Math.random() * 10],
-        rotation: [Math.random(), Math.random(), Math.random()],
+        rotation: [Math.random(), Math.random(), Math.random()]
       });
     }
 
@@ -294,8 +294,12 @@ const Scene = () => {
 We can also create compound shapes for instanced meshes by providing an array of `Colliders` in the `colliderNodes` prop.
 
 ```tsx
-import { InstancedRigidBodies, BoxCollider, SphereCollider } from "@react-three/rapier";
-const COUNT = 500
+import {
+  InstancedRigidBodies,
+  BoxCollider,
+  SphereCollider
+} from "@react-three/rapier";
+const COUNT = 500;
 
 const Scene = () => {
   const instances = useMemo(() => {
@@ -303,9 +307,9 @@ const Scene = () => {
 
     for (let i = 0; i < COUNT; i++) {
       instances.push({
-        key: 'instance_' + Math.random(),
+        key: "instance_" + Math.random(),
         position: [Math.random() * 10, Math.random() * 10, Math.random() * 10],
-        rotation: [Math.random(), Math.random(), Math.random()],
+        rotation: [Math.random(), Math.random(), Math.random()]
       });
     }
 
@@ -318,7 +322,7 @@ const Scene = () => {
       colliders="ball"
       colliderNodes={[
         <BoxCollider args={[0.5, 0.5, 0.5]} />,
-        <SphereCollider args={[0.5]} />,
+        <SphereCollider args={[0.5]} />
       ]}
     >
       <instancedMesh args={[undefined, undefined, COUNT]} count={COUNT} />
@@ -350,6 +354,7 @@ const Scene = () => {
 ```
 
 ## Moving things around, and applying forces
+
 You can access the instance for a RigidBody by storing its `ref`. This allows you to perform any operation on the underlying physics object directly.
 
 `r3/rapier` exposes a `RapierRigidBody` and `RapierCollider` as aliases for `rapiers` underlying base objects.
@@ -357,10 +362,7 @@ You can access the instance for a RigidBody by storing its `ref`. This allows yo
 For all available methods, see the [Rapier docs](https://rapier.rs/javascript3d/classes/RigidBody.html).
 
 ```tsx
-import { 
-  RigidBody, 
-  RapierRigidBody
-} from "@react-three/rapier";
+import { RigidBody, RapierRigidBody } from "@react-three/rapier";
 
 const Scene = () => {
   const rigidBody = useRef<RapierRigidBody>(null);
@@ -395,28 +397,25 @@ const Scene = () => {
 Rapier's API returns quaternions and vectors that are not compatible with Three.js, `r3/rapier` therefore exposes some helper functions (`vec3`, `quat`, `euler`) for quick type conversions. These helper functions can also be used as a shorthand for creating new objects.
 
 ```tsx
-import { 
-  RapierRigidBody, 
-  quat, 
-  vec3, 
-  euler 
-} from "@react-three/rapier";
+import { RapierRigidBody, quat, vec3, euler } from "@react-three/rapier";
 
 const Scene = () => {
-  const rigidBody = useRef<RapierRigidBody>(null)
+  const rigidBody = useRef<RapierRigidBody>(null);
 
   useEffect(() => {
     if (rigidBody.current) {
-      const position = vec3(rigidBody.current.translation())
-      const quaternion = quat(rigidBody.current.rotation())
-      const eulerRot = euler().setFromQuaternion(quat(rigidBody.current.rotation()))
+      const position = vec3(rigidBody.current.translation());
+      const quaternion = quat(rigidBody.current.rotation());
+      const eulerRot = euler().setFromQuaternion(
+        quat(rigidBody.current.rotation())
+      );
 
       // While Rapier's return types need conversion, setting values can be done directly with Three.js types
-      rigidBody.current.setTranslation(position, true)
-      rigidBody.current.setRotation(quaternion, true)
-      rigidBody.current.setAngVel({x: 0, y: 2, z: 0}, true)
+      rigidBody.current.setTranslation(position, true);
+      rigidBody.current.setRotation(quaternion, true);
+      rigidBody.current.setAngVel({ x: 0, y: 2, z: 0 }, true);
     }
-  }, [])
+  }, []);
 
   return (
     <RigidBody ref={rigidBody}>
@@ -426,8 +425,7 @@ const Scene = () => {
       </mesh>
     </RigidBody>
   );
-}
-
+};
 ```
 
 ## Collision Events
@@ -541,9 +539,10 @@ Contact force events are triggered on `<RigidBody>` and any collider components 
   colliders="ball"
   onContactForce={(payload) => {
     console.log(`The total force generated was: ${payload.totalForce}`);
-  }}>
+  }}
+>
   <Sphere>
-    <meshPhysicalMaterial color={'grey'} />
+    <meshPhysicalMaterial color={"grey"} />
   </Sphere>
 </RigidBody>
 ```
@@ -596,6 +595,7 @@ To detect when a collider enters or leaves another collider, you can use the `on
 ```
 
 ### 🖼 Sensors Example
+
 <a href="https://codesandbox.io/s/react-three-rapier-sensors-byjmsk"><img src="https://raw.githubusercontent.com/pmndrs/react-three-rapier/HEAD/packages/react-three-rapier/misc/example-sensors.jpg" width="240" /></a>
 
 ## Configuring Time Step Size
@@ -615,53 +615,58 @@ The `timeStep` prop may also be set to `"vary"`, which will cause the simulation
 > **Note** This is useful for games that run at variable frame rates, but may cause instability in the simulation. It also prevents the physics simulation from being fully deterministic. Please use with care!
 
 ## Joints
+
 Joints can be made between two `RigidBodies` to provide a way to restrict a motion of a body in relation to another.
+
 > Read more about joints in Rapier: https://rapier.rs/docs/user_guides/javascript/joints
 
 Joints are available in `r3/rapier` as hooks.
 
 There are 4 different joint types available:
+
 - Fixed (two bodies are fixed together)
 - Spherical (two bodies are connected by a ball and socket, for things like arms or chains)
 - Revolute (two bodies are connected by a hinge, for things like doors or wheels)
 - Prismatic (two bodies are connected by a sliding joint, for things like pistons or sliders)
 
-Each joint hook returns a RefObject containing the raw reference to the joint instance.  
+Each joint hook returns a RefObject containing the raw reference to the joint instance.
 
 ```tsx
-const WheelJoint = ({bodyA, bodyB}) => {
-  const joint = useRevoluteJoint(bodyA, bodyB, [[0,0,0],[0,0,0],[0,0,0]])
+const WheelJoint = ({ bodyA, bodyB }) => {
+  const joint = useRevoluteJoint(bodyA, bodyB, [
+    [0, 0, 0],
+    [0, 0, 0],
+    [0, 0, 0]
+  ]);
 
   useFrame(() => {
     if (joint.current) {
-      joint.current.configureMotorVelocity(10, 2)
+      joint.current.configureMotorVelocity(10, 2);
     }
-  }, [])
+  }, []);
 
-  return null
-}
+  return null;
+};
 ```
 
 ### Fixed Joint
+
 A fixed joint ensures that two rigid-bodies don't move relative to each other. Fixed joints are characterized by one local frame (represented by an isometry) on each rigid-body. The fixed-joint makes these frames coincide in world-space.
 
 🧩 See [FixedJoint docs](https://pmndrs.github.io/react-three-rapier/functions/useFixedJoint.html) for available options.
 
 ```tsx
 const JointedThing = () => {
-  const joint = useFixedJoint(
-    bodyA,
-    bodyB,
-    [
-      // Position of the joint in bodyA's local space
-      [0, 0, 0], 
-      // Orientation of the joint in bodyA's local space
-      [0, 0, 0, 1], 
-      // Position of the joint in bodyB's local space
-      [0, 0, 0], 
-       // Orientation of the joint in bodyB's local space
-      [0, 0, 0, 1],
-    ]);
+  const joint = useFixedJoint(bodyA, bodyB, [
+    // Position of the joint in bodyA's local space
+    [0, 0, 0],
+    // Orientation of the joint in bodyA's local space
+    [0, 0, 0, 1],
+    // Position of the joint in bodyB's local space
+    [0, 0, 0],
+    // Orientation of the joint in bodyB's local space
+    [0, 0, 0, 1]
+  ]);
 
   return (
     <group>
@@ -673,25 +678,23 @@ const JointedThing = () => {
       </RigidBody>
     </group>
   );
-}
+};
 ```
 
 ### Spherical Joint
+
 The spherical joint ensures that two points on the local-spaces of two rigid-bodies always coincide (it prevents any relative translational motion at this points).
 
 🧩 See [SphericalJoint docs](https://pmndrs.github.io/react-three-rapier/functions/useSphericalJoint.html) for available options.
 
 ```tsx
 const JointedThing = () => {
-  const joint = useSphericalJoint(
-    bodyA,
-    bodyB,
-    [
-      // Position of the joint in bodyA's local space
-      [0, 0, 0], 
-      // Position of the joint in bodyB's local space
-      [0, 0, 0], 
-    ]);
+  const joint = useSphericalJoint(bodyA, bodyB, [
+    // Position of the joint in bodyA's local space
+    [0, 0, 0],
+    // Position of the joint in bodyB's local space
+    [0, 0, 0]
+  ]);
 
   return (
     <group>
@@ -703,28 +706,26 @@ const JointedThing = () => {
       </RigidBody>
     </group>
   );
-}
+};
 ```
 
 ### Revolute Joint
+
 The revolute joint prevents any relative movement between two rigid-bodies, except for relative rotations along one axis. This is typically used to simulate wheels, fans, etc.
 
 🧩 See [RevoluteJoint docs](https://pmndrs.github.io/react-three-rapier/functions/useRevoluteJoint.html) for available options.
 
 ```tsx
 const JointedThing = () => {
-  const joint = useRevoluteJoint(
-    bodyA,
-    bodyB,
-    [
-      // Position of the joint in bodyA's local space    
-      [0, 0, 0], 
-      // Position of the joint in bodyB's local space
-      [0, 0, 0], 
-      // Axis of the joint, expressed in the local-space of 
-      // the rigid-bodies it is attached to. Cannot be [0,0,0].
-      [0, 1, 0], 
-    ]);
+  const joint = useRevoluteJoint(bodyA, bodyB, [
+    // Position of the joint in bodyA's local space
+    [0, 0, 0],
+    // Position of the joint in bodyB's local space
+    [0, 0, 0],
+    // Axis of the joint, expressed in the local-space of
+    // the rigid-bodies it is attached to. Cannot be [0,0,0].
+    [0, 1, 0]
+  ]);
 
   return (
     <group>
@@ -736,28 +737,26 @@ const JointedThing = () => {
       </RigidBody>
     </group>
   );
-}
+};
 ```
 
 ### Prismatic Joint
+
 The prismatic joint prevents any relative movement between two rigid-bodies, except for relative translations along one axis.
 
 🧩 See [PrismaticJoint docs](https://pmndrs.github.io/react-three-rapier/functions/usePrismaticJoint.html) for available options.
 
 ```tsx
 const JointedThing = () => {
-  const joint = usePrismaticJoint(
-    bodyA,
-    bodyB,
-    [
-      // Position of the joint in bodyA's local space    
-      [0, 0, 0], 
-      // Position of the joint in bodyB's local space
-      [0, 0, 0], 
-      // Axis of the joint, expressed in the local-space of 
-      // the rigid-bodies it is attached to. Cannot be [0,0,0].
-      [0, 1, 0], 
-    ]);
+  const joint = usePrismaticJoint(bodyA, bodyB, [
+    // Position of the joint in bodyA's local space
+    [0, 0, 0],
+    // Position of the joint in bodyB's local space
+    [0, 0, 0],
+    // Axis of the joint, expressed in the local-space of
+    // the rigid-bodies it is attached to. Cannot be [0,0,0].
+    [0, 1, 0]
+  ]);
 
   return (
     <group>
@@ -769,10 +768,11 @@ const JointedThing = () => {
       </RigidBody>
     </group>
   );
-}
+};
 ```
 
 ### 🖼 Joints Example
+
 <a href="https://codesandbox.io/s/react-three-rapier-joints-mhhbd4"><img src="https://raw.githubusercontent.com/pmndrs/react-three-rapier/HEAD/packages/react-three-rapier/misc/example-joints.jpg" width="240" /></a>
 
 ## Advanced hooks usage
@@ -800,6 +800,7 @@ step(1 / 60);
 ```
 
 ### On-demand rendering
+
 By default `@react-three/rapier` will update the physics simulation when a frame renders. This is fine for most cases, but if you want to only render the scene when things have changed, you need to run the physics simulation independently from the render loop.
 
 - See https://docs.pmnd.rs/react-three-fiber/advanced/scaling-performance#on-demand-rendering, for info on on-demand rendering in `@react-tree/fiber`.

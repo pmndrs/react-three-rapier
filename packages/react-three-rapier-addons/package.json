@@ -12,7 +12,7 @@
     "three": "*"
   },
   "dependencies": {
-    "three-stdlib": "2.21.6"
+    "three-stdlib": "2.23.9"
   },
   "devDependencies": {
     "@react-three/fiber": "8.9.1",
