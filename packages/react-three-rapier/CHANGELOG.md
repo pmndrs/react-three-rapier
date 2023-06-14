@@ -1,5 +1,11 @@
 # @react-three/rapier
 
+## 1.1.0
+
+### Minor Changes
+
+- 95a232b: Update deps
+
 ## 1.0.1
 
 ### Patch Changes
