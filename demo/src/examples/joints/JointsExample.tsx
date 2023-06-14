@@ -17,9 +17,9 @@ import {
 import { useImperativeHandle } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Demo } from "../../App";
-import { Quaternion } from "three";
+import { Mesh, Quaternion } from "three";
 
-const ShadowElement = forwardRef((_, ref) => (
+const ShadowElement = forwardRef<Mesh>((_, ref) => (
   <Sphere castShadow ref={ref} args={[0.5]}>
     <meshPhysicalMaterial />
   </Sphere>

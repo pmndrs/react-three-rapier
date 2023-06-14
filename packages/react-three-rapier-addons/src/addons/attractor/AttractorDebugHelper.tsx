@@ -4,7 +4,7 @@ import {
   Mesh,
   MeshBasicMaterial,
   Object3D,
-  SphereBufferGeometry,
+  SphereGeometry,
   Vector3
 } from "three";
 import { VertexNormalsHelper } from "three-stdlib";
@@ -24,7 +24,7 @@ export const AttractorDebugHelper = (
 
   useEffect(() => {
     ref.current = new Mesh(
-      new SphereBufferGeometry(0.2, 6, 6),
+      new SphereGeometry(0.2, 6, 6),
       new MeshBasicMaterial({ color, wireframe: true })
     );
 

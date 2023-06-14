@@ -15,7 +15,6 @@ import React, {
   useCallback,
   useEffect,
   useMemo,
-  useRef,
   useState
 } from "react";
 import { MathUtils, Matrix4, Object3D, Quaternion, Vector3 } from "three";
@@ -44,7 +43,6 @@ import {
 } from "../utils/utils";
 import FrameStepper from "./FrameStepper";
 import { Debug } from "./Debug";
-import { useImperativeInstance } from "../hooks/use-imperative-instance";
 import { createSingletonProxy } from "../utils/singleton-proxy";
 
 export interface RigidBodyState {
