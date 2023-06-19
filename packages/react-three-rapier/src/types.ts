@@ -463,9 +463,8 @@ export type FixedJointParams = [
 
 export type PrismaticJointParams = [
   body1Anchor: Vector3Tuple,
-  body1LocalFrame: Vector3Tuple,
   body2Anchor: Vector3Tuple,
-  body2LocalFrame: Vector3Tuple,
+  axis: Vector3Tuple,
   limits?: [min: number, max: number]
 ];
 
