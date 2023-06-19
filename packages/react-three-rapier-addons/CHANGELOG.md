@@ -1,5 +1,12 @@
 # @react-three/rapier-addons
 
+## 3.0.1
+
+### Patch Changes
+
+- Updated dependencies [c50783a]
+  - @react-three/rapier@1.1.1
+
 ## 3.0.0
 
 ### Minor Changes
