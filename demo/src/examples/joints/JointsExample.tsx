@@ -1,4 +1,4 @@
-import { Sphere } from "@react-three/drei";
+import { Box, Sphere } from "@react-three/drei";
 import {
   createRef,
   forwardRef,
@@ -12,7 +12,8 @@ import {
   RapierRigidBody,
   RigidBodyTypeString,
   useSphericalJoint,
-  Vector3Array
+  Vector3Array,
+  usePrismaticJoint
 } from "@react-three/rapier";
 import { useImperativeHandle } from "react";
 import { useFrame } from "@react-three/fiber";
@@ -89,10 +90,34 @@ const Rope = (props: { component: ReactNode; length: number }) => {
   );
 };
 
+const PrismaticExample = () => {
+  const box1 = useRef<RapierRigidBody>(null);
+  const box2 = useRef<RapierRigidBody>(null);
+  const joint = usePrismaticJoint(box1, box2, [
+    [-4, 0, 0],
+    [0, 4, 0],
+    [1, 0, 0],
+    [-2, 2]
+  ]);
+
+  return (
+    <group>
+      <RigidBody ref={box1}>
+        <Box />
+      </RigidBody>
+      <RigidBody ref={box2}>
+        <Box />
+      </RigidBody>
+    </group>
+  );
+};
+
 export const Joints: Demo = () => {
   return (
     <group>
       <Rope length={40} component={<ShadowElement />} />
+
+      <PrismaticExample />
     </group>
   );
 };
