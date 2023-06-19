@@ -1,5 +1,11 @@
 # @react-three/rapier
 
+## 1.1.1
+
+### Patch Changes
+
+- c50783a: Fix types for PrismaticJointParams (@wiledal)
+
 ## 1.1.0
 
 ### Minor Changes
