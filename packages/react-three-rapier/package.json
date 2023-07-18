@@ -15,7 +15,7 @@
     "@react-three/test-renderer": "8.1.5",
     "@types/react-dom": "18.0.2",
     "@types/three": "^0.152.1",
-    "@vitejs/plugin-react": "^2.1.0",
+    "@vitejs/plugin-react": "^4.0.3",
     "@vitest/ui": "0.32.0",
     "happy-dom": "9.19.2",
     "react": "18.2.0",
