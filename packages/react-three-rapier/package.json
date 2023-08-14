@@ -17,7 +17,7 @@
     "@types/three": "^0.152.1",
     "@vitejs/plugin-react": "^4.0.3",
     "@vitest/ui": "0.32.0",
-    "happy-dom": "9.19.2",
+    "happy-dom": "10.9.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "three": "0.146.0",
