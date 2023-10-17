@@ -181,21 +181,17 @@ describe("physics", () => {
   });
 
   describe("errors", () => {
-    it("throws a helpful error when useRapier is used outside of Physics", () => {
-      const error = new Error(
-        "react-three-rapier: useRapier must be used within <Physics />!"
-      );
+    const error = new Error(
+      "react-three-rapier: useRapier must be used within <Physics />!"
+    );
 
+    it("throws a helpful error when useRapier is used outside of Physics", () => {
       expect(async () => {
         renderHookWithErrors(useRapier);
       }).rejects.toEqual(error);
     });
 
     it("throws a helpful error when RigidBody is used outside of Physics", () => {
-      const error = new Error(
-        "react-three-rapier: useRapier must be used within <Physics />!"
-      );
-
       expect(async () => {
         await ReactThreeTestRenderer.create(
           <RigidBody
@@ -208,10 +204,6 @@ describe("physics", () => {
     });
 
     it("throws a helpful error when Collider is used outside of Physics", () => {
-      const error = new Error(
-        "react-three-rapier: useRapier must be used within <Physics />!"
-      );
-
       expect(async () => {
         await ReactThreeTestRenderer.create(<AnyCollider restitution={2} />);
       }).rejects.toEqual(error);
