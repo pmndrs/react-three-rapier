@@ -110,3 +110,23 @@ export const awaitReady = async (children: ReactNode) => {
 
   return step;
 };
+
+import { renderHook } from "@testing-library/react"; // v14.0.0
+import { Mock, vitest } from "vitest";
+
+// This suppresses console.error from cluttering the test output.
+export const supressConsoleError = () => {
+  vitest.spyOn(console, "error").mockImplementation(() => {});
+};
+
+export const restoreConsoleError = () => {
+  if ((console.error as Mock).mockRestore !== undefined) {
+    (console.error as Mock).mockRestore();
+  }
+};
+
+export const renderHookWithErrors = (hook: () => void) => {
+  supressConsoleError();
+  renderHook(hook);
+  restoreConsoleError();
+};

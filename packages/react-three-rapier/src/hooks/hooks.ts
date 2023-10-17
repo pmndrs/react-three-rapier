@@ -31,7 +31,10 @@ const useMutableCallback = <T>(fn: T) => {
  */
 export const useRapier = (): RapierContext => {
   const rapier = useContext(rapierContext);
-  if (!rapier) throw new Error('react-three-rapier: useRapier must be used within <Physics />!')
+  if (!rapier)
+    throw new Error(
+      "react-three-rapier: useRapier must be used within <Physics />!"
+    );
   return rapier;
 };
 
