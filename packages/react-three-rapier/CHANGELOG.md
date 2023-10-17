@@ -1,5 +1,11 @@
 # @react-three/rapier
 
+## 1.1.2
+
+### Patch Changes
+
+- c9e897a: Throw useful error when `usePhysics` used outside `<Physics />` (@CodyJasonBennett)
+
 ## 1.1.1
 
 ### Patch Changes
