@@ -28,6 +28,7 @@
     "@commitlint/config-conventional": "^17.1.0",
     "@manypkg/cli": "^0.19.1",
     "@preconstruct/cli": "^2.1.5",
+    "@testing-library/react": "14.0.0",
     "buffer": "^6.0.3",
     "np": "^7.6.1",
     "prettier": "2.7.1",

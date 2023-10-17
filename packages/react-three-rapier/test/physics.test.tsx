@@ -1,17 +1,19 @@
 import { it, describe, expect, vi } from "vitest";
 import {
+  AnyCollider,
   CuboidCollider,
   Physics,
   RapierContext,
   RapierRigidBody,
   RigidBody,
   useBeforePhysicsStep,
+  useRapier,
   vec3
 } from "../src";
 import React, { useEffect } from "react";
 import ReactThreeTestRenderer from "@react-three/test-renderer";
 import { Box } from "@react-three/drei";
-import { pause, UseRapierMounter } from "./test-utils";
+import { pause, renderHookWithErrors, UseRapierMounter } from "./test-utils";
 import { useFrame } from "@react-three/fiber";
 
 describe("physics", () => {
@@ -175,6 +177,36 @@ describe("physics", () => {
 
       expect(beforeStepCallback).toHaveBeenCalled();
       expect(frameCallback).toHaveBeenCalled();
+    });
+  });
+
+  describe("errors", () => {
+    const error = new Error(
+      "react-three-rapier: useRapier must be used within <Physics />!"
+    );
+
+    it("throws a helpful error when useRapier is used outside of Physics", () => {
+      expect(async () => {
+        renderHookWithErrors(useRapier);
+      }).rejects.toEqual(error);
+    });
+
+    it("throws a helpful error when RigidBody is used outside of Physics", () => {
+      expect(async () => {
+        await ReactThreeTestRenderer.create(
+          <RigidBody
+            colliders="cuboid"
+            restitution={2}
+            linearVelocity={[20, 20, 20]}
+          />
+        );
+      }).rejects.toEqual(error);
+    });
+
+    it("throws a helpful error when Collider is used outside of Physics", () => {
+      expect(async () => {
+        await ReactThreeTestRenderer.create(<AnyCollider restitution={2} />);
+      }).rejects.toEqual(error);
     });
   });
 });
