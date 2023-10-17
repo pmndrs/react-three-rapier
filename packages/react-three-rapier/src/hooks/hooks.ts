@@ -29,8 +29,10 @@ const useMutableCallback = <T>(fn: T) => {
  * Exposes the Rapier context, and world
  * @category Hooks
  */
-export const useRapier = () => {
-  return useContext(rapierContext) as RapierContext;
+export const useRapier = (): RapierContext => {
+  const rapier = useContext(rapierContext);
+  if (!rapier) throw new Error('react-three-rapier: useRapier must be used within <Physics />!')
+  return rapier;
 };
 
 /**
