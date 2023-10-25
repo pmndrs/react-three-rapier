@@ -413,7 +413,7 @@ const Scene = () => {
       // While Rapier's return types need conversion, setting values can be done directly with Three.js types
       rigidBody.current.setTranslation(position, true);
       rigidBody.current.setRotation(quaternion, true);
-      rigidBody.current.setAngVel({ x: 0, y: 2, z: 0 }, true);
+      rigidBody.current.setAngvel({ x: 0, y: 2, z: 0 }, true);
     }
   }, []);
 
