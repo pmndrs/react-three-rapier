@@ -133,6 +133,11 @@ export interface RapierContext {
   world: World;
 
   /**
+   * overwriting the Rapier physics world with a restored snapshot
+   */
+  setWorld: (world: World) => void;
+
+  /**
    * If the physics simulation is paused
    */
   isPaused: boolean;
@@ -368,7 +373,7 @@ export const Physics: FC<PhysicsProps> = (props) => {
    * This creates a singleton proxy, so that the world is only created when
    * something within it is accessed.
    */
-  const { proxy: worldProxy, reset: resetWorldProxy } = useConst(() =>
+  const { proxy: worldProxy, reset: resetWorldProxy, set: setWorldProxy } = useConst(() =>
     createSingletonProxy<World>(
       () => new rapier.World(vectorArrayToVector3(gravity))
     )
@@ -710,6 +715,7 @@ export const Physics: FC<PhysicsProps> = (props) => {
     () => ({
       rapier,
       world: worldProxy,
+      setWorld: (world: World) => { setWorldProxy(world) },
       physicsOptions: {
         colliders,
         gravity
