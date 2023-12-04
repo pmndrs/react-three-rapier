@@ -812,3 +812,39 @@ Setting `<Physics updateLoop="independent" />` will make the physics simulation 
   <Physics updateLoop="independent">...</Physics>
 </Canvas>
 ```
+
+### Snapshots
+The `world` can be serialized as a `Uint8Array` using `world.takeSnapshot()`, see Rapier's docs on [Serialization](https://rapier.rs/docs/user_guides/javascript/serialization/) for more info.
+
+The snapshot can be used to construct a new world. In `r3/rapier`, you need to replace the world with this snapshot.
+
+> [!NOTE]
+> This only works if the snapshotted world is identical to the restored one. If objects, or the order of creation of objects vary, expect RigidBodies to scramble.
+
+```tsx
+import { useRapier } from '@react-three/rapier';
+
+const SnapshottingComponent = () => {
+  const { world, setWorld, rapier } = useRapier();
+  const worldSnapshot = useRef<Uint8Array>();
+
+  // Store the snapshot
+  const takeSnapshot = () => {
+    const snapshot = world.takeSnapshot()
+    worldSnapshot.current = snapshot
+  }
+
+  // Create a new World from the snapshot, and replace the current one
+  const restoreSnapshot = () => {
+    setWorld(rapier.World.restoreSnapshot(worldSnapshot.current))
+  }
+
+  return <>
+    <Rigidbody>...</RigidBody>
+    <Rigidbody>...</RigidBody>
+    <Rigidbody>...</RigidBody>
+    <Rigidbody>...</RigidBody>
+    <Rigidbody>...</RigidBody>
+  </>
+}
+```
