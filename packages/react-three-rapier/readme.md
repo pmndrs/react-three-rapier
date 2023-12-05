@@ -82,6 +82,7 @@ For full API outline and documentation, see 🧩 [API Docs](https://pmndrs.githu
 - [Advanced hooks usage](#advanced-hooks-usage)
   - [Manual stepping](#manual-stepping)
   - [On-demand rendering](#on-demand-rendering)
+  - [Snapshots](#snapshots)
 
 ---
 
