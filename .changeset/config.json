@@ -7,5 +7,6 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
+  "onlyUpdatePeerDependentsWhenOutOfRange": true,
   "ignore": ["demo"]
 }
