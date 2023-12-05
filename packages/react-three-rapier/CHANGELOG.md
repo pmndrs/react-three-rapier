@@ -1,5 +1,11 @@
 # @react-three/rapier
 
+## 1.2.0
+
+### Minor Changes
+
+- a71ede9: Adds basic snapshot capabilities by adding `setWorld`
+
 ## 1.1.2
 
 ### Patch Changes
