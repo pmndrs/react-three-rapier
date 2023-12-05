@@ -111,6 +111,24 @@ export const awaitReady = async (children: ReactNode) => {
   return step;
 };
 
+export const RapierContextCatcher = ({
+  callback
+}: {
+  callback: (obj: ReturnType<typeof useRapier>) => void;
+}) => {
+  const rapierContext = useRapier();
+
+  useEffect(() => {
+    callback(rapierContext);
+  }, []);
+
+  return null;
+};
+
+export const getScenePositions = (
+  renderer: Awaited<ReturnType<typeof ReactThreeTestRenderer.create>>
+) => renderer.scene.children.map((c) => c.instance.position);
+
 import { renderHook } from "@testing-library/react"; // v14.0.0
 import { Mock, vitest } from "vitest";
 

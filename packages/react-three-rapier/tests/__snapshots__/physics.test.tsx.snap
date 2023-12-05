@@ -1,0 +1,41 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`physics > snapshots > restores snapshots correctly 1`] = `
+[
+  Vector3 {
+    "x": 0,
+    "y": -13.761244773864746,
+    "z": 0,
+  },
+  Vector3 {
+    "x": 2,
+    "y": -11.761244773864746,
+    "z": 2,
+  },
+  Vector3 {
+    "x": -2,
+    "y": -15.761244773864746,
+    "z": -2,
+  },
+]
+`;
+
+exports[`physics > snapshots > restores snapshots correctly 2`] = `
+[
+  Vector3 {
+    "x": 0,
+    "y": -13.761244773864746,
+    "z": 0,
+  },
+  Vector3 {
+    "x": 2,
+    "y": -11.761244773864746,
+    "z": 2,
+  },
+  Vector3 {
+    "x": -2,
+    "y": -15.761244773864746,
+    "z": -2,
+  },
+]
+`;

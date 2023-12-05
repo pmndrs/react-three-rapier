@@ -12,7 +12,7 @@ export default defineConfig({
     environment: "happy-dom",
     setupFiles: path.resolve(
       process.cwd(),
-      "./packages/react-three-rapier/test/setup.ts"
+      "./packages/react-three-rapier/tests/setup.ts"
     )
   }
 } as UserConfig);

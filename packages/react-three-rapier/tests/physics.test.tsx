@@ -13,8 +13,15 @@ import {
 import React, { useEffect } from "react";
 import ReactThreeTestRenderer from "@react-three/test-renderer";
 import { Box } from "@react-three/drei";
-import { pause, renderHookWithErrors, UseRapierMounter } from "./test-utils";
+import {
+  getScenePositions,
+  pause,
+  RapierContextCatcher,
+  renderHookWithErrors,
+  UseRapierMounter
+} from "./test-utils";
 import { useFrame } from "@react-three/fiber";
+import { renderHook } from "@testing-library/react";
 
 describe("physics", () => {
   describe("useRapier exposed things", () => {
@@ -139,10 +146,8 @@ describe("physics", () => {
       const beforeStepCallback = vi.fn();
       const frameCallback = vi.fn();
 
-      let renderer: Awaited<ReturnType<typeof ReactThreeTestRenderer.create>>;
-
       await new Promise(async (resolve) => {
-        renderer = await ReactThreeTestRenderer.create(
+        await ReactThreeTestRenderer.create(
           <Physics updateLoop="independent">
             <RigidBody colliders="cuboid" restitution={2}>
               <CuboidCollider args={[1, 1, 1]} />
@@ -207,6 +212,54 @@ describe("physics", () => {
       expect(async () => {
         await ReactThreeTestRenderer.create(<AnyCollider restitution={2} />);
       }).rejects.toEqual(error);
+    });
+  });
+
+  describe("snapshots", () => {
+    it("restores snapshots correctly", async () => {
+      let rapierContext: ReturnType<typeof useRapier>;
+
+      const renderer = await ReactThreeTestRenderer.create(
+        <Physics>
+          <RapierContextCatcher callback={(ctx) => (rapierContext = ctx)} />
+          <RigidBody colliders="cuboid">
+            <CuboidCollider args={[1, 1, 1]} />
+          </RigidBody>
+          <RigidBody colliders="cuboid" position={[2, 2, 2]}>
+            <CuboidCollider args={[1, 1, 1]} />
+          </RigidBody>
+          <RigidBody colliders="cuboid" position={[-2, -2, -2]}>
+            <CuboidCollider args={[1, 1, 1]} />
+          </RigidBody>
+        </Physics>
+      );
+
+      // Advance 100 frames to move the boxes
+      renderer.advanceFrames(100, 1 / 60);
+
+      // Advance make snapshot
+      const snap = rapierContext!.world.takeSnapshot();
+
+      // Advance 1 more frame
+      renderer.advanceFrames(1, 1 / 60);
+
+      // Save positions at this frame
+      const positions = getScenePositions(renderer);
+      expect(getScenePositions(renderer)).toMatchSnapshot();
+
+      renderer.advanceFrames(100, 1 / 60);
+
+      // Restore snapshot
+      rapierContext!.setWorld(
+        rapierContext!.rapier.World.restoreSnapshot(snap)
+      );
+
+      // Advance 1 more frame to move boxes again
+      renderer.advanceFrames(1, 1 / 60);
+
+      // Check for match
+      expect(positions).toEqual(getScenePositions(renderer));
+      expect(getScenePositions(renderer)).toMatchSnapshot();
     });
   });
 });
