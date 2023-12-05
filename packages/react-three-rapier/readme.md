@@ -82,7 +82,7 @@ For full API outline and documentation, see 🧩 [API Docs](https://pmndrs.githu
 - [Advanced hooks usage](#advanced-hooks-usage)
   - [Manual stepping](#manual-stepping)
   - [On-demand rendering](#on-demand-rendering)
-  - [Snapshots](#snapshots)
+- [Snapshots](#snapshots)
 
 ---
 
@@ -814,7 +814,7 @@ Setting `<Physics updateLoop="independent" />` will make the physics simulation 
 </Canvas>
 ```
 
-### Snapshots
+## Snapshots
 The `world` can be serialized as a `Uint8Array` using `world.takeSnapshot()`, see Rapier's docs on [Serialization](https://rapier.rs/docs/user_guides/javascript/serialization/) for more info.
 
 The snapshot can be used to construct a new world. In `r3/rapier`, you need to replace the world with this snapshot.
