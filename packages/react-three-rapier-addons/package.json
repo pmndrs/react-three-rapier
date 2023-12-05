@@ -1,6 +1,6 @@
 {
   "name": "@react-three/rapier-addons",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "main": "dist/react-three-rapier-addons.cjs.js",
   "module": "dist/react-three-rapier-addons.esm.js",
   "license": "MIT",
@@ -16,7 +16,7 @@
   },
   "devDependencies": {
     "@react-three/fiber": "8.9.1",
-    "@react-three/rapier": "1.x",
+    "@react-three/rapier": "1.2.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "three": "0.146.0"

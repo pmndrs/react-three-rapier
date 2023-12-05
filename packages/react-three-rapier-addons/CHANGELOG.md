@@ -1,5 +1,11 @@
 # @react-three/rapier-addons
 
+## 3.0.3
+
+### Patch Changes
+
+- a71ede9: Update changeset settings
+
 ## 3.0.2
 
 ### Patch Changes
