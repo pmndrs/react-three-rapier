@@ -133,7 +133,36 @@ export interface RapierContext {
   world: World;
 
   /**
-   * overwriting the Rapier physics world with a restored snapshot
+   * Can be used to overwrite the current World. Useful when working with snapshots.
+   *
+   * @example
+   * ```tsx
+   * import { useRapier } from '@react-three/rapier';
+   *
+   * const SnapshottingComponent = () => {
+   *   const { world, setWorld, rapier } = useRapier();
+   *   const worldSnapshot = useRef<Uint8Array>();
+   *
+   *   // Store the snapshot
+   *   const takeSnapshot = () => {
+   *     const snapshot = world.takeSnapshot()
+   *     worldSnapshot.current = snapshot
+   *   }
+   *
+   *   // Create a new World from the snapshot, and replace the current one
+   *   const restoreSnapshot = () => {
+   *     setWorld(rapier.World.restoreSnapshot(worldSnapshot.current))
+   *   }
+   *
+   *   return <>
+   *     <Rigidbody>...</RigidBody>
+   *     <Rigidbody>...</RigidBody>
+   *     <Rigidbody>...</RigidBody>
+   *     <Rigidbody>...</RigidBody>
+   *     <Rigidbody>...</RigidBody>
+   *   </>
+   * }
+   * ```
    */
   setWorld: (world: World) => void;
 
@@ -373,7 +402,11 @@ export const Physics: FC<PhysicsProps> = (props) => {
    * This creates a singleton proxy, so that the world is only created when
    * something within it is accessed.
    */
-  const { proxy: worldProxy, reset: resetWorldProxy, set: setWorldProxy } = useConst(() =>
+  const {
+    proxy: worldProxy,
+    reset: resetWorldProxy,
+    set: setWorldProxy
+  } = useConst(() =>
     createSingletonProxy<World>(
       () => new rapier.World(vectorArrayToVector3(gravity))
     )
@@ -715,7 +748,9 @@ export const Physics: FC<PhysicsProps> = (props) => {
     () => ({
       rapier,
       world: worldProxy,
-      setWorld: (world: World) => { setWorldProxy(world) },
+      setWorld: (world: World) => {
+        setWorldProxy(world);
+      },
       physicsOptions: {
         colliders,
         gravity
