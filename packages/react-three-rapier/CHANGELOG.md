@@ -1,5 +1,11 @@
 # @react-three/rapier
 
+## 1.2.1
+
+### Patch Changes
+
+- a5a08a0: Update docs for setWorld to include example
+
 ## 1.2.0
 
 ### Minor Changes
