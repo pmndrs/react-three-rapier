@@ -23,7 +23,7 @@
     "@babel/preset-env": "^7.17.10",
     "@babel/preset-react": "^7.16.7",
     "@babel/preset-typescript": "^7.16.7",
-    "@changesets/cli": "^2.22.0",
+    "@changesets/cli": "^2.27.1",
     "@commitlint/cli": "^17.1.2",
     "@commitlint/config-conventional": "^17.1.0",
     "@manypkg/cli": "^0.19.1",
