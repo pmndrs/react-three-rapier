@@ -6,7 +6,8 @@ import {
   ImpulseJoint,
   InteractionGroups,
   RigidBody as RapierRigidBody,
-  TempContactManifold
+  TempContactManifold,
+  RopeImpulseJoint
 } from "@dimforge/rapier3d-compat";
 import { Rotation, Vector } from "@dimforge/rapier3d-compat/math";
 import { Object3DProps } from "@react-three/fiber";
@@ -473,6 +474,20 @@ export type RevoluteJointParams = [
   body2Anchor: Vector3Tuple,
   axis: Vector3Tuple,
   limits?: [min: number, max: number]
+];
+
+export type RopeJointParams = [
+  body1Anchor: Vector3Tuple,
+  body2Anchor: Vector3Tuple,
+  length: number,
+];
+
+export type SpringJointParams = [
+  body1Anchor: Vector3Tuple,
+  body2Anchor: Vector3Tuple,
+  restLength: number,
+  stiffness: number,
+  damping: number,
 ];
 
 export interface UseImpulseJoint<JointParams, JointType extends ImpulseJoint> {
