@@ -8,8 +8,6 @@
 </p>
 
 <p align="center">
-⚠️ This library is under development. All APIs are subject to change. ⚠️
-<br />
 For contributions, please read the <a href="https://github.com/pmndrs/react-three-rapier/blob/main/packages/react-three-rapier/CONTRIBUTING.md">🪧 Contribution Guide</a>.
 <br/>
 For available APIs, see <a href="https://pmndrs.github.io/react-three-rapier/">🧩 API Docs</a>

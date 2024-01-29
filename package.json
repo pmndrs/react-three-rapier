@@ -5,6 +5,7 @@
   "repository": "https://github.com/pmndrs/react-three-rapier",
   "author": "Hugo Wiledal <hugo.wiledal@gmail.com>",
   "license": "MIT",
+  "packageManager": "yarn@4.0.2",
   "preconstruct": {
     "packages": [
       "packages/*"
