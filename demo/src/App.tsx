@@ -38,7 +38,8 @@ import { PerformanceExample } from "./examples/performance/PeformanceExample";
 import { DynamicTypeChangeExample } from "./examples/dynamic-type-change/DynamicTypeChangeExample";
 import { StutteringExample } from "./examples/stuttering/StutteringExample";
 import { ImmutablePropsExample } from "./examples/immutable-props/ImmutablePropsExample";
-import { SnapshotExample } from './examples/snapshot/SnapshotExample';
+import { SnapshotExample } from "./examples/snapshot/SnapshotExample";
+import { OneWayPlatform } from "./examples/one-way-platform/OneWayPlatform";
 
 const demoContext = createContext<{
   setDebug?(f: boolean): void;
@@ -90,7 +91,7 @@ const Floor = () => {
 };
 
 const routes: Record<string, ReactNode> = {
-  "": <Shapes />,
+  "": <OneWayPlatform />,
   joints: <Joints />,
   components: <ComponentsExample />,
   cradle: <CradleExample />,
@@ -200,7 +201,7 @@ export const App = () => {
       >
         {Object.keys(routes).map((key) => (
           <Link key={key} to={key} end>
-            {key.replace(/-/g, " ") || "Plinko"}
+            {key.replace(/-/g, " ") || "One Way Platform"}
           </Link>
         ))}
 
