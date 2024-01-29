@@ -12,7 +12,6 @@ import {
 } from "../src";
 import React, { useEffect } from "react";
 import ReactThreeTestRenderer from "@react-three/test-renderer";
-import { Box } from "@react-three/drei";
 import {
   getScenePositions,
   pause,
@@ -39,7 +38,10 @@ describe("physics", () => {
                   ref={rigidBody}
                   linearVelocity={[20, 20, 20]}
                 >
-                  <Box />
+                  <mesh>
+                    <boxGeometry />
+                    <meshStandardMaterial />
+                  </mesh>
                 </RigidBody>
               </Physics>
             );
