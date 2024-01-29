@@ -16,6 +16,9 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
+
+      - name: Enable corepack  
+        run: corepack enable
       
       - name: Install deps
         run: yarn --immutable
