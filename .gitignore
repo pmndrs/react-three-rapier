@@ -111,4 +111,4 @@ dist
 
 packages/react-three-rapier/docs
 
-/.yarn
+.yarn

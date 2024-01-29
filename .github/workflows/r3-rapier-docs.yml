@@ -37,7 +37,7 @@ jobs:
           node-version: 18.x
 
       - name: Install Node Dependencies
-        run: yarn
+        run: yarn --immutable
 
       - name: Run typedoc
         run: yarn docs:build
