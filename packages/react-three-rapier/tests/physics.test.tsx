@@ -21,7 +21,6 @@ import {
   UseRapierMounter
 } from "./test-utils";
 import { useFrame } from "@react-three/fiber";
-import { renderHook } from "@testing-library/react";
 
 describe("physics", () => {
   describe("useRapier exposed things", () => {

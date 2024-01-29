@@ -30,7 +30,7 @@
     "@preconstruct/cli": "^2.1.5",
     "@testing-library/react": "14.0.0",
     "@vitejs/plugin-react": "^4.0.3",
-    "@vitest/ui": "0.32.0",
+    "@vitest/ui": "^1.2.2",
     "happy-dom": "9.19.2",
     "prettier": "2.7.1",
     "simple-git-hooks": "^2.8.0",
