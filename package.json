@@ -32,12 +32,13 @@
     "@testing-library/react": "14.0.0",
     "@vitejs/plugin-react": "4.0.3",
     "@vitest/ui": "1.2.2",
-    "happy-dom": "9.19.2",
+    "jsdom": "24.0.0",
     "prettier": "2.7.1",
     "simple-git-hooks": "2.8.0",
     "typedoc": "0.23.24",
     "typescript": "4.6.3",
-    "vitest": "1.2.2"
+    "vitest": "1.2.2",
+    "vitest-canvas-mock": "0.3.3"
   },
   "scripts": {
     "ci": "preconstruct validate && manypkg check && yarn test",
