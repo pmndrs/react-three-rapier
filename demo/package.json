@@ -14,7 +14,7 @@
     "@react-three/fiber": "8.9.1",
     "@react-three/rapier": "1.2.1",
     "@react-three/rapier-addons": "3.0.3",
-    "@types/three": "^0.152.1",
+    "@types/three": "0.152.1",
     "leva": "0.9.34",
     "r3f-perf": "6.4.2",
     "react": "18.2.0",
@@ -23,8 +23,8 @@
     "three": "0.146.0"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^4.0.3",
-    "typescript": "^4.6.3",
+    "@vitejs/plugin-react": "4.0.3",
+    "typescript": "4.6.3",
     "vite": "3.0.3"
   },
   "repository": "https://github.com/pmndrs/react-three-rapier/tree/master/demo"

@@ -18,10 +18,10 @@ jobs:
       - name: Setup Node.js 18.x
         uses: actions/setup-node@v3
         with:
-          node-version: 18.x
+          node-version: 18
 
       - name: Install Dependencies
-        run: yarn --frozen-lockfile
+        run: yarn --immutable
 
       - name: Create Release Pull Request or Publish to npm
         id: changesets

@@ -12,7 +12,6 @@ import {
 } from "../src";
 import React, { useEffect } from "react";
 import ReactThreeTestRenderer from "@react-three/test-renderer";
-import { Box } from "@react-three/drei";
 import {
   getScenePositions,
   pause,
@@ -21,7 +20,6 @@ import {
   UseRapierMounter
 } from "./test-utils";
 import { useFrame } from "@react-three/fiber";
-import { renderHook } from "@testing-library/react";
 
 describe("physics", () => {
   describe("useRapier exposed things", () => {
@@ -40,7 +38,10 @@ describe("physics", () => {
                   ref={rigidBody}
                   linearVelocity={[20, 20, 20]}
                 >
-                  <Box />
+                  <mesh>
+                    <boxGeometry />
+                    <meshStandardMaterial />
+                  </mesh>
                 </RigidBody>
               </Physics>
             );

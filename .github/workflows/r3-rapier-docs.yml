@@ -35,9 +35,12 @@ jobs:
         uses: actions/setup-node@v3.6.0
         with:
           node-version: 18.x
+          
+      - name: Enable corepack  
+        run: corepack enable
 
       - name: Install Node Dependencies
-        run: yarn
+        run: yarn --immutable
 
       - name: Run typedoc
         run: yarn docs:build

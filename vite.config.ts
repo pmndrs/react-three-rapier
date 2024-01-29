@@ -9,7 +9,7 @@ import * as path from "path";
 export default defineConfig({
   plugins: [react()],
   test: {
-    environment: "happy-dom",
+    environment: "jsdom",
     setupFiles: path.resolve(
       process.cwd(),
       "./packages/react-three-rapier/tests/setup.ts"

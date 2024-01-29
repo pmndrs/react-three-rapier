@@ -38,7 +38,7 @@ import { PerformanceExample } from "./examples/performance/PeformanceExample";
 import { DynamicTypeChangeExample } from "./examples/dynamic-type-change/DynamicTypeChangeExample";
 import { StutteringExample } from "./examples/stuttering/StutteringExample";
 import { ImmutablePropsExample } from "./examples/immutable-props/ImmutablePropsExample";
-import { SnapshotExample } from './examples/snapshot/SnapshotExample';
+import { SnapshotExample } from "./examples/snapshot/SnapshotExample";
 
 const demoContext = createContext<{
   setDebug?(f: boolean): void;
@@ -149,7 +149,7 @@ export const App = () => {
               interpolate={interpolate}
               debug={debug}
               timeStep={1 / 60}
-            // erp={0.2}
+              // erp={0.2}
             >
               <directionalLight
                 castShadow
