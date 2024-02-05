@@ -29,7 +29,7 @@
     "three": ">=0.139.0"
   },
   "dependencies": {
-    "@dimforge/rapier3d-compat": "0.11.2",
+    "@dimforge/rapier3d-compat": "0.12.0",
     "three-stdlib": "2.23.9",
     "use-asset": "1.0.4"
   },
