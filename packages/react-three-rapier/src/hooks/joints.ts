@@ -5,7 +5,9 @@ import {
   RevoluteImpulseJoint,
   RopeImpulseJoint,
   SphericalImpulseJoint,
-  SpringImpulseJoint
+  SpringImpulseJoint,
+  JointType as ImpulseJointType,
+  Vector
 } from "@dimforge/rapier3d-compat";
 import { RefObject, useRef } from "react";
 import {
@@ -17,12 +19,18 @@ import {
   SphericalJointParams,
   SpringJointParams,
   UseImpulseJoint,
-  useRapier
+  useRapier,
+  vec3
 } from "..";
-import { tupleToObject, vectorArrayToVector3 } from "../utils/utils";
+import {
+  tupleToObject,
+  vectorArrayToVector3,
+  vector3ToRapierVector
+} from "../utils/utils";
 
 import type Rapier from "@dimforge/rapier3d-compat";
 import { useImperativeInstance } from "./use-imperative-instance";
+import { Vector3 } from "@react-three/fiber";
 
 /**
  * @internal
@@ -181,11 +189,10 @@ export const useRopeJoint: UseImpulseJoint<
 > = (body1, body2, [body1Anchor, body2Anchor, length]) => {
   const { rapier } = useRapier();
 
-  const params = rapier.JointData.rope(
-    length,
-    vectorArrayToVector3(body1Anchor),
-    vectorArrayToVector3(body2Anchor)
-  );
+  const vBody1Anchor = vector3ToRapierVector(body1Anchor);
+  const vBody2Anchor = vector3ToRapierVector(body2Anchor);
+
+  const params = rapier.JointData.rope(length, vBody1Anchor, vBody2Anchor);
 
   return useImpulseJoint<RopeImpulseJoint>(body1, body2, params);
 };
@@ -204,12 +211,15 @@ export const useSpringJoint: UseImpulseJoint<
 ) => {
   const { rapier } = useRapier();
 
+  const vBody1Anchor = vector3ToRapierVector(body1Anchor);
+  const vBody2Anchor = vector3ToRapierVector(body2Anchor);
+
   const params = rapier.JointData.spring(
     restLength,
     stiffness,
     damping,
-    vectorArrayToVector3(body1Anchor),
-    vectorArrayToVector3(body2Anchor)
+    vBody1Anchor,
+    vBody2Anchor
   );
 
   return useImpulseJoint<SpringImpulseJoint>(body1, body2, params);

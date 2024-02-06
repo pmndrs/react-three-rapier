@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import { useRef } from "react";
 import {
   Quaternion as RapierQuaternion,
   Vector3 as RapierVector3
@@ -7,6 +7,7 @@ import {
 import { Euler, Quaternion, Shape, Vector3 } from "three";
 import { _euler, _quaternion, _vector3 } from "./shared-objects";
 import { RigidBodyTypeString, Vector3Tuple } from "../types";
+import { Vector3 as Vector3ish } from "@react-three/fiber";
 
 export const vectorArrayToVector3 = (arr: Vector3Tuple) => {
   const [x, y, z] = arr;
@@ -99,3 +100,13 @@ export function useConst<T>(initialValue: T | (() => T)): T {
   }
   return ref.current.value;
 }
+
+export const vector3ToRapierVector = (v: Vector3ish) => {
+  if (Array.isArray(v)) {
+    return new RapierVector3(v[0], v[1], v[2]);
+  } else if (typeof v === "number") {
+    return new RapierVector3(v, v, v);
+  } else {
+    return v as THREE.Vector3;
+  }
+};

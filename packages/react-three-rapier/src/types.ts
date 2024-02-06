@@ -6,11 +6,10 @@ import {
   ImpulseJoint,
   InteractionGroups,
   RigidBody as RapierRigidBody,
-  TempContactManifold,
-  RopeImpulseJoint
+  TempContactManifold
 } from "@dimforge/rapier3d-compat";
 import { Rotation, Vector } from "@dimforge/rapier3d-compat/math";
-import { Object3DProps } from "@react-three/fiber";
+import { Object3DProps, Vector3 } from "@react-three/fiber";
 import { Object3D } from "three";
 import { ColliderProps } from ".";
 import { RigidBodyState } from "./components/Physics";
@@ -397,6 +396,17 @@ export interface RigidBodyOptions extends ColliderProps {
   restitution?: number;
 
   /**
+   * Sets the number of additional solver iterations that will be run for this
+   * rigid-body and everything that interacts with it directly or indirectly
+   * through contacts or joints.
+   *
+   * Compared to increasing the global `World.numSolverIteration`, setting this
+   * value lets you increase accuracy on only a subset of the scene, resulting in reduced
+   * performance loss.
+   */
+  additionalSolverIterations?: number;
+
+  /**
    * The default collision groups bitmask for all colliders in this rigid body.
    * Can be customized per-collider.
    */
@@ -477,17 +487,17 @@ export type RevoluteJointParams = [
 ];
 
 export type RopeJointParams = [
-  body1Anchor: Vector3Tuple,
-  body2Anchor: Vector3Tuple,
-  length: number,
+  body1Anchor: Vector3,
+  body2Anchor: Vector3,
+  length: number
 ];
 
 export type SpringJointParams = [
-  body1Anchor: Vector3Tuple,
-  body2Anchor: Vector3Tuple,
+  body1Anchor: Vector3,
+  body2Anchor: Vector3,
   restLength: number,
   stiffness: number,
-  damping: number,
+  damping: number
 ];
 
 export interface UseImpulseJoint<JointParams, JointType extends ImpulseJoint> {
