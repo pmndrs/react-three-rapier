@@ -4,7 +4,9 @@
 
 feat: update @dimforge/rapier3d-compat to 0.12.0
 
-- Physics component
-  - World integration parameters have changed in the new rapier version. As the new version of rapier has changes to it's constraint solver, there aren't direct alternatives for all old parameters.
-- Add 'useSpringJoint'
-- Add 'useRopeJoint'
+- Change Physics component props to match the new rapier version's integration parameter changes.
+  - There aren't direct alternatives for all old parameters. See the Physics component docs for more information on the new parameters: https://pmndrs.github.io/react-three-rapier/interfaces/PhysicsProps.html
+- Add `additionalSolverIterations` prop to `RigidBodyOptions`.
+  - See: https://pmndrs.github.io/react-three-rapier/interfaces/RigidBodyOptions.html#additionalSolverIterations
+- Add `useSpringJoint`
+- Add `useRopeJoint`
