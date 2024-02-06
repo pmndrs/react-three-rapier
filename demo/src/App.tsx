@@ -152,7 +152,6 @@ export const App = () => {
               interpolate={interpolate}
               debug={debug}
               timeStep={1 / 60}
-              // erp={0.2}
             >
               <directionalLight
                 castShadow
