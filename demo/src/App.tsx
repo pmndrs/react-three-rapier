@@ -119,7 +119,7 @@ const routes: Record<string, ReactNode> = {
   "immutable-props": <ImmutablePropsExample />,
   snapshot: <SnapshotExample />,
   spring: <SpringExample />,
-  ropeJoint: <RopeJointExample />
+  "rope-joint": <RopeJointExample />
 };
 
 export const App = () => {
