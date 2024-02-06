@@ -37,10 +37,10 @@ const BallSpring = forwardRef<RapierRigidBody, BallSpringProps>(
     const floor = useForwardedRef(floorRef);
     const ball = useRef<RapierRigidBody>(null);
 
-    let stiffness = 1.0e3;
-    let criticalDamping = 2.0 * Math.sqrt(stiffness * (props.mass ?? 1));
-    let dampingRatio = props.jointNum / (props.total / 2);
-    let damping = dampingRatio * criticalDamping;
+    const stiffness = 1.0e3;
+    const criticalDamping = 2.0 * Math.sqrt(stiffness * (props.mass ?? 1));
+    const dampingRatio = props.jointNum / (props.total / 2);
+    const damping = dampingRatio * criticalDamping;
 
     const ballPos = props.position as THREE.Vector3;
 
