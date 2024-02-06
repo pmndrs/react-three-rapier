@@ -29,7 +29,6 @@ import {
   RigidBodyAutoCollider,
   Vector3Tuple
 } from "../types";
-
 import {
   _matrix4,
   _position,
@@ -39,7 +38,8 @@ import {
 import {
   rapierQuaternionToQuaternion,
   useConst,
-  vectorArrayToVector3
+  vectorArrayToVector3,
+  vector3ToRapierVector
 } from "../utils/utils";
 import FrameStepper from "./FrameStepper";
 import { Debug } from "./Debug";
@@ -284,7 +284,7 @@ export interface PhysicsProps {
    * Number of internal Project Gauss Seidel (PGS) iterations run at each solver iteration.
    * Increasing this parameter will improve stability of the simulation. It will have a lesser effect than
    * increasing `numSolverIterations` but is also less computationally expensive.
-   * 
+   *
    * @defaultValue 1
    */
   numInternalPgsIterations?: number;
@@ -302,14 +302,14 @@ export interface PhysicsProps {
    *
    * @defaultValue 128
    */
-  minIslandSize?: number
+  minIslandSize?: number;
 
   /**
    * Maximum number of substeps performed by the solver
    *
    * @defaultValue 1
    */
-  maxCcdSubsteps?: number
+  maxCcdSubsteps?: number;
 
   /**
    * The Error Reduction Parameter in between 0 and 1, is the proportion of the positional error to be corrected at each time step.
@@ -401,13 +401,13 @@ export const Physics: FC<PhysicsProps> = (props) => {
 
     gravity = [0, -9.81, 0],
     allowedLinearError = 0.001,
-    predictionDistance = 4,
+    predictionDistance = 0.002,
     numSolverIterations = 4,
     numAdditionalFrictionIterations = 4,
     numInternalPgsIterations = 1,
     minIslandSize = 128,
     maxCcdSubsteps = 1,
-    erp = 0.2
+    erp = 0.8
   } = props;
   const rapier = useAsset(importRapier);
   const { invalidate } = useThree();
@@ -443,15 +443,17 @@ export const Physics: FC<PhysicsProps> = (props) => {
 
   // Update mutable props
   useEffect(() => {
-    worldProxy.gravity = vectorArrayToVector3(gravity);
+    worldProxy.gravity = vector3ToRapierVector(gravity);
 
-    worldProxy.numSolverIterations = numSolverIterations
-    worldProxy.numAdditionalFrictionIterations = numAdditionalFrictionIterations
-    worldProxy.numInternalPgsIterations = numInternalPgsIterations
+    worldProxy.integrationParameters.numSolverIterations = numSolverIterations;
+    worldProxy.integrationParameters.numAdditionalFrictionIterations =
+      numAdditionalFrictionIterations;
+    worldProxy.integrationParameters.numInternalPgsIterations =
+      numInternalPgsIterations;
 
-    worldProxy.integrationParameters.allowedLinearError = allowedLinearError
-    worldProxy.integrationParameters.minIslandSize = minIslandSize
-    worldProxy.integrationParameters.maxCcdSubsteps = maxCcdSubsteps
+    worldProxy.integrationParameters.allowedLinearError = allowedLinearError;
+    worldProxy.integrationParameters.minIslandSize = minIslandSize;
+    worldProxy.integrationParameters.maxCcdSubsteps = maxCcdSubsteps;
     worldProxy.integrationParameters.predictionDistance = predictionDistance;
     worldProxy.integrationParameters.erp = erp;
   }, [
