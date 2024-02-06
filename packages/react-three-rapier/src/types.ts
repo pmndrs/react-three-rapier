@@ -9,7 +9,7 @@ import {
   TempContactManifold
 } from "@dimforge/rapier3d-compat";
 import { Rotation, Vector } from "@dimforge/rapier3d-compat/math";
-import { Object3DProps, Vector3 } from "@react-three/fiber";
+import { Object3DProps, Vector3, Quaternion } from "@react-three/fiber";
 import { Object3D } from "three";
 import { ColliderProps } from ".";
 import { RigidBodyState } from "./components/Physics";
@@ -461,28 +461,28 @@ export interface RigidBodyOptions extends ColliderProps {
 
 // Joints
 export type SphericalJointParams = [
-  body1Anchor: Vector3Tuple,
-  body2Anchor: Vector3Tuple
+  body1Anchor: Vector3,
+  body2Anchor: Vector3
 ];
 
 export type FixedJointParams = [
-  body1Anchor: Vector3Tuple,
-  body1LocalFrame: Vector4Tuple,
-  body2Anchor: Vector3Tuple,
-  body2LocalFrame: Vector4Tuple
+  body1Anchor: Vector3,
+  body1LocalFrame: Quaternion,
+  body2Anchor: Vector3,
+  body2LocalFrame: Quaternion
 ];
 
 export type PrismaticJointParams = [
-  body1Anchor: Vector3Tuple,
-  body2Anchor: Vector3Tuple,
-  axis: Vector3Tuple,
+  body1Anchor: Vector3,
+  body2Anchor: Vector3,
+  axis: Vector3,
   limits?: [min: number, max: number]
 ];
 
 export type RevoluteJointParams = [
-  body1Anchor: Vector3Tuple,
-  body2Anchor: Vector3Tuple,
-  axis: Vector3Tuple,
+  body1Anchor: Vector3,
+  body2Anchor: Vector3,
+  axis: Vector3,
   limits?: [min: number, max: number]
 ];
 

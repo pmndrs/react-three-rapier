@@ -6,8 +6,6 @@ import {
   RopeImpulseJoint,
   SphericalImpulseJoint,
   SpringImpulseJoint,
-  JointType as ImpulseJointType,
-  Vector
 } from "@dimforge/rapier3d-compat";
 import { RefObject, useRef } from "react";
 import {
@@ -20,17 +18,14 @@ import {
   SpringJointParams,
   UseImpulseJoint,
   useRapier,
-  vec3
 } from "..";
 import {
-  tupleToObject,
-  vectorArrayToVector3,
-  vector3ToRapierVector
+  vector3ToRapierVector,
+  quaternionToRapierQuaternion
 } from "../utils/utils";
 
 import type Rapier from "@dimforge/rapier3d-compat";
 import { useImperativeInstance } from "./use-imperative-instance";
-import { Vector3 } from "@react-three/fiber";
 
 /**
  * @internal
@@ -93,10 +88,10 @@ export const useFixedJoint: UseImpulseJoint<
     body1,
     body2,
     rapier.JointData.fixed(
-      vectorArrayToVector3(body1Anchor),
-      tupleToObject(body1LocalFrame, ["x", "y", "z", "w"] as const),
-      vectorArrayToVector3(body2Anchor),
-      tupleToObject(body2LocalFrame, ["x", "y", "z", "w"] as const)
+      vector3ToRapierVector(body1Anchor),
+      quaternionToRapierQuaternion(body1LocalFrame),
+      vector3ToRapierVector(body2Anchor),
+      quaternionToRapierQuaternion(body2LocalFrame)
     )
   );
 };
@@ -119,8 +114,8 @@ export const useSphericalJoint: UseImpulseJoint<
     body1,
     body2,
     rapier.JointData.spherical(
-      vectorArrayToVector3(body1Anchor),
-      vectorArrayToVector3(body2Anchor)
+      vector3ToRapierVector(body1Anchor),
+      vector3ToRapierVector(body2Anchor)
     )
   );
 };
@@ -139,9 +134,9 @@ export const useRevoluteJoint: UseImpulseJoint<
   const { rapier } = useRapier();
 
   const params = rapier.JointData.revolute(
-    vectorArrayToVector3(body1Anchor),
-    vectorArrayToVector3(body2Anchor),
-    vectorArrayToVector3(axis)
+    vector3ToRapierVector(body1Anchor),
+    vector3ToRapierVector(body2Anchor),
+    vector3ToRapierVector(axis)
   );
 
   if (limits) {
@@ -166,9 +161,9 @@ export const usePrismaticJoint: UseImpulseJoint<
   const { rapier } = useRapier();
 
   const params = rapier.JointData.prismatic(
-    vectorArrayToVector3(body1Anchor),
-    vectorArrayToVector3(body2Anchor),
-    vectorArrayToVector3(axis)
+    vector3ToRapierVector(body1Anchor),
+    vector3ToRapierVector(body2Anchor),
+    vector3ToRapierVector(axis)
   );
 
   if (limits) {
