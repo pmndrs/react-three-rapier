@@ -78,6 +78,8 @@ For full API outline and documentation, see 🧩 [API Docs](https://pmndrs.githu
   - [Spherical Joint](#spherical-joint)
   - [Revolute Joint](#revolute-joint)
   - [Prismatic Joint](#prismatic-joint)
+  - [Rope Joint](#rope-joint)
+  - [Spring Joint](#spring-joint)
   - [🖼 Joints Example](#-joints-example)
 - [Advanced hooks usage](#advanced-hooks-usage)
   - [Manual stepping](#manual-stepping)
