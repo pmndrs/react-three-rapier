@@ -6,5 +6,7 @@
     "@react-three/rapier": "1.2.1",
     "@react-three/rapier-addons": "3.0.3"
   },
-  "changesets": []
+  "changesets": [
+    "cold-apples-drop"
+  ]
 }
