@@ -1,34 +1,16 @@
-import React, { useRef } from "react";
+import { useRef } from "react";
 import {
   Quaternion as RapierQuaternion,
-  Vector3 as RapierVector3
+  Vector3 as RapierVector3,
 } from "@dimforge/rapier3d-compat";
-
-import { Euler, Quaternion, Shape, Vector3 } from "three";
+import { Euler, Quaternion, Vector3 } from "three";
 import { _euler, _quaternion, _vector3 } from "./shared-objects";
 import { RigidBodyTypeString, Vector3Tuple } from "../types";
+import { Vector3 as Vector3Like, Quaternion as QuaternionLike } from "@react-three/fiber";
 
 export const vectorArrayToVector3 = (arr: Vector3Tuple) => {
   const [x, y, z] = arr;
   return new Vector3(x, y, z);
-};
-
-export const tupleToObject = <
-  T extends readonly any[],
-  K extends readonly string[]
->(
-  tuple: T,
-  keys: K
-) => {
-  return keys.reduce(
-    (obj, key, i) => {
-      obj[key as K[number]] = tuple[i];
-      return obj;
-    },
-    {} as {
-      [Key in K[number]]: T[number];
-    }
-  );
 };
 
 export const vector3ToQuaternion = (v: Vector3) => {
@@ -44,6 +26,25 @@ export const rapierQuaternionToQuaternion = ({
   z,
   w
 }: RapierQuaternion) => _quaternion.set(x, y, z, w);
+
+export const vector3ToRapierVector = (v: Vector3Like) => {
+  if (Array.isArray(v)) {
+    return new RapierVector3(v[0], v[1], v[2]);
+  } else if (typeof v === "number") {
+    return new RapierVector3(v, v, v);
+  } else {
+    const threeVector3 = v as THREE.Vector3;
+    return new RapierVector3(threeVector3.x, threeVector3.y, threeVector3.z);
+  }
+};
+
+export const quaternionToRapierQuaternion = (v: QuaternionLike) => {
+  if (Array.isArray(v)) {
+    return new RapierQuaternion(v[0], v[1], v[2], v[3]);
+  } else {
+    return new RapierQuaternion(v.x, v.y, v.z, v.w);
+  }
+};
 
 const rigidBodyTypeMap = {
   fixed: 1,

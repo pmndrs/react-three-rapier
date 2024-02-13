@@ -1,5 +1,5 @@
 import { RigidBody, RigidBodyDesc } from "@dimforge/rapier3d-compat";
-import React, { MutableRefObject, useEffect, useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { Matrix4, Object3D, Vector3 } from "three";
 import { Boolean3Tuple, RigidBodyProps, Vector3Tuple } from "..";
 import {
@@ -80,6 +80,9 @@ type MutableRigidBodyOptions = {
 export const mutableRigidBodyOptions: MutableRigidBodyOptions = {
   gravityScale: (rb: RigidBody, value: number) => {
     rb.setGravityScale(value, true);
+  },
+  additionalSolverIterations(rb: RigidBody, value: number) {
+    rb.setAdditionalSolverIterations(value);
   },
   linearDamping: (rb: RigidBody, value: number) => {
     rb.setLinearDamping(value);

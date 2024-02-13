@@ -1,15 +1,14 @@
 import { Box, Environment, OrbitControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
-import { Physics, RigidBody, useRapier } from "@react-three/rapier";
+import { Physics, RigidBody } from "@react-three/rapier";
 import { Perf } from "r3f-perf";
 import {
-  createContext,
   ReactNode,
-  Suspense,
-  useContext,
-  useState,
   StrictMode,
-  useEffect
+  Suspense,
+  createContext,
+  useContext,
+  useState
 } from "react";
 import { NavLink, NavLinkProps, Route, Routes } from "react-router-dom";
 import { AllCollidersExample } from "./examples/all-colliders/AllCollidersExample";
@@ -24,21 +23,23 @@ import { ComponentsExample } from "./examples/components/ComponentsExample";
 import { ContactForceEventsExample } from "./examples/contact-force-events/ContactForceEventsExample";
 import { CradleExample } from "./examples/cradle/CradleExample";
 import { Damping } from "./examples/damping/DampingExample";
+import { DynamicTypeChangeExample } from "./examples/dynamic-type-change/DynamicTypeChangeExample";
+import { ImmutablePropsExample } from "./examples/immutable-props/ImmutablePropsExample";
 import { InstancedMeshes } from "./examples/instanced-meshes/InstancedMeshesExample";
 import { InstancedMeshesCompound } from "./examples/instances-meshes-compound/InstancedMeshesCompoundExample";
 import { Joints } from "./examples/joints/JointsExample";
 import { Kinematics } from "./examples/kinematics/KinematicsExample";
+import { LockedTransformsExample } from "./examples/locked-transforms/LockedTransformsExample";
 import { ManualStepExample } from "./examples/manual-step/ManualStepExamples";
 import { MeshColliderTest } from "./examples/mesh-collider-test/MeshColliderExample";
-import { SensorsExample } from "./examples/sensors/SensorsExample";
-import Shapes from "./examples/plinko/ShapesExample";
-import { Transforms } from "./examples/transforms/TransformsExample";
-import { LockedTransformsExample } from "./examples/locked-transforms/LockedTransformsExample";
 import { PerformanceExample } from "./examples/performance/PeformanceExample";
-import { DynamicTypeChangeExample } from "./examples/dynamic-type-change/DynamicTypeChangeExample";
+import Shapes from "./examples/plinko/ShapesExample";
+import { RopeJointExample } from "./examples/rope-joint/RopeJointExample";
+import { SensorsExample } from "./examples/sensors/SensorsExample";
+import { SnapshotExample } from "./examples/snapshot/SnapshotExample";
+import { SpringExample } from "./examples/spring/SpringExample";
 import { StutteringExample } from "./examples/stuttering/StutteringExample";
-import { ImmutablePropsExample } from "./examples/immutable-props/ImmutablePropsExample";
-import { SnapshotExample } from './examples/snapshot/SnapshotExample';
+import { Transforms } from "./examples/transforms/TransformsExample";
 
 const demoContext = createContext<{
   setDebug?(f: boolean): void;
@@ -116,7 +117,9 @@ const routes: Record<string, ReactNode> = {
   "dynamic-type-changes": <DynamicTypeChangeExample />,
   stuttering: <StutteringExample />,
   "immutable-props": <ImmutablePropsExample />,
-  snapshot: <SnapshotExample />
+  snapshot: <SnapshotExample />,
+  spring: <SpringExample />,
+  "rope-joint": <RopeJointExample />
 };
 
 export const App = () => {
@@ -149,7 +152,6 @@ export const App = () => {
               interpolate={interpolate}
               debug={debug}
               timeStep={1 / 60}
-            // erp={0.2}
             >
               <directionalLight
                 castShadow

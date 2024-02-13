@@ -67,14 +67,14 @@ describe("physics", () => {
       });
 
       expect(vec3(rigidBody.current?.translation()).toArray()).to.deep.eq([
-        0.6666666865348816, 0.6639417409896851, 0.6666666865348816
+        0.6666666269302368, 0.6649635434150696, 0.6666666269302368,
       ]);
 
       await pause(100);
 
       // expect nothing to have changed
       expect(vec3(rigidBody.current?.translation()).toArray()).to.deep.eq([
-        0.6666666865348816, 0.6639417409896851, 0.6666666865348816
+        0.6666666269302368, 0.6649635434150696, 0.6666666269302368
       ]);
     });
   });

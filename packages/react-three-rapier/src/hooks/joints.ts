@@ -1,28 +1,28 @@
 import {
-  ImpulseJoint,
   FixedImpulseJoint,
-  SphericalImpulseJoint,
+  ImpulseJoint,
+  PrismaticImpulseJoint,
   RevoluteImpulseJoint,
-  PrismaticImpulseJoint
+  RopeImpulseJoint,
+  SphericalImpulseJoint,
+  SpringImpulseJoint,
 } from "@dimforge/rapier3d-compat";
-import React, {
-  useRef,
-  useEffect,
-  useMemo,
-  useState,
-  MutableRefObject,
-  RefObject
-} from "react";
+import { RefObject, useRef } from "react";
 import {
-  useRapier,
-  RapierRigidBody,
-  UseImpulseJoint,
   FixedJointParams,
-  SphericalJointParams,
+  PrismaticJointParams,
+  RapierRigidBody,
   RevoluteJointParams,
-  PrismaticJointParams
+  RopeJointParams,
+  SphericalJointParams,
+  SpringJointParams,
+  UseImpulseJoint,
+  useRapier,
 } from "..";
-import { vectorArrayToVector3, tupleToObject } from "../utils/utils";
+import {
+  vector3ToRapierVector,
+  quaternionToRapierQuaternion
+} from "../utils/utils";
 
 import type Rapier from "@dimforge/rapier3d-compat";
 import { useImperativeInstance } from "./use-imperative-instance";
@@ -88,10 +88,10 @@ export const useFixedJoint: UseImpulseJoint<
     body1,
     body2,
     rapier.JointData.fixed(
-      vectorArrayToVector3(body1Anchor),
-      tupleToObject(body1LocalFrame, ["x", "y", "z", "w"] as const),
-      vectorArrayToVector3(body2Anchor),
-      tupleToObject(body2LocalFrame, ["x", "y", "z", "w"] as const)
+      vector3ToRapierVector(body1Anchor),
+      quaternionToRapierQuaternion(body1LocalFrame),
+      vector3ToRapierVector(body2Anchor),
+      quaternionToRapierQuaternion(body2LocalFrame)
     )
   );
 };
@@ -114,8 +114,8 @@ export const useSphericalJoint: UseImpulseJoint<
     body1,
     body2,
     rapier.JointData.spherical(
-      vectorArrayToVector3(body1Anchor),
-      vectorArrayToVector3(body2Anchor)
+      vector3ToRapierVector(body1Anchor),
+      vector3ToRapierVector(body2Anchor)
     )
   );
 };
@@ -134,9 +134,9 @@ export const useRevoluteJoint: UseImpulseJoint<
   const { rapier } = useRapier();
 
   const params = rapier.JointData.revolute(
-    vectorArrayToVector3(body1Anchor),
-    vectorArrayToVector3(body2Anchor),
-    vectorArrayToVector3(axis)
+    vector3ToRapierVector(body1Anchor),
+    vector3ToRapierVector(body2Anchor),
+    vector3ToRapierVector(axis)
   );
 
   if (limits) {
@@ -161,9 +161,9 @@ export const usePrismaticJoint: UseImpulseJoint<
   const { rapier } = useRapier();
 
   const params = rapier.JointData.prismatic(
-    vectorArrayToVector3(body1Anchor),
-    vectorArrayToVector3(body2Anchor),
-    vectorArrayToVector3(axis)
+    vector3ToRapierVector(body1Anchor),
+    vector3ToRapierVector(body2Anchor),
+    vector3ToRapierVector(axis)
   );
 
   if (limits) {
@@ -172,4 +172,50 @@ export const usePrismaticJoint: UseImpulseJoint<
   }
 
   return useImpulseJoint<PrismaticImpulseJoint>(body1, body2, params);
+};
+
+/**
+ * The rope joint limits the max distance between two bodies.
+ * @category Hooks - Joints
+ */
+export const useRopeJoint: UseImpulseJoint<
+  RopeJointParams,
+  RopeImpulseJoint
+> = (body1, body2, [body1Anchor, body2Anchor, length]) => {
+  const { rapier } = useRapier();
+
+  const vBody1Anchor = vector3ToRapierVector(body1Anchor);
+  const vBody2Anchor = vector3ToRapierVector(body2Anchor);
+
+  const params = rapier.JointData.rope(length, vBody1Anchor, vBody2Anchor);
+
+  return useImpulseJoint<RopeImpulseJoint>(body1, body2, params);
+};
+
+/**
+ * The spring joint applies a force proportional to the distance between two objects.
+ * @category Hooks - Joints
+ */
+export const useSpringJoint: UseImpulseJoint<
+  SpringJointParams,
+  SpringImpulseJoint
+> = (
+  body1,
+  body2,
+  [body1Anchor, body2Anchor, restLength, stiffness, damping]
+) => {
+  const { rapier } = useRapier();
+
+  const vBody1Anchor = vector3ToRapierVector(body1Anchor);
+  const vBody2Anchor = vector3ToRapierVector(body2Anchor);
+
+  const params = rapier.JointData.spring(
+    restLength,
+    stiffness,
+    damping,
+    vBody1Anchor,
+    vBody2Anchor
+  );
+
+  return useImpulseJoint<SpringImpulseJoint>(body1, body2, params);
 };
