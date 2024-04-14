@@ -18,7 +18,7 @@ import React, {
   useState
 } from "react";
 import { MathUtils, Matrix4, Object3D, Quaternion, Vector3 } from "three";
-import { useAsset } from "use-asset";
+import { suspend } from "suspend-react";
 import {
   CollisionPayload,
   CollisionEnterHandler,
@@ -409,7 +409,7 @@ export const Physics: FC<PhysicsProps> = (props) => {
     maxCcdSubsteps = 1,
     erp = 0.8
   } = props;
-  const rapier = useAsset(importRapier);
+  const rapier = suspend(importRapier, ["@react-thee/rapier", importRapier]);
   const { invalidate } = useThree();
 
   const rigidBodyStates = useConst<RigidBodyStateMap>(() => new Map());
