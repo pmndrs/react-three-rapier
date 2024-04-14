@@ -1,5 +1,11 @@
 # @react-three/rapier
 
+## 1.3.1
+
+### Patch Changes
+
+- bad7da7: fix: move away from use-asset
+
 ## 1.3.0
 
 ### Minor Changes

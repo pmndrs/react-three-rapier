@@ -1,5 +1,12 @@
 # @react-three/rapier-addons
 
+## 4.0.1
+
+### Patch Changes
+
+- Updated dependencies [bad7da7]
+  - @react-three/rapier@1.3.1
+
 ## 4.0.0
 
 ### Patch Changes
