@@ -1,8 +1,8 @@
-import { Box, Sphere } from "@react-three/drei";
-import { BallCollider, RapierRigidBody, RigidBody } from "@react-three/rapier";
-import { useRef, useState } from "react";
 import { ActiveCollisionTypes } from "@dimforge/rapier3d-compat";
+import { Box, Sphere } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
+import { RapierRigidBody, RigidBody } from "@react-three/rapier";
+import { useRef, useState } from "react";
 
 const activeCollisionTypes =
   ActiveCollisionTypes.DEFAULT | ActiveCollisionTypes.KINEMATIC_FIXED;
