@@ -320,7 +320,7 @@ export interface PhysicsProps {
 
   /**
    * The approximate size of most dynamic objects in the scene.
-   * 
+   *
    * This value is used internally to estimate some length-based tolerance.
    * This value can be understood as the number of units-per-meter in your physical world compared to a human-sized world in meter.
    * For example, in a 2d game, if your typical object size is 100 pixels, set lengthUnit to 100.0. The physics engine will interpret it as if 100 pixels is equivalent to 1 meter in its various internal threshold.
@@ -419,7 +419,7 @@ export const Physics: FC<PhysicsProps> = (props) => {
     minIslandSize = 128,
     maxCcdSubsteps = 1,
     erp = 0.8,
-    lengthUnit = 1,
+    lengthUnit = 1
   } = props;
   const rapier = suspend(importRapier, ["@react-thee/rapier", importRapier]);
   const { invalidate } = useThree();
@@ -463,10 +463,12 @@ export const Physics: FC<PhysicsProps> = (props) => {
     worldProxy.integrationParameters.numInternalPgsIterations =
       numInternalPgsIterations;
 
-    worldProxy.integrationParameters.normalizedAllowedLinearError = allowedLinearError;
+    worldProxy.integrationParameters.normalizedAllowedLinearError =
+      allowedLinearError;
     worldProxy.integrationParameters.minIslandSize = minIslandSize;
     worldProxy.integrationParameters.maxCcdSubsteps = maxCcdSubsteps;
-    worldProxy.integrationParameters.normalizedPredictionDistance = predictionDistance;
+    worldProxy.integrationParameters.normalizedPredictionDistance =
+      predictionDistance;
     worldProxy.integrationParameters.erp = erp;
     worldProxy.lengthUnit = lengthUnit;
   }, [

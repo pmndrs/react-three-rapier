@@ -250,16 +250,15 @@ export interface ColliderOptions<ColliderArgs extends Array<unknown>> {
     angularInertiaLocalFrame: Rotation;
   };
 
-
   /**
    * The contact skin of the collider.
-   * 
+   *
    * The contact skin acts as if the collider was enlarged with a skin of width contactSkin around it, keeping objects further apart when colliding.
-   * 
+   *
    * A non-zero contact skin can increase performance, and in some cases, stability.
    * However it creates a small gap between colliding object (equal to the sum of their skin).
    * If the skin is sufficiently small, this might not be visually significant or can be hidden by the rendering assets.
-   * 
+   *
    * @defaultValue 0
    */
   contactSkin?: number;
@@ -378,9 +377,9 @@ export interface RigidBodyOptions extends ColliderProps {
 
   /**
    * The maximum prediction distance Soft Continuous Collision-Detection.
-   * 
+   *
    * When set to 0, soft-CCD is disabled.
-   * 
+   *
    * Soft-CCD helps prevent tunneling especially of slow-but-thin to moderately fast objects.
    * The soft CCD prediction distance indicates how far in the object’s path the CCD algorithm is allowed to inspect.
    * Large values can impact performance badly by increasing the work needed from the broad-phase.
@@ -489,10 +488,7 @@ export interface RigidBodyOptions extends ColliderProps {
 }
 
 // Joints
-export type SphericalJointParams = [
-  body1Anchor: Vector3,
-  body2Anchor: Vector3
-];
+export type SphericalJointParams = [body1Anchor: Vector3, body2Anchor: Vector3];
 
 export type FixedJointParams = [
   body1Anchor: Vector3,
