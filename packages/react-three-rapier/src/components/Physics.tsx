@@ -323,7 +323,6 @@ export interface PhysicsProps {
    *
    * This value is used internally to estimate some length-based tolerance.
    * This value can be understood as the number of units-per-meter in your physical world compared to a human-sized world in meter.
-   * For example, in a 2d game, if your typical object size is 100 pixels, set lengthUnit to 100.0. The physics engine will interpret it as if 100 pixels is equivalent to 1 meter in its various internal threshold.
    *
    * @defaultValue 1
    */
