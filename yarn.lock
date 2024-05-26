@@ -1595,10 +1595,10 @@
   dependencies:
     "@jridgewell/trace-mapping" "0.3.9"
 
-"@dimforge/rapier3d-compat@0.12.0":
-  version "0.12.0"
-  resolved "https://registry.yarnpkg.com/@dimforge/rapier3d-compat/-/rapier3d-compat-0.12.0.tgz#7b3365e1dfdc5cd957b45afe920b4ac06c7cd389"
-  integrity sha512-uekIGetywIgopfD97oDL5PfeezkFpNhwlzlaEYNOA0N6ghdsOvh/HYjSMek5Q2O1PYvRSDFcqFVJl4r4ZBwOow==
+"@dimforge/rapier3d-compat@0.13.1":
+  version "0.13.1"
+  resolved "https://registry.yarnpkg.com/@dimforge/rapier3d-compat/-/rapier3d-compat-0.13.1.tgz#d9da32941de5fcfae55ffb6ac26c38539f57ddf4"
+  integrity sha512-SsQ/MTH4Vvs8f62g31iVV1VOmzwNwsJl91rVzafi5B2mCrI2OsQ3VyjJOb4/tvS5VNc6OLjIDgfClcOAkW+O2A==
 
 "@esbuild/android-arm64@0.17.14":
   version "0.17.14"
