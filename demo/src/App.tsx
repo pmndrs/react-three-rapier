@@ -121,7 +121,7 @@ const routes: Record<string, ReactNode> = {
   snapshot: <SnapshotExample />,
   spring: <SpringExample />,
   "rope-joint": <RopeJointExample />,
-  "contact-skin": <ContactSkinExample />,
+  "contact-skin": <ContactSkinExample />
 };
 
 export const App = () => {
