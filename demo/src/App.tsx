@@ -40,6 +40,7 @@ import { SnapshotExample } from "./examples/snapshot/SnapshotExample";
 import { SpringExample } from "./examples/spring/SpringExample";
 import { StutteringExample } from "./examples/stuttering/StutteringExample";
 import { Transforms } from "./examples/transforms/TransformsExample";
+import { ActiveCollisionTypesExample } from "./examples/active-collision-types/ActiveCollisionTypesExample";
 
 const demoContext = createContext<{
   setDebug?(f: boolean): void;
@@ -119,7 +120,8 @@ const routes: Record<string, ReactNode> = {
   "immutable-props": <ImmutablePropsExample />,
   snapshot: <SnapshotExample />,
   spring: <SpringExample />,
-  "rope-joint": <RopeJointExample />
+  "rope-joint": <RopeJointExample />,
+  "active-collision-types": <ActiveCollisionTypesExample />,
 };
 
 export const App = () => {

@@ -138,6 +138,9 @@ const mutableColliderOptions: MutableColliderOptions = {
   restitutionCombineRule: (collider, value) => {
     collider.setRestitutionCombineRule(value);
   },
+  activeCollisionTypes: (collider, value: number) => {
+    collider.setActiveCollisionTypes(value);
+  },
   // To make sure the options all mutable options are listed
   quaternion: () => {},
   position: () => {},

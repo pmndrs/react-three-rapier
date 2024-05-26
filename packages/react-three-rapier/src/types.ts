@@ -6,7 +6,8 @@ import {
   ImpulseJoint,
   InteractionGroups,
   RigidBody as RapierRigidBody,
-  TempContactManifold
+  TempContactManifold,
+  ActiveCollisionTypes
 } from "@dimforge/rapier3d-compat";
 import { Rotation, Vector } from "@dimforge/rapier3d-compat/math";
 import { Object3DProps, Vector3, Quaternion } from "@react-three/fiber";
@@ -187,7 +188,7 @@ export interface ColliderOptions<ColliderArgs extends Array<unknown>> {
   scale?: Object3DProps["scale"];
 
   /**
-   * Callback when this collider collides with another collider.
+   * Callback when this collider collideas with another collider.
    */
   onCollisionEnter?: CollisionEnterHandler;
 
@@ -220,6 +221,16 @@ export interface ColliderOptions<ColliderArgs extends Array<unknown>> {
    * The bit mask configuring the groups and mask for solver handling.
    */
   solverGroups?: InteractionGroups;
+
+  /**
+   * The collision types active for this collider.
+   *
+   * Use `ActiveCollisionTypes` to specify which collision types should be active for this collider.
+   *
+   * @see https://rapier.rs/javascript3d/classes/Collider.html#setActiveCollisionTypes
+   * @see https://rapier.rs/javascript3d/enums/ActiveCollisionTypes.html
+   */
+  activeCollisionTypes?: ActiveCollisionTypes;
 
   /**
    * Sets the uniform density of this collider.
@@ -417,6 +428,17 @@ export interface RigidBodyOptions extends ColliderProps {
    * Can be customized per-collider.
    */
   solverGroups?: InteractionGroups;
+
+  /**
+   * The default active collision types for all colliders in this rigid body.
+   * Can be customized per-collider.
+   * 
+   * Use `ActiveCollisionTypes` to specify which collision types should be active for this collider.
+   *
+   * @see https://rapier.rs/javascript3d/classes/Collider.html#setActiveCollisionTypes
+   * @see https://rapier.rs/javascript3d/enums/ActiveCollisionTypes.html
+   */
+  activeCollisionTypes?: ActiveCollisionTypes;
 
   onSleep?(): void;
 
