@@ -479,6 +479,7 @@ export const cleanRigidBodyPropsForCollider = (props: RigidBodyProps = {}) => {
     canSleep,
     ccd,
     gravityScale,
+    softCcdPrediction,
     ...rest
   } = props;
 
