@@ -1,22 +1,22 @@
 import { MutableRefObject, RefObject } from "react";
 
 import {
+  ActiveCollisionTypes,
   CoefficientCombineRule,
-  Collider as RapierCollider,
   ImpulseJoint,
   InteractionGroups,
+  Collider as RapierCollider,
   RigidBody as RapierRigidBody,
-  TempContactManifold,
-  ActiveCollisionTypes
+  TempContactManifold
 } from "@dimforge/rapier3d-compat";
 import { Rotation, Vector } from "@dimforge/rapier3d-compat/math";
-import { Object3DProps, Vector3, Quaternion } from "@react-three/fiber";
+import { Object3DProps, Quaternion, Vector3 } from "@react-three/fiber";
 import { Object3D } from "three";
 import { ColliderProps } from ".";
 import { RigidBodyState } from "./components/Physics";
 
 export { CoefficientCombineRule as CoefficientCombineRule } from "@dimforge/rapier3d-compat";
-export { RapierRigidBody, RapierCollider };
+export { RapierCollider, RapierRigidBody };
 
 export type RefGetter<T> = MutableRefObject<() => T | undefined>;
 
