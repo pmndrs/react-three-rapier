@@ -1,5 +1,20 @@
 # @react-three/rapier
 
+## 1.4.0
+
+### Minor Changes
+
+- a155277: feat: bump @dimforge/rapier3d-compat from 0.12.0 to 0.13.1
+
+  - Added World prop `lengthUnit`
+  - Renamed World props `allowedLinearError` and `predictionDistance` to `normalizedAllowedLinearError` and `normalizedPredictionDistance`, matching upstream changes
+  - Added `softCcdPrediction` RigidBody prop
+  - Added `contactSkin` collider prop
+
+### Patch Changes
+
+- 1dc78d0: feat: add `activeCollisionTypes` prop to RigidBody and Collider components
+
 ## 1.3.1
 
 ### Patch Changes
