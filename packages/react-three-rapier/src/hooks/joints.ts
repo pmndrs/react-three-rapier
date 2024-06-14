@@ -5,7 +5,7 @@ import {
   RevoluteImpulseJoint,
   RopeImpulseJoint,
   SphericalImpulseJoint,
-  SpringImpulseJoint,
+  SpringImpulseJoint
 } from "@dimforge/rapier3d-compat";
 import { RefObject, useRef } from "react";
 import {
@@ -17,7 +17,7 @@ import {
   SphericalJointParams,
   SpringJointParams,
   UseImpulseJoint,
-  useRapier,
+  useRapier
 } from "..";
 import {
   vector3ToRapierVector,

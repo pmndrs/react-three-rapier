@@ -1,12 +1,15 @@
 import { useRef } from "react";
 import {
   Quaternion as RapierQuaternion,
-  Vector3 as RapierVector3,
+  Vector3 as RapierVector3
 } from "@dimforge/rapier3d-compat";
 import { Euler, Quaternion, Vector3 } from "three";
 import { _euler, _quaternion, _vector3 } from "./shared-objects";
 import { RigidBodyTypeString, Vector3Tuple } from "../types";
-import { Vector3 as Vector3Like, Quaternion as QuaternionLike } from "@react-three/fiber";
+import {
+  Vector3 as Vector3Like,
+  Quaternion as QuaternionLike
+} from "@react-three/fiber";
 
 export const vectorArrayToVector3 = (arr: Vector3Tuple) => {
   const [x, y, z] = arr;

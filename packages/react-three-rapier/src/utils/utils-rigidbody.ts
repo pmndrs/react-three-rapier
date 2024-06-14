@@ -114,6 +114,9 @@ export const mutableRigidBodyOptions: MutableRigidBodyOptions = {
   ccd: (rb: RigidBody, value: boolean) => {
     rb.enableCcd(value);
   },
+  softCcdPrediction: (rb: RigidBody, value: number) => {
+    rb.setSoftCcdPrediction(value);
+  },
   userData: (rb: RigidBody, value: { [key: string]: any }) => {
     rb.userData = value;
   },

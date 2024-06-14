@@ -21,6 +21,7 @@ import { Colliders } from "./examples/colliders/CollidersExample";
 import { CollisionEventsExample } from "./examples/collision-events/CollisionEventsExample";
 import { ComponentsExample } from "./examples/components/ComponentsExample";
 import { ContactForceEventsExample } from "./examples/contact-force-events/ContactForceEventsExample";
+import { ContactSkinExample } from "./examples/contact-skin/ContactSkinExample";
 import { CradleExample } from "./examples/cradle/CradleExample";
 import { Damping } from "./examples/damping/DampingExample";
 import { DynamicTypeChangeExample } from "./examples/dynamic-type-change/DynamicTypeChangeExample";
@@ -122,6 +123,7 @@ const routes: Record<string, ReactNode> = {
   spring: <SpringExample />,
   "rope-joint": <RopeJointExample />,
   "active-collision-types": <ActiveCollisionTypesExample />,
+  "contact-skin": <ContactSkinExample />,
 };
 
 export const App = () => {

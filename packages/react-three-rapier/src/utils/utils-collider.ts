@@ -141,6 +141,9 @@ const mutableColliderOptions: MutableColliderOptions = {
   activeCollisionTypes: (collider, value: number) => {
     collider.setActiveCollisionTypes(value);
   },
+  contactSkin: (collider, value: number) => {
+    collider.setContactSkin(value);
+  },
   // To make sure the options all mutable options are listed
   quaternion: () => {},
   position: () => {},
@@ -479,6 +482,7 @@ export const cleanRigidBodyPropsForCollider = (props: RigidBodyProps = {}) => {
     canSleep,
     ccd,
     gravityScale,
+    softCcdPrediction,
     ...rest
   } = props;
 
