@@ -138,6 +138,9 @@ const mutableColliderOptions: MutableColliderOptions = {
   restitutionCombineRule: (collider, value) => {
     collider.setRestitutionCombineRule(value);
   },
+  contactSkin: (collider, value: number) => {
+    collider.setContactSkin(value);
+  },
   // To make sure the options all mutable options are listed
   quaternion: () => {},
   position: () => {},
@@ -476,6 +479,7 @@ export const cleanRigidBodyPropsForCollider = (props: RigidBodyProps = {}) => {
     canSleep,
     ccd,
     gravityScale,
+    softCcdPrediction,
     ...rest
   } = props;
 

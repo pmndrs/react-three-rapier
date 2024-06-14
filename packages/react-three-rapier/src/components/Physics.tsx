@@ -319,6 +319,16 @@ export interface PhysicsProps {
   erp?: number;
 
   /**
+   * The approximate size of most dynamic objects in the scene.
+   *
+   * This value is used internally to estimate some length-based tolerance.
+   * This value can be understood as the number of units-per-meter in your physical world compared to a human-sized world in meter.
+   *
+   * @defaultValue 1
+   */
+  lengthUnit?: number;
+
+  /**
    * Set the base automatic colliders for this physics world
    * All Meshes inside RigidBodies will generate a collider
    * based on this value, if not overridden.
@@ -407,7 +417,8 @@ export const Physics: FC<PhysicsProps> = (props) => {
     numInternalPgsIterations = 1,
     minIslandSize = 128,
     maxCcdSubsteps = 1,
-    erp = 0.8
+    erp = 0.8,
+    lengthUnit = 1
   } = props;
   const rapier = suspend(importRapier, ["@react-thee/rapier", importRapier]);
   const { invalidate } = useThree();
@@ -451,11 +462,14 @@ export const Physics: FC<PhysicsProps> = (props) => {
     worldProxy.integrationParameters.numInternalPgsIterations =
       numInternalPgsIterations;
 
-    worldProxy.integrationParameters.allowedLinearError = allowedLinearError;
+    worldProxy.integrationParameters.normalizedAllowedLinearError =
+      allowedLinearError;
     worldProxy.integrationParameters.minIslandSize = minIslandSize;
     worldProxy.integrationParameters.maxCcdSubsteps = maxCcdSubsteps;
-    worldProxy.integrationParameters.predictionDistance = predictionDistance;
+    worldProxy.integrationParameters.normalizedPredictionDistance =
+      predictionDistance;
     worldProxy.integrationParameters.erp = erp;
+    worldProxy.lengthUnit = lengthUnit;
   }, [
     worldProxy,
     ...gravity,
@@ -466,7 +480,8 @@ export const Physics: FC<PhysicsProps> = (props) => {
     minIslandSize,
     maxCcdSubsteps,
     predictionDistance,
-    erp
+    erp,
+    lengthUnit
   ]);
 
   const getSourceFromColliderHandle = useCallback((handle: ColliderHandle) => {
