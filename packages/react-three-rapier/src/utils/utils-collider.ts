@@ -138,6 +138,9 @@ const mutableColliderOptions: MutableColliderOptions = {
   restitutionCombineRule: (collider, value) => {
     collider.setRestitutionCombineRule(value);
   },
+  activeCollisionTypes: (collider, value: number) => {
+    collider.setActiveCollisionTypes(value);
+  },
   contactSkin: (collider, value: number) => {
     collider.setContactSkin(value);
   },

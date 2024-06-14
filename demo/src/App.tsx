@@ -41,6 +41,7 @@ import { SnapshotExample } from "./examples/snapshot/SnapshotExample";
 import { SpringExample } from "./examples/spring/SpringExample";
 import { StutteringExample } from "./examples/stuttering/StutteringExample";
 import { Transforms } from "./examples/transforms/TransformsExample";
+import { ActiveCollisionTypesExample } from "./examples/active-collision-types/ActiveCollisionTypesExample";
 
 const demoContext = createContext<{
   setDebug?(f: boolean): void;
@@ -121,7 +122,8 @@ const routes: Record<string, ReactNode> = {
   snapshot: <SnapshotExample />,
   spring: <SpringExample />,
   "rope-joint": <RopeJointExample />,
-  "contact-skin": <ContactSkinExample />
+  "active-collision-types": <ActiveCollisionTypesExample />,
+  "contact-skin": <ContactSkinExample />,
 };
 
 export const App = () => {
