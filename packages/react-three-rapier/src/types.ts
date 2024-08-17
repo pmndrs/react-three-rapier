@@ -1,21 +1,22 @@
 import { MutableRefObject, RefObject } from "react";
 
 import {
+  ActiveCollisionTypes,
   CoefficientCombineRule,
-  Collider as RapierCollider,
   ImpulseJoint,
   InteractionGroups,
+  Collider as RapierCollider,
   RigidBody as RapierRigidBody,
   TempContactManifold
 } from "@dimforge/rapier3d-compat";
 import { Rotation, Vector } from "@dimforge/rapier3d-compat/math";
-import { Object3DProps } from "@react-three/fiber";
+import { Object3DProps, Quaternion, Vector3 } from "@react-three/fiber";
 import { Object3D } from "three";
 import { ColliderProps } from ".";
 import { RigidBodyState } from "./components/Physics";
 
 export { CoefficientCombineRule as CoefficientCombineRule } from "@dimforge/rapier3d-compat";
-export { RapierRigidBody, RapierCollider };
+export { RapierCollider, RapierRigidBody };
 
 export type RefGetter<T> = MutableRefObject<() => T | undefined>;
 
@@ -187,7 +188,7 @@ export interface ColliderOptions<ColliderArgs extends Array<unknown>> {
   scale?: Object3DProps["scale"];
 
   /**
-   * Callback when this collider collides with another collider.
+   * Callback when this collider collideas with another collider.
    */
   onCollisionEnter?: CollisionEnterHandler;
 
@@ -222,6 +223,16 @@ export interface ColliderOptions<ColliderArgs extends Array<unknown>> {
   solverGroups?: InteractionGroups;
 
   /**
+   * The collision types active for this collider.
+   *
+   * Use `ActiveCollisionTypes` to specify which collision types should be active for this collider.
+   *
+   * @see https://rapier.rs/javascript3d/classes/Collider.html#setActiveCollisionTypes
+   * @see https://rapier.rs/javascript3d/enums/ActiveCollisionTypes.html
+   */
+  activeCollisionTypes?: ActiveCollisionTypes;
+
+  /**
    * Sets the uniform density of this collider.
    * If this is set, other mass-properties like the angular inertia tensor are computed
    * automatically from the collider's shape.
@@ -249,6 +260,19 @@ export interface ColliderOptions<ColliderArgs extends Array<unknown>> {
     principalAngularInertia: Vector;
     angularInertiaLocalFrame: Rotation;
   };
+
+  /**
+   * The contact skin of the collider.
+   *
+   * The contact skin acts as if the collider was enlarged with a skin of width contactSkin around it, keeping objects further apart when colliding.
+   *
+   * A non-zero contact skin can increase performance, and in some cases, stability.
+   * However it creates a small gap between colliding object (equal to the sum of their skin).
+   * If the skin is sufficiently small, this might not be visually significant or can be hidden by the rendering assets.
+   *
+   * @defaultValue 0
+   */
+  contactSkin?: number;
 
   /**
    * Sets whether or not this collider is a sensor.
@@ -363,6 +387,21 @@ export interface RigidBodyOptions extends ColliderProps {
   ccd?: boolean;
 
   /**
+   * The maximum prediction distance Soft Continuous Collision-Detection.
+   *
+   * When set to 0, soft-CCD is disabled.
+   *
+   * Soft-CCD helps prevent tunneling especially of slow-but-thin to moderately fast objects.
+   * The soft CCD prediction distance indicates how far in the object’s path the CCD algorithm is allowed to inspect.
+   * Large values can impact performance badly by increasing the work needed from the broad-phase.
+   *
+   * It is a generally cheaper variant of regular CCD since it relies on predictive constraints instead of shape-cast and substeps.
+   *
+   * @defaultValue 0
+   */
+  softCcdPrediction?: number;
+
+  /**
    * Initial position of the RigidBody
    */
   position?: Object3DProps["position"];
@@ -396,6 +435,17 @@ export interface RigidBodyOptions extends ColliderProps {
   restitution?: number;
 
   /**
+   * Sets the number of additional solver iterations that will be run for this
+   * rigid-body and everything that interacts with it directly or indirectly
+   * through contacts or joints.
+   *
+   * Compared to increasing the global `World.numSolverIteration`, setting this
+   * value lets you increase accuracy on only a subset of the scene, resulting in reduced
+   * performance loss.
+   */
+  additionalSolverIterations?: number;
+
+  /**
    * The default collision groups bitmask for all colliders in this rigid body.
    * Can be customized per-collider.
    */
@@ -406,6 +456,17 @@ export interface RigidBodyOptions extends ColliderProps {
    * Can be customized per-collider.
    */
   solverGroups?: InteractionGroups;
+
+  /**
+   * The default active collision types for all colliders in this rigid body.
+   * Can be customized per-collider.
+   * 
+   * Use `ActiveCollisionTypes` to specify which collision types should be active for this collider.
+   *
+   * @see https://rapier.rs/javascript3d/classes/Collider.html#setActiveCollisionTypes
+   * @see https://rapier.rs/javascript3d/enums/ActiveCollisionTypes.html
+   */
+  activeCollisionTypes?: ActiveCollisionTypes;
 
   onSleep?(): void;
 
@@ -449,30 +510,41 @@ export interface RigidBodyOptions extends ColliderProps {
 }
 
 // Joints
-export type SphericalJointParams = [
-  body1Anchor: Vector3Tuple,
-  body2Anchor: Vector3Tuple
-];
+export type SphericalJointParams = [body1Anchor: Vector3, body2Anchor: Vector3];
 
 export type FixedJointParams = [
-  body1Anchor: Vector3Tuple,
-  body1LocalFrame: Vector4Tuple,
-  body2Anchor: Vector3Tuple,
-  body2LocalFrame: Vector4Tuple
+  body1Anchor: Vector3,
+  body1LocalFrame: Quaternion,
+  body2Anchor: Vector3,
+  body2LocalFrame: Quaternion
 ];
 
 export type PrismaticJointParams = [
-  body1Anchor: Vector3Tuple,
-  body2Anchor: Vector3Tuple,
-  axis: Vector3Tuple,
+  body1Anchor: Vector3,
+  body2Anchor: Vector3,
+  axis: Vector3,
   limits?: [min: number, max: number]
 ];
 
 export type RevoluteJointParams = [
-  body1Anchor: Vector3Tuple,
-  body2Anchor: Vector3Tuple,
-  axis: Vector3Tuple,
+  body1Anchor: Vector3,
+  body2Anchor: Vector3,
+  axis: Vector3,
   limits?: [min: number, max: number]
+];
+
+export type RopeJointParams = [
+  body1Anchor: Vector3,
+  body2Anchor: Vector3,
+  length: number
+];
+
+export type SpringJointParams = [
+  body1Anchor: Vector3,
+  body2Anchor: Vector3,
+  restLength: number,
+  stiffness: number,
+  damping: number
 ];
 
 export interface UseImpulseJoint<JointParams, JointType extends ImpulseJoint> {

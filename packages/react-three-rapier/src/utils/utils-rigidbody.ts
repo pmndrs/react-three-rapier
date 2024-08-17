@@ -1,5 +1,5 @@
 import { RigidBody, RigidBodyDesc } from "@dimforge/rapier3d-compat";
-import React, { MutableRefObject, useEffect, useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { Matrix4, Object3D, Vector3 } from "three";
 import { Boolean3Tuple, RigidBodyProps, Vector3Tuple } from "..";
 import {
@@ -81,6 +81,9 @@ export const mutableRigidBodyOptions: MutableRigidBodyOptions = {
   gravityScale: (rb: RigidBody, value: number) => {
     rb.setGravityScale(value, true);
   },
+  additionalSolverIterations(rb: RigidBody, value: number) {
+    rb.setAdditionalSolverIterations(value);
+  },
   linearDamping: (rb: RigidBody, value: number) => {
     rb.setLinearDamping(value);
   },
@@ -110,6 +113,9 @@ export const mutableRigidBodyOptions: MutableRigidBodyOptions = {
   },
   ccd: (rb: RigidBody, value: boolean) => {
     rb.enableCcd(value);
+  },
+  softCcdPrediction: (rb: RigidBody, value: number) => {
+    rb.setSoftCcdPrediction(value);
   },
   userData: (rb: RigidBody, value: { [key: string]: any }) => {
     rb.userData = value;

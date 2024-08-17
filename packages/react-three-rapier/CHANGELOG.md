@@ -1,5 +1,53 @@
 # @react-three/rapier
 
+## 1.4.0
+
+### Minor Changes
+
+- a155277: feat: bump @dimforge/rapier3d-compat from 0.12.0 to 0.13.1
+  
+  - See the rapier.js changelog for more information: https://github.com/dimforge/rapier.js/blob/master/CHANGELOG.md 
+  - Added World prop `lengthUnit`
+  - Renamed World props `allowedLinearError` and `predictionDistance` to `normalizedAllowedLinearError` and `normalizedPredictionDistance`, matching upstream changes
+  - Added `softCcdPrediction` RigidBody prop
+  - Added `contactSkin` collider prop
+
+### Patch Changes
+
+- 1dc78d0: feat: add `activeCollisionTypes` prop to RigidBody and Collider components
+
+## 1.3.1
+
+### Patch Changes
+
+- bad7da7: fix: move away from use-asset
+
+## 1.3.0
+
+### Minor Changes
+
+- 1517acb: feat: update @dimforge/rapier3d-compat to 0.12.0 (@0xtito, @isaac-mason)
+
+  - Change Physics component props to match the new rapier version's integration parameter changes.
+    - There aren't direct alternatives for all old parameters. See the Physics component docs for more information on the new parameters: https://pmndrs.github.io/react-three-rapier/interfaces/PhysicsProps.html
+  - Add `additionalSolverIterations` prop to `RigidBodyOptions`.
+    - See: https://pmndrs.github.io/react-three-rapier/interfaces/RigidBodyOptions.html#additionalSolverIterations
+  - Add `useSpringJoint`
+  - Add `useRopeJoint`
+
+## 1.3.0-canary.0
+
+### Minor Changes
+
+- 1517acb: feat: update @dimforge/rapier3d-compat to 0.12.0 (@0xtito, @isaac-mason)
+
+  - Change Physics component props to match the new rapier version's integration parameter changes.
+    - There aren't direct alternatives for all old parameters. See the Physics component docs for more information on the new parameters: https://pmndrs.github.io/react-three-rapier/interfaces/PhysicsProps.html
+  - Add `additionalSolverIterations` prop to `RigidBodyOptions`.
+    - See: https://pmndrs.github.io/react-three-rapier/interfaces/RigidBodyOptions.html#additionalSolverIterations
+  - Add `useSpringJoint`
+  - Add `useRopeJoint`
+
 ## 1.2.1
 
 ### Patch Changes
