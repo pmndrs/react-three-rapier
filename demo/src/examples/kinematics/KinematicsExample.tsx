@@ -4,6 +4,7 @@ import { RigidBody, RapierRigidBody } from "@react-three/rapier";
 import { useEffect, useRef } from "react";
 import { Euler, Quaternion } from "three";
 import { Demo } from "../../App";
+import { resetOrbitControl } from "../../hooks/resetOrbitControl";
 
 const Ball = () => {
   const ball = useRef<RapierRigidBody>(null);
@@ -32,7 +33,7 @@ const Ball = () => {
 export const Kinematics: Demo = () => {
   const torus = useRef<RapierRigidBody>(null);
   const platform = useRef<RapierRigidBody>(null);
-
+  resetOrbitControl(30);
   useFrame(() => {
     const now = performance.now();
 

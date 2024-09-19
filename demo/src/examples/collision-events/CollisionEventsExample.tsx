@@ -20,6 +20,7 @@ import {
 } from "react";
 import { PlaneGeometry } from "three";
 import { useSuzanne } from "../all-shapes/AllShapesExample";
+import { resetOrbitControl } from "../../hooks/resetOrbitControl";
 
 const Suzanne = ({ color }: { color: string }) => {
   const { nodes: suzanne } = useSuzanne();
@@ -51,7 +52,7 @@ const heightFieldGeometry = new PlaneGeometry(
 );
 
 heightField.forEach((v, index) => {
-  (heightFieldGeometry.attributes.position.array as number[])[index * 3 + 2] =
+  (heightFieldGeometry.attributes.position.array)[index * 3 + 2] =
     v;
 });
 heightFieldGeometry.scale(1, -1, 1);
@@ -218,6 +219,7 @@ const Explosions = () => {
 
 export const CollisionEventsExample = () => {
   const [explosions, setExplosions] = useState<ReactNode[]>([]);
+  resetOrbitControl(30);
 
   return (
     <explosionContext.Provider value={{ explosions, setExplosions }}>

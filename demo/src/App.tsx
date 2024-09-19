@@ -8,6 +8,8 @@ import {
   Suspense,
   createContext,
   useContext,
+  useEffect,
+  useRef,
   useState
 } from "react";
 import { NavLink, NavLinkProps, Route, Routes } from "react-router-dom";
@@ -42,12 +44,17 @@ import { SpringExample } from "./examples/spring/SpringExample";
 import { StutteringExample } from "./examples/stuttering/StutteringExample";
 import { Transforms } from "./examples/transforms/TransformsExample";
 import { ActiveCollisionTypesExample } from "./examples/active-collision-types/ActiveCollisionTypesExample";
+import { OrbitControls as OrbitControlsImpl } from "three-stdlib";
+import { resetOrbitControl } from "./hooks/resetOrbitControl";
 
-const demoContext = createContext<{
-  setDebug?(f: boolean): void;
-  setPaused?(f: boolean): void;
-  setCameraEnabled?(f: boolean): void;
-}>({});
+type DemoContextType = {
+  setDebug: (f: boolean) => void;
+  setPaused: (f: boolean) => void;
+  setCameraEnabled: (f: boolean) => void;
+  orbitControlRef: React.RefObject<OrbitControlsImpl>;
+};
+
+const demoContext = createContext<Partial<DemoContextType>>({});
 
 export const useDemo = () => useContext(demoContext);
 
@@ -123,7 +130,7 @@ const routes: Record<string, ReactNode> = {
   spring: <SpringExample />,
   "rope-joint": <RopeJointExample />,
   "active-collision-types": <ActiveCollisionTypesExample />,
-  "contact-skin": <ContactSkinExample />,
+  "contact-skin": <ContactSkinExample />
 };
 
 export const App = () => {
@@ -133,6 +140,9 @@ export const App = () => {
   const [interpolate, setInterpolate] = useState<boolean>(true);
   const [physicsKey, setPhysicsKey] = useState<number>(0);
   const [cameraEnabled, setCameraEnabled] = useState<boolean>(true);
+  const orbitControlRef = useRef<OrbitControlsImpl>(null);
+
+  resetOrbitControl();
 
   const updatePhysicsKey = () => {
     setPhysicsKey((current) => current + 1);
@@ -169,13 +179,18 @@ export const App = () => {
               />
               <Environment preset="apartment" />
 
-              <OrbitControls enabled={cameraEnabled} />
+              <OrbitControls
+                // @ts-ignore
+                ref={orbitControlRef}
+                enabled={cameraEnabled}
+              />
 
               <demoContext.Provider
                 value={{
                   setDebug,
                   setPaused,
-                  setCameraEnabled
+                  setCameraEnabled,
+                  orbitControlRef
                 }}
               >
                 <Routes>

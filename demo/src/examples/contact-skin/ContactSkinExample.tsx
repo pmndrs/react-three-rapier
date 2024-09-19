@@ -1,6 +1,7 @@
 import { Box, Sphere } from "@react-three/drei";
 import { RapierRigidBody, RigidBody } from "@react-three/rapier";
 import { useRef } from "react";
+import { resetOrbitControl } from "../../hooks/resetOrbitControl";
 
 const Ball = () => {
   const rb = useRef<RapierRigidBody>(null);
@@ -25,6 +26,7 @@ const Floor = () => {
 };
 
 export const ContactSkinExample = () => {
+  resetOrbitControl(10);
   return (
     <group>
       <Ball />

@@ -8,6 +8,7 @@ import {
 } from "@react-three/rapier";
 import { createRef, RefObject, useRef } from "react";
 import { Demo } from "../../App";
+import { resetOrbitControl } from "../../hooks/resetOrbitControl";
 
 const WheelJoint = ({
   body,
@@ -48,6 +49,7 @@ export const Car: Demo = () => {
   const wheelRefs = useRef(
     wheelPositions.map(() => createRef<RapierRigidBody>())
   );
+  resetOrbitControl(30);
 
   return (
     <group>
