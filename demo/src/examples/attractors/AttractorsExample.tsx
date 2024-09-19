@@ -9,11 +9,13 @@ import { RapierRigidBody } from "@react-three/rapier";
 import { createRef, useEffect, useRef } from "react";
 import { Demo } from "../../App";
 import { Attractor } from "@react-three/rapier-addons";
+import { resetOrbitControl } from "../../hooks/resetOrbitControl";
 
 const BALLS = 100;
 
 export const AttractorExample: Demo = () => {
   const api = useRef<RapierRigidBody[]>(null);
+  resetOrbitControl(40);
 
   return (
     <group>

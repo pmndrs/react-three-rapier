@@ -8,6 +8,7 @@ import {
 } from "@react-three/rapier";
 import { useEffect, useRef, useState } from "react";
 import { MeshPhysicalMaterial } from "three";
+import { resetOrbitControl } from "../../hooks/resetOrbitControl";
 
 const material = new MeshPhysicalMaterial();
 
@@ -91,6 +92,8 @@ const Ball = () => {
 };
 
 export const SensorsExample = () => {
+  resetOrbitControl(30);
+
   return (
     <group>
       <Goal />

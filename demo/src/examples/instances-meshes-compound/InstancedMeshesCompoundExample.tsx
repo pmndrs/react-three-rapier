@@ -8,6 +8,7 @@ import { useEffect, useRef } from "react";
 import { useSuzanne } from "../all-shapes/AllShapesExample";
 import { Demo } from "../../App";
 import { RapierRigidBody } from "@react-three/rapier";
+import { resetOrbitControl } from "../../hooks/resetOrbitControl";
 
 const COUNT = 300;
 
@@ -15,6 +16,8 @@ export const InstancedMeshesCompound: Demo = () => {
   const {
     nodes: { Suzanne }
   } = useSuzanne();
+
+  resetOrbitControl(30);
 
   const api = useRef<RapierRigidBody[]>(null);
 

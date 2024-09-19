@@ -4,6 +4,7 @@ import { RapierRigidBody, RigidBody } from "@react-three/rapier";
 import { useEffect, useRef, useState } from "react";
 import { useDemo } from "../../App";
 import { useSuzanne } from "../all-shapes/AllShapesExample";
+import { resetOrbitControl } from "../../hooks/resetOrbitControl";
 
 export const DynamicTypeChangeExample = () => {
   const { setCameraEnabled } = useDemo();
@@ -18,6 +19,7 @@ export const DynamicTypeChangeExample = () => {
   } = useSuzanne();
 
   const { mouse } = useThree();
+  resetOrbitControl(30);
 
   useEffect(() => {
     if (dragging) {

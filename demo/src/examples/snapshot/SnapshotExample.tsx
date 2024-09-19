@@ -6,6 +6,7 @@ import { Demo } from "../../App";
 import React, { useRef } from "react";
 
 import { useControls, button } from "leva";
+import { resetOrbitControl } from "../../hooks/resetOrbitControl";
 
 export const SnapshotExample: Demo = () => {
   const floor = useTexture(
@@ -33,6 +34,7 @@ export const SnapshotExample: Demo = () => {
         setWorld(rapier.World.restoreSnapshot(worldSnapshot.current))
     )
   });
+  resetOrbitControl(40, [0, 0.25, 0.75]);
 
   return (
     <>
