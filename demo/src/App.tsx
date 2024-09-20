@@ -46,6 +46,7 @@ import { Transforms } from "./examples/transforms/TransformsExample";
 import { ActiveCollisionTypesExample } from "./examples/active-collision-types/ActiveCollisionTypesExample";
 import { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import { resetOrbitControl } from "./hooks/resetOrbitControl";
+import { KinematicCharacterControllerExample } from "./examples/kinematic-character-controller/KinematicCharacterControllerExample";
 
 type DemoContextType = {
   setDebug: (f: boolean) => void;
@@ -111,6 +112,7 @@ const routes: Record<string, ReactNode> = {
   car: <Car />,
   "api-usage": <ApiUsage />,
   kinematics: <Kinematics />,
+  kinematicCharacterController: <KinematicCharacterControllerExample />,
   "mesh-collider-test": <MeshColliderTest />,
   colliders: <Colliders />,
   "instanced-meshes": <InstancedMeshes />,
