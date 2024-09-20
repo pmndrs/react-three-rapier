@@ -9,7 +9,7 @@ import {
   useRapier
 } from "@react-three/rapier";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Quaternion, Vector3 } from "three";
+import { Object3D, Quaternion, Vector3 } from "three";
 
 const CAMERA_OFFSET = new Vector3(0, 3, -10);
 
@@ -31,12 +31,13 @@ export const KinematicCharacterController = ({
   applyImpulsesToDynamicBodies = true,
   characterMass = 1,
   characterControllerOffset = 0.01,
-  kinematicMode = "position"
+  kinematicMode = "position",
+  colliderType = "capsule"
 }) => {
   const refCollider = useRef();
   const rigidBodyRef = useRef(null);
   const isGroundedRef = useRef(false);
-  const refCharacterModel = useRef(null);
+  const refObject3D = useRef(new Object3D());// todo replace by simple quaternion
   const canJumpRef = useRef(false);
   // const currentYRotation = useRef(0)
   const allIntersections = useRef(new Map()).current;
@@ -96,13 +97,13 @@ export const KinematicCharacterController = ({
 
       if (left || right) {
         if (left && !right) {
-          refCharacterModel.current.rotateY(rotationForce * delta);
+          refObject3D.current.rotateY(rotationForce * delta);
         } else if (right && !left) {
-          refCharacterModel.current.rotateY(-rotationForce * delta);
+          refObject3D.current.rotateY(-rotationForce * delta);
         }
       }
 
-      invQuaternion.copy(refCharacterModel.current.quaternion).invert();
+      invQuaternion.copy(refObject3D.current.quaternion).invert();
       velocityLocal.copy(velocityWorld).applyQuaternion(invQuaternion);
 
       if (forward || back) {
@@ -116,14 +117,16 @@ export const KinematicCharacterController = ({
       velocityLocal.x *= damping;
       velocityLocal.z *= damping;
 
-      invQuaternion.copy(refCharacterModel.current.quaternion).invert();
+      invQuaternion.copy(refObject3D.current.quaternion).invert();
       velocityWorld
         .copy(velocityLocal)
-        .applyQuaternion(refCharacterModel.current.quaternion);
+        .applyQuaternion(refObject3D.current.quaternion);
 
       if (jump && canJumpRef.current) {
         velocityWorld.y = jumpForce;
       }
+
+      // refCollider.current.setRotation(refObject3D.current.quaternion)
 
       characterController.computeColliderMovement(
         refCollider.current,
@@ -136,6 +139,7 @@ export const KinematicCharacterController = ({
       nextTranslation.add(computedMovement);
       velocityWorld.copy(computedMovement);
       rigidBodyRef.current.setNextKinematicTranslation(nextTranslation);
+      rigidBodyRef.current.setRotation(refObject3D.current.quaternion)
     } else {
       velocityWorld.copy(rigidBodyRef.current.linvel());
       velocityWorld.multiplyScalar(world.timestep);
@@ -149,13 +153,13 @@ export const KinematicCharacterController = ({
 
       if (left || right) {
         if (left && !right) {
-          refCharacterModel.current.rotateY(rotationForce * delta);
+          refObject3D.current.rotateY(rotationForce * delta);
         } else if (right && !left) {
-          refCharacterModel.current.rotateY(-rotationForce * delta);
+          refObject3D.current.rotateY(-rotationForce * delta);
         }
       }
 
-      invQuaternion.copy(refCharacterModel.current.quaternion).invert();
+      invQuaternion.copy(refObject3D.current.quaternion).invert();
       velocityLocal.copy(velocityWorld).applyQuaternion(invQuaternion);
 
       if (forward || back) {
@@ -169,10 +173,10 @@ export const KinematicCharacterController = ({
       velocityLocal.x *= damping;
       velocityLocal.z *= damping;
 
-      invQuaternion.copy(refCharacterModel.current.quaternion).invert();
+      invQuaternion.copy(refObject3D.current.quaternion).invert();
       velocityWorld
         .copy(velocityLocal)
-        .applyQuaternion(refCharacterModel.current.quaternion);
+        .applyQuaternion(refObject3D.current.quaternion);
 
       if (jump && canJumpRef.current) {
         velocityWorld.y = jumpForce;
@@ -187,12 +191,13 @@ export const KinematicCharacterController = ({
       velocityWorld.copy(computedMovement);
       velocityWorld.divideScalar(world.timestep);
       rigidBodyRef.current.setLinvel(velocityWorld);
+      rigidBodyRef.current.setRotation(refObject3D.current.quaternion)
     }
 
     currentPos.copy(rigidBodyRef.current.translation());
     camera.position
       .copy(CAMERA_OFFSET)
-      .applyQuaternion(refCharacterModel.current.quaternion)
+      .applyQuaternion(refObject3D.current.quaternion)
       .add(currentPos);
     camera.lookAt(currentPos);
   });
@@ -227,15 +232,24 @@ export const KinematicCharacterController = ({
         ccd={true}
       >
         {/* add model character here */}
-        {/* capsule is a placeholer */}
-        <Capsule ref={refCharacterModel} args={[radius, height]}>
+        {/* capsule and cuboid act as a placeholer */}
+        {
+          colliderType === 'cuboid' ? <>
+            <Box args={[radius*2,height*2,radius*2]} />
+            <CuboidCollider ref={refCollider} args={[radius,height,radius]} />
+          </> : <>
+          <Capsule args={[radius, height]}>
           <Box
             args={[0.2, 0.2, 0.5]}
             position={[0, height / 2 + radius / 2, -radius / 2]}
             rotation={[0, 0, Math.PI / 2]}
           />
         </Capsule>
-        <CapsuleCollider ref={refCollider} args={[height / 2, radius]} />
+          <CapsuleCollider ref={refCollider} args={[height / 2, radius]} />
+          </>
+        }
+
+        {/* <CapsuleCollider ref={refCollider} args={[height / 2, radius]} /> */}
         <BallCollider
           sensor
           position={[0, -height / 2 - radius / 2, 0]}
@@ -250,16 +264,6 @@ export const KinematicCharacterController = ({
           }
         />
       </RigidBody>
-
-      {/* <CuboidCollider
-        position={[0, 0, 1]}
-        args={[5, 3, 1]}
-        sensor
-        onIntersectionEnter={() => {
-          console.log(true);
-        }}
-        onIntersectionExit={() => console.log(false)}
-      /> */}
     </>
   );
 };

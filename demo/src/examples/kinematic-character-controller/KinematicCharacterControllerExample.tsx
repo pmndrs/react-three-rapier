@@ -149,7 +149,7 @@ export const KinematicCharacterControllerExample: Demo = () => {
       </group>
       <KeyboardControls map={keyboardMap}>
         <KinematicCharacterController
-          kinematicMode="position"
+          kinematicMode="velocity"
           autostepMaxHeight={1}
           autostepMinWidth={0.1}
           moveForce={10}
