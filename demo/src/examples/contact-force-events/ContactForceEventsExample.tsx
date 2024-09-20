@@ -9,6 +9,7 @@ import {
 import { useCallback, useRef, useState } from "react";
 import { Color } from "three";
 import { Demo } from "../../App";
+import { resetOrbitControl } from "../../hooks/resetOrbitControl";
 
 type BallProps = { onContactForce: RigidBodyProps["onContactForce"] };
 const Ball = ({ onContactForce }: BallProps) => {
@@ -62,6 +63,8 @@ export const ContactForceEventsExample: Demo = () => {
     },
     []
   );
+
+  resetOrbitControl(10);
 
   // magic number: this is the start force for where the ball drops from
   // and is used to calculate the color change

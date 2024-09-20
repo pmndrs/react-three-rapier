@@ -460,7 +460,7 @@ export interface RigidBodyOptions extends ColliderProps {
   /**
    * The default active collision types for all colliders in this rigid body.
    * Can be customized per-collider.
-   * 
+   *
    * Use `ActiveCollisionTypes` to specify which collision types should be active for this collider.
    *
    * @see https://rapier.rs/javascript3d/classes/Collider.html#setActiveCollisionTypes

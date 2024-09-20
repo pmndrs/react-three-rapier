@@ -10,17 +10,17 @@
   ],
   "scripts": {},
   "devDependencies": {
-    "@react-three/drei": "9.74.14",
-    "@react-three/fiber": "8.9.1",
-    "@react-three/test-renderer": "8.1.5",
+    "@react-three/drei": "9.112.0",
+    "@react-three/fiber": "8.17.7",
+    "@react-three/test-renderer": "8.2.1",
     "@types/react-dom": "18.0.2",
-    "@types/three": "^0.152.1",
-    "@vitejs/plugin-react": "^4.0.3",
+    "@types/three": "^0.168.0",
+    "@vitejs/plugin-react": "^4.3.1",
     "@vitest/ui": "0.32.0",
     "happy-dom": "9.19.2",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "three": "0.146.0",
+    "three": "0.168.0",
     "vitest": "0.32.0"
   },
   "peerDependencies": {
@@ -29,7 +29,7 @@
     "three": ">=0.139.0"
   },
   "dependencies": {
-    "@dimforge/rapier3d-compat": "0.13.1",
+    "@dimforge/rapier3d-compat": "0.14.0",
     "suspend-react": "^0.1.3",
     "three-stdlib": "2.23.9"
   },

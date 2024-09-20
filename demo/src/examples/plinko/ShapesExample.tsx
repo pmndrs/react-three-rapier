@@ -177,6 +177,22 @@ const Scene: FC = () => {
     convexMesh: button(() => addItem("convexMesh"))
   });
 
+  useEffect(() => {
+    addItem("box");
+    setTimeout(() => {
+      addItem("cylinder");
+    }, 1000);
+    setTimeout(() => {
+      addItem("ball");
+    }, 2000 + Math.random() * 500);
+    setTimeout(() => {
+      addItem("convexHull");
+    }, 3000 + Math.random() * 500);
+    setTimeout(() => {
+      addItem("convexMesh");
+    }, 4000 + Math.random() * 500);
+  }, []);
+
   const addItem = (str: string) => {
     setItems((curr) => [...curr, str]);
   };
