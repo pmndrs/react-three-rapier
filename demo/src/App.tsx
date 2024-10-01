@@ -11,6 +11,7 @@ import {
   useState
 } from "react";
 import { NavLink, NavLinkProps, Route, Routes } from "react-router-dom";
+import { ActiveCollisionTypesExample } from "./examples/active-collision-types/ActiveCollisionTypesExample";
 import { AllCollidersExample } from "./examples/all-colliders/AllCollidersExample";
 import { AllShapesExample } from "./examples/all-shapes/AllShapesExample";
 import { ApiUsage } from "./examples/api-usage/ApiUsageExample";
@@ -33,6 +34,7 @@ import { Kinematics } from "./examples/kinematics/KinematicsExample";
 import { LockedTransformsExample } from "./examples/locked-transforms/LockedTransformsExample";
 import { ManualStepExample } from "./examples/manual-step/ManualStepExamples";
 import { MeshColliderTest } from "./examples/mesh-collider-test/MeshColliderExample";
+import { OneWayPlatform } from "./examples/one-way-platform/OneWayPlatform";
 import { PerformanceExample } from "./examples/performance/PeformanceExample";
 import Shapes from "./examples/plinko/ShapesExample";
 import { RopeJointExample } from "./examples/rope-joint/RopeJointExample";
@@ -41,7 +43,6 @@ import { SnapshotExample } from "./examples/snapshot/SnapshotExample";
 import { SpringExample } from "./examples/spring/SpringExample";
 import { StutteringExample } from "./examples/stuttering/StutteringExample";
 import { Transforms } from "./examples/transforms/TransformsExample";
-import { ActiveCollisionTypesExample } from "./examples/active-collision-types/ActiveCollisionTypesExample";
 
 const demoContext = createContext<{
   setDebug?(f: boolean): void;
@@ -93,7 +94,8 @@ const Floor = () => {
 };
 
 const routes: Record<string, ReactNode> = {
-  "": <Shapes />,
+  "": <OneWayPlatform />,
+  shapes: Shapes,
   joints: <Joints />,
   components: <ComponentsExample />,
   cradle: <CradleExample />,
@@ -206,7 +208,7 @@ export const App = () => {
       >
         {Object.keys(routes).map((key) => (
           <Link key={key} to={key} end>
-            {key.replace(/-/g, " ") || "Plinko"}
+            {key.replace(/-/g, " ") || "One Way Platform"}
           </Link>
         ))}
 
