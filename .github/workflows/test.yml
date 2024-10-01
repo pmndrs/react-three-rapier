@@ -15,11 +15,13 @@ jobs:
       - name: Setup Node.js 18.x
         uses: actions/setup-node@v3
         with:
-          node-version: 18.x
-          cache: "npm"
+          node-version: 18
+
+      - name: Enable corepack  
+        run: corepack enable
       
       - name: Install deps
-        run: yarn --frozen-lockfile
+        run: yarn --immutable
       
       - name: "Run tests"
         run: npm run test

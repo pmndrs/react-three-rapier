@@ -123,7 +123,7 @@ const routes: Record<string, ReactNode> = {
   spring: <SpringExample />,
   "rope-joint": <RopeJointExample />,
   "active-collision-types": <ActiveCollisionTypesExample />,
-  "contact-skin": <ContactSkinExample />,
+  "contact-skin": <ContactSkinExample />
 };
 
 export const App = () => {
