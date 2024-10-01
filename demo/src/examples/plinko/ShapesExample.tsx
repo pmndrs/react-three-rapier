@@ -9,6 +9,7 @@ import {
 import Plinko from "./Plinko";
 import { Mesh, Vector3 } from "three";
 import { useControls, button } from "leva";
+import { useResetOrbitControls } from "../../hooks/use-reset-orbit-controls";
 
 const colors = ["red", "green", "blue", "yellow", "orange", "purple"];
 const randomColor = () => colors[Math.floor(Math.random() * colors.length)];

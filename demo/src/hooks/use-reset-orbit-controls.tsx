@@ -8,10 +8,7 @@ export const useResetOrbitControls = (distance = 20, direction = [0, 0, 1]) => {
   const { orbitControlRef } = useDemo();
 
   useEffect(() => {
-    if (
-      orbitControlRef?.current === undefined ||
-      orbitControlRef?.current === null
-    ) {
+    if (!orbitControlRef?.current) {
       return;
     }
 
@@ -19,6 +16,7 @@ export const useResetOrbitControls = (distance = 20, direction = [0, 0, 1]) => {
     const camera = controls.object; // This is the camera that OrbitControls is controlling
     // Get the current look-at target
     const target = controls.target;
+    target.set(0, 0, 0);
 
     // Calculate the direction vector from target to camera
     directionVector.fromArray(direction).normalize();
