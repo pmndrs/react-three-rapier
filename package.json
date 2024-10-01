@@ -27,7 +27,7 @@
     "@commitlint/cli": "17.1.2",
     "@commitlint/config-conventional": "17.1.0",
     "@manypkg/cli": "0.19.1",
-    "@preconstruct/cli": "2.1.5",
+    "@preconstruct/cli": "2.8.8",
     "@testing-library/react": "14.0.0",
     "@vitejs/plugin-react": "4.0.3",
     "@vitest/ui": "1.2.2",
