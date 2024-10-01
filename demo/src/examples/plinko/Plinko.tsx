@@ -8,7 +8,7 @@ import { useEffect, useRef } from "react";
 import { Group, Mesh, MeshPhysicalMaterial, MeshStandardMaterial } from "three";
 import { RigidBody } from "@react-three/rapier";
 import { useDemo } from "../../App";
-import { resetOrbitControl } from "../../hooks/resetOrbitControl";
+import { useResetOrbitControls } from "../../hooks/use-reset-orbit-controls";
 
 type GLTFResult = GLTF & {
   nodes: {
@@ -32,18 +32,17 @@ export default function Plinko({ ...props }: JSX.IntrinsicElements["group"]) {
     new URL("../../models/plinko.glb", import.meta.url).toString()
   ) as unknown as GLTFResult;
 
-  resetOrbitControl();
+  useResetOrbitControls();
 
   return (
     <group
       ref={group}
       {...props}
       dispose={null}
-      rotation={[0, -1, 0]}
-      position={[6, 0, 0.75]}
+      position={[0, 0, 0.75]}
       scale={1}
     >
-      <RigidBody type="fixed" colliders="trimesh" position={[-5, 1, 5]}>
+      <RigidBody type="fixed" colliders="trimesh">
         <group scale={1}>
           <mesh
             geometry={nodes.plinko.geometry}
@@ -51,8 +50,8 @@ export default function Plinko({ ...props }: JSX.IntrinsicElements["group"]) {
             material-color="blue"
             castShadow
             receiveShadow
-            rotation={[0, Math.PI / 3.2, 0.4]}
-            position={[0, 6.58, 0]}
+            rotation={nodes.plinko.rotation}
+            position={nodes.plinko.position}
           />
         </group>
       </RigidBody>
@@ -61,15 +60,14 @@ export default function Plinko({ ...props }: JSX.IntrinsicElements["group"]) {
           geometry={nodes.container.geometry}
           material={materials.Material}
           castShadow
-          rotation={[0, 1, 0]}
         />
       </RigidBody>
       <RigidBody type="fixed" colliders={"hull"}>
         <mesh
           geometry={nodes.wall.geometry}
           material={materials["Material.001"]}
-          rotation={[0, Math.PI / 3.1, 0]}
-          position={[-2.5, -0.39, 4]}
+          rotation={nodes.wall.rotation}
+          position={nodes.wall.position}
         />
       </RigidBody>
     </group>

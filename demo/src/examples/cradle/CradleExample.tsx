@@ -9,7 +9,7 @@ import {
 } from "@react-three/rapier";
 import { useRef } from "react";
 import { Demo } from "../../App";
-import { resetOrbitControl } from "../../hooks/resetOrbitControl";
+import { useResetOrbitControls } from "../../hooks/use-reset-orbit-controls";
 
 const Rod = (props: RigidBodyOptions) => {
   const anchor = useRef<RapierRigidBody>(null);
@@ -45,7 +45,8 @@ const Rod = (props: RigidBodyOptions) => {
 };
 
 export const CradleExample: Demo = () => {
-  resetOrbitControl();
+  useResetOrbitControls();
+
   return (
     <group rotation={[1, 0, 0]} scale={3}>
       <Rod position={[0, 0, 0]} />

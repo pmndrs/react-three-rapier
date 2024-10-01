@@ -1,10 +1,10 @@
 import { Html, Torus } from "@react-three/drei";
 import { RigidBody } from "@react-three/rapier";
 import { Demo } from "../../App";
-import { resetOrbitControl } from "../../hooks/resetOrbitControl";
+import { useResetOrbitControls } from "../../hooks/use-reset-orbit-controls";
 
 export const LockedTransformsExample: Demo = () => {
-  resetOrbitControl(30);
+  useResetOrbitControls(30);
 
   return (
     <group rotation={[0, 0, 0]} scale={1}>

@@ -8,13 +8,14 @@ import {
 import { useEffect, useRef } from "react";
 import { Color, InstancedMesh } from "three";
 import { Demo } from "../../App";
-import { resetOrbitControl } from "../../hooks/resetOrbitControl";
+import { useResetOrbitControls } from "../../hooks/use-reset-orbit-controls";
 
 const BALLS = 1000;
 
 export const Cluster: Demo = () => {
   const api = useRef<RapierRigidBody[]>(null);
-  resetOrbitControl();
+
+  useResetOrbitControls();
 
   const { isPaused } = useRapier();
 

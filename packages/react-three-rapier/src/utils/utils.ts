@@ -36,7 +36,7 @@ export const vector3ToRapierVector = (v: Vector3Like) => {
   } else if (typeof v === "number") {
     return new RapierVector3(v, v, v);
   } else {
-    const threeVector3 = v as THREE.Vector3;
+    const threeVector3 = v as Vector3;
     return new RapierVector3(threeVector3.x, threeVector3.y, threeVector3.z);
   }
 };

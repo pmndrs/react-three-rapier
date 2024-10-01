@@ -19,7 +19,7 @@ import { useSuzanne } from "../all-shapes/AllShapesExample";
 import { RoundedBoxGeometry } from "three-stdlib";
 import { PlaneGeometry } from "three";
 import { useEffect, useRef } from "react";
-import { resetOrbitControl } from "../../hooks/resetOrbitControl";
+import { useResetOrbitControls } from "../../hooks/use-reset-orbit-controls";
 
 const CuteBox = (props: Omit<MeshProps, "args">) => (
   <Box castShadow receiveShadow {...props}>
@@ -82,7 +82,7 @@ export const AllCollidersExample = () => {
     console.log("roundCuboidCollider", roundCuboidCollider.current);
   }, []);
 
-  resetOrbitControl(30);
+  useResetOrbitControls(30);
 
   return (
     <group>

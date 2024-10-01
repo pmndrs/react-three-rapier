@@ -1,10 +1,11 @@
 import { Box, Sphere, Torus } from "@react-three/drei";
 import { MeshCollider, RigidBody } from "@react-three/rapier";
 import { Demo } from "../../App";
-import { resetOrbitControl } from "../../hooks/resetOrbitControl";
+import { useResetOrbitControls } from "../../hooks/use-reset-orbit-controls";
 
 export const MeshColliderTest: Demo = () => {
-  resetOrbitControl(30);
+  useResetOrbitControls(30);
+
   return (
     <group>
       <RigidBody position={[0, 2, 0]} colliders={false}>

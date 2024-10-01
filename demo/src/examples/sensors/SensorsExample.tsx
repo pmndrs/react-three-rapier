@@ -8,7 +8,7 @@ import {
 } from "@react-three/rapier";
 import { useEffect, useRef, useState } from "react";
 import { MeshPhysicalMaterial } from "three";
-import { resetOrbitControl } from "../../hooks/resetOrbitControl";
+import { useResetOrbitControls } from "../../hooks/use-reset-orbit-controls";
 
 const material = new MeshPhysicalMaterial();
 
@@ -92,7 +92,7 @@ const Ball = () => {
 };
 
 export const SensorsExample = () => {
-  resetOrbitControl(30);
+  useResetOrbitControls(30);
 
   return (
     <group>

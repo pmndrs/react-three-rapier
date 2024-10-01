@@ -8,7 +8,7 @@ import { Color, InstancedMesh } from "three";
 import { useSuzanne } from "../all-shapes/AllShapesExample";
 import { Demo } from "../../App";
 import { button, useControls } from "leva";
-import { resetOrbitControl } from "../../hooks/resetOrbitControl";
+import { useResetOrbitControls } from "../../hooks/use-reset-orbit-controls";
 
 const MAX_COUNT = 2000;
 
@@ -27,7 +27,8 @@ export const InstancedMeshes: Demo = () => {
   const {
     nodes: { Suzanne }
   } = useSuzanne();
-  resetOrbitControl(30);
+
+  useResetOrbitControls(30);
 
   const api = useRef<RapierRigidBody[]>([]);
 

@@ -468,7 +468,6 @@ export const Physics: FC<PhysicsProps> = (props) => {
     worldProxy.integrationParameters.maxCcdSubsteps = maxCcdSubsteps;
     worldProxy.integrationParameters.normalizedPredictionDistance =
       predictionDistance;
-    worldProxy.integrationParameters.erp = erp;
     worldProxy.lengthUnit = lengthUnit;
   }, [
     worldProxy,
@@ -480,7 +479,6 @@ export const Physics: FC<PhysicsProps> = (props) => {
     minIslandSize,
     maxCcdSubsteps,
     predictionDistance,
-    erp,
     lengthUnit
   ]);
 

@@ -9,7 +9,7 @@ import {
 import { useRef } from "react";
 import { Demo } from "../../App";
 import { Vector3 } from "@react-three/fiber";
-import { resetOrbitControl } from "../../hooks/resetOrbitControl";
+import { useResetOrbitControls } from "../../hooks/use-reset-orbit-controls";
 
 const WALL_COLORS = ["#50514F", "#CBD4C2", "#FFFCFF", "#247BA0", "#C3B299"];
 
@@ -107,7 +107,7 @@ const RopeJoint = ({
 };
 
 export const RopeJointExample: Demo = () => {
-  resetOrbitControl(40, [0, 0.25, 0.75]);
+  useResetOrbitControls(40, [0, 0.25, 0.75]);
 
   return (
     <group position={[0, 0, 0]} scale={3}>

@@ -3,7 +3,7 @@ import { Box, Sphere } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { RapierRigidBody, RigidBody } from "@react-three/rapier";
 import { useRef, useState } from "react";
-import { resetOrbitControl } from "../../hooks/resetOrbitControl";
+import { useResetOrbitControls } from "../../hooks/use-reset-orbit-controls";
 
 const activeCollisionTypes =
   ActiveCollisionTypes.DEFAULT | ActiveCollisionTypes.KINEMATIC_FIXED;
@@ -49,7 +49,8 @@ const Wall = () => {
 };
 
 export const ActiveCollisionTypesExample = () => {
-  resetOrbitControl(10);
+  useResetOrbitControls(10);
+
   return (
     <group>
       <Ball />

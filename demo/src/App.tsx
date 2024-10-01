@@ -45,7 +45,7 @@ import { StutteringExample } from "./examples/stuttering/StutteringExample";
 import { Transforms } from "./examples/transforms/TransformsExample";
 import { ActiveCollisionTypesExample } from "./examples/active-collision-types/ActiveCollisionTypesExample";
 import { OrbitControls as OrbitControlsImpl } from "three-stdlib";
-import { resetOrbitControl } from "./hooks/resetOrbitControl";
+import { useResetOrbitControls } from "./hooks/use-reset-orbit-controls";
 
 type DemoContextType = {
   setDebug: (f: boolean) => void;
@@ -142,7 +142,7 @@ export const App = () => {
   const [cameraEnabled, setCameraEnabled] = useState<boolean>(true);
   const orbitControlRef = useRef<OrbitControlsImpl>(null);
 
-  resetOrbitControl();
+  useResetOrbitControls();
 
   const updatePhysicsKey = () => {
     setPhysicsKey((current) => current + 1);

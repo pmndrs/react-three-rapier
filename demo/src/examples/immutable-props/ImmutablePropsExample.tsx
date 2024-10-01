@@ -4,12 +4,14 @@ import { RapierRigidBody, RigidBody, euler, quat } from "@react-three/rapier";
 import { Demo } from "../../App";
 import { useRef, useState } from "react";
 import { useControls } from "leva";
-import { resetOrbitControl } from "../../hooks/resetOrbitControl";
+import { useResetOrbitControls } from "../../hooks/use-reset-orbit-controls";
 
 export const ImmutablePropsExample: Demo = () => {
   const [canSleep, setCanSleep] = useState(true);
   const rb = useRef<RapierRigidBody>(null);
-  resetOrbitControl(30);
+
+  useResetOrbitControls(30);
+
   useControls({
     canSleep: {
       value: canSleep,

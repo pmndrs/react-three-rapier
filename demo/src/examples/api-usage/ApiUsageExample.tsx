@@ -2,11 +2,13 @@ import { Torus } from "@react-three/drei";
 import { RigidBody, RapierRigidBody } from "@react-three/rapier";
 import { useEffect, useRef } from "react";
 import { Demo } from "../../App";
-import { resetOrbitControl } from "../../hooks/resetOrbitControl";
+import { useResetOrbitControls } from "../../hooks/use-reset-orbit-controls";
 
 export const ApiUsage: Demo = () => {
   const torus = useRef<RapierRigidBody>(null);
-  resetOrbitControl();
+
+  useResetOrbitControls();
+
   useEffect(() => {
     if (torus.current) {
       torus.current.applyTorqueImpulse(

@@ -161,6 +161,11 @@ const itemMap: Record<string, FC> = {
   convexMesh: MeshBoat
 };
 
+const randomItem = () => {
+  const keys = Object.keys(itemMap);
+  return keys[Math.floor(Math.random() * keys.length)];
+};
+
 const Thing = ({ item }: { item: string }) => {
   const Thang = itemMap[item];
   return <Thang />;
@@ -178,19 +183,17 @@ const Scene: FC = () => {
   });
 
   useEffect(() => {
-    addItem("box");
-    setTimeout(() => {
-      addItem("cylinder");
-    }, 1000);
-    setTimeout(() => {
-      addItem("ball");
-    }, 2000 + Math.random() * 500);
-    setTimeout(() => {
-      addItem("convexHull");
-    }, 3000 + Math.random() * 500);
-    setTimeout(() => {
-      addItem("convexMesh");
-    }, 4000 + Math.random() * 500);
+    let ticker = 0;
+    const interval = setInterval(() => {
+      ticker++;
+      addItem(randomItem());
+
+      if (ticker > 50) {
+        clearInterval(interval);
+      }
+    }, 200);
+
+    return () => clearInterval(interval);
   }, []);
 
   const addItem = (str: string) => {

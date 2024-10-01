@@ -5,7 +5,7 @@ import { RigidBody, TrimeshCollider } from "@react-three/rapier";
 import { GroupProps, Object3DNode, useFrame } from "@react-three/fiber";
 import { Mesh } from "three";
 import { Demo } from "../../App";
-import { resetOrbitControl } from "../../hooks/resetOrbitControl";
+import { useResetOrbitControls } from "../../hooks/use-reset-orbit-controls";
 
 const Map = () => {
   const { nodes } = useGLTF(
@@ -89,7 +89,8 @@ const CompoundShape = () => {
 };
 
 export const ComponentsExample: Demo = () => {
-  resetOrbitControl();
+  useResetOrbitControls();
+
   return (
     <group>
       <CompoundShape />
