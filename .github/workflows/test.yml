@@ -22,6 +22,10 @@ jobs:
       
       - name: Install deps
         run: yarn --immutable
-      
-      - name: "Run tests"
+
+      # See if the build runs
+      - name: Run build
+        run: yarn build
+    
+      - name: Run tests
         run: npm run test
