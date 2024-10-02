@@ -475,7 +475,6 @@ export const Physics: FC<PhysicsProps> = (props) => {
     worldProxy.lengthUnit = lengthUnit;
     worldProxy.integrationParameters.contact_natural_frequency =
       contactNaturalFrequency;
-    console.log(worldProxy.integrationParameters.contact_erp);
   }, [
     worldProxy,
     ...gravity,
