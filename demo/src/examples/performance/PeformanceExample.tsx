@@ -6,6 +6,7 @@ import { ReactNode, useEffect, useRef, useState } from "react";
 import { Mesh } from "three";
 import { GLTF } from "three-stdlib";
 import { useSuzanne } from "../all-shapes/AllShapesExample";
+import { useResetOrbitControls } from "../../hooks/use-reset-orbit-controls";
 
 const useBendy = () => {
   return useGLTF(
@@ -111,6 +112,8 @@ const Bendy = (props: GroupProps) => {
 };
 
 export const PerformanceExample = () => {
+  useResetOrbitControls(15);
+
   return (
     <group>
       <Bendy position={[0, 0, 0]} />

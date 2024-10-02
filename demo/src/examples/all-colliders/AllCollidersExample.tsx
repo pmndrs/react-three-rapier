@@ -19,6 +19,7 @@ import { useSuzanne } from "../all-shapes/AllShapesExample";
 import { RoundedBoxGeometry } from "three-stdlib";
 import { PlaneGeometry } from "three";
 import { useEffect, useRef } from "react";
+import { useResetOrbitControls } from "../../hooks/use-reset-orbit-controls";
 
 const CuteBox = (props: Omit<MeshProps, "args">) => (
   <Box castShadow receiveShadow {...props}>
@@ -64,8 +65,7 @@ const heightFieldGeometry = new PlaneGeometry(
 );
 
 heightField.forEach((v, index) => {
-  (heightFieldGeometry.attributes.position.array as number[])[index * 3 + 2] =
-    v;
+  heightFieldGeometry.attributes.position.array[index * 3 + 2] = v;
 });
 heightFieldGeometry.scale(1, -1, 1);
 heightFieldGeometry.rotateX(-Math.PI / 2);
@@ -81,6 +81,8 @@ export const AllCollidersExample = () => {
   useEffect(() => {
     console.log("roundCuboidCollider", roundCuboidCollider.current);
   }, []);
+
+  useResetOrbitControls(30);
 
   return (
     <group>

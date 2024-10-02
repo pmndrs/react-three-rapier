@@ -19,6 +19,7 @@ import { useImperativeHandle } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Demo } from "../../App";
 import { Mesh, Quaternion } from "three";
+import { useResetOrbitControls } from "../../hooks/use-reset-orbit-controls";
 
 const ShadowElement = forwardRef<Mesh>((_, ref) => (
   <Sphere castShadow ref={ref} args={[0.5]}>
@@ -113,6 +114,8 @@ const PrismaticExample = () => {
 };
 
 export const Joints: Demo = () => {
+  useResetOrbitControls();
+
   return (
     <group>
       <Rope length={40} component={<ShadowElement />} />

@@ -312,11 +312,15 @@ export interface PhysicsProps {
   maxCcdSubsteps?: number;
 
   /**
-   * The Error Reduction Parameter in between 0 and 1, is the proportion of the positional error to be corrected at each time step.
+   * Directly affects the `erp` (Error Reduction Parameter) which is the proportion (0 to 1) of the positional error to be corrected at each time step.
+   * The higher this value is, the more the physics engine will try to correct errors.
    *
-   * @defaultValue 0.8
+   * This prop is currently undocumented in the Rapier documentation.
+   *
+   * @see https://github.com/dimforge/rapier/pull/651 where this change was made to Rapier
+   * @defaultValue 30
    */
-  erp?: number;
+  contactNaturalFrequency?: number;
 
   /**
    * The approximate size of most dynamic objects in the scene.
@@ -417,7 +421,7 @@ export const Physics: FC<PhysicsProps> = (props) => {
     numInternalPgsIterations = 1,
     minIslandSize = 128,
     maxCcdSubsteps = 1,
-    erp = 0.8,
+    contactNaturalFrequency = 30,
     lengthUnit = 1
   } = props;
   const rapier = suspend(importRapier, ["@react-thee/rapier", importRapier]);
@@ -468,8 +472,9 @@ export const Physics: FC<PhysicsProps> = (props) => {
     worldProxy.integrationParameters.maxCcdSubsteps = maxCcdSubsteps;
     worldProxy.integrationParameters.normalizedPredictionDistance =
       predictionDistance;
-    worldProxy.integrationParameters.erp = erp;
     worldProxy.lengthUnit = lengthUnit;
+    worldProxy.integrationParameters.contact_natural_frequency =
+      contactNaturalFrequency;
   }, [
     worldProxy,
     ...gravity,
@@ -480,8 +485,8 @@ export const Physics: FC<PhysicsProps> = (props) => {
     minIslandSize,
     maxCcdSubsteps,
     predictionDistance,
-    erp,
-    lengthUnit
+    lengthUnit,
+    contactNaturalFrequency
   ]);
 
   const getSourceFromColliderHandle = useCallback((handle: ColliderHandle) => {

@@ -9,6 +9,7 @@ import {
 import Plinko from "./Plinko";
 import { Mesh, Vector3 } from "three";
 import { useControls, button } from "leva";
+import { useResetOrbitControls } from "../../hooks/use-reset-orbit-controls";
 
 const colors = ["red", "green", "blue", "yellow", "orange", "purple"];
 const randomColor = () => colors[Math.floor(Math.random() * colors.length)];
@@ -161,6 +162,11 @@ const itemMap: Record<string, FC> = {
   convexMesh: MeshBoat
 };
 
+const randomItem = () => {
+  const keys = Object.keys(itemMap);
+  return keys[Math.floor(Math.random() * keys.length)];
+};
+
 const Thing = ({ item }: { item: string }) => {
   const Thang = itemMap[item];
   return <Thang />;
@@ -176,6 +182,20 @@ const Scene: FC = () => {
     convexHull: button(() => addItem("convexHull")),
     convexMesh: button(() => addItem("convexMesh"))
   });
+
+  useEffect(() => {
+    let ticker = 0;
+    const interval = setInterval(() => {
+      ticker++;
+      addItem(randomItem());
+
+      if (ticker > 50) {
+        clearInterval(interval);
+      }
+    }, 200);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const addItem = (str: string) => {
     setItems((curr) => [...curr, str]);

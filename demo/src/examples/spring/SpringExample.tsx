@@ -10,6 +10,8 @@ import { forwardRef, useMemo, useRef } from "react";
 import { Demo } from "../../App";
 import { useForwardedRef } from "@react-three/rapier/src/hooks/use-forwarded-ref";
 import { vectorArrayToVector3 } from "@react-three/rapier/src/utils/utils";
+import { useResetOrbitControls } from "../../hooks/use-reset-orbit-controls";
+import { Vector3 } from "three";
 
 const COLORS_ARR = ["#335C67", "#FFF3B0", "#E09F3E", "#9E2A2B", "#540B0E"];
 
@@ -42,7 +44,7 @@ const BallSpring = forwardRef<RapierRigidBody, BallSpringProps>(
     const dampingRatio = props.jointNum / (props.total / 2);
     const damping = dampingRatio * criticalDamping;
 
-    const ballPos = props.position as THREE.Vector3;
+    const ballPos = props.position as Vector3;
 
     if (!ballPos) {
       throw new Error("BallSpring requires a position prop");
@@ -84,6 +86,8 @@ export const SpringExample: Demo = () => {
       return vectorArrayToVector3([-20 + 1.5 * (i + 1), 7.5, -30]);
     });
   }, []);
+
+  useResetOrbitControls(8);
 
   return (
     <>

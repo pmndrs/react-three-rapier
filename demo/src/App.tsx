@@ -8,6 +8,7 @@ import {
   Suspense,
   createContext,
   useContext,
+  useRef,
   useState
 } from "react";
 import { NavLink, NavLinkProps, Route, Routes } from "react-router-dom";
@@ -42,36 +43,19 @@ import { SpringExample } from "./examples/spring/SpringExample";
 import { StutteringExample } from "./examples/stuttering/StutteringExample";
 import { Transforms } from "./examples/transforms/TransformsExample";
 import { ActiveCollisionTypesExample } from "./examples/active-collision-types/ActiveCollisionTypesExample";
+import { OrbitControls as OrbitControlsImpl } from "three-stdlib";
+import { useResetOrbitControls } from "./hooks/use-reset-orbit-controls";
 
-const demoContext = createContext<{
-  setDebug?(f: boolean): void;
-  setPaused?(f: boolean): void;
-  setCameraEnabled?(f: boolean): void;
-}>({});
+type DemoContext = {
+  setDebug: (f: boolean) => void;
+  setPaused: (f: boolean) => void;
+  setCameraEnabled: (f: boolean) => void;
+  orbitControlRef: React.RefObject<OrbitControlsImpl>;
+};
+
+const demoContext = createContext<Partial<DemoContext>>({});
 
 export const useDemo = () => useContext(demoContext);
-
-const ToggleButton = ({
-  label,
-  value,
-  onClick
-}: {
-  label: string;
-  value: boolean;
-  onClick(): void;
-}) => (
-  <button
-    style={{
-      background: value ? "red" : "transparent",
-      border: "2px solid red",
-      color: value ? "white" : "red",
-      borderRadius: 4
-    }}
-    onClick={onClick}
-  >
-    {label}
-  </button>
-);
 
 export interface Demo {
   (props: { children?: ReactNode }): JSX.Element;
@@ -133,6 +117,9 @@ export const App = () => {
   const [interpolate, setInterpolate] = useState<boolean>(true);
   const [physicsKey, setPhysicsKey] = useState<number>(0);
   const [cameraEnabled, setCameraEnabled] = useState<boolean>(true);
+  const orbitControlRef = useRef<OrbitControlsImpl>(null);
+
+  useResetOrbitControls();
 
   const updatePhysicsKey = () => {
     setPhysicsKey((current) => current + 1);
@@ -143,10 +130,20 @@ export const App = () => {
       style={{
         position: "fixed",
         inset: 0,
-        background: "linear-gradient(blue, white)",
+        background: "linear-gradient(#aef, #ddd)",
+        backgroundRepeat: "repeat",
         fontFamily: "sans-serif"
       }}
     >
+      <div
+        style={{
+          position: "fixed",
+          inset: 0,
+          // background: "radial-gradient(#00000035 1px, transparent 0px)",
+          backgroundSize: "24px 24px",
+          backgroundRepeat: "repeat"
+        }}
+      />
       <Suspense fallback="Loading...">
         <Canvas shadows dpr={1}>
           <StrictMode>
@@ -169,13 +166,14 @@ export const App = () => {
               />
               <Environment preset="apartment" />
 
-              <OrbitControls enabled={cameraEnabled} />
+              <OrbitControls ref={orbitControlRef} enabled={cameraEnabled} />
 
               <demoContext.Provider
                 value={{
                   setDebug,
                   setPaused,
-                  setCameraEnabled
+                  setCameraEnabled,
+                  orbitControlRef
                 }}
               >
                 <Routes>
@@ -196,41 +194,58 @@ export const App = () => {
       <div
         style={{
           position: "absolute",
-          bottom: 24,
-          left: 24,
-          display: "flex",
+          top: 0,
+          left: 0,
+          bottom: 0,
+          width: 240,
+          display: "block",
           flexWrap: "wrap",
-          gap: 12,
-          maxWidth: 600
+          overflow: "auto",
+          padding: 20,
+          background: "linear-gradient(to right, #fffa, #fffa)"
         }}
       >
+        <h1
+          style={{
+            fontSize: 24
+          }}
+        >
+          r3/rapier demos
+        </h1>
+
+        <div>
+          <ToggleButton
+            label="Debug"
+            value={debug}
+            onClick={() => setDebug((v) => !v)}
+          />
+          <ToggleButton
+            label="Perf"
+            value={perf}
+            onClick={() => setPerf((v) => !v)}
+          />
+          <ToggleButton
+            label="Paused"
+            value={paused}
+            onClick={() => setPaused((v) => !v)}
+          />
+          <ToggleButton
+            label="Interpolate"
+            value={interpolate}
+            onClick={() => setInterpolate((v) => !v)}
+          />
+          <ToggleButton
+            label="Reset"
+            value={false}
+            onClick={updatePhysicsKey}
+          />
+        </div>
+
         {Object.keys(routes).map((key) => (
           <Link key={key} to={key} end>
             {key.replace(/-/g, " ") || "Plinko"}
           </Link>
         ))}
-
-        <ToggleButton
-          label="Debug"
-          value={debug}
-          onClick={() => setDebug((v) => !v)}
-        />
-        <ToggleButton
-          label="Perf"
-          value={perf}
-          onClick={() => setPerf((v) => !v)}
-        />
-        <ToggleButton
-          label="Paused"
-          value={paused}
-          onClick={() => setPaused((v) => !v)}
-        />
-        <ToggleButton
-          label="Interpolate"
-          value={interpolate}
-          onClick={() => setInterpolate((v) => !v)}
-        />
-        <ToggleButton label="Reset" value={false} onClick={updatePhysicsKey} />
       </div>
     </div>
   );
@@ -241,7 +256,9 @@ const Link = (props: NavLinkProps) => {
     <NavLink
       {...props}
       style={({ isActive }) => ({
+        display: "inline-block",
         border: "2px solid blue",
+        margin: 4,
         textTransform: "capitalize",
         borderRadius: 4,
         padding: 4,
@@ -252,3 +269,26 @@ const Link = (props: NavLinkProps) => {
     />
   );
 };
+
+const ToggleButton = ({
+  label,
+  value,
+  onClick
+}: {
+  label: string;
+  value: boolean;
+  onClick(): void;
+}) => (
+  <button
+    style={{
+      background: value ? "red" : "transparent",
+      border: "2px solid red",
+      color: value ? "white" : "red",
+      borderRadius: 4,
+      margin: 4
+    }}
+    onClick={onClick}
+  >
+    {label}
+  </button>
+);

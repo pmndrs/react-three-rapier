@@ -6,7 +6,7 @@
 
 - a155277: feat: bump @dimforge/rapier3d-compat from 0.12.0 to 0.13.1
   
-  - See the rapier.js changelog for more information: https://github.com/dimforge/rapier.js/blob/master/CHANGELOG.md 
+  - See the rapier.js changelog for more information: https://github.com/dimforge/rapier.js/blob/master/CHANGELOG.md
   - Added World prop `lengthUnit`
   - Renamed World props `allowedLinearError` and `predictionDistance` to `normalizedAllowedLinearError` and `normalizedPredictionDistance`, matching upstream changes
   - Added `softCcdPrediction` RigidBody prop

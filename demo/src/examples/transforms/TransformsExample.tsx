@@ -3,9 +3,11 @@ import { RigidBody } from "@react-three/rapier";
 import { useRef } from "react";
 import { Group } from "three";
 import { Demo } from "../../App";
+import { useResetOrbitControls } from "../../hooks/use-reset-orbit-controls";
 
 export const Transforms: Demo = () => {
   const group = useRef<Group>(null);
+  useResetOrbitControls();
 
   return (
     <group>
