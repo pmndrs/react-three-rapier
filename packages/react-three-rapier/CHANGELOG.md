@@ -1,11 +1,21 @@
 # @react-three/rapier
 
+## 1.5.0
+
+### Minor Changes
+
+- 55fa8fe: Update @dimforge/rapier3d-compat to 0.14.0 (@wiledal)
+  - See https://github.com/dimforge/rapier.js/blob/master/CHANGELOG.md
+  - Changed World prop `erp` to `contactNaturalFrequency`
+    - This is undocumented in the Rapier.js documentation, but was introduced Rapier 0.20.0 https://github.com/dimforge/rapier/pull/651
+    - The change mentions `contactDampingRatio` but this is not exposed in the Rapier.js API as of yet
+
 ## 1.4.0
 
 ### Minor Changes
 
 - a155277: feat: bump @dimforge/rapier3d-compat from 0.12.0 to 0.13.1
-  
+
   - See the rapier.js changelog for more information: https://github.com/dimforge/rapier.js/blob/master/CHANGELOG.md
   - Added World prop `lengthUnit`
   - Renamed World props `allowedLinearError` and `predictionDistance` to `normalizedAllowedLinearError` and `normalizedPredictionDistance`, matching upstream changes
