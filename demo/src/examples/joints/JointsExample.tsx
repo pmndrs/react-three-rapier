@@ -4,7 +4,6 @@ import {
   forwardRef,
   ReactNode,
   RefObject,
-  useEffect,
   useRef
 } from "react";
 import {
@@ -12,10 +11,9 @@ import {
   RapierRigidBody,
   RigidBodyTypeString,
   useSphericalJoint,
-  Vector3Array,
+  Vector3Tuple,
   usePrismaticJoint
 } from "@react-three/rapier";
-import { useImperativeHandle } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Demo } from "../../App";
 import { Mesh, Quaternion } from "three";
@@ -28,7 +26,7 @@ const ShadowElement = forwardRef<Mesh>((_, ref) => (
 ));
 
 type RopeSegmentProps = {
-  position: Vector3Array;
+  position: Vector3Tuple;
   component: ReactNode;
   type: RigidBodyTypeString;
 };
@@ -60,7 +58,7 @@ const RopeJoint = ({
 
 const Rope = (props: { component: ReactNode; length: number }) => {
   const refs = useRef(
-    Array.from({ length: props.length }).map(() => createRef<RapierRigidBody>())
+    Array.from({ length: props.length }).map(() => createRef<RapierRigidBody>()) as RefObject<RapierRigidBody>[]
   );
 
   useFrame(() => {
@@ -92,8 +90,8 @@ const Rope = (props: { component: ReactNode; length: number }) => {
 };
 
 const PrismaticExample = () => {
-  const box1 = useRef<RapierRigidBody>(null);
-  const box2 = useRef<RapierRigidBody>(null);
+  const box1 = useRef<RapierRigidBody>(null!);
+  const box2 = useRef<RapierRigidBody>(null!);
   const joint = usePrismaticJoint(box1, box2, [
     [-4, 0, 0],
     [0, 4, 0],

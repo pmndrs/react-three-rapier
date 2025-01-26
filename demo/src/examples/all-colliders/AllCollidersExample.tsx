@@ -1,5 +1,5 @@
 import { Box, Cone, Cylinder, Html, Sphere } from "@react-three/drei";
-import { MeshProps, Object3DProps } from "@react-three/fiber";
+import { ThreeElements } from "@react-three/fiber";
 import {
   BallCollider,
   CapsuleCollider,
@@ -21,7 +21,10 @@ import { PlaneGeometry } from "three";
 import { useEffect, useRef } from "react";
 import { useResetOrbitControls } from "../../hooks/use-reset-orbit-controls";
 
-const CuteBox = (props: Omit<MeshProps, "args">) => (
+type Object3DProps = ThreeElements["object3D"];
+type MeshProps = ThreeElements["mesh"];
+
+const CuteBox = (props: Omit<MeshProps, "args" | "ref">) => (
   <Box castShadow receiveShadow {...props}>
     <meshPhysicalMaterial color="orange" />
   </Box>

@@ -78,8 +78,8 @@ const RopeJoint = ({
   ballPosition,
   ropeLength
 }: RopeJointProps) => {
-  const anchor = useRef<RapierRigidBody>(null);
-  const ball = useRef<RapierRigidBody>(null);
+  const anchor = useRef<RapierRigidBody>(null!);
+  const ball = useRef<RapierRigidBody>(null!);
 
   useRopeJoint(anchor, ball, [[0, 0, 0], [0, 0, 0], ropeLength]);
 

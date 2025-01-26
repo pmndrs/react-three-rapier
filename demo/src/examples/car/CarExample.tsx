@@ -4,7 +4,7 @@ import {
   RapierRigidBody,
   RigidBody,
   useRevoluteJoint,
-  Vector3Array
+  Vector3Tuple
 } from "@react-three/rapier";
 import { createRef, RefObject, useRef } from "react";
 import { Demo } from "../../App";
@@ -19,9 +19,9 @@ const WheelJoint = ({
 }: {
   body: RefObject<RapierRigidBody>;
   wheel: RefObject<RapierRigidBody>;
-  bodyAnchor: Vector3Array;
-  wheelAnchor: Vector3Array;
-  rotationAxis: Vector3Array;
+  bodyAnchor: Vector3Tuple;
+  wheelAnchor: Vector3Tuple;
+  rotationAxis: Vector3Tuple;
 }) => {
   const joint = useRevoluteJoint(body, wheel, [
     bodyAnchor,
@@ -39,7 +39,7 @@ const WheelJoint = ({
 };
 
 export const Car: Demo = () => {
-  const bodyRef = useRef<RapierRigidBody>(null);
+  const bodyRef = useRef<RapierRigidBody>(null!);
   const wheelPositions: [number, number, number][] = [
     [-3, 0, 2],
     [-3, 0, -2],
@@ -47,7 +47,9 @@ export const Car: Demo = () => {
     [3, 0, -2]
   ];
   const wheelRefs = useRef(
-    wheelPositions.map(() => createRef<RapierRigidBody>())
+    wheelPositions.map(() =>
+      createRef<RapierRigidBody>()
+    ) as RefObject<RapierRigidBody>[]
   );
 
   useResetOrbitControls(30);

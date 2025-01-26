@@ -1,5 +1,5 @@
 import { Collider } from "@dimforge/rapier3d-compat";
-import React, { useRef, MutableRefObject, useEffect, ReactNode } from "react";
+import React, { useRef, useEffect, ReactNode } from "react";
 import {
   CuboidColliderProps,
   CuboidCollider,
@@ -34,7 +34,7 @@ export const TestCollider = ({
   ...rest
 }: { ready: (collider: Collider) => void } & Pick<CuboidColliderProps, "args"> &
   Partial<CuboidColliderProps>) => {
-  const ref = useRef() as MutableRefObject<Collider>;
+  const ref = useRef<Collider>(null!);
 
   useEffect(() => {
     ready(ref.current);
@@ -127,7 +127,7 @@ export const RapierContextCatcher = ({
 
 export const getScenePositions = (
   renderer: Awaited<ReturnType<typeof ReactThreeTestRenderer.create>>
-) => renderer.scene.children.map((c) => c.instance.position);
+) => renderer.scene.children.map((c: any) => c.instance.position);
 
 import { renderHook } from "@testing-library/react"; // v14.0.0
 import { Mock, vitest } from "vitest";

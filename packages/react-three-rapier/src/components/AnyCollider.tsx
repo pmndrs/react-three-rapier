@@ -1,31 +1,32 @@
 import { Collider } from "@dimforge/rapier3d-compat";
 import React, {
-  ReactNode,
-  useRef,
-  memo,
   ForwardedRef,
+  memo,
+  ReactNode,
+  Ref,
+  useEffect,
   useMemo,
-  forwardRef,
-  useImperativeHandle,
-  useEffect
+  useRef
 } from "react";
 import { Object3D } from "three";
 import { useRapier } from "../hooks/hooks";
-import { useRigidBodyContext } from "./RigidBody";
-import { _euler, _position, _rotation, _scale } from "../utils/shared-objects";
+import { useForwardedRef } from "../hooks/use-forwarded-ref";
+import { useImperativeInstance } from "../hooks/use-imperative-instance";
 import {
-  ColliderOptions,
-  CuboidArgs,
-  RoundCuboidArgs,
   BallArgs,
   CapsuleArgs,
-  HeightfieldArgs,
-  TrimeshArgs,
+  ColliderOptions,
   ConeArgs,
-  CylinderArgs,
   ConvexHullArgs,
-  RoundCylinderArgs
+  CuboidArgs,
+  CylinderArgs,
+  HeightfieldArgs,
+  RoundConeArgs,
+  RoundCuboidArgs,
+  RoundCylinderArgs,
+  TrimeshArgs
 } from "../types";
+import { vec3 } from "../utils/three-object-helpers";
 import {
   cleanRigidBodyPropsForCollider,
   createColliderFromOptions,
@@ -35,104 +36,101 @@ import {
   useColliderEvents,
   useUpdateColliderOptions
 } from "../utils/utils-collider";
-import { useImperativeInstance } from "../hooks/use-imperative-instance";
-import { vec3 } from "../utils/three-object-helpers";
-import { RoundConeArgs } from "../types";
-import { useForwardedRef } from "../hooks/use-forwarded-ref";
+import { useRigidBodyContext } from "./RigidBody";
 
 export interface ColliderProps extends ColliderOptions<any> {
   children?: ReactNode;
+  ref?: Ref<Collider>;
 }
 
 /**
  * A collider is a shape that can be attached to a rigid body to define its physical properties.
  * @internal
  */
-export const AnyCollider = memo(
-  forwardRef((props: ColliderProps, forwardedRef: ForwardedRef<Collider>) => {
-    const { children, position, rotation, quaternion, scale, name } = props;
-    const { world, colliderEvents, colliderStates } = useRapier();
-    const rigidBodyContext = useRigidBodyContext();
-    const colliderRef = useForwardedRef(forwardedRef);
-    const objectRef = useRef<Object3D>(null);
+export const AnyCollider = memo((props: ColliderProps) => {
+  const { children, position, rotation, quaternion, scale, name } = props;
+  const { world, colliderEvents, colliderStates } = useRapier();
+  const rigidBodyContext = useRigidBodyContext();
+  const colliderRef = useForwardedRef(props.ref);
+  const objectRef = useRef<Object3D>(null);
 
-    // We spread the props out here to make sure that the ref is updated when the props change.
-    const immutablePropArray = immutableColliderOptions.flatMap((key) =>
-      Array.isArray(props[key]) ? [...props[key]] : props[key]
-    );
+  // We spread the props out here to make sure that the ref is updated when the props change.
+  const immutablePropArray = immutableColliderOptions.flatMap((key) =>
+    // Array.isArray(props[key]) ? [...props[key]] : props[key]
+    Array.isArray(props[key]) ? props[key] : [props[key]]
+  );
 
-    const getInstance = useImperativeInstance(
-      () => {
-        const worldScale = objectRef.current!.getWorldScale(vec3());
+  const getInstance = useImperativeInstance(
+    () => {
+      const worldScale = objectRef.current!.getWorldScale(vec3());
 
-        const collider = createColliderFromOptions(
-          props,
-          world,
-          worldScale,
-          rigidBodyContext?.getRigidBody
-        );
-
-        if (typeof forwardedRef == "function") {
-          forwardedRef(collider);
-        }
-        colliderRef.current = collider;
-
-        return collider;
-      },
-      (collider) => {
-        if (world.getCollider(collider.handle)) {
-          world.removeCollider(collider, true);
-        }
-      },
-      [...immutablePropArray, rigidBodyContext]
-    );
-
-    useEffect(() => {
-      const collider = getInstance();
-
-      colliderStates.set(
-        collider.handle,
-        createColliderState(
-          collider,
-          objectRef.current!,
-          rigidBodyContext?.ref.current
-        )
+      const collider = createColliderFromOptions(
+        props,
+        world,
+        worldScale,
+        rigidBodyContext?.getRigidBody
       );
 
-      return () => {
-        colliderStates.delete(collider.handle);
-      };
-    }, [getInstance]);
+      if (typeof props.ref == "function") {
+        props.ref(collider);
+      }
+      colliderRef.current = collider;
 
-    const mergedProps = useMemo(() => {
-      return {
-        ...cleanRigidBodyPropsForCollider(rigidBodyContext?.options),
-        ...props
-      };
-    }, [props, rigidBodyContext?.options]);
+      return collider;
+    },
+    (collider) => {
+      if (world.getCollider(collider.handle)) {
+        world.removeCollider(collider, true);
+      }
+    },
+    [...immutablePropArray, rigidBodyContext]
+  );
 
-    useUpdateColliderOptions(getInstance, mergedProps, colliderStates);
-    useColliderEvents(
-      getInstance,
-      mergedProps,
-      colliderEvents,
-      getActiveCollisionEventsFromProps(rigidBodyContext?.options)
+  useEffect(() => {
+    const collider = getInstance();
+
+    colliderStates.set(
+      collider.handle,
+      createColliderState(
+        collider,
+        objectRef.current!,
+        rigidBodyContext?.ref.current
+      )
     );
 
-    return (
-      <object3D
-        position={position}
-        rotation={rotation}
-        quaternion={quaternion}
-        scale={scale}
-        ref={objectRef}
-        name={name}
-      >
-        {children}
-      </object3D>
-    );
-  })
-);
+    return () => {
+      colliderStates.delete(collider.handle);
+    };
+  }, [getInstance]);
+
+  const mergedProps = useMemo(() => {
+    return {
+      ...cleanRigidBodyPropsForCollider(rigidBodyContext?.options),
+      ...props
+    };
+  }, [props, rigidBodyContext?.options]);
+
+  useUpdateColliderOptions(getInstance, mergedProps, colliderStates);
+  useColliderEvents(
+    getInstance,
+    mergedProps,
+    colliderEvents,
+    getActiveCollisionEventsFromProps(rigidBodyContext?.options)
+  );
+
+  return (
+    <object3D
+      position={position}
+      rotation={rotation}
+      quaternion={quaternion}
+      scale={scale}
+      ref={objectRef}
+      name={name}
+    >
+      {children}
+    </object3D>
+  );
+});
 
 export type ColliderOptionsRequiredArgs<T extends unknown[]> = Omit<
   ColliderOptions<T>,

@@ -28,15 +28,16 @@
     "@commitlint/config-conventional": "17.1.0",
     "@manypkg/cli": "0.19.1",
     "@preconstruct/cli": "2.8.8",
-    "@testing-library/react": "14.0.0",
-    "@vitejs/plugin-react": "4.3.1",
-    "@vitest/ui": "1.2.2",
+    "@testing-library/react": "16.2.0",
+    "@testing-library/dom": "10.4.0",
+    "@vitejs/plugin-react": "4.3.4",
+    "@vitest/ui": "3.0.4",
     "jsdom": "24.0.0",
     "prettier": "2.7.1",
     "simple-git-hooks": "2.8.0",
     "typedoc": "0.23.24",
-    "typescript": "4.6.3",
-    "vitest": "1.2.2",
+    "typescript": "5.7.3",
+    "vitest": "3.0.4",
     "vitest-canvas-mock": "0.3.3"
   },
   "scripts": {
@@ -61,5 +62,6 @@
   "workspaces": [
     "packages/*",
     "demo"
-  ]
+  ],
+  "packageManager": "yarn@1.22.21+sha1.1959a18351b811cdeedbd484a8f86c3cc3bbaf72"
 }

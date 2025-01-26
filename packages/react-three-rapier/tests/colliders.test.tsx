@@ -1,38 +1,29 @@
+import {
+  CoefficientCombineRule,
+  Collider,
+  World
+} from "@dimforge/rapier3d-compat";
+import { Vector } from "@dimforge/rapier3d-compat/math";
 import ReactThreeTestRenderer from "@react-three/test-renderer";
+import React, { useEffect, useState } from "react";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  MockInstance,
+  vi
+} from "vitest";
 import {
   ConeCollider,
   CuboidCollider,
-  CuboidColliderProps,
   interactionGroups,
   Physics,
   RigidBody,
   useRapier
 } from "../src";
-import React, { MutableRefObject, useEffect, useRef, useState } from "react";
-import {
-  expect,
-  describe,
-  it,
-  vi,
-  beforeEach,
-  SpyInstance,
-  afterEach
-} from "vitest";
-import {
-  Collider,
-  CoefficientCombineRule,
-  World
-} from "@dimforge/rapier3d-compat";
-import { Vector } from "@dimforge/rapier3d-compat/math";
 import { createCollider } from "./test-utils";
-
-type SpyHelper<
-  T extends { prototype: Record<string, any> },
-  TMethod extends keyof T["prototype"]
-> = SpyInstance<
-  Parameters<T["prototype"][TMethod]>,
-  ReturnType<T["prototype"][TMethod]>
->;
 
 describe("colliders", () => {
   describe("mutable collider options", () => {
@@ -193,9 +184,9 @@ describe("colliders", () => {
   });
 
   describe("mass-related", () => {
-    let setDensity: SpyHelper<typeof Collider, "setDensity">;
-    let setMass: SpyHelper<typeof Collider, "setMass">;
-    let setMassProperties: SpyHelper<typeof Collider, "setMassProperties">;
+    let setDensity: ReturnType<typeof vi.spyOn>;
+    let setMass: ReturnType<typeof vi.spyOn>;
+    let setMassProperties: ReturnType<typeof vi.spyOn>;
 
     beforeEach(() => {
       setDensity = vi.spyOn(Collider.prototype, "setDensity");

@@ -92,7 +92,7 @@ export const vectorToTuple = (
 };
 
 export function useConst<T>(initialValue: T | (() => T)): T {
-  const ref = useRef<{ value: T }>();
+  const ref = useRef<{ value: T }>(undefined);
   if (ref.current === undefined) {
     ref.current = {
       value:
