@@ -1,11 +1,5 @@
 import { Box, Sphere } from "@react-three/drei";
-import {
-  createRef,
-  forwardRef,
-  ReactNode,
-  RefObject,
-  useRef
-} from "react";
+import { createRef, forwardRef, ReactNode, RefObject, useRef } from "react";
 import {
   RigidBody,
   RapierRigidBody,
@@ -58,7 +52,9 @@ const RopeJoint = ({
 
 const Rope = (props: { component: ReactNode; length: number }) => {
   const refs = useRef(
-    Array.from({ length: props.length }).map(() => createRef<RapierRigidBody>()) as RefObject<RapierRigidBody>[]
+    Array.from({ length: props.length }).map(() =>
+      createRef<RapierRigidBody>()
+    ) as RefObject<RapierRigidBody>[]
   );
 
   useFrame(() => {
