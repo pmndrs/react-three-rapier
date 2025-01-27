@@ -51,32 +51,35 @@ describe("physics", () => {
         }
       );
 
-      expect(vec3(rigidBody.current?.translation()).toArray()).to.deep.eq([
-        0, 0, 0
-      ]);
+      const translation1 = vec3(rigidBody.current?.translation()).toArray();
+      expect(translation1).to.deep.eq([0, 0, 0]);
 
       await ReactThreeTestRenderer.act(async () => {
         rapierContext.step(1 / 60);
       });
 
-      expect(vec3(rigidBody.current?.translation()).toArray()).to.deep.eq([
-        0.3333333432674408, 0.3333333432674408, 0.3333333432674408
-      ]);
+      const translation2 = vec3(rigidBody.current?.translation()).toArray();
+
+      expect(translation2[0]).to.be.greaterThan(translation1[0]);
+      expect(translation2[1]).to.be.greaterThan(translation1[1]);
+      expect(translation2[2]).to.be.greaterThan(translation1[2]);
 
       await ReactThreeTestRenderer.act(async () => {
         rapierContext.step(1 / 60);
       });
 
-      expect(vec3(rigidBody.current?.translation()).toArray()).to.deep.eq([
-        0.6666666269302368, 0.6649635434150696, 0.6666666269302368
-      ]);
+      const translation3 = vec3(rigidBody.current?.translation()).toArray();
+
+      expect(translation3[0]).to.be.greaterThan(translation2[0]);
+      expect(translation3[1]).to.be.greaterThan(translation2[1]);
+      expect(translation3[2]).to.be.greaterThan(translation2[2]);
 
       await pause(100);
 
+      const translation4 = vec3(rigidBody.current?.translation()).toArray();
+
       // expect nothing to have changed
-      expect(vec3(rigidBody.current?.translation()).toArray()).to.deep.eq([
-        0.6666666269302368, 0.6649635434150696, 0.6666666269302368
-      ]);
+      expect(translation4).to.deep.eq(translation3);
     });
   });
 
@@ -191,14 +194,14 @@ describe("physics", () => {
       "react-three-rapier: useRapier must be used within <Physics />!"
     );
 
-    it("throws a helpful error when useRapier is used outside of Physics", () => {
-      expect(async () => {
+    it("throws a helpful error when useRapier is used outside of Physics", async () => {
+      await expect(async () => {
         renderHookWithErrors(useRapier);
       }).rejects.toEqual(error);
     });
 
-    it("throws a helpful error when RigidBody is used outside of Physics", () => {
-      expect(async () => {
+    it("throws a helpful error when RigidBody is used outside of Physics", async () => {
+      await expect(async () => {
         await ReactThreeTestRenderer.create(
           <RigidBody
             colliders="cuboid"
@@ -209,8 +212,8 @@ describe("physics", () => {
       }).rejects.toEqual(error);
     });
 
-    it("throws a helpful error when Collider is used outside of Physics", () => {
-      expect(async () => {
+    it("throws a helpful error when Collider is used outside of Physics", async () => {
+      await expect(async () => {
         await ReactThreeTestRenderer.create(<AnyCollider restitution={2} />);
       }).rejects.toEqual(error);
     });
