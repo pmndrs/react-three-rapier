@@ -15,8 +15,8 @@
     "three-stdlib": "^2.35.12"
   },
   "devDependencies": {
-    "@react-three/drei": "10.0.0-rc.1",
-    "@react-three/fiber": "9.0.0-rc.5",
+    "@react-three/drei": "10.0.1",
+    "@react-three/fiber": "9.0.4",
     "@react-three/rapier": "1.5.0",
     "@types/react": "19.0.8",
     "@types/react-dom": "19.0.3",

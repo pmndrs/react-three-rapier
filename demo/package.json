@@ -10,8 +10,8 @@
   },
   "dependencies": {
     "@react-three/csg": "3.3.0",
-    "@react-three/drei": "10.0.0-rc.1",
-    "@react-three/fiber": "9.0.0-rc.5",
+    "@react-three/drei": "10.0.1",
+    "@react-three/fiber": "9.0.4",
     "@react-three/rapier": "1.5.0",
     "@react-three/rapier-addons": "4.0.1",
     "@types/three": "0.172.0",
