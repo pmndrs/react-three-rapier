@@ -1,5 +1,17 @@
 # @react-three/rapier
 
+## 2.0.0
+
+### Major Changes
+
+- 62906a9: feat: react 19 support, @react-three/fiber v9 support
+
+### Minor Changes
+
+- 62906a9: feat: remove deprecated Vector3Array, Vector4Array, Boolean3Array types
+
+  use Vector3Tuple, Vector4Tuple, Boolean3Tuple instead
+
 ## 2.0.0-canary.0
 
 ### Major Changes
