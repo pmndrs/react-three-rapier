@@ -1,5 +1,5 @@
-import { Box, Plane, Sphere } from "@react-three/drei";
-import { MeshPhysicalMaterialProps } from "@react-three/fiber";
+import { Box, Sphere } from "@react-three/drei";
+import { ThreeElements } from "@react-three/fiber";
 import {
   RigidBody,
   RapierRigidBody,
@@ -10,6 +10,8 @@ import { useCallback, useRef, useState } from "react";
 import { Color } from "three";
 import { Demo } from "../../App";
 import { useResetOrbitControls } from "../../hooks/use-reset-orbit-controls";
+
+type MeshPhysicalMaterialProps = ThreeElements["meshPhysicalMaterial"];
 
 type BallProps = { onContactForce: RigidBodyProps["onContactForce"] };
 const Ball = ({ onContactForce }: BallProps) => {

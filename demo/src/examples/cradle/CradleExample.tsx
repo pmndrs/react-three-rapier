@@ -12,8 +12,8 @@ import { Demo } from "../../App";
 import { useResetOrbitControls } from "../../hooks/use-reset-orbit-controls";
 
 const Rod = (props: RigidBodyOptions) => {
-  const anchor = useRef<RapierRigidBody>(null);
-  const rod = useRef<RapierRigidBody>(null);
+  const anchor = useRef<RapierRigidBody>(null!);
+  const rod = useRef<RapierRigidBody>(null!);
 
   useSphericalJoint(anchor, rod, [
     [0, 0, 0],

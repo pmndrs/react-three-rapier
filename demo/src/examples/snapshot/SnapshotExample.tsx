@@ -24,7 +24,7 @@ export const SnapshotExample: Demo = () => {
   const balls = Array.from(Array(10).keys());
 
   const { world, setWorld, rapier } = useRapier();
-  const worldSnapshot = useRef<Uint8Array>();
+  const worldSnapshot = useRef<Uint8Array>(null!);
 
   useControls({
     takeSnapshot: button(() => (worldSnapshot.current = world.takeSnapshot())),

@@ -1,28 +1,16 @@
-import React, {
-  RefObject,
-  Suspense,
-  createRef,
-  forwardRef,
-  useEffect,
-  useImperativeHandle,
-  useRef,
-  useState
-} from "react";
 import ReactThreeTestRenderer from "@react-three/test-renderer";
+import { RefObject, useEffect, useRef, useState } from "react";
 import { describe, expect, it } from "vitest";
-
+import { Cuboid } from "@dimforge/rapier3d-compat";
 import {
-  RigidBody,
-  Physics,
   CuboidCollider,
-  RapierRigidBody,
-  RigidBodyProps,
-  ColliderProps,
+  CuboidColliderProps,
   RapierCollider,
-  CuboidColliderProps
+  RapierRigidBody,
+  RigidBody,
+  RigidBodyProps
 } from "../src";
-import { awaitReady, pause } from "./test-utils";
-import { Collider, Cuboid, Shape } from "@dimforge/rapier3d-compat";
+import { awaitReady } from "./test-utils";
 
 const RigidBodyArgsChanger = ({
   onReady
@@ -35,7 +23,7 @@ const RigidBodyArgsChanger = ({
     ref: RefObject<RapierRigidBody>;
   }) => void;
 }) => {
-  const ref = useRef<RapierRigidBody>(null);
+  const ref = useRef<RapierRigidBody>(null!);
   const [props, setProps] = useState<RigidBodyProps>({
     type: "dynamic",
     position: [0, 0, 0],
@@ -116,7 +104,7 @@ const ColliderArgsChanger = ({
     ref: RefObject<RapierCollider>;
   }) => void;
 }) => {
-  const ref = useRef<RapierCollider>(null);
+  const ref = useRef<RapierCollider>(null!);
   const [props, setProps] = useState<CuboidColliderProps>({
     position: [0, 0, 0],
     args: [1, 1, 1]

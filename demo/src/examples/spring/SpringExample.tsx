@@ -37,7 +37,7 @@ const BoxRigidBody = ({ color, ...props }: BoxRigidBodyProps) => {
 const BallSpring = forwardRef<RapierRigidBody, BallSpringProps>(
   (props, floorRef) => {
     const floor = useForwardedRef(floorRef);
-    const ball = useRef<RapierRigidBody>(null);
+    const ball = useRef<RapierRigidBody>(null!);
 
     const stiffness = 1.0e3;
     const criticalDamping = 2.0 * Math.sqrt(stiffness * (props.mass ?? 1));

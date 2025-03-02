@@ -18,8 +18,8 @@ export const AttractorDebugHelper = (
   }
 ) => {
   const { scene } = useThree();
-  const ref = useRef<Mesh>();
-  const normalsHelper = useRef<VertexNormalsHelper>();
+  const ref = useRef<Mesh>(null!);
+  const normalsHelper = useRef<VertexNormalsHelper>(null!);
   const color = props.strength > 0 ? 0x0000ff : 0xff0000;
 
   useEffect(() => {

@@ -3,6 +3,7 @@ import { Canvas } from "@react-three/fiber";
 import { Physics, RigidBody } from "@react-three/rapier";
 import { Perf } from "r3f-perf";
 import {
+  JSX,
   ReactNode,
   StrictMode,
   Suspense,
@@ -117,7 +118,7 @@ export const App = () => {
   const [interpolate, setInterpolate] = useState<boolean>(true);
   const [physicsKey, setPhysicsKey] = useState<number>(0);
   const [cameraEnabled, setCameraEnabled] = useState<boolean>(true);
-  const orbitControlRef = useRef<OrbitControlsImpl>(null);
+  const orbitControlRef = useRef<OrbitControlsImpl>(null!);
 
   useResetOrbitControls();
 

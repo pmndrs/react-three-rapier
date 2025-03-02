@@ -1,5 +1,4 @@
-import { MutableRefObject, RefObject } from "react";
-
+import { RefObject } from "react";
 import {
   ActiveCollisionTypes,
   CoefficientCombineRule,
@@ -10,7 +9,7 @@ import {
   TempContactManifold
 } from "@dimforge/rapier3d-compat";
 import { Rotation, Vector } from "@dimforge/rapier3d-compat/math";
-import { Object3DProps, Quaternion, Vector3 } from "@react-three/fiber";
+import { Quaternion, ThreeElements, Vector3 } from "@react-three/fiber";
 import { Object3D } from "three";
 import { ColliderProps } from ".";
 import { RigidBodyState } from "./components/Physics";
@@ -18,7 +17,7 @@ import { RigidBodyState } from "./components/Physics";
 export { CoefficientCombineRule as CoefficientCombineRule } from "@dimforge/rapier3d-compat";
 export { RapierCollider, RapierRigidBody };
 
-export type RefGetter<T> = MutableRefObject<() => T | undefined>;
+export type RefGetter<T> = RefObject<() => T | undefined>;
 
 export type RigidBodyAutoCollider =
   | "ball"
@@ -109,21 +108,6 @@ export type Vector4Tuple = [x: number, y: number, z: number, w: number];
 export type Boolean3Tuple = [x: boolean, y: boolean, z: boolean];
 export type Vector3Object = { x: number; y: number; z: number };
 
-/**
- * @deprecated use Vector3Tuple instead
- */
-export type Vector3Array = Vector3Tuple;
-
-/**
- * @deprecated use Vector4Tuple instead
- * */
-export type Vector4Array = Vector4Tuple;
-
-/**
- * @deprecated use Boolean3Tuple instead
- * */
-export type Boolean3Array = Boolean3Tuple;
-
 export interface ColliderOptions<ColliderArgs extends Array<unknown>> {
   /**
    * The optional name passed to THREE's Object3D
@@ -170,22 +154,22 @@ export interface ColliderOptions<ColliderArgs extends Array<unknown>> {
   /**
    * The position of this collider relative to the rigid body
    */
-  position?: Object3DProps["position"];
+  position?: ThreeElements["object3D"]["position"];
 
   /**
    * The rotation of this collider relative to the rigid body
    */
-  rotation?: Object3DProps["rotation"];
+  rotation?: ThreeElements["object3D"]["rotation"];
 
   /**
    * The rotation, as a Quaternion, of this collider relative to the rigid body
    */
-  quaternion?: Object3DProps["quaternion"];
+  quaternion?: ThreeElements["object3D"]["quaternion"];
 
   /**
    * The scale of this collider relative to the rigid body
    */
-  scale?: Object3DProps["scale"];
+  scale?: ThreeElements["object3D"]["scale"];
 
   /**
    * Callback when this collider collideas with another collider.
@@ -335,7 +319,7 @@ export type IntersectionExitHandler = (
 
 export type ContactForceHandler = (payload: ContactForcePayload) => void;
 
-export interface RigidBodyOptions extends ColliderProps {
+export interface RigidBodyOptions extends Omit<ColliderProps, "ref"> {
   /**
    * Specify the type of this rigid body
    */
@@ -404,12 +388,12 @@ export interface RigidBodyOptions extends ColliderProps {
   /**
    * Initial position of the RigidBody
    */
-  position?: Object3DProps["position"];
+  position?: ThreeElements["object3D"]["position"];
 
   /**
    * Initial rotation of the RigidBody
    */
-  rotation?: Object3DProps["rotation"];
+  rotation?: ThreeElements["object3D"]["rotation"];
 
   /**
    * Automatically generate colliders based on meshes inside this
@@ -495,7 +479,7 @@ export interface RigidBodyOptions extends ColliderProps {
   /**
    * Passed down to the object3d representing this collider.
    */
-  userData?: Object3DProps["userData"];
+  userData?: ThreeElements["object3D"]["userData"];
 
   /**
    * Include invisible objects on the collider creation estimation.
