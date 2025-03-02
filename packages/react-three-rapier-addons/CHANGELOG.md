@@ -4,7 +4,7 @@
 
 ### Major Changes
 
-- 62906a9: feat: react 19 support
+- 62906a9: feat: react 19 support, @react-three/fiber v9 support
 
 ### Minor Changes
 
