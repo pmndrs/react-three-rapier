@@ -1,22 +1,8 @@
 import React, { memo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
-import { BufferAttribute, LineSegments } from "three";
+import { BufferAttribute, BufferGeometry, LineSegments } from "three";
 import { useRapier } from "../hooks/hooks";
 import { _vector3 } from "../utils/shared-objects";
-
-function mapsEqual(map1: Map<string, any>, map2: Map<string, any>) {
-  var testVal;
-  if (map1.size !== map2.size) {
-    return false;
-  }
-  for (var [key, val] of map1) {
-    testVal = map2.get(key);
-    if (testVal !== val || (testVal === undefined && !map2.has(key))) {
-      return false;
-    }
-  }
-  return true;
-}
 
 export const Debug = memo(() => {
   const { world } = useRapier();
@@ -28,11 +14,12 @@ export const Debug = memo(() => {
 
     const buffers = world.debugRender();
 
-    mesh.geometry.setAttribute(
-      "position",
-      new BufferAttribute(buffers.vertices, 3)
-    );
-    mesh.geometry.setAttribute("color", new BufferAttribute(buffers.colors, 4));
+    const geometry = new BufferGeometry();
+    geometry.setAttribute("position", new BufferAttribute(buffers.vertices, 3));
+    geometry.setAttribute("color", new BufferAttribute(buffers.colors, 4));
+
+    mesh.geometry.dispose();
+    mesh.geometry = geometry;
   });
 
   return (
