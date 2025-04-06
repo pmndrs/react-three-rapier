@@ -1,5 +1,11 @@
 # @react-three/rapier
 
+## 2.0.1
+
+### Patch Changes
+
+- a42dfc9: fix: debug geometry not updating correctly for WebGPURenderer
+
 ## 2.0.0
 
 ### Major Changes
