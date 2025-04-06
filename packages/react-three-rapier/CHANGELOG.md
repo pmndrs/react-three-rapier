@@ -1,5 +1,13 @@
 # @react-three/rapier
 
+## 2.1.0
+
+### Minor Changes
+
+- 0b585e0: feat: bump @dimforge/rapier3d-compat from v0.14.0 to v0.15.0
+
+  See the rapier.js changelog for details: https://github.com/dimforge/rapier.js/blob/master/CHANGELOG.md
+
 ## 2.0.1
 
 ### Patch Changes
