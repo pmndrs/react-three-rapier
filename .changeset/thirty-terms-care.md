@@ -1,5 +1,4 @@
 ---
-"@react-three/rapier-addons": minor
 "@react-three/rapier": minor
 ---
 
