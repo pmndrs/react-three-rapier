@@ -13,10 +13,10 @@
     "@react-three/fiber": "9.0.4",
     "@react-three/test-renderer": "9.0.1",
     "@types/react": "19.0.8",
-    "@types/react-dom": "19.0.3",
+    "@types/react-dom": "19.1.1",
     "@types/three": "0.172.0",
     "react": "19.0.0",
-    "react-dom": "19.0.0",
+    "react-dom": "19.1.0",
     "three": "0.172.0"
   },
   "peerDependencies": {
