@@ -10,7 +10,7 @@
   ],
   "devDependencies": {
     "@react-three/drei": "10.0.1",
-    "@react-three/fiber": "9.0.4",
+    "@react-three/fiber": "9.1.2",
     "@react-three/test-renderer": "9.0.1",
     "@types/react": "19.0.8",
     "@types/react-dom": "19.0.3",
