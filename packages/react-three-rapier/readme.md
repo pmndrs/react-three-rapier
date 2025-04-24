@@ -3,6 +3,11 @@
 </p>
 
 <p align="center">
+📣 @react-three/rapier v2 has been released, which adds support for @react-three/fiber v9 and react 19. If you are using react 18, you will need to use @react-three/rapier v1 and @react-three/fiber v8.
+</p>
+
+
+<p align="center">
   <a href="https://www.npmjs.com/package/@react-three/rapier"><img src="https://img.shields.io/npm/v/@react-three/rapier?style=for-the-badge&colorA=0099DA&colorB=ffffff" /></a>
   <a href="https://discord.gg/ZZjjNvJ"><img src="https://img.shields.io/discord/740090768164651008?style=for-the-badge&colorA=0099DA&colorB=ffffff&label=discord&logo=discord&logoColor=ffffff" /></a>
 </p>
