@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-📣 @react-three/rapier v2 has been released, which adds support for @react-three/fiber v9 and react 19. If you are using react 18, you will need to use @react-three/rapier v1 and @react-three/fiber v8.
+📣 @react-three/rapier v2 has been released, which adds support for @react-three/fiber v9 and react v19. If you are using react v18, you will need to use @react-three/rapier v1 and @react-three/fiber v8.
 </p>
 
 
