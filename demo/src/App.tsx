@@ -79,7 +79,6 @@ const Floor = () => {
 };
 
 const routes: Record<string, ReactNode> = {
-  "": <OneWayPlatform />,
   shapes: <Shapes />,
   joints: <Joints />,
   components: <ComponentsExample />,
@@ -110,7 +109,8 @@ const routes: Record<string, ReactNode> = {
   spring: <SpringExample />,
   "rope-joint": <RopeJointExample />,
   "active-collision-types": <ActiveCollisionTypesExample />,
-  "contact-skin": <ContactSkinExample />
+  "contact-skin": <ContactSkinExample />,
+  "one-way-platform": <OneWayPlatform />
 };
 
 export const App = () => {
