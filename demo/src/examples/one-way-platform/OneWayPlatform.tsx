@@ -5,6 +5,7 @@ import {
   RapierCollider,
   RapierRigidBody,
   RigidBody,
+  useBeforePhysicsStep,
   useRapier
 } from "@react-three/rapier";
 import { useCallback, useEffect, useRef } from "react";
@@ -12,11 +13,13 @@ import { Vector3 } from "three";
 import { Demo } from "../../App";
 
 export const OneWayPlatform: Demo = () => {
-  const ref = useRef<RapierRigidBody>(null);
-  const collider = useRef<RapierCollider>(null);
-
-  const ball = useRef<RapierRigidBody>(null);
+  const platformRef = useRef<RapierRigidBody>(null);
+  const colliderRef = useRef<RapierCollider>(null);
+  const ballRef = useRef<RapierRigidBody>(null);
   const { camera } = useThree();
+
+  // Cache for storing body states before physics step
+  const bodyStateCache = useRef<Map<number, { position: Vector3; velocity: Vector3 }>>(new Map());
 
   useEffect(() => {
     camera.position.set(0, 10, 20);
@@ -24,63 +27,81 @@ export const OneWayPlatform: Demo = () => {
     camera.updateProjectionMatrix();
 
     window.addEventListener("click", () => {
-      ball.current?.applyImpulse(new Vector3(0, 50, 0), true);
+      ballRef.current?.applyImpulse(new Vector3(0, 100, 0), true);
     });
   }, []);
 
-  const { filterContactPairHooks, world } = useRapier();
+  const { filterContactPairHooks } = useRapier();
+
+  // Cache body states BEFORE the physics step
+  useBeforePhysicsStep(() => {
+    if (platformRef.current && ballRef.current) {
+      const platformHandle = platformRef.current.handle;
+      const ballHandle = ballRef.current.handle;
+
+      const platformPos = platformRef.current.translation();
+      const ballPos = ballRef.current.translation();
+      const ballVel = ballRef.current.linvel();
+
+      bodyStateCache.current.set(platformHandle, {
+        position: new Vector3(platformPos.x, platformPos.y, platformPos.z),
+        velocity: new Vector3(0, 0, 0)
+      });
+
+      bodyStateCache.current.set(ballHandle, {
+        position: new Vector3(ballPos.x, ballPos.y, ballPos.z),
+        velocity: new Vector3(ballVel.x, ballVel.y, ballVel.z)
+      });
+    }
+  });
 
   const hook = useCallback(
     (c1: number, c2: number, b1: number, b2: number) => {
       try {
-        const collider1 = world.getCollider(c1);
-        const collider2 = world.getCollider(c2);
+        // Use cached states instead of querying the world
+        const state1 = bodyStateCache.current.get(b1);
+        const state2 = bodyStateCache.current.get(b2);
 
-        const body1 = world.getRigidBody(b1);
-        const body2 = world.getRigidBody(b2);
+        if (!state1 || !state2) {
+          return null; // Let default behavior happen
+        }
 
-        if (
-          (body1.userData as any)?.type &&
-          (body1.userData as any).type === "platform" &&
-          (body2.userData as any)?.type &&
-          (body2.userData as any)?.type === "ball"
-        ) {
-          // Once we get try to get access to the ball and platform, the "hook" that we pass to filterContactPairHooks crashes
+        // Determine which is platform and which is ball
+        let platformState, ballState;
+        
+        if (platformRef.current?.handle === b1 && ballRef.current?.handle === b2) {
+          platformState = state1;
+          ballState = state2;
+        } else if (platformRef.current?.handle === b2 && ballRef.current?.handle === b1) {
+          platformState = state2;
+          ballState = state1;
+        } else {
+          return null; // Not our platform/ball pair
+        }
 
-          // why does this crash here? what's wrong with the below setup?
-          const platformPosition = body1.translation();
-          const ballVelocity = body2.linvel();
-          const ballPosition = body2.translation();
-
-          // also doesn't work
-          // const platformPosition = ref.current!.translation();
-          // const ballVelocity = ball.current!.linvel();
-          // const ballPosition = ref.current!.translation();
-
-          // Allow collision if the ball is moving downwards and above the platform
-          if (ballVelocity.y < 0 && ballPosition.y > platformPosition.y) {
-            return 1; // Process the collision
-          }
+        // Allow collision only if the ball is moving downwards and above the platform
+        if (ballState.velocity.y < 0 && ballState.position.y > platformState.position.y) {
+          return 1; // Process the collision (SolverFlags::COMPUTE_IMPULSES)
         }
 
         return 0; // Ignore the collision
       } catch (error) {
-        console.log(error);
+        console.error(error);
         return null;
       }
     },
-    [world]
+    []
   );
 
   useEffect(() => {
-    collider.current?.setActiveHooks(1);
+    colliderRef.current?.setActiveHooks(1);
     filterContactPairHooks.push(hook);
   }, []);
 
   return (
     <group>
       <RigidBody
-        ref={ball}
+        ref={ballRef}
         colliders="ball"
         position={[0, -5, 0]}
         userData={{ type: "ball" }}
@@ -93,8 +114,8 @@ export const OneWayPlatform: Demo = () => {
         <boxGeometry args={[10, 0.1, 10]} />
         <meshStandardMaterial color={"grey"} opacity={0.5} transparent={true} />
       </mesh>
-      <RigidBody type="fixed" userData={{ type: "platform" }} ref={ref}>
-        <CuboidCollider args={[10, 0.1, 10]} ref={collider} />
+      <RigidBody type="fixed" userData={{ type: "platform" }} ref={platformRef}>
+        <CuboidCollider args={[10, 0.1, 10]} ref={colliderRef} />
       </RigidBody>
     </group>
   );

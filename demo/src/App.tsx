@@ -80,7 +80,7 @@ const Floor = () => {
 
 const routes: Record<string, ReactNode> = {
   "": <OneWayPlatform />,
-  shapes: Shapes,
+  shapes: <Shapes />,
   joints: <Joints />,
   components: <ComponentsExample />,
   cradle: <CradleExample />,
