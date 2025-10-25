@@ -79,7 +79,7 @@ const Floor = () => {
 };
 
 const routes: Record<string, ReactNode> = {
-  shapes: <Shapes />,
+  "": <Shapes />,
   joints: <Joints />,
   components: <ComponentsExample />,
   cradle: <CradleExample />,
