@@ -246,7 +246,7 @@ export const App = () => {
 
         {Object.keys(routes).map((key) => (
           <Link key={key} to={key} end>
-            {key.replace(/-/g, " ") || "One Way Platform"}
+            {key.replace(/-/g, " ") || "Plinko"}
           </Link>
         ))}
       </div>
