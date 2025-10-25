@@ -85,6 +85,7 @@ For full API outline and documentation, see 🧩 [API Docs](https://pmndrs.githu
   - [Spring Joint](#spring-joint)
   - [🖼 Joints Example](#-joints-example)
 - [Advanced hooks usage](#advanced-hooks-usage)
+  - [Physics Hooks (Collision Filtering)](#physics-hooks-collision-filtering)
   - [Manual stepping](#manual-stepping)
   - [On-demand rendering](#on-demand-rendering)
 - [Snapshots](#snapshots)
@@ -885,6 +886,68 @@ Advanced users might need granular access to the physics loop and direct access 
 - `useAfterPhysicsStep`
   Allows you to run code after the physics simulation is stepped.  
   🧩 See [useAfterPhysicsStep docs](https://pmndrs.github.io/react-three-rapier/functions/useAfterPhysicsStep.html) for more information.
+
+### Physics Hooks (Collision Filtering)
+
+You can implement advanced collision behaviors like one-way platforms by using physics hooks. These hooks allow you to filter collision and intersection pairs during the physics step.
+
+The `useRapier` hook provides access to two arrays:
+- `filterContactPairHooks` - Filter collision pairs and control solver behavior
+- `filterIntersectionPairHooks` - Filter intersection pairs for sensors
+
+**Important:** To avoid Rust aliasing errors, you **cannot** access rigid body properties (like `translation()` or `linvel()`) directly during the physics step. Instead, cache the needed state before the step using `useBeforePhysicsStep`.
+
+```tsx
+import { useRapier, useBeforePhysicsStep } from "@react-three/rapier";
+
+const OneWayPlatform = () => {
+  const platformRef = useRef<RapierRigidBody>(null);
+  const ballRef = useRef<RapierRigidBody>(null);
+  const colliderRef = useRef<RapierCollider>(null);
+  
+  // Cache for storing body states before physics step
+  const bodyStateCache = useRef(new Map());
+  
+  const { filterContactPairHooks } = useRapier();
+
+  // Cache body states BEFORE the physics step
+  useBeforePhysicsStep(() => {
+    if (platformRef.current && ballRef.current) {
+      const ballPos = ballRef.current.translation();
+      const ballVel = ballRef.current.linvel();
+      
+      bodyStateCache.current.set(ballRef.current.handle, {
+        position: ballPos,
+        velocity: ballVel
+      });
+    }
+  });
+
+  // Filter hook using cached data
+  const hook = useCallback((c1, c2, b1, b2) => {
+    const ballState = bodyStateCache.current.get(b1);
+    if (!ballState) return null;
+
+    // Allow collision only if ball is moving down and above platform
+    if (ballState.velocity.y < 0 && ballState.position.y > 0) {
+      return 1; // Process collision
+    }
+    return 0; // Ignore collision
+  }, []);
+
+  useEffect(() => {
+    // Enable active hooks on the collider
+    colliderRef.current?.setActiveHooks(1);
+    filterContactPairHooks.push(hook);
+  }, []);
+
+  return (
+    <RigidBody ref={platformRef}>
+      <CuboidCollider ref={colliderRef} args={[5, 0.1, 5]} />
+    </RigidBody>
+  );
+};
+```
 
 ### Manual stepping
 
