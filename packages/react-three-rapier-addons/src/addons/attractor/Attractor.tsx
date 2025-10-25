@@ -3,8 +3,10 @@ import { InteractionGroups, RigidBody } from "@dimforge/rapier3d-compat";
 import { useBeforePhysicsStep, useRapier } from "@react-three/rapier";
 import { FC, memo, useRef } from "react";
 import { Object3D, Vector3 } from "three";
-import { Object3DProps } from "@react-three/fiber";
+import { ThreeElements } from "@react-three/fiber";
 import { AttractorDebugHelper } from "./AttractorDebugHelper";
+
+type Object3DProps = ThreeElements["object3D"];
 
 export type AttractorGravityType = "static" | "linear" | "newtonian";
 
@@ -138,7 +140,7 @@ export const Attractor: FC<AttractorProps> = memo((props) => {
     gravitationalConstant = 6.673e-11,
     collisionGroups
   } = props;
-  const object = useRef<Object3D>(null);
+  const object = useRef<Object3D>(null!);
   const { isDebug } = useRapier();
 
   useBeforePhysicsStep((world) => {

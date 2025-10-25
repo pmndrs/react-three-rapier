@@ -1,25 +1,28 @@
 {
   "name": "@react-three/rapier-addons",
-  "version": "4.0.1",
+  "version": "5.0.0",
   "main": "dist/react-three-rapier-addons.cjs.js",
   "module": "dist/react-three-rapier-addons.esm.js",
   "license": "MIT",
   "sideEffects": false,
   "peerDependencies": {
     "@react-three/fiber": "*",
-    "@react-three/rapier": "^1.3.1",
-    "react": ">=18.0.0",
+    "@react-three/rapier": "^2.0.0",
+    "react": "^19",
     "three": "*"
   },
   "dependencies": {
-    "three-stdlib": "2.23.9"
+    "three-stdlib": "^2.35.12"
   },
   "devDependencies": {
-    "@react-three/fiber": "8.9.1",
-    "@react-three/rapier": "^1.3.1",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
-    "three": "0.146.0"
+    "@react-three/drei": "10.0.1",
+    "@react-three/fiber": "9.0.4",
+    "@react-three/rapier": "2.1.0",
+    "@types/react": "19.0.8",
+    "@types/react-dom": "19.0.3",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "three": "0.172.0"
   },
   "repository": "https://github.com/pmndrs/react-three-rapier/tree/master/packages/react-three-rapier-addons"
 }

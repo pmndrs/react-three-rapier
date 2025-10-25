@@ -1,12 +1,60 @@
 # @react-three/rapier
 
+## 2.1.0
+
+### Minor Changes
+
+- 0b585e0: feat: bump @dimforge/rapier3d-compat from v0.14.0 to v0.15.0
+
+  See the rapier.js changelog for details: https://github.com/dimforge/rapier.js/blob/master/CHANGELOG.md
+
+## 2.0.1
+
+### Patch Changes
+
+- a42dfc9: fix: debug geometry not updating correctly for WebGPURenderer
+
+## 2.0.0
+
+### Major Changes
+
+- 62906a9: feat: react 19 support, @react-three/fiber v9 support
+
+### Minor Changes
+
+- 62906a9: feat: remove deprecated Vector3Array, Vector4Array, Boolean3Array types
+
+  use Vector3Tuple, Vector4Tuple, Boolean3Tuple instead
+
+## 2.0.0-canary.0
+
+### Major Changes
+
+- 62906a9: feat: react 19 support
+
+### Minor Changes
+
+- 62906a9: feat: remove deprecated Vector3Array, Vector4Array, Boolean3Array types
+
+  use Vector3Tuple, Vector4Tuple, Boolean3Tuple instead
+
+## 1.5.0
+
+### Minor Changes
+
+- 55fa8fe: Update @dimforge/rapier3d-compat to 0.14.0 (@wiledal)
+  - See https://github.com/dimforge/rapier.js/blob/master/CHANGELOG.md
+  - Changed World prop `erp` to `contactNaturalFrequency`
+    - This is undocumented in the Rapier.js documentation, but was introduced Rapier 0.20.0 https://github.com/dimforge/rapier/pull/651
+    - The change mentions `contactDampingRatio` but this is not exposed in the Rapier.js API as of yet
+
 ## 1.4.0
 
 ### Minor Changes
 
 - a155277: feat: bump @dimforge/rapier3d-compat from 0.12.0 to 0.13.1
-  
-  - See the rapier.js changelog for more information: https://github.com/dimforge/rapier.js/blob/master/CHANGELOG.md 
+
+  - See the rapier.js changelog for more information: https://github.com/dimforge/rapier.js/blob/master/CHANGELOG.md
   - Added World prop `lengthUnit`
   - Renamed World props `allowedLinearError` and `predictionDistance` to `normalizedAllowedLinearError` and `normalizedPredictionDistance`, matching upstream changes
   - Added `softCcdPrediction` RigidBody prop

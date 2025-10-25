@@ -1,11 +1,11 @@
-import { Box, Html, Sphere, Torus } from "@react-three/drei";
-import { useFrame } from "@react-three/fiber";
-import { RigidBody, RapierRigidBody } from "@react-three/rapier";
-import { useControls } from "leva";
-import { useEffect, useRef } from "react";
+import { Html, Torus } from "@react-three/drei";
+import { RigidBody } from "@react-three/rapier";
 import { Demo } from "../../App";
+import { useResetOrbitControls } from "../../hooks/use-reset-orbit-controls";
 
 export const LockedTransformsExample: Demo = () => {
+  useResetOrbitControls(30);
+
   return (
     <group rotation={[0, 0, 0]} scale={1}>
       <RigidBody

@@ -1,4 +1,4 @@
-import { DependencyList, useCallback, useEffect, useMemo, useRef } from "react";
+import { DependencyList, useCallback, useEffect, useRef } from "react";
 
 /**
  * Initiate an instance and return a safe getter
@@ -8,7 +8,7 @@ export const useImperativeInstance = <InstanceType>(
   destroyFn: (instance: InstanceType) => void,
   dependencyList: DependencyList
 ) => {
-  const ref = useRef<InstanceType>();
+  const ref = useRef<InstanceType | undefined>(undefined);
 
   const getInstance = useCallback(() => {
     if (!ref.current) {

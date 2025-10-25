@@ -12,6 +12,7 @@ import {
 
 import { Demo } from "../../App";
 import { Mesh } from "three";
+import { useResetOrbitControls } from "../../hooks/use-reset-orbit-controls";
 
 export const useSuzanne = () => {
   // @ts-ignore
@@ -61,6 +62,7 @@ const OffsetTorus = () => {
 
 export const AllShapesExample: Demo = () => {
   const { nodes } = useSuzanne();
+  useResetOrbitControls();
 
   return (
     <>

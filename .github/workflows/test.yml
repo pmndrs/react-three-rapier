@@ -12,14 +12,20 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: Setup Node.js 18.x
+      - name: Setup Node.js 22.x
         uses: actions/setup-node@v3
         with:
-          node-version: 18.x
-          cache: "npm"
+          node-version: 22
+
+      - name: Enable corepack  
+        run: corepack enable
       
       - name: Install deps
-        run: yarn --frozen-lockfile
-      
-      - name: "Run tests"
+        run: yarn --immutable
+
+      # See if the build runs
+      - name: Run build
+        run: yarn build
+    
+      - name: Run tests
         run: npm run test

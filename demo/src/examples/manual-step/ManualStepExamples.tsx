@@ -8,6 +8,7 @@ import {
 import { Box } from "@react-three/drei";
 import { useControls, button } from "leva";
 import { useDemo } from "../../App";
+import { useResetOrbitControls } from "../../hooks/use-reset-orbit-controls";
 
 export const ManualStepExample = () => {
   const { setPaused } = useDemo();
@@ -37,6 +38,8 @@ export const ManualStepExample = () => {
     steps.current.after++;
     console.log("after step", steps.current.after);
   });
+
+  useResetOrbitControls(30);
 
   return (
     <group>

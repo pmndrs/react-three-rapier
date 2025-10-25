@@ -9,6 +9,7 @@ import {
 } from "@react-three/rapier";
 import { useEffect, useRef } from "react";
 import { Demo } from "../../App";
+import { useResetOrbitControls } from "../../hooks/use-reset-orbit-controls";
 
 const Ball = () => {
   const ball = useRef<RapierRigidBody>(null);
@@ -41,9 +42,7 @@ const Ball = () => {
 export const Colliders: Demo = () => {
   const cuboid = useRef<RapierCollider>(null);
 
-  useEffect(() => {
-    console.log(cuboid.current);
-  }, []);
+  useResetOrbitControls(30);
 
   return (
     <group>

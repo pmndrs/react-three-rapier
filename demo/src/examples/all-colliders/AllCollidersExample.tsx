@@ -1,5 +1,5 @@
 import { Box, Cone, Cylinder, Html, Sphere } from "@react-three/drei";
-import { MeshProps, Object3DProps } from "@react-three/fiber";
+import { ThreeElements } from "@react-three/fiber";
 import {
   BallCollider,
   CapsuleCollider,
@@ -19,8 +19,12 @@ import { useSuzanne } from "../all-shapes/AllShapesExample";
 import { RoundedBoxGeometry } from "three-stdlib";
 import { PlaneGeometry } from "three";
 import { useEffect, useRef } from "react";
+import { useResetOrbitControls } from "../../hooks/use-reset-orbit-controls";
 
-const CuteBox = (props: Omit<MeshProps, "args">) => (
+type Object3DProps = ThreeElements["object3D"];
+type MeshProps = ThreeElements["mesh"];
+
+const CuteBox = (props: Omit<MeshProps, "args" | "ref">) => (
   <Box castShadow receiveShadow {...props}>
     <meshPhysicalMaterial color="orange" />
   </Box>
@@ -64,8 +68,7 @@ const heightFieldGeometry = new PlaneGeometry(
 );
 
 heightField.forEach((v, index) => {
-  (heightFieldGeometry.attributes.position.array as number[])[index * 3 + 2] =
-    v;
+  heightFieldGeometry.attributes.position.array[index * 3 + 2] = v;
 });
 heightFieldGeometry.scale(1, -1, 1);
 heightFieldGeometry.rotateX(-Math.PI / 2);
@@ -81,6 +84,8 @@ export const AllCollidersExample = () => {
   useEffect(() => {
     console.log("roundCuboidCollider", roundCuboidCollider.current);
   }, []);
+
+  useResetOrbitControls(30);
 
   return (
     <group>

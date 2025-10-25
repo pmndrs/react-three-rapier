@@ -2,6 +2,7 @@ import { Box, Sphere, useTexture } from "@react-three/drei";
 import { RigidBody } from "@react-three/rapier";
 import { RepeatWrapping } from "three";
 import { Demo } from "../../App";
+import { useResetOrbitControls } from "../../hooks/use-reset-orbit-controls";
 
 export const Damping: Demo = () => {
   const floor = useTexture(new URL("./white.png", import.meta.url).toString());
@@ -11,6 +12,8 @@ export const Damping: Demo = () => {
   floor.wrapS = floor.wrapT = RepeatWrapping;
 
   const balls = Array.from(Array(10).keys());
+
+  useResetOrbitControls(40, [0, 0.25, 0.75]);
 
   return (
     <>

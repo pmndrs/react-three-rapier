@@ -1,5 +1,5 @@
 import React, {
-  MutableRefObject,
+  RefObject,
   useContext,
   useEffect,
   useRef,
@@ -79,7 +79,7 @@ export const useAfterPhysicsStep = (callback: WorldStepCallback) => {
  * @internal
  */
 export const useChildColliderProps = <O extends Object3D>(
-  ref: MutableRefObject<O | undefined | null>,
+  ref: RefObject<O | undefined | null>,
   options: RigidBodyProps,
   ignoreMeshColliders = true
 ) => {

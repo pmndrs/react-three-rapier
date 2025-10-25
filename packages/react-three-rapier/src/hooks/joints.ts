@@ -36,7 +36,7 @@ export const useImpulseJoint = <JointType extends ImpulseJoint>(
   params: Rapier.JointData
 ) => {
   const { world } = useRapier();
-  const jointRef = useRef<JointType>();
+  const jointRef = useRef<JointType | undefined>(undefined);
 
   useImperativeInstance(
     () => {

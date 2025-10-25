@@ -1,10 +1,13 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 
 import { Box, Clone, Sphere, useGLTF } from "@react-three/drei";
 import { RigidBody, TrimeshCollider } from "@react-three/rapier";
-import { GroupProps, Object3DNode, useFrame } from "@react-three/fiber";
+import { ThreeElements } from "@react-three/fiber";
 import { Mesh } from "three";
 import { Demo } from "../../App";
+import { useResetOrbitControls } from "../../hooks/use-reset-orbit-controls";
+
+type GroupProps = ThreeElements["group"];
 
 const Map = () => {
   const { nodes } = useGLTF(
@@ -88,6 +91,8 @@ const CompoundShape = () => {
 };
 
 export const ComponentsExample: Demo = () => {
+  useResetOrbitControls();
+
   return (
     <group>
       <CompoundShape />

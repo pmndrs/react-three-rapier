@@ -34,10 +34,13 @@ jobs:
       - name: Setup Node.js environment
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: 18.x
+          node-version: 22.x
+          
+      - name: Enable corepack  
+        run: corepack enable
 
       - name: Install Node Dependencies
-        run: yarn
+        run: yarn --immutable
 
       - name: Run typedoc
         run: yarn docs:build
@@ -46,10 +49,11 @@ jobs:
         uses: actions/configure-pages@v2
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v1
+        uses: actions/upload-pages-artifact@v3
         with:
           # Upload docs folder
           path: "./packages/react-three-rapier/docs"
+
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v1
+        uses: actions/deploy-pages@v4
