@@ -419,7 +419,6 @@ export const Physics: FC<PhysicsProps> = (props) => {
     allowedLinearError = 0.001,
     predictionDistance = 0.002,
     numSolverIterations = 4,
-    numAdditionalFrictionIterations = 4,
     numInternalPgsIterations = 1,
     minIslandSize = 128,
     maxCcdSubsteps = 1,
@@ -427,14 +426,6 @@ export const Physics: FC<PhysicsProps> = (props) => {
     lengthUnit = 1
   } = props;
 
-  // Warn users about deprecated property
-  if (numAdditionalFrictionIterations !== 4) {
-    console.warn(
-      "react-three-rapier: `numAdditionalFrictionIterations` is deprecated and has no effect. " +
-      "This property was removed in rapier 0.19.0 as part of the legacy PGS solver removal. " +
-      "It will be removed in a future major version."
-    );
-  }
   const rapier = suspend(importRapier, ["@react-thee/rapier", importRapier]);
   const { invalidate } = useThree();
 
@@ -472,9 +463,6 @@ export const Physics: FC<PhysicsProps> = (props) => {
     worldProxy.gravity = vector3ToRapierVector(gravity);
 
     worldProxy.integrationParameters.numSolverIterations = numSolverIterations;
-    // numAdditionalFrictionIterations was removed in rapier 0.19.0 as part of legacy PGS solver removal
-    // worldProxy.integrationParameters.numAdditionalFrictionIterations =
-    //   numAdditionalFrictionIterations;
     worldProxy.integrationParameters.numInternalPgsIterations =
       numInternalPgsIterations;
 
@@ -491,7 +479,6 @@ export const Physics: FC<PhysicsProps> = (props) => {
     worldProxy,
     ...gravity,
     numSolverIterations,
-    // numAdditionalFrictionIterations, // Removed in rapier 0.19.0 as part of legacy PGS solver removal
     numInternalPgsIterations,
     allowedLinearError,
     minIslandSize,
