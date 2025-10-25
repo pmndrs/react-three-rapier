@@ -172,17 +172,20 @@ describe("physics hooks", () => {
           }
         });
 
-        const hook = useCallback((c1: number, c2: number, b1: number, b2: number) => {
-          const state = bodyStateCache.current.get(b1) || 
-                        bodyStateCache.current.get(b2);
-          
-          // If we have cached state, the test is successful
-          if (state) {
-            filterHook();
-          }
-          
-          return 1; // Allow collision
-        }, []);
+        const hook = useCallback(
+          (c1: number, c2: number, b1: number, b2: number) => {
+            const state =
+              bodyStateCache.current.get(b1) || bodyStateCache.current.get(b2);
+
+            // If we have cached state, the test is successful
+            if (state) {
+              filterHook();
+            }
+
+            return 1; // Allow collision
+          },
+          []
+        );
 
         useEffect(() => {
           if (colliderRef.current && !hookRegistered) {
@@ -260,4 +263,3 @@ describe("physics hooks", () => {
     });
   });
 });
-
