@@ -27,7 +27,7 @@ export const OneWayPlatform: Demo = () => {
     camera.updateProjectionMatrix();
 
     window.addEventListener("click", () => {
-      ballRef.current?.applyImpulse(new Vector3(0, 100, 0), true);
+      ballRef.current?.applyImpulse(new Vector3(0, 50, 0), true);
     });
   }, []);
 
