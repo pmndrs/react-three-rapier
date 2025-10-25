@@ -276,6 +276,8 @@ export interface PhysicsProps {
    * The greater this value is, the most realistic friction will be.
    * However a greater number of iterations is more computationally intensive.
    *
+   * @deprecated This property was removed in rapier 0.19.0 as part of the legacy PGS solver removal.
+   * It has no effect and will be removed in a future major version.
    * @defaultValue 4
    */
   numAdditionalFrictionIterations?: number;
@@ -424,6 +426,15 @@ export const Physics: FC<PhysicsProps> = (props) => {
     contactNaturalFrequency = 30,
     lengthUnit = 1
   } = props;
+
+  // Warn users about deprecated property
+  if (numAdditionalFrictionIterations !== 4) {
+    console.warn(
+      "react-three-rapier: `numAdditionalFrictionIterations` is deprecated and has no effect. " +
+      "This property was removed in rapier 0.19.0 as part of the legacy PGS solver removal. " +
+      "It will be removed in a future major version."
+    );
+  }
   const rapier = suspend(importRapier, ["@react-thee/rapier", importRapier]);
   const { invalidate } = useThree();
 
@@ -461,8 +472,9 @@ export const Physics: FC<PhysicsProps> = (props) => {
     worldProxy.gravity = vector3ToRapierVector(gravity);
 
     worldProxy.integrationParameters.numSolverIterations = numSolverIterations;
-    worldProxy.integrationParameters.numAdditionalFrictionIterations =
-      numAdditionalFrictionIterations;
+    // numAdditionalFrictionIterations was removed in rapier 0.19.0 as part of legacy PGS solver removal
+    // worldProxy.integrationParameters.numAdditionalFrictionIterations =
+    //   numAdditionalFrictionIterations;
     worldProxy.integrationParameters.numInternalPgsIterations =
       numInternalPgsIterations;
 
@@ -479,7 +491,7 @@ export const Physics: FC<PhysicsProps> = (props) => {
     worldProxy,
     ...gravity,
     numSolverIterations,
-    numAdditionalFrictionIterations,
+    // numAdditionalFrictionIterations, // Removed in rapier 0.19.0 as part of legacy PGS solver removal
     numInternalPgsIterations,
     allowedLinearError,
     minIslandSize,
