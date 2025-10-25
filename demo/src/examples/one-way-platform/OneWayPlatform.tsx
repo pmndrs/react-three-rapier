@@ -19,7 +19,9 @@ export const OneWayPlatform: Demo = () => {
   const { camera } = useThree();
 
   // Cache for storing body states before physics step
-  const bodyStateCache = useRef<Map<number, { position: Vector3; velocity: Vector3 }>>(new Map());
+  const bodyStateCache = useRef<
+    Map<number, { position: Vector3; velocity: Vector3 }>
+  >(new Map());
 
   useEffect(() => {
     camera.position.set(0, 10, 20);
@@ -55,43 +57,49 @@ export const OneWayPlatform: Demo = () => {
     }
   });
 
-  const hook = useCallback(
-    (c1: number, c2: number, b1: number, b2: number) => {
-      try {
-        // Use cached states instead of querying the world
-        const state1 = bodyStateCache.current.get(b1);
-        const state2 = bodyStateCache.current.get(b2);
+  const hook = useCallback((c1: number, c2: number, b1: number, b2: number) => {
+    try {
+      // Use cached states instead of querying the world
+      const state1 = bodyStateCache.current.get(b1);
+      const state2 = bodyStateCache.current.get(b2);
 
-        if (!state1 || !state2) {
-          return null; // Let default behavior happen
-        }
-
-        // Determine which is platform and which is ball
-        let platformState, ballState;
-        
-        if (platformRef.current?.handle === b1 && ballRef.current?.handle === b2) {
-          platformState = state1;
-          ballState = state2;
-        } else if (platformRef.current?.handle === b2 && ballRef.current?.handle === b1) {
-          platformState = state2;
-          ballState = state1;
-        } else {
-          return null; // Not our platform/ball pair
-        }
-
-        // Allow collision only if the ball is moving downwards and above the platform
-        if (ballState.velocity.y < 0 && ballState.position.y > platformState.position.y) {
-          return 1; // Process the collision (SolverFlags::COMPUTE_IMPULSES)
-        }
-
-        return 0; // Ignore the collision
-      } catch (error) {
-        console.error(error);
-        return null;
+      if (!state1 || !state2) {
+        return null; // Let default behavior happen
       }
-    },
-    []
-  );
+
+      // Determine which is platform and which is ball
+      let platformState, ballState;
+
+      if (
+        platformRef.current?.handle === b1 &&
+        ballRef.current?.handle === b2
+      ) {
+        platformState = state1;
+        ballState = state2;
+      } else if (
+        platformRef.current?.handle === b2 &&
+        ballRef.current?.handle === b1
+      ) {
+        platformState = state2;
+        ballState = state1;
+      } else {
+        return null; // Not our platform/ball pair
+      }
+
+      // Allow collision only if the ball is moving downwards and above the platform
+      if (
+        ballState.velocity.y < 0 &&
+        ballState.position.y > platformState.position.y
+      ) {
+        return 1; // Process the collision (SolverFlags::COMPUTE_IMPULSES)
+      }
+
+      return 0; // Ignore the collision
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  }, []);
 
   useEffect(() => {
     colliderRef.current?.setActiveHooks(1);
