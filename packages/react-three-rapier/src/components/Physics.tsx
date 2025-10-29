@@ -425,7 +425,6 @@ export const Physics: FC<PhysicsProps> = (props) => {
     contactNaturalFrequency = 30,
     lengthUnit = 1
   } = props;
-
   const rapier = suspend(importRapier, ["@react-thee/rapier", importRapier]);
   const { invalidate } = useThree();
 
