@@ -1,26 +1,5 @@
 # @react-three/rapier
 
-## [Next Version]
-
-### Minor Changes
-
-- feat: bump @dimforge/rapier3d-compat from v0.15.0 to v0.19.2
-
-  See the rapier.js changelog for details: https://github.com/dimforge/rapier.js/blob/master/CHANGELOG.md
-  
-  Notable fixes:
-  - Fixed kinematic bodies not waking up when setting velocity
-  - Fixed slow-moving kinematic bodies falling asleep
-  - Fixed point-projection on voxel shapes
-  
-  **Breaking Changes:**
-  - Removed `numAdditionalFrictionIterations` from IntegrationParameters (legacy PGS solver method)
-  - Removed legacy PGS solver methods: `switchToStandardPgsSolver`, `switchToSmallStepsPgsSolver`, `switchToSmallStepsPgsSolverWithoutWarmstart`
-  - Renamed `RigidBody.invPrincipalInertiaSqrt` and `.effectiveWorldInvInertiaSqrt` methods to remove the `Sqrt` suffix
-  
-  **Deprecations:**
-  - `numAdditionalFrictionIterations` prop is now deprecated and has no effect. It will be removed in a future major version.
-
 ## 2.1.0
 
 ### Minor Changes
