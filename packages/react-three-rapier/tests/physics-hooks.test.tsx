@@ -155,6 +155,72 @@ describe("physics hooks", () => {
       expect(onCollisionEnter).toHaveBeenCalled();
     });
 
+    it("should block collisions when hook returns SolverFlags.EMPTY", async () => {
+      let ballRef: RapierRigidBody | null = null;
+      let platformRef: RapierRigidBody | null = null;
+
+      const TestComponent = () => {
+        const colliderRef = useRef<RapierCollider>(null);
+        const platformBodyRef = useRef<RapierRigidBody>(null);
+
+        useEffect(() => {
+          platformRef = platformBodyRef.current;
+        }, []);
+
+        useFilterContactPair(
+          useCallback(() => {
+            return SolverFlags.EMPTY; // Block collision resolution
+          }, [])
+        );
+
+        useEffect(() => {
+          if (colliderRef.current) {
+            colliderRef.current.setActiveHooks(
+              ActiveHooks.FILTER_CONTACT_PAIRS
+            );
+          }
+        }, []);
+
+        return (
+          <RigidBody ref={platformBodyRef} type="fixed" position={[0, 0, 0]}>
+            <CuboidCollider ref={colliderRef} args={[5, 0.5, 5]} />
+          </RigidBody>
+        );
+      };
+
+      const FallingBall = () => {
+        const ref = useRef<RapierRigidBody>(null);
+
+        useEffect(() => {
+          ballRef = ref.current;
+        }, []);
+
+        return (
+          <RigidBody ref={ref} position={[0, 5, 0]}>
+            <CuboidCollider args={[0.5, 0.5, 0.5]} />
+          </RigidBody>
+        );
+      };
+
+      const step = await awaitReady(
+        <>
+          <TestComponent />
+          <FallingBall />
+        </>
+      );
+
+      await ReactThreeTestRenderer.act(async () => {
+        // Step enough times for ball to fall through platform
+        for (let i = 0; i < 120; i++) {
+          step(1 / 60);
+        }
+      });
+
+      // Ball should have fallen through the platform (y position below platform)
+      // If collision was resolved, ball would be resting on top of platform at y ~1
+      expect(ballRef!.translation().y).toBeLessThan(-2);
+    });
+
     it("should work with cached body state from useBeforePhysicsStep", async () => {
       const filterHook = vi.fn(() => 1);
 
