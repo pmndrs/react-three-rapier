@@ -54,15 +54,27 @@ export const OneWayPlatform: Demo = () => {
       const ballPos = ballRef.current.translation();
       const ballVel = ballRef.current.linvel();
 
-      bodyStateCache.current.set(platformHandle, {
-        position: new Vector3(platformPos.x, platformPos.y, platformPos.z),
-        velocity: new Vector3(0, 0, 0)
-      });
+      let platformState = bodyStateCache.current.get(platformHandle);
+      if (!platformState) {
+        platformState = {
+          position: new Vector3(),
+          velocity: new Vector3()
+        };
+        bodyStateCache.current.set(platformHandle, platformState);
+      }
+      platformState.position.set(platformPos.x, platformPos.y, platformPos.z);
+      platformState.velocity.set(0, 0, 0);
 
-      bodyStateCache.current.set(ballHandle, {
-        position: new Vector3(ballPos.x, ballPos.y, ballPos.z),
-        velocity: new Vector3(ballVel.x, ballVel.y, ballVel.z)
-      });
+      let ballState = bodyStateCache.current.get(ballHandle);
+      if (!ballState) {
+        ballState = {
+          position: new Vector3(),
+          velocity: new Vector3()
+        };
+        bodyStateCache.current.set(ballHandle, ballState);
+      }
+      ballState.position.set(ballPos.x, ballPos.y, ballPos.z);
+      ballState.velocity.set(ballVel.x, ballVel.y, ballVel.z);
     }
   });
 

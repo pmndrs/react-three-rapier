@@ -147,6 +147,18 @@ export interface RapierContext {
   afterStepCallbacks: WorldStepCallbackSet;
 
   /**
+   * Hooks to filter contact pairs
+   * @internal
+   */
+  filterContactPairHooks: FilterContactPairCallbackSet;
+
+  /**
+   * Hooks to filter intersection pairs
+   * @internal
+   */
+  filterIntersectionPairHooks: FilterIntersectionPairCallbackSet;
+
+  /**
    * Direct access to the Rapier instance
    */
   rapier: typeof Rapier;
@@ -211,18 +223,6 @@ export interface RapierContext {
    * Is debug mode enabled
    */
   isDebug: boolean;
-
-  /**
-   * Hooks to filter contact pairs
-   * @internal
-   */
-  filterContactPairHooks: FilterContactPairCallbackSet;
-
-  /**
-   * Hooks to filter intersection pairs
-   * @internal
-   */
-  filterIntersectionPairHooks: FilterIntersectionPairCallbackSet;
 }
 
 export const rapierContext = createContext<RapierContext | undefined>(
