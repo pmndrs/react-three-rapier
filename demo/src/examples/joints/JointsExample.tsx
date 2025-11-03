@@ -59,9 +59,12 @@ const Rope = (props: { component: ReactNode; length: number }) => {
 
   useFrame(() => {
     const now = performance.now();
-    refs.current[0].current!.setNextKinematicRotation(
-      new Quaternion(0, Math.sin(now / 500) * 3, 0)
-    );
+    const ref = refs.current[0].current;
+    if (ref) {
+      ref.setNextKinematicRotation(
+        new Quaternion(0, Math.sin(now / 500) * 3, 0)
+      );
+    }
   });
 
   return (
