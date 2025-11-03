@@ -3,8 +3,10 @@ import {
   Collider,
   ColliderHandle,
   EventQueue,
+  PhysicsHooks,
   RigidBody,
   RigidBodyHandle,
+  SolverFlags,
   World
 } from "@dimforge/rapier3d-compat";
 import { useThree } from "@react-three/fiber";
@@ -65,6 +67,28 @@ export type WorldStepCallback = (world: World) => void;
 
 export type WorldStepCallbackSet = Set<{ current: WorldStepCallback }>;
 
+export type FilterContactPairCallback = (
+  collider1: ColliderHandle,
+  collider2: ColliderHandle,
+  body1: RigidBodyHandle,
+  body2: RigidBodyHandle
+) => SolverFlags | null;
+
+export type FilterIntersectionPairCallback = (
+  collider1: ColliderHandle,
+  collider2: ColliderHandle,
+  body1: RigidBodyHandle,
+  body2: RigidBodyHandle
+) => boolean;
+
+export type FilterContactPairCallbackSet = Set<{
+  current: FilterContactPairCallback;
+}>;
+
+export type FilterIntersectionPairCallbackSet = Set<{
+  current: FilterIntersectionPairCallback;
+}>;
+
 export interface ColliderState {
   collider: Collider;
   object: Object3D;
@@ -121,6 +145,18 @@ export interface RapierContext {
    * @internal
    */
   afterStepCallbacks: WorldStepCallbackSet;
+
+  /**
+   * Hooks to filter contact pairs
+   * @internal
+   */
+  filterContactPairHooks: FilterContactPairCallbackSet;
+
+  /**
+   * Hooks to filter intersection pairs
+   * @internal
+   */
+  filterIntersectionPairHooks: FilterIntersectionPairCallbackSet;
 
   /**
    * Direct access to the Rapier instance
@@ -422,6 +458,29 @@ export const Physics: FC<PhysicsProps> = (props) => {
   const rigidBodyEvents = useConst<EventMap>(() => new Map());
   const colliderEvents = useConst<EventMap>(() => new Map());
   const eventQueue = useConst(() => new EventQueue(false));
+
+  const filterContactPairHooks = useConst<FilterContactPairCallbackSet>(
+    () => new Set()
+  );
+  const filterIntersectionPairHooks =
+    useConst<FilterIntersectionPairCallbackSet>(() => new Set());
+
+  const hooks = useConst<PhysicsHooks>(() => ({
+    filterContactPair: (...args) => {
+      for (const hook of filterContactPairHooks) {
+        const result = hook.current(...args);
+        if (result !== null) return result;
+      }
+      return null;
+    },
+    filterIntersectionPair: (...args) => {
+      for (const hook of filterIntersectionPairHooks) {
+        const result = hook.current(...args);
+        if (result === false) return false;
+      }
+      return true;
+    }
+  }));
   const beforeStepCallbacks = useConst<WorldStepCallbackSet>(() => new Set());
   const afterStepCallbacks = useConst<WorldStepCallbackSet>(() => new Set());
 
@@ -541,7 +600,12 @@ export const Physics: FC<PhysicsProps> = (props) => {
         });
 
         world.timestep = delta;
-        world.step(eventQueue);
+
+        const hasHooks =
+          filterContactPairHooks.size > 0 ||
+          filterIntersectionPairHooks.size > 0;
+
+        world.step(eventQueue, hasHooks ? hooks : undefined);
 
         // Trigger afterStep callbacks
         afterStepCallbacks.forEach((callback) => {
@@ -800,7 +864,9 @@ export const Physics: FC<PhysicsProps> = (props) => {
       afterStepCallbacks,
       isPaused: paused,
       isDebug: debug,
-      step
+      step,
+      filterContactPairHooks,
+      filterIntersectionPairHooks
     }),
     [paused, step, debug, colliders, gravity]
   );

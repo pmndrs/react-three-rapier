@@ -85,6 +85,7 @@ For full API outline and documentation, see 🧩 [API Docs](https://pmndrs.githu
   - [Spring Joint](#spring-joint)
   - [🖼 Joints Example](#-joints-example)
 - [Advanced hooks usage](#advanced-hooks-usage)
+  - [Physics Hooks (Collision Filtering)](#physics-hooks-collision-filtering)
   - [Manual stepping](#manual-stepping)
   - [On-demand rendering](#on-demand-rendering)
 - [Snapshots](#snapshots)
@@ -885,6 +886,95 @@ Advanced users might need granular access to the physics loop and direct access 
 - `useAfterPhysicsStep`
   Allows you to run code after the physics simulation is stepped.  
   🧩 See [useAfterPhysicsStep docs](https://pmndrs.github.io/react-three-rapier/functions/useAfterPhysicsStep.html) for more information.
+
+### Physics Hooks (Collision Filtering)
+
+You can implement advanced collision behaviors like one-way platforms by using physics hooks. These hooks allow you to filter collision and intersection pairs during the physics step.
+
+`r3/rapier` provides two hooks for collision filtering:
+- `useFilterContactPair` - Filter collision pairs and control solver behavior
+- `useFilterIntersectionPair` - Filter intersection pairs for sensors
+
+#### Filter Contact Pairs
+
+`useFilterContactPair` allows you to control how collisions are processed. The callback should return:
+- `SolverFlags.COMPUTE_IMPULSE` (1) - Process the collision normally
+- `SolverFlags.EMPTY` (0) - Ignore the collision
+- `null` - Let other hooks decide, or use default behavior
+
+#### Filter Intersection Pairs  
+
+`useFilterIntersectionPair` controls which sensor intersections are detected. The callback should return:
+- `true` - Allow the intersection to be detected
+- `false` - Block the intersection
+
+If multiple hooks are registered:
+- For contact pairs, the **first hook that returns non-null wins**
+- For intersection pairs, the **first hook that returns false blocks** the intersection
+
+**Important:** To avoid Rust aliasing errors, you **cannot** access rigid body properties (like `translation()` or `linvel()`) directly during the physics step. Instead, cache the needed state before the step using `useBeforePhysicsStep`.
+
+🧩 See [useFilterContactPair docs](https://pmndrs.github.io/react-three-rapier/functions/useFilterContactPair.html) and [useFilterIntersectionPair docs](https://pmndrs.github.io/react-three-rapier/functions/useFilterIntersectionPair.html) for more information.
+
+```tsx
+import { 
+  useRapier, 
+  useBeforePhysicsStep,
+  useFilterContactPair 
+} from "@react-three/rapier";
+
+const OneWayPlatform = () => {
+  const platformRef = useRef<RapierRigidBody>(null);
+  const ballRef = useRef<RapierRigidBody>(null);
+  const colliderRef = useRef<RapierCollider>(null);
+  
+  // Cache for storing body states before physics step
+  const bodyStateCache = useRef(new Map());
+  
+  const { rapier } = useRapier();
+
+  // Cache body states BEFORE the physics step
+  useBeforePhysicsStep(() => {
+    if (platformRef.current && ballRef.current) {
+      const ballPos = ballRef.current.translation();
+      const ballVel = ballRef.current.linvel();
+
+      bodyStateCache.current.set(ballRef.current.handle, {
+        position: ballPos,
+        velocity: ballVel
+      });
+    }
+  });
+
+  // Filter collisions using cached data
+  useFilterContactPair((collider1, collider2, body1, body2) => {
+    const ballState = bodyStateCache.current.get(body1);
+    if (!ballState) return null; // Let other hooks or default behavior handle it
+
+    // Allow collision only if ball is moving down and above platform
+    if (ballState.velocity.y < 0 && ballState.position.y > 0) {
+      return rapier.SolverFlags.COMPUTE_IMPULSE; // Process collision
+    }
+    return rapier.SolverFlags.EMPTY; // Ignore collision
+  });
+
+  useEffect(() => {
+    // Enable active hooks on the collider (required for filtering)
+    colliderRef.current?.setActiveHooks(rapier.ActiveHooks.FILTER_CONTACT_PAIRS);
+  }, []);
+
+  return (
+    <>
+      <RigidBody ref={platformRef} type="fixed">
+        <CuboidCollider ref={colliderRef} args={[5, 0.1, 5]} />
+      </RigidBody>
+      <RigidBody ref={ballRef} position={[0, 3, 0]}>
+        <CuboidCollider args={[1, 1, 1]} />
+      </RigidBody>
+    </>
+  );
+};
+```
 
 ### Manual stepping
 

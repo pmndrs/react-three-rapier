@@ -13,6 +13,7 @@ import {
   useState
 } from "react";
 import { NavLink, NavLinkProps, Route, Routes } from "react-router-dom";
+import { ActiveCollisionTypesExample } from "./examples/active-collision-types/ActiveCollisionTypesExample";
 import { AllCollidersExample } from "./examples/all-colliders/AllCollidersExample";
 import { AllShapesExample } from "./examples/all-shapes/AllShapesExample";
 import { ApiUsage } from "./examples/api-usage/ApiUsageExample";
@@ -35,6 +36,7 @@ import { Kinematics } from "./examples/kinematics/KinematicsExample";
 import { LockedTransformsExample } from "./examples/locked-transforms/LockedTransformsExample";
 import { ManualStepExample } from "./examples/manual-step/ManualStepExamples";
 import { MeshColliderTest } from "./examples/mesh-collider-test/MeshColliderExample";
+import { OneWayPlatform } from "./examples/one-way-platform/OneWayPlatform";
 import { PerformanceExample } from "./examples/performance/PeformanceExample";
 import Shapes from "./examples/plinko/ShapesExample";
 import { RopeJointExample } from "./examples/rope-joint/RopeJointExample";
@@ -43,7 +45,6 @@ import { SnapshotExample } from "./examples/snapshot/SnapshotExample";
 import { SpringExample } from "./examples/spring/SpringExample";
 import { StutteringExample } from "./examples/stuttering/StutteringExample";
 import { Transforms } from "./examples/transforms/TransformsExample";
-import { ActiveCollisionTypesExample } from "./examples/active-collision-types/ActiveCollisionTypesExample";
 import { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import { useResetOrbitControls } from "./hooks/use-reset-orbit-controls";
 
@@ -108,7 +109,8 @@ const routes: Record<string, ReactNode> = {
   spring: <SpringExample />,
   "rope-joint": <RopeJointExample />,
   "active-collision-types": <ActiveCollisionTypesExample />,
-  "contact-skin": <ContactSkinExample />
+  "contact-skin": <ContactSkinExample />,
+  "one-way-platform": <OneWayPlatform />
 };
 
 export const App = () => {
