@@ -6,17 +6,26 @@ import {
   RapierRigidBody,
   RigidBody,
   useBeforePhysicsStep,
+  useFilterContactPair,
   useRapier
 } from "@react-three/rapier";
-import { useCallback, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { Vector3 } from "three";
 import { Demo } from "../../App";
+import { useControls } from "leva";
 
 export const OneWayPlatform: Demo = () => {
   const platformRef = useRef<RapierRigidBody>(null);
   const colliderRef = useRef<RapierCollider>(null);
   const ballRef = useRef<RapierRigidBody>(null);
   const { camera } = useThree();
+
+  const { filteringEnabled } = useControls("One-Way Platform", {
+    filteringEnabled: {
+      value: true,
+      label: "Enable Filtering"
+    }
+  });
 
   // Cache for storing body states before physics step
   const bodyStateCache = useRef<
@@ -33,7 +42,7 @@ export const OneWayPlatform: Demo = () => {
     });
   }, []);
 
-  const { filterContactPairHooks } = useRapier();
+  const { rapier } = useRapier();
 
   // Cache body states BEFORE the physics step
   useBeforePhysicsStep(() => {
@@ -57,8 +66,13 @@ export const OneWayPlatform: Demo = () => {
     }
   });
 
-  const hook = useCallback((c1: number, c2: number, b1: number, b2: number) => {
+  useFilterContactPair((c1: number, c2: number, b1: number, b2: number) => {
     try {
+      // If filtering is disabled, let default collision behavior happen
+      if (!filteringEnabled) {
+        return null;
+      }
+
       // Use cached states instead of querying the world
       const state1 = bodyStateCache.current.get(b1);
       const state2 = bodyStateCache.current.get(b2);
@@ -91,20 +105,23 @@ export const OneWayPlatform: Demo = () => {
         ballState.velocity.y < 0 &&
         ballState.position.y > platformState.position.y
       ) {
-        return 1; // Process the collision (SolverFlags::COMPUTE_IMPULSES)
+        return rapier.SolverFlags.COMPUTE_IMPULSE; // Process the collision
       }
 
-      return 0; // Ignore the collision
+      return rapier.SolverFlags.EMPTY; // Ignore the collision (pass through)
     } catch (error) {
       console.error(error);
       return null;
     }
-  }, []);
+  });
 
   useEffect(() => {
-    colliderRef.current?.setActiveHooks(1);
-    filterContactPairHooks.push(hook);
-  }, []);
+    if (colliderRef.current) {
+      colliderRef.current.setActiveHooks(
+        filteringEnabled ? rapier.ActiveHooks.FILTER_CONTACT_PAIRS : 0
+      );
+    }
+  }, [filteringEnabled, rapier]);
 
   return (
     <group>
@@ -120,7 +137,11 @@ export const OneWayPlatform: Demo = () => {
       </RigidBody>
       <mesh>
         <boxGeometry args={[10, 0.1, 10]} />
-        <meshStandardMaterial color={"grey"} opacity={0.5} transparent={true} />
+        <meshStandardMaterial
+          color={filteringEnabled ? "orange" : "grey"}
+          opacity={0.5}
+          transparent={true}
+        />
       </mesh>
       <RigidBody type="fixed" userData={{ type: "platform" }} ref={platformRef}>
         <CuboidCollider args={[10, 0.1, 10]} ref={colliderRef} />

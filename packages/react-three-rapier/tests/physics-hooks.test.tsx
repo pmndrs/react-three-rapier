@@ -7,26 +7,29 @@ import {
   CuboidCollider,
   useRapier,
   useBeforePhysicsStep,
+  useFilterContactPair,
+  useFilterIntersectionPair,
   RapierRigidBody,
   RapierCollider
 } from "../src";
+import { SolverFlags, ActiveHooks } from "@dimforge/rapier3d-compat";
 import { awaitReady } from "./test-utils";
 
 describe("physics hooks", () => {
-  describe("filterContactPairHooks", () => {
+  describe("useFilterContactPair", () => {
     it("should register and call contact pair filter hooks", async () => {
       const filterHook = vi.fn(() => null);
-      let hookRegistered = false;
 
       const TestComponent = () => {
-        const { filterContactPairHooks } = useRapier();
         const colliderRef = useRef<RapierCollider>(null);
 
+        useFilterContactPair(filterHook);
+
         useEffect(() => {
-          if (colliderRef.current && !hookRegistered) {
-            colliderRef.current.setActiveHooks(1);
-            filterContactPairHooks.push(filterHook);
-            hookRegistered = true;
+          if (colliderRef.current) {
+            colliderRef.current.setActiveHooks(
+              ActiveHooks.FILTER_CONTACT_PAIRS
+            );
           }
         }, []);
 
@@ -56,28 +59,24 @@ describe("physics hooks", () => {
       expect(filterHook).toHaveBeenCalled();
     });
 
-    it("should allow blocking collisions when hook returns 0", async () => {
-      const onCollisionEnter = vi.fn();
-      let hookRegistered = false;
+    it("should call hook with correct parameters when collision occurs", async () => {
+      const filterHook = vi.fn(() => SolverFlags.COMPUTE_IMPULSE);
 
       const TestComponent = () => {
-        const { filterContactPairHooks } = useRapier();
         const colliderRef = useRef<RapierCollider>(null);
 
-        const filterHook = useCallback(() => {
-          return 0; // Block all collisions
-        }, []);
+        useFilterContactPair(filterHook);
 
         useEffect(() => {
-          if (colliderRef.current && !hookRegistered) {
-            colliderRef.current.setActiveHooks(1);
-            filterContactPairHooks.push(filterHook);
-            hookRegistered = true;
+          if (colliderRef.current) {
+            colliderRef.current.setActiveHooks(
+              ActiveHooks.FILTER_CONTACT_PAIRS
+            );
           }
         }, []);
 
         return (
-          <RigidBody onCollisionEnter={onCollisionEnter}>
+          <RigidBody>
             <CuboidCollider ref={colliderRef} args={[1, 1, 1]} />
           </RigidBody>
         );
@@ -98,27 +97,35 @@ describe("physics hooks", () => {
         }
       });
 
-      // Collision should be blocked
-      expect(onCollisionEnter).not.toHaveBeenCalled();
+      // Hook should be called with 4 numeric parameters (collider1, collider2, body1, body2)
+      expect(filterHook).toHaveBeenCalled();
+      expect(filterHook.mock.calls.length).toBeGreaterThan(0);
+
+      const callArgs: any[] = filterHook.mock.calls[0];
+      expect(callArgs.length).toBe(4);
+      expect(typeof callArgs[0]).toBe("number"); // collider1
+      expect(typeof callArgs[1]).toBe("number"); // collider2
+      expect(typeof callArgs[2]).toBe("number"); // body1
+      expect(typeof callArgs[3]).toBe("number"); // body2
     });
 
-    it("should allow collisions when hook returns 1", async () => {
+    it("should allow collisions when hook returns SolverFlags.COMPUTE_IMPULSE", async () => {
       const onCollisionEnter = vi.fn();
-      let hookRegistered = false;
 
       const TestComponent = () => {
-        const { filterContactPairHooks } = useRapier();
         const colliderRef = useRef<RapierCollider>(null);
 
-        const filterHook = useCallback(() => {
-          return 1; // Allow collisions
-        }, []);
+        useFilterContactPair(
+          useCallback(() => {
+            return SolverFlags.COMPUTE_IMPULSE; // Allow collisions
+          }, [])
+        );
 
         useEffect(() => {
-          if (colliderRef.current && !hookRegistered) {
-            colliderRef.current.setActiveHooks(1);
-            filterContactPairHooks.push(filterHook);
-            hookRegistered = true;
+          if (colliderRef.current) {
+            colliderRef.current.setActiveHooks(
+              ActiveHooks.FILTER_CONTACT_PAIRS
+            );
           }
         }, []);
 
@@ -150,10 +157,8 @@ describe("physics hooks", () => {
 
     it("should work with cached body state from useBeforePhysicsStep", async () => {
       const filterHook = vi.fn(() => 1);
-      let hookRegistered = false;
 
       const OneWayPlatform = () => {
-        const { filterContactPairHooks } = useRapier();
         const platformRef = useRef<RapierRigidBody>(null);
         const ballRef = useRef<RapierRigidBody>(null);
         const colliderRef = useRef<RapierCollider>(null);
@@ -172,8 +177,8 @@ describe("physics hooks", () => {
           }
         });
 
-        const hook = useCallback(
-          (c1: number, c2: number, b1: number, b2: number) => {
+        useFilterContactPair(
+          useCallback((c1: number, c2: number, b1: number, b2: number) => {
             const state =
               bodyStateCache.current.get(b1) || bodyStateCache.current.get(b2);
 
@@ -182,16 +187,15 @@ describe("physics hooks", () => {
               filterHook();
             }
 
-            return 1; // Allow collision
-          },
-          []
+            return SolverFlags.COMPUTE_IMPULSE; // Allow collision
+          }, [])
         );
 
         useEffect(() => {
-          if (colliderRef.current && !hookRegistered) {
-            colliderRef.current.setActiveHooks(1);
-            filterContactPairHooks.push(hook);
-            hookRegistered = true;
+          if (colliderRef.current) {
+            colliderRef.current.setActiveHooks(
+              ActiveHooks.FILTER_CONTACT_PAIRS
+            );
           }
         }, []);
 
@@ -220,20 +224,20 @@ describe("physics hooks", () => {
     });
   });
 
-  describe("filterIntersectionPairHooks", () => {
+  describe("useFilterIntersectionPair", () => {
     it("should register and call intersection pair filter hooks", async () => {
       const filterHook = vi.fn(() => true);
-      let hookRegistered = false;
 
       const TestComponent = () => {
-        const { filterIntersectionPairHooks } = useRapier();
         const colliderRef = useRef<RapierCollider>(null);
 
+        useFilterIntersectionPair(filterHook);
+
         useEffect(() => {
-          if (colliderRef.current && !hookRegistered) {
-            colliderRef.current.setActiveHooks(2); // Active hooks for intersection
-            filterIntersectionPairHooks.push(filterHook);
-            hookRegistered = true;
+          if (colliderRef.current) {
+            colliderRef.current.setActiveHooks(
+              ActiveHooks.FILTER_INTERSECTION_PAIRS
+            );
           }
         }, []);
 

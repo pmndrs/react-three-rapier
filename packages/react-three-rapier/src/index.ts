@@ -20,7 +20,9 @@ export type {
 export type {
   PhysicsProps,
   RapierContext,
-  WorldStepCallback
+  WorldStepCallback,
+  FilterContactPairCallback,
+  FilterIntersectionPairCallback
 } from "./components/Physics";
 export type { MeshColliderProps } from "./components/MeshCollider";
 
@@ -34,7 +36,9 @@ export * from "./hooks/joints";
 export {
   useRapier,
   useBeforePhysicsStep,
-  useAfterPhysicsStep
+  useAfterPhysicsStep,
+  useFilterContactPair,
+  useFilterIntersectionPair
 } from "./hooks/hooks";
 export * from "./utils/interaction-groups";
 export * from "./utils/three-object-helpers";
