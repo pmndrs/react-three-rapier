@@ -34,10 +34,10 @@ jobs:
       - name: Setup Node.js environment
         uses: actions/setup-node@v3.6.0
         with:
-          node-version: 22.x
+          node-version: 24.x
           
       - name: Enable corepack  
-        run: corepack enable
+        run: npm install --global corepack && corepack enable
 
       - name: Install Node Dependencies
         run: yarn --immutable

@@ -86,6 +86,8 @@ For full API outline and documentation, see 🧩 [API Docs](https://pmndrs.githu
   - [🖼 Joints Example](#-joints-example)
 - [Advanced hooks usage](#advanced-hooks-usage)
   - [Physics Hooks (Collision Filtering)](#physics-hooks-collision-filtering)
+    - [Filter Contact Pairs](#filter-contact-pairs)
+    - [Filter Intersection Pairs](#filter-intersection-pairs)
   - [Manual stepping](#manual-stepping)
   - [On-demand rendering](#on-demand-rendering)
 - [Snapshots](#snapshots)
@@ -1007,6 +1009,7 @@ The snapshot can be used to construct a new world. In `r3/rapier`, you need to r
 
 > [!NOTE]
 > This only works if the snapshotted world is identical to the restored one. If objects, or the order of creation of objects vary, expect RigidBodies to scramble.
+> Snapshot formats are version-dependent. Store the Rapier version alongside persisted snapshot data and check compatibility before restoring after an upgrade.
 
 ```tsx
 import { useRapier } from '@react-three/rapier';

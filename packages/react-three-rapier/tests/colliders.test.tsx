@@ -1,9 +1,9 @@
 import {
   CoefficientCombineRule,
   Collider,
+  Vector,
   World
 } from "@dimforge/rapier3d-compat";
-import { Vector } from "@dimforge/rapier3d-compat/math";
 import ReactThreeTestRenderer from "@react-three/test-renderer";
 import React, { useEffect, useState } from "react";
 import {
