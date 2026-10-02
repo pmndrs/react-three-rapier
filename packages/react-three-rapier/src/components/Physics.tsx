@@ -327,13 +327,13 @@ export interface PhysicsProps {
   /**
    * Minimum number of dynamic bodies in each active island
    *
-    * @deprecated Removed from Rapier. This prop is ignored.
+   * @deprecated Removed from Rapier. This prop is ignored.
    */
   minIslandSize?: number;
 
   /**
    * Maximum number of substeps performed by the solver
-    * Set to 0 to disable CCD entirely, including automatic CCD against fixed colliders.
+   * Set to 0 to disable CCD entirely, including automatic CCD against fixed colliders.
    *
    * @defaultValue 1
    */

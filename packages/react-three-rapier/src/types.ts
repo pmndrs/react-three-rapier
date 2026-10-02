@@ -365,9 +365,9 @@ export interface RigidBodyOptions extends Omit<ColliderProps, "ref"> {
   dominanceGroup?: number;
 
   /**
-    * Enable bullet CCD against kinematic and dynamic bodies for this rigid-body.
-    * Fast dynamic bodies already use CCD against fixed colliders, even when false.
-    * Set `<Physics maxCcdSubsteps={0}>` to disable CCD entirely.
+   * Enable bullet CCD against kinematic and dynamic bodies for this rigid-body.
+   * Fast dynamic bodies already use CCD against fixed colliders, even when false.
+   * Set `<Physics maxCcdSubsteps={0}>` to disable CCD entirely.
    * https://rapier.rs/docs/user_guides/javascript/rigid_bodies#continuous-collision-detection
    * @defaultValue false
    */
@@ -422,7 +422,7 @@ export interface RigidBodyOptions extends Omit<ColliderProps, "ref"> {
   restitution?: number;
 
   /**
-    * Sets the number of additional solver substeps that will be run for this
+   * Sets the number of additional solver substeps that will be run for this
    * rigid-body and everything that interacts with it directly or indirectly
    * through contacts or joints.
    *
