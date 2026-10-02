@@ -15,10 +15,13 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v3
 
-      - name: Setup Node.js 22.x
+      - name: Setup Node.js 24.x
         uses: actions/setup-node@v3
         with:
-          node-version: 22
+          node-version: 24
+
+      - name: Enable corepack
+        run: npm install --global corepack && corepack enable
 
       - name: Install Dependencies
         run: yarn --immutable

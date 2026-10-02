@@ -12,13 +12,13 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: Setup Node.js 22.x
+      - name: Setup Node.js 24.x
         uses: actions/setup-node@v3
         with:
-          node-version: 22
+          node-version: 24
 
       - name: Enable corepack  
-        run: corepack enable
+        run: npm install --global corepack && corepack enable
       
       - name: Install deps
         run: yarn --immutable

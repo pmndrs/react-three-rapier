@@ -3,13 +3,13 @@
 exports[`physics > snapshots > restores snapshots correctly 1`] = `
 [
   Vector3 {
-    "x": 0,
+    "x": 9.957413737993193e-8,
     "y": -13.659093856811523,
-    "z": 0,
+    "z": 1.048499953526516e-7,
   },
   Vector3 {
     "x": 2,
-    "y": -11.659093856811523,
+    "y": -11.65909194946289,
     "z": 2,
   },
   Vector3 {
@@ -23,13 +23,13 @@ exports[`physics > snapshots > restores snapshots correctly 1`] = `
 exports[`physics > snapshots > restores snapshots correctly 2`] = `
 [
   Vector3 {
-    "x": 0,
+    "x": 9.957413737993193e-8,
     "y": -13.659093856811523,
-    "z": 0,
+    "z": 1.048499953526516e-7,
   },
   Vector3 {
     "x": 2,
-    "y": -11.659093856811523,
+    "y": -11.65909194946289,
     "z": 2,
   },
   Vector3 {

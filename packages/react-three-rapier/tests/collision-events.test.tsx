@@ -22,6 +22,38 @@ describe("collision events", () => {
 
       expect(collisionFn).toBeCalledTimes(1);
     });
+
+    it("should expose current manifold material and world-space contact data", async () => {
+      const collisionFn = vi.fn((event) => {
+        const { manifold } = event;
+
+        expect(manifold.friction()).toBeCloseTo(0.5);
+        expect(manifold.restitution()).toBeCloseTo(0.25);
+        expect(manifold.numSolverContacts()).toBeGreaterThan(0);
+
+        const point = manifold.solverContactPoint(0);
+        expect(Number.isFinite(point.x)).toBe(true);
+        expect(Number.isFinite(point.y)).toBe(true);
+        expect(Number.isFinite(point.z)).toBe(true);
+      });
+
+      const step = await awaitReady(
+        <>
+          <TestRigidBody
+            friction={0.5}
+            restitution={0.25}
+            onCollisionEnter={collisionFn}
+          />
+          <TestRigidBody friction={0.5} restitution={0.25} />
+        </>
+      );
+
+      await ReactThreeTestRenderer.act(async () => {
+        step(1 / 60);
+      });
+
+      expect(collisionFn).toBeCalledTimes(1);
+    });
   });
 
   describe("intersections", () => {

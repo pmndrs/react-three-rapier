@@ -327,12 +327,13 @@ export interface PhysicsProps {
   /**
    * Minimum number of dynamic bodies in each active island
    *
-   * @defaultValue 128
+    * @deprecated Removed from Rapier. This prop is ignored.
    */
   minIslandSize?: number;
 
   /**
    * Maximum number of substeps performed by the solver
+    * Set to 0 to disable CCD entirely, including automatic CCD against fixed colliders.
    *
    * @defaultValue 1
    */
@@ -445,7 +446,6 @@ export const Physics: FC<PhysicsProps> = (props) => {
     predictionDistance = 0.002,
     numSolverIterations = 4,
     numInternalPgsIterations = 1,
-    minIslandSize = 128,
     maxCcdSubsteps = 1,
     contactNaturalFrequency = 30,
     lengthUnit = 1
@@ -515,7 +515,6 @@ export const Physics: FC<PhysicsProps> = (props) => {
 
     worldProxy.integrationParameters.normalizedAllowedLinearError =
       allowedLinearError;
-    worldProxy.integrationParameters.minIslandSize = minIslandSize;
     worldProxy.integrationParameters.maxCcdSubsteps = maxCcdSubsteps;
     worldProxy.integrationParameters.normalizedPredictionDistance =
       predictionDistance;
@@ -528,7 +527,6 @@ export const Physics: FC<PhysicsProps> = (props) => {
     numSolverIterations,
     numInternalPgsIterations,
     allowedLinearError,
-    minIslandSize,
     maxCcdSubsteps,
     predictionDistance,
     lengthUnit,
