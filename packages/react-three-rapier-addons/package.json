@@ -55,9 +55,6 @@
     "react": ">=19.0 <19.3",
     "three": ">=0.185.0"
   },
-  "dependencies": {
-    "three-stdlib": "^2.36.1"
-  },
   "devDependencies": {
     "@react-three/fiber": "10.0.0-canary.a056612",
     "@react-three/rapier": "workspace:*",

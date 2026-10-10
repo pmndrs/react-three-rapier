@@ -23,6 +23,13 @@ export interface InstancedRigidBodiesProps extends Omit<RigidBodyProps, "ref"> {
   colliderNodes?: ReactNode[];
   children: ReactNode;
   ref?: React.Ref<(RapierRigidBody | null)[] | null>;
+  /**
+   * Whether the child InstancedMesh is frustum culled. Physics moves the
+   * instances away from where three computed the mesh's bounding sphere, so
+   * culling is disabled by default to keep instances from vanishing (#683).
+   * @defaultValue false
+   */
+  frustumCulled?: boolean;
 }
 
 export const InstancedRigidBodies = memo(
@@ -36,6 +43,7 @@ export const InstancedRigidBodies = memo(
       children,
       instances,
       colliderNodes = [],
+      frustumCulled = false,
 
       // wrapper object props
       position,
@@ -74,6 +82,20 @@ export const InstancedRigidBodies = memo(
       }
     }, []);
 
+    // Three computes an InstancedMesh's bounding sphere once, from the
+    // initial instance matrices. Physics then moves the instances around,
+    // so the cached bounds go stale and the whole mesh gets culled when the
+    // camera moves (#683). Recomputing the sphere every step is O(instances)
+    // per frame, so we opt out of frustum culling by default instead.
+    // Runs after every render so that a re-created InstancedMesh (e.g. when the
+    // instance count changes) is also covered; it is cheap and idempotent.
+    useEffect(() => {
+      const instancedMesh = getInstancedMesh();
+      if (instancedMesh && instancedMesh.frustumCulled !== frustumCulled) {
+        instancedMesh.frustumCulled = frustumCulled;
+      }
+    });
+
     // Update the RigidBodyStates whenever the instances change
     const applyInstancedState = (state: RigidBodyState, index: number) => {
       const instancedMesh = getInstancedMesh();
@@ -107,8 +129,9 @@ export const InstancedRigidBodies = memo(
       >
         <object3D ref={instanceWrapperRef}>{children}</object3D>
 
-        {instances?.map((instance, index) => (
+        {instances?.map(({ key, ...instance }, index) => (
           <RigidBody
+            key={key ?? index}
             {...rigidBodyProps}
             {...instance}
             ref={(body) => {

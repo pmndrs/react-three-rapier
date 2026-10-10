@@ -2193,7 +2193,6 @@ __metadata:
     react: "npm:19.2.8"
     react-dom: "npm:19.2.8"
     three: "npm:0.186.1"
-    three-stdlib: "npm:^2.36.1"
   peerDependencies:
     "@react-three/fiber": ">=10.0.0-0"
     "@react-three/rapier": ^3.0.0-0
@@ -2216,7 +2215,6 @@ __metadata:
     react-dom: "npm:19.2.8"
     suspend-react: "npm:^0.1.3"
     three: "npm:0.186.1"
-    three-stdlib: "npm:^2.36.1"
   peerDependencies:
     "@react-three/fiber": ">=10.0.0-0"
     react: ">=19.0 <19.3"
@@ -2912,13 +2910,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/draco3d@npm:^1.4.0":
-  version: 1.4.10
-  resolution: "@types/draco3d@npm:1.4.10"
-  checksum: 10c0/431e333b2fd67e2b081e8697e71dfb82a125fc04b2cbfa0205e4d521719d3749c964b2bf82bb7944ba0a12e5bc3d9afe387a58e68b195d838fcdbc65c8572a35
-  languageName: node
-  linkType: hard
-
 "@types/estree@npm:1.0.6, @types/estree@npm:^1.0.0":
   version: 1.0.6
   resolution: "@types/estree@npm:1.0.6"
@@ -2958,13 +2949,6 @@ __metadata:
   version: 2.4.4
   resolution: "@types/normalize-package-data@npm:2.4.4"
   checksum: 10c0/aef7bb9b015883d6f4119c423dd28c4bdc17b0e8a0ccf112c78b4fe0e91fbc4af7c6204b04bba0e199a57d2f3fbbd5b4a14bf8739bf9d2a39b2a0aad545e0f86
-  languageName: node
-  linkType: hard
-
-"@types/offscreencanvas@npm:^2019.6.4":
-  version: 2019.7.3
-  resolution: "@types/offscreencanvas@npm:2019.7.3"
-  checksum: 10c0/6d1dfae721d321cd2b5435f347a0e53b09f33b2f9e9333396480f592823bc323847b8169f7d251d2285cb93dbc1ba2e30741ac5cf4b1c003d660fd4c24526963
   languageName: node
   linkType: hard
 
@@ -3027,13 +3011,6 @@ __metadata:
   version: 0.5.24
   resolution: "@types/webxr@npm:0.5.24"
   checksum: 10c0/ff59ffd390d06ca3f89ab2531d583ac10bc5e2ab82e5a01ecc40fbc365224a3375e7caa5b14649cf6141db21fb024940da7ad2bd8faa3cd497a6665257cb53b5
-  languageName: node
-  linkType: hard
-
-"@types/webxr@npm:^0.5.2":
-  version: 0.5.21
-  resolution: "@types/webxr@npm:0.5.21"
-  checksum: 10c0/7b6a7001f8592a0c8f1bff46352a451a5bcc24d016d10985a4d7bff9b778c4530fb82e48db1a7e1da67ff4f75bff49384fdac5e56fa103455f8281c3c0f403a6
   languageName: node
   linkType: hard
 
@@ -4493,13 +4470,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"draco3d@npm:^1.4.1":
-  version: 1.5.7
-  resolution: "draco3d@npm:1.5.7"
-  checksum: 10c0/4419509bb93c31560a22a1a54e1c394a5b5017cab39941120c75151d941c11dec05925abf31f597ac2694c570b78c04f82aa3d69e5311f8f8e71fc8b9d92d12f
-  languageName: node
-  linkType: hard
-
 "dunder-proto@npm:^1.0.0, dunder-proto@npm:^1.0.1":
   version: 1.0.1
   resolution: "dunder-proto@npm:1.0.1"
@@ -5357,13 +5327,6 @@ __metadata:
     picomatch:
       optional: true
   checksum: 10c0/e345083c4306b3aed6cb8ec551e26c36bab5c511e99ea4576a16750ddc8d3240e63826cc624f5ae17ad4dc82e68a253213b60d556c11bfad064b7607847ed07f
-  languageName: node
-  linkType: hard
-
-"fflate@npm:^0.6.9":
-  version: 0.6.10
-  resolution: "fflate@npm:0.6.10"
-  checksum: 10c0/c452f720e4cb404b300fceb8ef0bdf345f18fbfd3f57f7d0974dce5f5e2ac0e8dd4b6ff4bb7061ae74fd919b9c707172f9dbd44d91149b1137199b8c705768f1
   languageName: node
   linkType: hard
 
@@ -8162,13 +8125,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"potpack@npm:^1.0.1":
-  version: 1.0.2
-  resolution: "potpack@npm:1.0.2"
-  checksum: 10c0/670c23898a4257130858b960c2e654d3327c0f6a7e7091ff5846f213e65af8f9476320b995b8ad561a47a4d1c359c7ef347de57d22e7b02597051abb52bc85c4
-  languageName: node
-  linkType: hard
-
 "prelude-ls@npm:^1.2.1":
   version: 1.2.1
   resolution: "prelude-ls@npm:1.2.1"
@@ -9756,22 +9712,6 @@ __metadata:
   peerDependencies:
     three: ">= 0.159.0"
   checksum: 10c0/19f42c366f5f4fe3710d89fce8b29a6107fa636e77656298effb85ef8f48e25286deaf495a24c755f7d455c18d462d3ad74f21c4c2edbd88b95e6bff3cff532d
-  languageName: node
-  linkType: hard
-
-"three-stdlib@npm:^2.36.1":
-  version: 2.36.1
-  resolution: "three-stdlib@npm:2.36.1"
-  dependencies:
-    "@types/draco3d": "npm:^1.4.0"
-    "@types/offscreencanvas": "npm:^2019.6.4"
-    "@types/webxr": "npm:^0.5.2"
-    draco3d: "npm:^1.4.1"
-    fflate: "npm:^0.6.9"
-    potpack: "npm:^1.0.1"
-  peerDependencies:
-    three: ">=0.128.0"
-  checksum: 10c0/6d04a3e6e1cf5a23e1d8807085609e5cfa999d342a8f4a3168432c4152e99ab555f7fd7ab22903d9639f33d8d19d2183c62931be34ad6c3ac8bd3ed879d973c2
   languageName: node
   linkType: hard
 

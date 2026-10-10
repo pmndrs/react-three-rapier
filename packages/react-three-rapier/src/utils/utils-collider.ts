@@ -6,8 +6,16 @@ import {
   World
 } from "@dimforge/rapier3d-compat";
 import { useEffect, useMemo } from "react";
-import { BufferGeometry, Euler, Mesh, Object3D, Vector3 } from "three";
-import { mergeVertices } from "three-stdlib";
+import {
+  BufferAttribute,
+  BufferGeometry,
+  Euler,
+  InterleavedBufferAttribute,
+  Mesh,
+  Object3D,
+  Vector3
+} from "three";
+import { mergeVertices } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { ColliderProps, RigidBodyProps } from "..";
 import {
   ColliderState,
@@ -21,7 +29,11 @@ import {
   _scale,
   _vector3
 } from "./shared-objects";
-import { ColliderShape, RigidBodyAutoCollider } from "../types";
+import {
+  ColliderShape,
+  HeightfieldArgs,
+  RigidBodyAutoCollider
+} from "../types";
 import { scaleVertices, vectorToTuple } from "./utils";
 
 export const scaleColliderArgs = (
@@ -33,10 +45,9 @@ export const scaleColliderArgs = (
 
   // Heightfield uses a vector
   if (shape === "heightfield") {
+    // Don't mutate the user's args object, or scale compounds on every remount
     const s = newArgs[3] as { x: number; y: number; z: number };
-    s.x *= scale.x;
-    s.x *= scale.y;
-    s.x *= scale.z;
+    newArgs[3] = { x: s.x * scale.x, y: s.y * scale.y, z: s.z * scale.z };
 
     return newArgs;
   }
@@ -52,17 +63,68 @@ export const scaleColliderArgs = (
   return newArgs.map((arg, index) => scaleArray[index] * (arg as number));
 };
 
+/**
+ * Copy a position attribute into a tightly packed Float32Array of xyz triples.
+ * Using `getX/getY/getZ` handles InterleavedBufferAttribute, offsets, and
+ * normalized/quantized (e.g. Draco/meshopt) attributes, which `attribute.array` does not.
+ */
+export const getPositionArray = (
+  attribute: BufferAttribute | InterleavedBufferAttribute
+): Float32Array => {
+  const out = new Float32Array(attribute.count * 3);
+  for (let i = 0; i < attribute.count; i++) {
+    out[i * 3] = attribute.getX(i);
+    out[i * 3 + 1] = attribute.getY(i);
+    out[i * 3 + 2] = attribute.getZ(i);
+  }
+  return out;
+};
+
+export const getIndexArray = (index: BufferAttribute): Uint32Array =>
+  index.array instanceof Uint32Array
+    ? index.array
+    : Uint32Array.from(index.array as ArrayLike<number>);
+
 export const createColliderFromOptions = (
   options: ColliderProps,
   world: World,
   scale: Vector3,
   getRigidBody?: () => RigidBody
 ) => {
+  if (options.shape === "heightfield") {
+    const [rows, cols, heights] = options.args as HeightfieldArgs;
+    const expected = (rows + 1) * (cols + 1);
+    if (heights?.length !== expected) {
+      console.warn(
+        `@react-three/rapier: heightfield collider expects \`heights\` to have (rows + 1) * (cols + 1) = ${expected} values, but got ${heights?.length}.`
+      );
+    }
+  }
+
   const scaledArgs = scaleColliderArgs(options.shape!, options.args, scale);
   // @ts-ignore
   const desc = ColliderDesc[options.shape!](...scaledArgs);
 
-  return world.createCollider(desc!, getRigidBody?.());
+  const failure = (cause?: unknown) =>
+    new Error(
+      `@react-three/rapier: Could not create a "${options.shape}" collider from the given args. ` +
+        (options.shape === "convexHull"
+          ? "Rapier failed to compute a convex hull: the points are probably degenerate (coplanar, collinear, duplicated, or contain NaN)."
+          : "Check that the args are valid for this shape."),
+      { cause }
+    );
+
+  if (!desc) {
+    throw failure();
+  }
+
+  const rigidBody = getRigidBody?.();
+
+  try {
+    return world.createCollider(desc, rigidBody);
+  } catch (e) {
+    throw failure(e);
+  }
 };
 
 type ImmutableColliderOptions = (keyof ColliderProps)[];
@@ -115,6 +177,25 @@ const setColliderMassOptions = (
     );
   }
 };
+
+const massPropertiesToFlatArray = (
+  massProperties: ColliderProps["massProperties"]
+) =>
+  massProperties
+    ? [
+        massProperties.mass,
+        massProperties.centerOfMass.x,
+        massProperties.centerOfMass.y,
+        massProperties.centerOfMass.z,
+        massProperties.principalAngularInertia.x,
+        massProperties.principalAngularInertia.y,
+        massProperties.principalAngularInertia.z,
+        massProperties.angularInertiaLocalFrame.x,
+        massProperties.angularInertiaLocalFrame.y,
+        massProperties.angularInertiaLocalFrame.z,
+        massProperties.angularInertiaLocalFrame.w
+      ]
+    : new Array(11).fill(undefined); // keep the dependency list length constant
 
 const mutableColliderOptions: MutableColliderOptions = {
   sensor: (collider, value: boolean) => {
@@ -220,10 +301,16 @@ export const useUpdateColliderOptions = (
 ) => {
   // TODO: Improve this, split each prop into its own effect
   const mutablePropsAsFlatArray = useMemo(
-    () =>
-      mutableColliderOptionKeys.flatMap((key) => {
+    () => [
+      ...mutableColliderOptionKeys.flatMap((key) => {
         return vectorToTuple(props[key as keyof ColliderProps]);
       }),
+      // Mass options are exclusive and applied separately, but must also
+      // re-apply when they change
+      props.density,
+      props.mass,
+      ...massPropertiesToFlatArray(props.massProperties)
+    ],
     [props]
   );
 
@@ -365,8 +452,10 @@ export const getColliderArgsFromGeometry = (
 
         return {
           args: [
-            clonedGeometry.attributes.position.array as Float32Array,
-            clonedGeometry.index?.array as Uint32Array
+            getPositionArray(clonedGeometry.attributes.position),
+            clonedGeometry.index
+              ? getIndexArray(clonedGeometry.index)
+              : undefined
           ],
           offset: new Vector3()
         };
@@ -375,10 +464,8 @@ export const getColliderArgsFromGeometry = (
 
     case "hull":
       {
-        const g = geometry.clone();
-
         return {
-          args: [g.attributes.position.array as Float32Array],
+          args: [getPositionArray(geometry.attributes.position)],
           offset: new Vector3()
         };
       }

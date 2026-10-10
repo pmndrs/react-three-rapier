@@ -56,8 +56,7 @@
   },
   "dependencies": {
     "@dimforge/rapier3d-compat": "0.21.0",
-    "suspend-react": "^0.1.3",
-    "three-stdlib": "^2.36.1"
+    "suspend-react": "^0.1.3"
   },
   "devDependencies": {
     "@react-three/fiber": "10.0.0-canary.a056612",

@@ -3,6 +3,7 @@ import React, {
   forwardRef,
   memo,
   ReactNode,
+  MutableRefObject,
   Ref,
   RefObject,
   useContext,
@@ -60,6 +61,9 @@ export const RigidBody = memo((props: RigidBodyProps) => {
 
   const objectRef = useRef<Object3D>(null);
   const rigidBodyRef = useForwardedRef(ref);
+  // Destroy closures can outlive a render; always use the latest ref
+  const latestRef = useRef(ref);
+  latestRef.current = ref;
   const { world, rigidBodyStates, physicsOptions, rigidBodyEvents } =
     useRapier();
 
@@ -85,8 +89,8 @@ export const RigidBody = memo((props: RigidBodyProps) => {
       const desc = rigidBodyDescFromOptions(mergedOptions);
       const rigidBody = world.createRigidBody(desc);
 
-      if (typeof ref === "function") {
-        ref(rigidBody);
+      if (typeof latestRef.current === "function") {
+        latestRef.current(rigidBody);
       }
       rigidBodyRef.current = rigidBody;
 
@@ -95,6 +99,18 @@ export const RigidBody = memo((props: RigidBodyProps) => {
     (rigidBody) => {
       if (world.getRigidBody(rigidBody.handle)) {
         world.removeRigidBody(rigidBody);
+      }
+
+      // Don't leave the consumer holding a reference to a freed rapier object
+      const currentRef = latestRef.current;
+      if (typeof currentRef === "function") {
+        currentRef(null);
+      } else if (currentRef && currentRef.current === rigidBody) {
+        currentRef.current = null;
+      }
+      if (rigidBodyRef.current === rigidBody) {
+        (rigidBodyRef as MutableRefObject<RapierRigidBody | null>).current =
+          null;
       }
     },
     immutablePropArray
