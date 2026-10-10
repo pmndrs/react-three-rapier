@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import React, { useEffect } from "react";
 import ReactThreeTestRenderer from "@react-three/test-renderer";
-import { getScheduler } from "@react-three/fiber";
+import { getScheduler, useFrame } from "@react-three/fiber";
 import {
   BufferGeometry,
   Group,
@@ -11,6 +11,7 @@ import {
   Vector3
 } from "three";
 import {
+  CuboidCollider,
   Physics,
   RapierContext,
   RapierRigidBody,
@@ -479,5 +480,255 @@ describe("stepping", () => {
     expect(geometries.size).toBe(3);
     expect(disposed).toHaveLength(3);
     expect(new Set(disposed)).toEqual(geometries);
+  });
+});
+
+const worldPosition = (object: Object3D) => {
+  object.updateWorldMatrix(true, false);
+  return new Vector3().setFromMatrixPosition(object.matrixWorld);
+};
+
+// Regression tests from the PR #788 review (R1, R4, R5, R6, R9, R10)
+describe("stepping review regressions", () => {
+  it("syncs a nested RigidBody after its parent body, without a frame of lag (R1)", async () => {
+    const inner = React.createRef<RapierRigidBody>();
+    const innerObject = React.createRef<Object3D>();
+    await create(
+      <Physics gravity={[0, 0, 0]} interpolate={false}>
+        <RigidBody colliders={false} linearVelocity={[6, 0, 0]}>
+          <CuboidCollider args={[0.5, 0.5, 0.5]} sensor />
+          <RigidBody ref={inner} colliders={false} position={[0, 3, 0]}>
+            <CuboidCollider args={[0.5, 0.5, 0.5]} sensor />
+            <object3D ref={innerObject} />
+          </RigidBody>
+        </RigidBody>
+      </Physics>
+    );
+
+    const frames = createClock();
+    frames(1 / 60, 5);
+    const t = inner.current!.translation();
+    const visual = worldPosition(innerObject.current!);
+    expect(visual.x).toBeCloseTo(t.x, 4);
+    expect(visual.y).toBeCloseTo(t.y, 4);
+  });
+
+  it("does not interpolate across a teleport made in useBeforePhysicsStep (R4)", async () => {
+    const body = React.createRef<RapierRigidBody>();
+    const object = React.createRef<Object3D>();
+    let teleported = false;
+    const Teleporter = () => {
+      useBeforePhysicsStep(() => {
+        if (!teleported && body.current) {
+          body.current.setTranslation({ x: 10, y: 0, z: 0 }, true);
+          teleported = true;
+        }
+      });
+      return null;
+    };
+
+    await create(
+      <Physics gravity={[0, 0, 0]}>
+        <Teleporter />
+        <RigidBody ref={body} colliders={false}>
+          <CuboidCollider args={[0.5, 0.5, 0.5]} />
+          <object3D ref={object} />
+        </RigidBody>
+      </Physics>
+    );
+
+    const frames = createClock();
+    frames(1.5 / 60);
+    expect(worldPosition(object.current!).x).toBeCloseTo(10, 4);
+  });
+
+  it("re-reads the parent space when a body is re-parented (R5)", async () => {
+    const groupB = React.createRef<Group>();
+    const body = React.createRef<RapierRigidBody>();
+    const object = React.createRef<Object3D>();
+
+    await create(
+      <Physics gravity={[0, 0, 0]}>
+        <group position={[0, 2, 0]}>
+          <RigidBody ref={body} colliders={false}>
+            <CuboidCollider args={[0.5, 0.5, 0.5]} />
+            <object3D ref={object} />
+          </RigidBody>
+        </group>
+        <group ref={groupB} position={[10, 0, 0]}>
+          <RigidBody colliders={false}>
+            <CuboidCollider args={[0.5, 0.5, 0.5]} />
+          </RigidBody>
+        </group>
+      </Physics>
+    );
+
+    const frames = createClock();
+    frames(1 / 60, 2);
+    groupB.current!.add(object.current!.parent!);
+    frames(1 / 60, 2);
+
+    const visual = worldPosition(object.current!);
+    const t = body.current!.translation();
+    expect(visual.x).toBeCloseTo(t.x, 4);
+    expect(visual.y).toBeCloseTo(t.y, 4);
+  });
+
+  it("does not grow the scheduler's phase list when timeStep changes (R6)", async () => {
+    const scene = (timeStep: number) => (
+      <Physics timeStep={timeStep}>
+        <Body />
+      </Physics>
+    );
+    const renderer = await create(scene(1 / 60));
+    const before = scheduler.phases.length;
+
+    const { before: steps, Recorder } = createRecorder();
+    for (let i = 1; i <= 20; i++) {
+      await ReactThreeTestRenderer.act(async () => {
+        await renderer.update(scene((1 / 60) * (1 - i / 100)));
+      });
+    }
+    expect(scheduler.phases.length).toBe(before);
+
+    // ...and the world now steps with the last timeStep
+    await ReactThreeTestRenderer.act(async () => {
+      await renderer.update(
+        <Physics timeStep={1 / 30}>
+          <Recorder />
+          <Body />
+        </Physics>
+      );
+    });
+    const frames = createClock();
+    frames(1 / 60, 4);
+    expect(steps).toEqual([1 / 30, 1 / 30]);
+    expect(scheduler.phases.length).toBe(before);
+  });
+
+  it("reuses fixed phases when worlds unmount and remount", async () => {
+    const renderer = await create(
+      <Physics>
+        <Body />
+      </Physics>
+    );
+    const before = scheduler.phases.length;
+    for (let i = 0; i < 5; i++) {
+      await ReactThreeTestRenderer.act(async () => {
+        await renderer.update(<group />);
+      });
+      await ReactThreeTestRenderer.act(async () => {
+        await renderer.update(
+          <Physics timeStep={1 / (30 + i)}>
+            <Body />
+          </Physics>
+        );
+      });
+    }
+    expect(scheduler.phases.length).toBe(before);
+  });
+
+  it("does not render behind a manual step after resuming (R9)", async () => {
+    const object = React.createRef<Object3D>();
+    let context!: RapierContext;
+    const scene = (paused: boolean) => (
+      <Physics paused={paused} gravity={[0, 0, 0]}>
+        <ContextCatcher onContext={(c) => (context = c)} />
+        <RigidBody colliders={false} linearVelocity={[6, 0, 0]}>
+          <CuboidCollider args={[0.5, 0.5, 0.5]} />
+          <object3D ref={object} />
+        </RigidBody>
+      </Physics>
+    );
+    const renderer = await create(scene(true));
+
+    const frames = createClock();
+    frames(1 / 60, 3);
+    context.step(1 / 6);
+    expect(worldPosition(object.current!).x).toBeCloseTo(1, 4);
+
+    await ReactThreeTestRenderer.act(async () => {
+      await renderer.update(scene(false));
+    });
+    // No fixed step this frame: must not lerp back towards the pre-step pose
+    frames(0.5 / 60);
+    expect(worldPosition(object.current!).x).toBeCloseTo(1, 4);
+
+    // The next step interpolates forward from the manual step
+    frames(1 / 60);
+    const x = worldPosition(object.current!).x;
+    expect(x).toBeGreaterThanOrEqual(1);
+    expect(x).toBeLessThanOrEqual(1.1 + 1e-6);
+  });
+
+  it("does not interpolate across a teleport made while paused", async () => {
+    const body = React.createRef<RapierRigidBody>();
+    const object = React.createRef<Object3D>();
+    const scene = (paused: boolean) => (
+      <Physics paused={paused} gravity={[0, 0, 0]}>
+        <RigidBody ref={body} colliders={false}>
+          <CuboidCollider args={[0.5, 0.5, 0.5]} />
+          <object3D ref={object} />
+        </RigidBody>
+      </Physics>
+    );
+    const renderer = await create(scene(false));
+    const frames = createClock();
+    frames(1 / 60, 3);
+
+    await ReactThreeTestRenderer.act(async () => {
+      await renderer.update(scene(true));
+    });
+    body.current!.setTranslation({ x: 8, y: 0, z: 0 }, true);
+    frames(1 / 60);
+
+    await ReactThreeTestRenderer.act(async () => {
+      await renderer.update(scene(false));
+    });
+    frames(1.5 / 60);
+    expect(worldPosition(object.current!).x).toBeCloseTo(8, 4);
+  });
+
+  it("keeps bodies on their bodies when an ancestor moves in a default-phase useFrame (R10)", async () => {
+    const group = React.createRef<Group>();
+    const body = React.createRef<RapierRigidBody>();
+    const object = React.createRef<Object3D>();
+    const Mover = () => {
+      useFrame(() => {
+        if (group.current) {
+          group.current.position.x += 1;
+          group.current.rotation.y += 0.1;
+        }
+      });
+      return null;
+    };
+
+    await create(
+      <Physics gravity={[0, 0, 0]}>
+        <Mover />
+        <group ref={group}>
+          <RigidBody ref={body} colliders={false} position={[0, 2, 0]}>
+            <CuboidCollider args={[0.5, 0.5, 0.5]} />
+            <object3D ref={object} />
+          </RigidBody>
+        </group>
+      </Physics>
+    );
+
+    const frames = createClock();
+    frames(1 / 60, 5);
+    const visual = worldPosition(object.current!);
+    const t = body.current!.translation();
+    expect(visual.x).toBeCloseTo(t.x, 4);
+    expect(visual.y).toBeCloseTo(t.y, 4);
+    expect(visual.z).toBeCloseTo(t.z, 4);
+
+    // ...also once the body sleeps
+    body.current!.sleep();
+    frames(1 / 60, 3);
+    expect(body.current!.isSleeping()).toBe(true);
+    const asleep = worldPosition(object.current!);
+    expect(asleep.x).toBeCloseTo(t.x, 4);
+    expect(asleep.z).toBeCloseTo(t.z, 4);
   });
 });
