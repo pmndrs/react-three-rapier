@@ -111,4 +111,9 @@ dist
 
 packages/react-three-rapier/docs
 
-.yarn
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions

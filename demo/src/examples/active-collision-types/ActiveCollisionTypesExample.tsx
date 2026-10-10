@@ -13,7 +13,7 @@ const Ball = () => {
 
   const [color, setColor] = useState("blue");
 
-  useFrame(({ clock: { elapsedTime } }) => {
+  useFrame(({ elapsed: elapsedTime }) => {
     if (!rb.current) return;
 
     rb.current.setTranslation(
