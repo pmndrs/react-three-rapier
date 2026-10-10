@@ -11,9 +11,6 @@
     "react": "^19",
     "three": "*"
   },
-  "dependencies": {
-    "three-stdlib": "^2.35.12"
-  },
   "devDependencies": {
     "@react-three/drei": "10.0.1",
     "@react-three/fiber": "9.0.4",

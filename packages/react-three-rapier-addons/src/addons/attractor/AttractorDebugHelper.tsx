@@ -7,7 +7,7 @@ import {
   SphereGeometry,
   Vector3
 } from "three";
-import { VertexNormalsHelper } from "three-stdlib";
+import { VertexNormalsHelper } from "three/examples/jsm/helpers/VertexNormalsHelper.js";
 import { AttractorState } from "./Attractor";
 
 const _v3 = new Vector3();

@@ -4,7 +4,7 @@ import { RigidBody, RigidBodyProps } from "@react-three/rapier";
 import { RapierRigidBody } from "@react-three/rapier";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { Mesh } from "three";
-import { GLTF } from "three-stdlib";
+import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { useSuzanne } from "../all-shapes/AllShapesExample";
 import { useResetOrbitControls } from "../../hooks/use-reset-orbit-controls";
 

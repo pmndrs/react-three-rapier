@@ -5,6 +5,7 @@ import { Perf } from "r3f-perf";
 import {
   JSX,
   ReactNode,
+  ComponentRef,
   StrictMode,
   Suspense,
   createContext,
@@ -45,14 +46,13 @@ import { SnapshotExample } from "./examples/snapshot/SnapshotExample";
 import { SpringExample } from "./examples/spring/SpringExample";
 import { StutteringExample } from "./examples/stuttering/StutteringExample";
 import { Transforms } from "./examples/transforms/TransformsExample";
-import { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import { useResetOrbitControls } from "./hooks/use-reset-orbit-controls";
 
 type DemoContext = {
   setDebug: (f: boolean) => void;
   setPaused: (f: boolean) => void;
   setCameraEnabled: (f: boolean) => void;
-  orbitControlRef: React.RefObject<OrbitControlsImpl>;
+  orbitControlRef: React.RefObject<ComponentRef<typeof OrbitControls>>;
 };
 
 const demoContext = createContext<Partial<DemoContext>>({});
@@ -120,7 +120,7 @@ export const App = () => {
   const [interpolate, setInterpolate] = useState<boolean>(true);
   const [physicsKey, setPhysicsKey] = useState<number>(0);
   const [cameraEnabled, setCameraEnabled] = useState<boolean>(true);
-  const orbitControlRef = useRef<OrbitControlsImpl>(null!);
+  const orbitControlRef = useRef<ComponentRef<typeof OrbitControls>>(null!);
 
   useResetOrbitControls();
 
