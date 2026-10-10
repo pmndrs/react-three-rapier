@@ -44,8 +44,7 @@ export interface CharacterControllerRef {
  * @category Character Controller
  */
 export interface CharacterControllerProps
-  extends CharacterControllerOptions,
-    Omit<RigidBodyProps, "type" | "ref"> {
+  extends CharacterControllerOptions, Omit<RigidBodyProps, "type" | "ref"> {
   ref?: Ref<CharacterControllerRef>;
   /** Called once when the character becomes grounded (edge triggered). */
   onGrounded?: () => void;
@@ -199,7 +198,7 @@ export const CharacterController = (props: CharacterControllerProps) => {
   useBeforePhysicsStep((_world, dt) => {
     const body = bodyRef.current;
     if (!body) return;
-        const { velocity, pending, desired } = state;
+    const { velocity, pending, desired } = state;
     desired.x = velocity.x * dt + pending.x;
     desired.y = velocity.y * dt + pending.y;
     desired.z = velocity.z * dt + pending.z;

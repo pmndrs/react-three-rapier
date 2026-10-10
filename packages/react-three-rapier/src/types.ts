@@ -27,11 +27,7 @@ export { RapierCollider, RapierRigidBody };
 export type RefGetter<T> = RefObject<() => T | undefined>;
 
 export type RigidBodyAutoCollider =
-  | "ball"
-  | "cuboid"
-  | "hull"
-  | "trimesh"
-  | false;
+  "ball" | "cuboid" | "hull" | "trimesh" | false;
 
 export type CuboidArgs = [
   halfWidth: number,
@@ -101,10 +97,7 @@ export type RoundConvexMeshArgs = [
 export type UseBodyOptions = Omit<RigidBodyOptions, "shape">;
 
 export type RigidBodyTypeString =
-  | "fixed"
-  | "dynamic"
-  | "kinematicPosition"
-  | "kinematicVelocity";
+  "fixed" | "dynamic" | "kinematicPosition" | "kinematicVelocity";
 
 export type ColliderShape =
   | "cuboid"

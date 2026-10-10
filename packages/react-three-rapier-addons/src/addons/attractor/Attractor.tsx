@@ -54,8 +54,9 @@ export interface AttractorProps {
   collisionGroups?: InteractionGroups;
 }
 
-export interface AttractorState
-  extends Required<Omit<AttractorProps, "position" | "collisionGroups">> {
+export interface AttractorState extends Required<
+  Omit<AttractorProps, "position" | "collisionGroups">
+> {
   collisionGroups?: InteractionGroups;
 }
 

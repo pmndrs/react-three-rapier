@@ -232,8 +232,8 @@ describe("character controller", () => {
     expect(onCollision).toHaveBeenCalled();
   });
 
-  const stepScene = (autostep: boolean) => (chars: CharacterControllerRef[]) =>
-    (
+  const stepScene =
+    (autostep: boolean) => (chars: CharacterControllerRef[]) => (
       <>
         <Floor />
         <RigidBody type="fixed" position={[2, 0.1, 0]}>

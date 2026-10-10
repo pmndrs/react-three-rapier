@@ -61,7 +61,6 @@ const Floor = () => {
   );
 };
 
-
 export const App = () => {
   const [debug, setDebug] = useState<boolean>(false);
   const [perf, setPerf] = useState<boolean>(false);
@@ -121,60 +120,62 @@ export const App = () => {
         >
           <StrictMode>
             <GlShim>
-            <Physics
-              paused={paused}
-              key={physicsKey}
-              interpolate={interpolate}
-              debug={debug}
-              timeStep={1 / 60}
-            >
-              <directionalLight
-                castShadow
-                position={[10, 10, 10]}
-                shadow-camera-bottom={-40}
-                shadow-camera-top={40}
-                shadow-camera-left={-40}
-                shadow-camera-right={40}
-                shadow-mapSize-width={1024}
-                shadow-bias={-0.0001}
-              />
-              <Environment preset="apartment" />
-
-              <OrbitControls ref={orbitControlRef} enabled={cameraEnabled} />
-
-              <demoContext.Provider
-                value={{
-                  setDebug,
-                  setPaused,
-                  setCameraEnabled,
-                  orbitControlRef,
-                  renderer
-                }}
+              <Physics
+                paused={paused}
+                key={physicsKey}
+                interpolate={interpolate}
+                debug={debug}
+                timeStep={1 / 60}
               >
-                <Suspense fallback={null}>
-                  <Routes>
-                    <Route
-                      path="/"
-                      element={<Navigate to={DEFAULT_EXAMPLE} replace />}
-                    />
-                    {examples.map(({ path, Component }) => (
-                      <Route path={path} key={path} element={<Component />} />
-                    ))}
-                  </Routes>
-                </Suspense>
-              </demoContext.Provider>
+                <directionalLight
+                  castShadow
+                  position={[10, 10, 10]}
+                  shadow-camera-bottom={-40}
+                  shadow-camera-top={40}
+                  shadow-camera-left={-40}
+                  shadow-camera-right={40}
+                  shadow-mapSize-width={1024}
+                  shadow-bias={-0.0001}
+                />
+                <Environment preset="apartment" />
 
-              <Floor />
+                <OrbitControls ref={orbitControlRef} enabled={cameraEnabled} />
 
-              {/* r3f-perf does not support r3f v10 yet; drei <Stats> stands in */}
-              {perf && <Stats />}
-            </Physics>
+                <demoContext.Provider
+                  value={{
+                    setDebug,
+                    setPaused,
+                    setCameraEnabled,
+                    orbitControlRef,
+                    renderer
+                  }}
+                >
+                  <Suspense fallback={null}>
+                    <Routes>
+                      <Route
+                        path="/"
+                        element={<Navigate to={DEFAULT_EXAMPLE} replace />}
+                      />
+                      {examples.map(({ path, Component }) => (
+                        <Route path={path} key={path} element={<Component />} />
+                      ))}
+                    </Routes>
+                  </Suspense>
+                </demoContext.Provider>
+
+                <Floor />
+
+                {/* r3f-perf does not support r3f v10 yet; drei <Stats> stands in */}
+                {perf && <Stats />}
+              </Physics>
             </GlShim>
           </StrictMode>
         </Canvas>
       </Suspense>
 
-      {(meta.title || meta.description || (meta.webglOnly && renderer === "webgpu")) && (
+      {(meta.title ||
+        meta.description ||
+        (meta.webglOnly && renderer === "webgpu")) && (
         <div
           style={{
             position: "absolute",

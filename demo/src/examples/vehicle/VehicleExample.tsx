@@ -53,7 +53,9 @@ const useKeys = () => {
 const Vehicle = () => {
   const { rapier, world } = useRapier();
   const chassis = useRef<RapierRigidBody>(null);
-  const controller = useRef<ReturnType<typeof world.createVehicleController> | null>(null);
+  const controller = useRef<ReturnType<
+    typeof world.createVehicleController
+  > | null>(null);
   const wheelGroups = useRef<(Group | null)[]>([]);
   const wheelSpin = useRef<(Group | null)[]>([]);
   const keys = useKeys();
@@ -93,9 +95,11 @@ const Vehicle = () => {
     if (!vehicle) return;
 
     const k = keys.current;
-    const forward = (k.has("KeyW") || k.has("ArrowUp") ? 1 : 0) -
+    const forward =
+      (k.has("KeyW") || k.has("ArrowUp") ? 1 : 0) -
       (k.has("KeyS") || k.has("ArrowDown") ? 1 : 0);
-    const steer = (k.has("KeyA") || k.has("ArrowLeft") ? 1 : 0) -
+    const steer =
+      (k.has("KeyA") || k.has("ArrowLeft") ? 1 : 0) -
       (k.has("KeyD") || k.has("ArrowRight") ? 1 : 0);
     const brake = k.has("Space") ? 1 : 0;
 
@@ -108,10 +112,7 @@ const Vehicle = () => {
 
     // EXCLUDE_SENSORS: wheel rays ignore sensor colliders. Without it the green trigger zone
     // below would be treated as ground (#693).
-    vehicle.updateVehicle(
-      dt,
-      rapier.QueryFilterFlags.EXCLUDE_SENSORS
-    );
+    vehicle.updateVehicle(dt, rapier.QueryFilterFlags.EXCLUDE_SENSORS);
   });
 
   // Wheel meshes are children of the chassis body, so they live in chassis space - exactly
@@ -138,7 +139,8 @@ const Vehicle = () => {
       if (!group || !spin) continue;
 
       const [x, y, z] = WHEELS[i];
-      const suspension = vehicle.wheelSuspensionLength(i) ?? SUSPENSION_REST_LENGTH;
+      const suspension =
+        vehicle.wheelSuspensionLength(i) ?? SUSPENSION_REST_LENGTH;
       group.position.set(x, y - suspension, z);
       group.rotation.y = vehicle.wheelSteering(i) ?? 0;
       spin.rotation.x = vehicle.wheelRotation(i) ?? 0;
@@ -200,12 +202,7 @@ export const VehicleExample: Demo = () => {
 
       {/* ramp */}
       <RigidBody type="fixed" colliders="cuboid" position={[0, 0.4, -14]}>
-        <Box
-          args={[6, 0.4, 8]}
-          rotation={[0.2, 0, 0]}
-          castShadow
-          receiveShadow
-        >
+        <Box args={[6, 0.4, 8]} rotation={[0.2, 0, 0]} castShadow receiveShadow>
           <meshStandardMaterial color="#cb8" />
         </Box>
       </RigidBody>
