@@ -2,6 +2,7 @@ import { Collider } from "@dimforge/rapier3d-compat";
 import React, {
   ForwardedRef,
   memo,
+  MutableRefObject,
   ReactNode,
   Ref,
   useEffect,
@@ -81,6 +82,16 @@ export const AnyCollider = memo((props: ColliderProps) => {
     (collider) => {
       if (world.getCollider(collider.handle)) {
         world.removeCollider(collider, true);
+      }
+
+      // Don't leave the consumer holding a reference to a freed rapier object
+      if (typeof props.ref === "function") {
+        props.ref(null);
+      } else if (props.ref && props.ref.current === collider) {
+        props.ref.current = null;
+      }
+      if (colliderRef.current === collider) {
+        (colliderRef as MutableRefObject<Collider | null>).current = null;
       }
     },
     [...immutablePropArray, rigidBodyContext]

@@ -3,6 +3,7 @@ import React, {
   forwardRef,
   memo,
   ReactNode,
+  MutableRefObject,
   Ref,
   RefObject,
   useContext,
@@ -95,6 +96,17 @@ export const RigidBody = memo((props: RigidBodyProps) => {
     (rigidBody) => {
       if (world.getRigidBody(rigidBody.handle)) {
         world.removeRigidBody(rigidBody);
+      }
+
+      // Don't leave the consumer holding a reference to a freed rapier object
+      if (typeof ref === "function") {
+        ref(null);
+      } else if (ref && ref.current === rigidBody) {
+        ref.current = null;
+      }
+      if (rigidBodyRef.current === rigidBody) {
+        (rigidBodyRef as MutableRefObject<RapierRigidBody | null>).current =
+          null;
       }
     },
     immutablePropArray
