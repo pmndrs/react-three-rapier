@@ -67,10 +67,10 @@ declarations in `dist/types`) and then rollup with the shared config in
 `scripts/rollup-library.mjs`: esbuild produces `dist/<entry>.mjs` and `dist/<entry>.cjs`, and
 rollup-plugin-dts rolls the declarations into `dist/<entry>.d.ts`, `.d.mts` and `.d.cts`.
 
-Entry points are read from the package's `exports` map. To add a subpath entry such as
-`@react-three/rapier/soft-bodies`, create `src/soft-bodies/index.ts`, add a `"./soft-bodies"`
-entry to `exports` (same shape as `"."`), `"dist/soft-bodies.*"` to `files` and a
-`typesVersions` entry for node10 resolution. Subpath entries must import core through
+Entry points are read from the package's `exports` map. `@react-three/rapier/soft-bodies` is the
+reference subpath entry: it has `src/soft-bodies/index.ts`, a `"./soft-bodies"` entry in
+`exports` (same shape as `"."`), `"dist/soft-bodies.*"` in `files` and a `typesVersions` entry for
+node10 resolution. A new subpath needs the same four things. Subpath entries must import core through
 `../index`, which the build rewrites to `@react-three/rapier` so core is never bundled twice.
 
 ## Linting and formatting

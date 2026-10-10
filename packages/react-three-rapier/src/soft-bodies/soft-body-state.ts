@@ -66,9 +66,14 @@ export class SoftBodyState {
   private weldMap: Uint32Array | null = null;
   private weldedCount = 0;
   private knownVersions = new Map<RawSoftBody, number>();
-  // Particle buffers of the last two steps, for interpolation
+  // Particle buffers of the last two steps, for interpolation. `capture`
+  // records them after every step, `sync` blends them once per frame.
   private prev: Float32Array | null = null;
   private curr: Float32Array | null = null;
+  // Bumped by every capture that changed `curr`, to skip redundant syncs.
+  private stepVersion = 0;
+  private renderedVersion = -1;
+  private renderedAlpha = -1;
   private readonly onTear?: SoftBodyOptions["onTear"];
 
   constructor(
@@ -246,19 +251,81 @@ export class SoftBodyState {
     this.sync();
   }
 
+  private topologyChanged() {
+    for (const body of this.bodies) {
+      if (this.knownVersions.get(body) !== body.topologyVersion()) return true;
+    }
+    return false;
+  }
+
+  private readSource() {
+    return this.type === "volume"
+      ? this.body.meshVertices(0)
+      : this.body.particlePositions();
+  }
+
+  /**
+   * Records the simulated positions of the step that just ran, as the target
+   * of the next frames' interpolation. Called after every physics step.
+   */
+  capture() {
+    if (this.disposed) return;
+    // A tear changes the particle layout; handleTear resets the buffers.
+    if (this.topologyChanged()) return;
+    if (this.torn) {
+      // Torn pieces are read live by sync (no interpolation).
+      this.stepVersion++;
+      return;
+    }
+    if (this.curr && this.body.isSleeping()) {
+      // Nothing moves anymore: settle on the latest step.
+      if (this.prev && this.prev !== this.curr) {
+        this.prev = this.curr;
+        this.stepVersion++;
+      }
+      return;
+    }
+    this.prev = this.curr;
+    this.curr = this.readSource();
+    this.stepVersion++;
+  }
+
+  /**
+   * Stop interpolating from the previous step: the next frames render the
+   * latest step until a new step gives something to interpolate from.
+   */
+  resetInterpolation() {
+    if (this.prev === null) return;
+    this.prev = null;
+    this.stepVersion++;
+  }
+
   /**
    * Writes the simulated positions into the object's geometry, in the space
-   * of the object's parent, then updates normals and bounds. Called after
-   * every physics step; you rarely need to call it yourself.
+   * of the object's parent, then updates normals and bounds. `alpha` blends
+   * between the previous and the latest step (1 = the latest step), like the
+   * rigid bodies' interpolation. `<Physics>` calls it once per rendered frame;
+   * you rarely need to call it yourself.
+   *
+   * @returns whether the body is still moving
    */
-  sync(alpha = 1) {
-    if (this.disposed) return;
+  sync(alpha = 1): boolean {
+    if (this.disposed) return false;
     // A tear changes the particle layout; wait until handleTear has remapped.
-    for (const body of this.bodies) {
-      if (this.knownVersions.get(body) !== body.topologyVersion()) return;
+    if (this.topologyChanged()) return true;
+
+    const blend =
+      this.prev && this.prev !== this.curr
+        ? Math.min(Math.max(alpha, 0), 1)
+        : 1;
+    const moving = this.bodies.some((body) => !body.isSleeping());
+    if (
+      this.synced &&
+      this.renderedVersion === this.stepVersion &&
+      this.renderedAlpha === blend
+    ) {
+      return moving;
     }
-    if (this.synced && !this.torn && alpha >= 1 && this.body.isSleeping())
-      return;
 
     const { object } = this;
     const geometry = object.geometry;
@@ -277,19 +344,13 @@ export class SoftBodyState {
     const identity = _inverse.equals(_matrix.identity());
 
     if (this.torn) {
+      // Pieces are re-topologized on every tear; render the latest step.
       const cache = new Map<RawSoftBody, Float32Array>();
       this.write(array, null, null, 1, cache, identity);
     } else {
-      const source =
-        this.type === "volume"
-          ? this.body.meshVertices(0)
-          : this.body.particlePositions();
-      if (alpha >= 1) {
-        this.prev = this.curr;
-        this.curr = source;
-      }
+      const source = (this.curr ??= this.readSource());
       const prev = this.prev?.length === source.length ? this.prev : null;
-      this.write(array, source, prev, alpha, null, identity);
+      this.write(array, source, prev, blend, null, identity);
     }
 
     position.needsUpdate = true;
@@ -297,6 +358,9 @@ export class SoftBodyState {
     geometry.computeBoundingSphere();
     geometry.computeBoundingBox();
     this.synced = true;
+    this.renderedVersion = this.stepVersion;
+    this.renderedAlpha = blend;
+    return moving;
   }
 
   private resetOwners(body: RawSoftBody, count: number) {
@@ -470,6 +534,7 @@ export class SoftBodyState {
     }
     this.prev = this.curr = null;
     this.synced = false;
+    this.stepVersion++;
     // Show the new layout right away (sync was skipped while it was stale)
     this.sync();
     this.onTear?.({
@@ -492,9 +557,11 @@ export class SoftBodyState {
     for (const name of Object.keys(geometry.attributes)) {
       const attribute = geometry.attributes[name] as BufferAttribute;
       const { itemSize } = attribute;
-      const array = new (attribute.array.constructor as new (
-        length: number
-      ) => typeof attribute.array)(total * itemSize);
+      const array = new (
+        attribute.array.constructor as new (
+          length: number
+        ) => typeof attribute.array
+      )(total * itemSize);
       array.set(attribute.array);
       sources.forEach((source, i) => {
         for (let k = 0; k < itemSize; k++) {

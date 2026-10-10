@@ -38,11 +38,30 @@
       },
       "default": "./dist/index.mjs"
     },
+    "./soft-bodies": {
+      "import": {
+        "types": "./dist/soft-bodies.d.mts",
+        "default": "./dist/soft-bodies.mjs"
+      },
+      "require": {
+        "types": "./dist/soft-bodies.d.cts",
+        "default": "./dist/soft-bodies.cjs"
+      },
+      "default": "./dist/soft-bodies.mjs"
+    },
     "./package.json": "./package.json"
+  },
+  "typesVersions": {
+    "*": {
+      "soft-bodies": [
+        "./dist/soft-bodies.d.ts"
+      ]
+    }
   },
   "sideEffects": false,
   "files": [
     "dist/index.*",
+    "dist/soft-bodies.*",
     "CHANGELOG.md"
   ],
   "scripts": {

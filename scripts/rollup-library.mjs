@@ -11,8 +11,8 @@
 //        `dist/<name>.d.ts` / `.d.mts` / `.d.cts`, so each module condition gets exactly one
 //        self-contained declaration file (this is what keeps `attw` happy).
 //
-// ENTRY POINTS ARE DERIVED FROM THE `exports` MAP IN package.json. To add a subpath entry such
-// as `@react-three/rapier/soft-bodies`:
+// ENTRY POINTS ARE DERIVED FROM THE `exports` MAP IN package.json. To add a subpath entry (see
+// `@react-three/rapier/soft-bodies` for a wired-up example):
 //   1. create `src/soft-bodies/index.ts`;
 //   2. add `"./soft-bodies"` to `exports` (copy the shape of `"."`, with `soft-bodies.*` files),
 //      add `"dist/soft-bodies.*"` to `files`, and a `typesVersions` entry for node10 resolution;

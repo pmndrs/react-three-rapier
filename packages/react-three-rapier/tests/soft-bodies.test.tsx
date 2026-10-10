@@ -1,4 +1,5 @@
 import ReactThreeTestRenderer from "@react-three/test-renderer";
+import { getScheduler } from "@react-three/fiber";
 import React, { StrictMode } from "react";
 import { describe, expect, it } from "vitest";
 import { Physics, RapierContext, RapierRigidBody, RigidBody } from "../src";
@@ -9,7 +10,7 @@ import { pause, UseRapierMounter } from "./test-utils";
 
 const setup = async (
   children: React.ReactNode,
-  { strict = false }: { strict?: boolean } = {}
+  { strict = false, paused = true }: { strict?: boolean; paused?: boolean } = {}
 ) => {
   // Await `create` itself (not just the mount callback): racing them leaves
   // act() scopes overlapping, which doesn't flush reliably on r3f v10.
@@ -18,7 +19,7 @@ const setup = async (
     resolveContext = resolve;
   });
   const tree = (
-    <Physics paused>
+    <Physics paused={paused}>
       <UseRapierMounter ready={resolveContext} />
       {children}
     </Physics>
@@ -233,7 +234,7 @@ describe("soft bodies", () => {
   it("builds ropes from a line, and the free end swings", async () => {
     const ref = React.createRef<SoftBodyState>();
     const geometry = new BufferGeometry().setFromPoints(
-      Array.from({ length: 6 }, (_, i) => ({ x: i * 0.4, y: 4, z: 0 } as any))
+      Array.from({ length: 6 }, (_, i) => ({ x: i * 0.4, y: 4, z: 0 }) as any)
     );
     const { context } = await setup(
       <SoftBody type="rope" ref={ref} pinned={[0]}>
@@ -318,6 +319,78 @@ describe("soft bodies", () => {
     const p = positions(ref.current!.object as Mesh);
     const topX = p.filter((_, i) => i % 3 === 0 && p[i + 1] > 3.3);
     expect(Math.max(...topX)).toBeGreaterThan(1);
+  });
+
+  it("keeps attached vertices on their interpolated rigid body between steps", async () => {
+    const body = React.createRef<RapierRigidBody>();
+    const anchor = React.createRef<Mesh>();
+    const ref = React.createRef<SoftBodyState>();
+    await setup(
+      <>
+        <RigidBody
+          type="kinematicVelocity"
+          ref={body}
+          colliders={false}
+          position={[0, 3.5, 0]}
+          linearVelocity={[6, 0, 0]}
+        >
+          <mesh ref={anchor} />
+        </RigidBody>
+        <SoftBody
+          type="cloth"
+          ref={ref}
+          attachments={[{ particles: (p) => p.y > 0.49, body }]}
+        >
+          {clothMesh}
+        </SoftBody>
+      </>,
+      { paused: false }
+    );
+    const cloth = ref.current!.object as Mesh;
+    expect(ref.current!.body.numAttachments()).toBe(5);
+
+    // Rendered (local) x offsets of the attached top row from the body.
+    const topRow = (bodyX: number) => {
+      const p = positions(cloth);
+      const out: number[] = [];
+      for (let i = 0; i < p.length; i += 3) {
+        const world = cloth.localToWorld(new Vector3(p[i], p[i + 1], p[i + 2]));
+        if (world.y > 3.45) out.push(world.x - bodyX);
+      }
+      return out.sort((a, b) => a - b);
+    };
+
+    // Drive real frames: 10 whole steps, then half a step, so the frame
+    // renders with an interpolation alpha of 0.5.
+    const scheduler = getScheduler();
+    let time = 0;
+    scheduler.resetTiming();
+    scheduler.step(time);
+    for (let i = 0; i < 10; i++) {
+      time += 1000 / 60;
+      scheduler.step(time);
+    }
+    time += 500 / 60;
+    scheduler.step(time);
+
+    const rendered = anchor.current!.getWorldPosition(new Vector3());
+    const simulated = body.current!.translation();
+    // The body itself renders half a step (6 m/s / 60 / 2) behind the simulation
+    expect(simulated.x - rendered.x).toBeCloseTo(0.05, 3);
+
+    // The attached vertices keep the offsets the simulation has between them
+    // and the body (the engine's attachment trails a moving body slightly),
+    // measured from the rendered body: they are not half a step ahead of it.
+    const offsets = topRow(rendered.x);
+    const particles = ref.current!.body.particlePositions();
+    const expected: number[] = [];
+    for (let i = 0; i < particles.length; i += 3) {
+      if (particles[i + 1] > 3.45) expected.push(particles[i] - simulated.x);
+    }
+    expected.sort((a, b) => a - b);
+    expect(offsets.length).toBe(5);
+    expect(expected.length).toBe(5);
+    expected.forEach((x, i) => expect(offsets[i]).toBeCloseTo(x, 3));
   });
 
   it("reports tears and gives the torn seam its own vertices", async () => {

@@ -85,9 +85,11 @@ export const applyWeldMap = (
   for (const name of Object.keys(geometry.attributes)) {
     const attribute = geometry.attributes[name] as BufferAttribute;
     const { itemSize } = attribute;
-    const array = new (attribute.array.constructor as new (
-      length: number
-    ) => typeof attribute.array)(weldedCount * itemSize);
+    const array = new (
+      attribute.array.constructor as new (
+        length: number
+      ) => typeof attribute.array
+    )(weldedCount * itemSize);
     for (let v = 0; v < weldedCount; v++) {
       for (let k = 0; k < itemSize; k++) {
         array[v * itemSize + k] = attribute[getters[k]](firstSource[v]);

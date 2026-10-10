@@ -160,6 +160,30 @@ export type SoftBodyTearCallback = (event: SoftBodyTearEvent) => void;
 
 export type WorldStepCallbackSet = Set<{ current: WorldStepCallback }>;
 
+/**
+ * Something whose visuals are written once per rendered frame, next to the
+ * rigid bodies (e.g. a soft body's geometry).
+ * @internal
+ */
+export interface FrameSyncCallback {
+  /**
+   * Write the visuals, interpolated by `alpha` between the previous and the
+   * latest step (1 = the latest step). Called in the per-frame sync, after
+   * the rigid bodies were written. Return `true` while the visuals still
+   * move, to keep a `frameloop="demand"` canvas ticking.
+   */
+  sync: (alpha: number) => boolean | void;
+  /**
+   * The previous step's state must not be interpolated from anymore (manual
+   * step, `setWorld`, or a `paused`/`interpolate`/`timeStep` change). Render
+   * the latest step until the next one.
+   */
+  resetInterpolation?: () => void;
+}
+
+/** @internal */
+export type FrameSyncCallbackSet = Set<{ current: FrameSyncCallback }>;
+
 export type FilterContactPairCallback = (
   collider1: ColliderHandle,
   collider2: ColliderHandle,
@@ -244,6 +268,13 @@ export interface RapierContext {
    * @internal
    */
   softBodyTearCallbacks: Set<SoftBodyTearCallback>;
+
+  /**
+   * Visuals synced once per rendered frame with the interpolation alpha,
+   * right after the rigid bodies (e.g. soft bodies)
+   * @internal
+   */
+  frameSyncCallbacks: FrameSyncCallbackSet;
 
   /**
    * Hooks to filter contact pairs
@@ -605,6 +636,7 @@ export const Physics: FC<PhysicsProps> = (props) => {
   const softBodyTearCallbacks = useConst<Set<SoftBodyTearCallback>>(
     () => new Set()
   );
+  const frameSyncCallbacks = useConst<FrameSyncCallbackSet>(() => new Set());
 
   /**
    * Initiate the world
@@ -982,6 +1014,10 @@ export const Physics: FC<PhysicsProps> = (props) => {
       writePose(state, pose.position, pose.rotation);
     }
 
+    frameSyncCallbacks.forEach((callback) => {
+      if (callback.current.sync(alpha)) anyAwake = true;
+    });
+
     if (anyAwake) invalidate();
   });
 
@@ -1028,6 +1064,9 @@ export const Physics: FC<PhysicsProps> = (props) => {
     rigidBodyStates.forEach((state) => {
       if (state.previousPose) state.previousPose.valid = false;
     });
+    frameSyncCallbacks.forEach((callback) => {
+      callback.current.resetInterpolation?.();
+    });
   });
 
   useEffect(() => {
@@ -1059,6 +1098,7 @@ export const Physics: FC<PhysicsProps> = (props) => {
       beforeStepCallbacks,
       afterStepCallbacks,
       softBodyTearCallbacks,
+      frameSyncCallbacks,
       isPaused: paused,
       isDebug: debug,
       step,

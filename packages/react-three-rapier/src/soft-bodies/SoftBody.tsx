@@ -9,7 +9,7 @@ import React, {
   useRef
 } from "react";
 import type { Object3D } from "three";
-import { useRapier } from "../hooks/hooks";
+import { useRapier } from "../index";
 import { SoftBodyState } from "./soft-body-state";
 import type { SoftBodyOptions } from "./types";
 import { useSoftBody } from "./use-soft-body";
@@ -36,7 +36,7 @@ const setRef = <T,>(ref: Ref<T> | undefined, value: T | null) => {
 /**
  * A deformable body: cloth, rope or volumetric (jelly) body built from the
  * geometry of its child mesh. The mesh is kept in sync with the simulation
- * after every physics step.
+ * once per rendered frame, interpolated like the rigid bodies.
  *
  * Soft bodies collide with colliders and rigid bodies in the same
  * `<Physics>` world, can be pinned, and can be attached to rigid bodies.

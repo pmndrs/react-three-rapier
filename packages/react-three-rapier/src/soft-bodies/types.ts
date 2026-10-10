@@ -38,8 +38,7 @@ export type SoftBodyType = "cloth" | "volume" | "rope";
  * @category Soft Bodies
  */
 export type SoftBodyParticleSelector =
-  | number[]
-  | ((position: Vector3, index: number) => boolean);
+  number[] | ((position: Vector3, index: number) => boolean);
 
 /**
  * Anchors particles of a soft body to a rigid body, so the soft body follows it.

@@ -14,3 +14,18 @@ describe("rapier enum re-exports (#703)", () => {
     expect(R3R[name]).toBe(Rapier[name]);
   });
 });
+
+describe("@react-three/rapier/soft-bodies subpath", () => {
+  it("resolves to the same source modules as the relative import", async () => {
+    const subpath = await import("@react-three/rapier/soft-bodies");
+    const relative = await import("../src/soft-bodies");
+    expect(subpath.SoftBody).toBeDefined();
+    expect(subpath.useSoftBody).toBeDefined();
+    expect(subpath.SoftBodyState).toBe(relative.SoftBodyState);
+  });
+
+  it("shares core with the main entry (one rapier context)", async () => {
+    const main = await import("@react-three/rapier");
+    expect(main.useRapier).toBe(R3R.useRapier);
+  });
+});
