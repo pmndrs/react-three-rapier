@@ -1,0 +1,99 @@
+---
+title: RigidBody
+description: The RigidBody component, body types, forces and continuous collision detection.
+nav: 4
+---
+
+The `<RigidBody />` component is used to add a `mesh` into the physics world. You use it by wrapping one or more `meshes` and setting desired props. By default, this will automatically generate `Colliders` based on the shape of the wrapped `meshes` (see [Automatic colliders](#automatic-colliders)).
+
+🧩 See [RigidBodyProps docs](https://pmndrs.github.io/react-three-rapier/interfaces/RigidBodyProps.html) for available props.
+
+```tsx
+const RigidBodyMesh = () => (
+  <RigidBody>
+    <mesh />
+  </RigidBody>
+);
+```
+
+## Body types
+
+`type` selects the Rapier body type: `"dynamic"` (default, moved by forces), `"fixed"` (never moves),
+`"kinematicPosition"` and `"kinematicVelocity"` (moved by you).
+
+Kinematic bodies are not moved by contacts: they push dynamic bodies and nothing pushes them back. A kinematic body
+will not stop at a fixed collider, even with `activeCollisionTypes={ActiveCollisionTypes.ALL}`, which only enables
+*events* for that pair. See the [FAQ](/advanced/faq#kinematic-body-passes-through-fixed-colliders).
+
+Move a kinematic body with `setNextKinematicTranslation({ x, y, z })` and `setNextKinematicRotation({ x, y, z, w })`,
+passing objects, not arrays.
+
+## Moving things around
+
+See [Basic usage](/getting-started/basic-usage#moving-things-around-and-applying-forces) for applying impulses and
+forces, and for converting between Rapier and three.js types with `vec3`, `quat` and `euler`.
+
+## Continuous collision detection
+
+Rapier 0.21 rewrote CCD as a sweep-based time of impact:
+
+- Fast dynamic bodies **always** run CCD against fixed colliders automatically.
+- The `ccd` prop (`enableCcd`) now means "bullet": the body is additionally swept against kinematic and dynamic bodies.
+  `ccd={false}` no longer disables all CCD.
+- `<Physics maxCcdSubsteps={0}>` disables CCD entirely.
+
+```tsx
+<RigidBody ccd>
+  <mesh>
+    <sphereGeometry args={[0.1]} />
+  </mesh>
+</RigidBody>
+```
+
+## Solver iterations
+
+`additionalSolverIterations` now adds whole solver substeps for the constraint-connected group of bodies, rather than
+only extra iterations. Scenes that set it may need retuning.
+
+## Sleeping
+
+Rapier 0.21 rewrote sleeping around persistent islands and made it more aggressive (linear threshold `0.4` to `0.05`,
+time until sleep `2.0s` to `0.5s`). Bodies fall asleep sooner, and an island sleeps and wakes as a unit. `onSleep` and
+`onWake` still fire per body. Set `canSleep={false}` on bodies that must stay awake.
+
+## Transformed parents
+
+RigidBodies work inside other transformed objects as well. Simulation runs in world space and is transformed to the objects local space, so that things act as you'd expect.
+
+```tsx
+import { Box } from "@react-three/drei";
+import { RigidBody, CuboidCollider } from "@react-three/rapier";
+
+const Scene = () => (
+  <group position={[2, 5, 0]} rotation={[0, 0.3, 2]}>
+    <RigidBody>
+      <Box />
+      <CuboidCollider args={[0.5, 0.5, 0.5]} />
+    </RigidBody>
+  </group>
+);
+```
+
+> [!WARNING]
+> The parent transform is read when the body is created. Rotating or moving a *physics ancestor* after mount
+> (for example drei `PresentationControls`) is not followed. See the [FAQ](/advanced/faq#rotating-a-parent-of-a-rigidbody-after-mount).
+
+> [!NOTE]
+> It is best to create RigidBodies where the center of gravity is at the center of the object, otherwise you might
+> get unexpected behavior during simulation interpolation.
+
+## Events
+
+`<RigidBody>` and every collider accept `onCollisionEnter`, `onCollisionExit`, `onIntersectionEnter`,
+`onIntersectionExit`, `onContactForce`, `onSleep` and `onWake`. See [Collision events](/advanced/collision-events).
+
+> [!WARNING]
+> **TODO (3.0 character controller):** `useCharacterController` and `<CharacterController>` are being built on
+> Rapier's kinematic character controller. The API is not final and is not documented here yet.
+
+🧩 See [RigidBodyProps](https://pmndrs.github.io/react-three-rapier/interfaces/RigidBodyProps.html) for all props.

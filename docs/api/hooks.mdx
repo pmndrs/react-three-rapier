@@ -1,0 +1,71 @@
+---
+title: Hooks
+description: useRapier, step callbacks, physics hooks, joints and queries.
+nav: 10
+---
+
+## useRapier
+
+Gives you access to the `world`, direct access to the `rapier` module, and more. It throws if used outside `<Physics>`.
+🧩 See [RapierContext docs](https://pmndrs.github.io/react-three-rapier/interfaces/RapierContext.html).
+
+```tsx
+import { useRapier } from '@react-three/rapier';
+
+const { world, rapier } = useRapier();
+```
+
+### Raycasting and queries
+
+Queries live on the world; there is no separate raycaster.
+
+```tsx
+const { world, rapier } = useRapier();
+
+const castDown = (origin: { x: number; y: number; z: number }) => {
+  const ray = new rapier.Ray(origin, { x: 0, y: -1, z: 0 });
+  const maxToi = 10;
+  const solid = true;
+  const hit = world.castRay(ray, maxToi, solid);
+  if (hit) {
+    const point = ray.pointAt(hit.timeOfImpact);
+    // hit.collider is the Rapier collider that was hit
+  }
+};
+```
+
+`world.castRayAndGetNormal`, `world.intersectionsWithRay`, `world.projectPoint` and shape casts work the same way.
+
+## useBeforePhysicsStep / useAfterPhysicsStep
+
+Run code before or after the physics simulation is stepped.
+
+- `useBeforePhysicsStep(callback)`
+  🧩 See [docs](https://pmndrs.github.io/react-three-rapier/functions/useBeforePhysicsStep.html).
+- `useAfterPhysicsStep(callback)`
+  🧩 See [docs](https://pmndrs.github.io/react-three-rapier/functions/useAfterPhysicsStep.html).
+
+> [!WARNING]
+> **TODO (3.0):** these hooks are being reworked together with the update loop (the callback is planned to receive
+> the world and the step delta, and run inside the fixed-step phase). See [Update loop](/advanced/update-loop).
+
+## useFilterContactPair / useFilterIntersectionPair
+
+Collision filtering for one-way platforms and similar. See [Physics hooks](/advanced/physics-hooks).
+
+## Joint hooks
+
+`useFixedJoint`, `useSphericalJoint`, `useRevoluteJoint`, `usePrismaticJoint`, `useRopeJoint`, `useSpringJoint`.
+See [Joints](/api/joints).
+
+## Character controller
+
+> [!WARNING]
+> **TODO (3.0):** `useCharacterController` and `<CharacterController>` are coming in 3.0 and are not documented yet.
+> Until then, use `world.createCharacterController(offset)` from `useRapier()` directly.
+
+## Soft bodies
+
+> [!WARNING]
+> **TODO (3.0):** `<SoftBody>` (ropes, cloth, volumetric bodies) is planned on a separate entry point,
+> `@react-three/rapier/soft-bodies`, so the extra Rapier code is only bundled when used. Not documented yet.

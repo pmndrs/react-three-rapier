@@ -1,0 +1,113 @@
+---
+title: Migrating from 2.x to 3.0
+description: Peer dependencies, WebGPU, Rapier 0.21 breaking changes and the new package layout.
+nav: 28
+---
+
+3.0 is a breaking release. It moves to react-three-fiber v10 (with WebGPU renderer support), Rapier.js 0.21, a
+new build with an `exports` map, and a reworked update loop.
+
+> [!WARNING]
+> 3.0 is in development. This guide lists what is known so far and will grow. Sections marked **TODO** describe
+> work that has not landed yet.
+
+## 1. Peer dependencies
+
+| package | 2.x | 3.0 |
+| --- | --- | --- |
+| `@react-three/fiber` | `^9` | `>=10.0.0-0` |
+| `react` / `react-dom` | `^19` | `>=19.0 <19.3` (follows react-three-fiber 10) |
+| `three` | `>=0.159` | `>=0.185` |
+| `@dimforge/rapier3d-compat` | `0.19.2` | `0.21.0` (dependency) |
+
+If you are on react-three-fiber v9 you will need to migrate it to v10 first; follow the
+[react-three-fiber migration guide](https://r3f.docs.pmnd.rs/).
+
+## 2. WebGPU
+
+react-three-fiber v10 can drive three's `WebGPURenderer`. `@react-three/rapier` itself does not touch the renderer,
+but anything that draws, such as the debug renderer, must work on both backends.
+
+- Materials you use for your own meshes must be WebGPU-compatible (node materials or the built-in ones).
+- The debug renderer is being rewritten to be WebGPU-safe.
+
+> [!WARNING]
+> **TODO:** confirm the WebGPU story for `<Debug>` and `Attractor` debug helpers once the demo has been verified on both renderers.
+
+## 3. Rapier 0.21
+
+`@dimforge/rapier3d-compat` jumps from 0.19.2 to 0.21.0 (Rapier engine 0.35 and 0.36). This changes behavior as well as API.
+
+### API changes
+
+- **`minIslandSize` is removed.** Rapier no longer has this setting. The `<Physics minIslandSize>` prop is deprecated and ignored; delete it.
+- **Manifold API.** `manifold.solverContactFriction(i)` and `manifold.solverContactRestitution(i)` are replaced by
+  `manifold.friction()` and `manifold.restitution()`. `manifold.solverContactPoint(i)` now returns the world-space midpoint of the
+  two per-body surface points. Read manifold data inside the event callback, since manifolds are temporary.
+- **Rapier package layout.** Files moved into `dist/` and the `exports` map only exposes `.`. Imports like
+  `@dimforge/rapier3d-compat/math` (use the root exports `Rotation` and `Vector`) and pinned CDN file URLs must be updated.
+- **Low-level pipelines.** Code that uses `useRapier()` to reach `PhysicsPipeline`, `DebugRenderPipeline`,
+  `SerializationPipeline` or the body/collider sets must account for the new `SoftBodySet` arguments, and `NarrowPhase.contactPair`
+  also requires the rigid-body set. The `World` convenience methods that this library uses are unchanged.
+- **Snapshots.** Snapshots from older Rapier versions cannot be restored. Recreate saved snapshots after upgrading and
+  store the Rapier version alongside persisted snapshot data.
+
+### Behavior changes
+
+- **CCD.** Fast dynamic bodies use CCD against fixed colliders automatically. The `ccd` prop enables additional sweeps against kinematic and
+  dynamic bodies ("bullet"), and `ccd={false}` no longer disables all CCD. Use `<Physics maxCcdSubsteps={0}>` to disable CCD entirely.
+- **`additionalSolverIterations`** now adds whole solver substeps for the constraint-connected bodies.
+- **Sleeping.** Bodies fall asleep sooner (linear sleep threshold `0.4` to `0.05`, time-until-sleep `2.0s` to `0.5s`), and islands sleep and wake as a unit.
+- **Velocity caps.** Linear velocity is capped at 400 units/s and angular rotation at about 45 degrees per step.
+- **Contact forces.** Contact impulses and contact-force events are smaller; restitution is applied in an end-of-step pass.
+- **Contact defaults.** `<Physics>` keeps `allowedLinearError={0.001}` and `predictionDistance={0.002}`. Rapier's new native defaults are `0.005` and `0.02`;
+  set them explicitly to adopt them.
+- Existing scenes may need retuning and numerical trajectories will differ.
+
+### Bundle size
+
+The Rapier wasm roughly doubled (about 1.6 MB to 3.1 MB) because the soft-body solver is now part of it.
+
+### New in Rapier 0.21
+
+Soft bodies and per-axis spherical-joint motors are available through Rapier's own API. React components for them are planned
+(see below).
+
+See the [TypeScript binding changelog](https://github.com/dimforge/rapier/blob/master/bindings/typescript/CHANGELOG.md)
+and the [engine changelog](https://github.com/dimforge/rapier/blob/master/CHANGELOG.md).
+
+## 4. Update loop and stepping
+
+> [!WARNING]
+> **TODO:** the stepping rework is not finished. What is planned:
+>
+> - Physics steps in a fixed-step phase of the react-three-fiber v10 scheduler (`@pmndrs/scheduler`), with an overstep alpha for interpolation.
+> - **`updatePriority` no longer takes over rendering.** In 2.x, setting a positive priority makes react-three-fiber stop rendering automatically;
+>   the new loop will not do that.
+> - `timeStep`, `updateLoop`, `interpolate` and `paused` semantics, `maxSubSteps`, and the `FrameStepper`.
+> - `useBeforePhysicsStep` and `useAfterPhysicsStep` callback signatures.
+> - Parent-space syncing every frame, so rotating a physics ancestor works (issue #36).
+>
+> Fill this section in when the API lands.
+
+## 5. Package exports
+
+The package now ships an `exports` map. Import from `@react-three/rapier` only; deep imports such as
+`@react-three/rapier/dist/...` or `@react-three/rapier/src/...` no longer resolve. Optional features live on named entry points
+(for example `@react-three/rapier/soft-bodies`, see below). Ensure your bundler and TypeScript use a resolution mode that understands
+`exports` (`moduleResolution: "bundler"`, `"node16"` or `"nodenext"`).
+
+## 6. Dependencies
+
+- **`three-stdlib` is removed.** The library uses `three/addons` for the helpers it needed. If you relied on `three-stdlib` being installed
+  transitively, add it to your own dependencies. This also removes the `Could not resolve "fs"` problem that
+  `opentype.js` caused for some bundlers.
+- The minimum React is 19.0 and three is 0.185.
+
+## 7. New features
+
+> [!WARNING]
+> **TODO:** document these when their APIs are final.
+>
+> - Character controller: `useCharacterController` and `<CharacterController>`.
+> - Soft bodies: `<SoftBody>` on the separate entry point `@react-three/rapier/soft-bodies`.

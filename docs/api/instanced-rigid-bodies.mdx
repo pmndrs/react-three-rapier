@@ -1,0 +1,109 @@
+---
+title: InstancedRigidBodies
+description: One rigid body per instance of an InstancedMesh.
+nav: 6
+---
+
+Instanced meshes can also be used and have automatic colliders generated from their mesh.
+
+By wrapping exactly one `Three.InstancedMesh` in `<InstancedRigidBodies />`, each instance will be attached to an individual `RigidBody`.
+
+🧩 See [InstancedRigidBodiesProps docs](https://pmndrs.github.io/react-three-rapier/interfaces/InstancedRigidBodiesProps.html) for available props.
+
+```tsx
+import { InstancedRigidBodies, RapierRigidBody } from "@react-three/rapier";
+
+const COUNT = 1000;
+
+const Scene = () => {
+  const rigidBodies = useRef<RapierRigidBody[]>(null);
+
+  useEffect(() => {
+    if (!rigidBodies.current) {
+      return;
+    }
+
+    // You can access individual instanced by their index
+    rigidBodies.current[40].applyImpulse({ x: 0, y: 10, z: 0 }, true);
+    rigidBodies.current.at(100).applyImpulse({ x: 0, y: 10, z: 0 }, true);
+
+    // Or update all instances
+    rigidBodies.current.forEach((api) => {
+      api.applyImpulse({ x: 0, y: 10, z: 0 }, true);
+    });
+  }, []);
+
+  // We can set the initial positions, and rotations, and scales, of
+  // the instances by providing an array of InstancedRigidBodyProps
+  // which is the same as RigidBodyProps, but with an additional "key" prop.
+  const instances = useMemo(() => {
+    const instances: InstancedRigidBodyProps[] = [];
+
+    for (let i = 0; i < COUNT; i++) {
+      instances.push({
+        key: "instance_" + Math.random(),
+        position: [Math.random() * 10, Math.random() * 10, Math.random() * 10],
+        rotation: [Math.random(), Math.random(), Math.random()]
+      });
+    }
+
+    return instances;
+  }, []);
+
+  return (
+    <InstancedRigidBodies
+      ref={rigidBodies}
+      instances={instances}
+      colliders="ball"
+    >
+      <instancedMesh args={[undefined, undefined, COUNT]} count={COUNT} />
+    </InstancedRigidBodies>
+  );
+};
+```
+
+We can also create compound shapes for instanced meshes by providing an array of `Colliders` in the `colliderNodes` prop.
+
+```tsx
+import {
+  InstancedRigidBodies,
+  BoxCollider,
+  SphereCollider
+} from "@react-three/rapier";
+const COUNT = 500;
+
+const Scene = () => {
+  const instances = useMemo(() => {
+    const instances: InstancedRigidBodyProps[] = [];
+
+    for (let i = 0; i < COUNT; i++) {
+      instances.push({
+        key: "instance_" + Math.random(),
+        position: [Math.random() * 10, Math.random() * 10, Math.random() * 10],
+        rotation: [Math.random(), Math.random(), Math.random()]
+      });
+    }
+
+    return instances;
+  }, []);
+
+  return (
+    <InstancedRigidBodies
+      instances={instances}
+      colliders="ball"
+      colliderNodes={[
+        <BoxCollider args={[0.5, 0.5, 0.5]} />,
+        <SphereCollider args={[0.5]} />
+      ]}
+    >
+      <instancedMesh args={[undefined, undefined, COUNT]} count={COUNT} />
+    </InstancedRigidBodies>
+  );
+};
+```
+
+> [!NOTE]
+> Three.js cannot grow an `InstancedMesh` past the count it was allocated with. To add instances at runtime,
+> allocate a maximum (`args={[geometry, material, MAX_COUNT]}`) and set `count` to the number of live instances.
+
+See also [Performance](/advanced/performance).

@@ -1,0 +1,42 @@
+---
+title: Performance
+description: Keeping simulations fast - instancing, simple colliders, sleeping and solver settings.
+nav: 27
+---
+
+Rapier is fast, but every body, collider and contact costs time on every step. Most performance problems come from
+the number of colliders and their complexity.
+
+## Prefer simple colliders
+
+- `cuboid` and `ball` are the cheapest shapes. Use them whenever the visual shape is close enough.
+- `hull` is a good compromise for convex objects. It is much cheaper than `trimesh`.
+- `trimesh` is only appropriate for fixed bodies (level geometry). Dynamic trimesh bodies are expensive and unreliable.
+- Hand-place a few simple colliders on a [compound body](/api/colliders#collider-components) instead of one detailed mesh collider.
+- Turn off automatic colliders you do not need: `<Physics colliders={false}>`.
+
+## Use instancing for many identical objects
+
+Use [`InstancedRigidBodies`](/api/instanced-rigid-bodies) rather than hundreds of separate meshes. Each instance still
+costs a rigid body in the simulation, but you pay only one draw call. Give every instance a stable `key`.
+
+## Let bodies sleep
+
+Bodies at rest are put to sleep and skipped by the solver. Rapier 0.21 sleeps bodies sooner than 0.19 did. Do not set
+`canSleep={false}` unless you need to. Sleeping is also what lets [on-demand rendering](/advanced/update-loop#on-demand-rendering)
+idle.
+
+## Tune the solver sparingly
+
+`numSolverIterations`, `numInternalPgsIterations` and `additionalSolverIterations` trade stability for speed. Raise them
+only for the bodies or scenes that need it. Use `ccd` on small, fast bodies rather than very small time steps.
+
+## Reduce overhead
+
+- Leave `debug` off in production.
+- Avoid running heavy code in `onCollisionEnter` and `onContactForce`, which fire often.
+- Do not create many `<Physics>` worlds.
+
+> [!WARNING]
+> **TODO (3.0):** document fixed-step catch-up limits (`maxSubSteps`) and per-frame invalidation once the new stepping
+> API lands.

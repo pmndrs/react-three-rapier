@@ -1,0 +1,29 @@
+---
+title: Debug
+description: Rendering collider outlines with the debug option.
+nav: 8
+---
+
+Set the `debug` prop on `<Physics />` to see live representations of all colliders in a scene, using the live debug buffer from the physics engine.
+
+```tsx
+import { Box, Sphere } from "@react-three/drei";
+import { RigidBody } from "@react-three/rapier";
+
+const Scene = () => {
+  return (
+    <Physics debug>
+      <RigidBody>
+        <Box />
+      </RigidBody>
+      <RigidBody>
+        <Sphere />
+      </RigidBody>
+    </Physics>
+  );
+};
+```
+
+> [!WARNING]
+> **TODO (3.0):** the debug renderer is being rewritten to reuse a single geometry and to work on the WebGPU
+> renderer. The `debug` prop stays, but internals and any extra options may change.
