@@ -164,6 +164,25 @@ const setColliderMassOptions = (
   }
 };
 
+const massPropertiesToFlatArray = (
+  massProperties: ColliderProps["massProperties"]
+) =>
+  massProperties
+    ? [
+        massProperties.mass,
+        massProperties.centerOfMass.x,
+        massProperties.centerOfMass.y,
+        massProperties.centerOfMass.z,
+        massProperties.principalAngularInertia.x,
+        massProperties.principalAngularInertia.y,
+        massProperties.principalAngularInertia.z,
+        massProperties.angularInertiaLocalFrame.x,
+        massProperties.angularInertiaLocalFrame.y,
+        massProperties.angularInertiaLocalFrame.z,
+        massProperties.angularInertiaLocalFrame.w
+      ]
+    : new Array(11).fill(undefined); // keep the dependency list length constant
+
 const mutableColliderOptions: MutableColliderOptions = {
   sensor: (collider, value: boolean) => {
     collider.setSensor(value);
@@ -268,10 +287,16 @@ export const useUpdateColliderOptions = (
 ) => {
   // TODO: Improve this, split each prop into its own effect
   const mutablePropsAsFlatArray = useMemo(
-    () =>
-      mutableColliderOptionKeys.flatMap((key) => {
+    () => [
+      ...mutableColliderOptionKeys.flatMap((key) => {
         return vectorToTuple(props[key as keyof ColliderProps]);
       }),
+      // Mass options are exclusive and applied separately, but must also
+      // re-apply when they change
+      props.density,
+      props.mass,
+      ...massPropertiesToFlatArray(props.massProperties)
+    ],
     [props]
   );
 
