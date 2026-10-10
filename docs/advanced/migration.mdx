@@ -1,38 +1,48 @@
 ---
 title: Migrating from 2.x to 3.0
-description: Peer dependencies, WebGPU, Rapier 0.21 breaking changes and the new package layout.
+description: Peer dependencies, WebGPU, Rapier 0.21 breaking changes, the new update loop and the new package layout.
 nav: 28
 ---
 
 3.0 is a breaking release. It moves to react-three-fiber v10 (with WebGPU renderer support), Rapier.js 0.21, a
-new build with an `exports` map, and a reworked update loop.
+new build with an `exports` map, and an update loop built on the react-three-fiber v10 scheduler. It also adds a
+character controller and soft bodies.
 
-> [!WARNING]
-> 3.0 is in development. This guide lists what is known so far and will grow. Sections marked **TODO** describe
-> work that has not landed yet.
+Install the prerelease with `npm install @react-three/rapier@alpha` (and `@react-three/rapier-addons@alpha` if you use
+the addons).
 
 ## 1. Peer dependencies
 
-| package | 2.x | 3.0 |
-| --- | --- | --- |
-| `@react-three/fiber` | `^9` | `>=10.0.0-0` |
-| `react` / `react-dom` | `^19` | `>=19.0 <19.3` (follows react-three-fiber 10) |
-| `three` | `>=0.159` | `>=0.185` |
-| `@dimforge/rapier3d-compat` | `0.19.2` | `0.21.0` (dependency) |
+| package                                                  | 2.x       | 3.0                                           |
+| -------------------------------------------------------- | --------- | --------------------------------------------- |
+| `@react-three/fiber`                                     | `^9`      | `>=10.0.0-0`                                  |
+| `react` / `react-dom`                                    | `^19`     | `>=19.0 <19.3` (follows react-three-fiber 10) |
+| `three`                                                  | `>=0.159` | `>=0.185`                                     |
+| `@dimforge/rapier3d-compat`                              | `0.19.2`  | `0.21.0` (dependency)                         |
+| `@react-three/rapier` (for `@react-three/rapier-addons`) | `^2.0.0`  | `^3.0.0-0`                                    |
 
 If you are on react-three-fiber v9 you will need to migrate it to v10 first; follow the
-[react-three-fiber migration guide](https://r3f.docs.pmnd.rs/).
+[react-three-fiber migration guide](https://r3f.docs.pmnd.rs/). The fixed-step scheduler phases need
+`@pmndrs/scheduler` 0.3 or later (shipped with current react-three-fiber v10 builds); older builds fall back to an
+internal accumulator, see [Update loop and stepping](/advanced/update-loop).
+
+In your own frame callbacks, `state.clock` is gone in react-three-fiber v10: use `state.elapsed` and `state.delta`.
 
 ## 2. WebGPU
 
-react-three-fiber v10 can drive three's `WebGPURenderer`. `@react-three/rapier` itself does not touch the renderer,
-but anything that draws, such as the debug renderer, must work on both backends.
+react-three-fiber v10 can drive three's `WebGPURenderer`. `@react-three/rapier` itself does not touch the renderer;
+everything it draws works on both backends.
 
-- Materials you use for your own meshes must be WebGPU-compatible (node materials or the built-in ones).
-- The debug renderer is being rewritten to be WebGPU-safe.
+- **`<Physics debug>`** works on WebGL and WebGPU. Rapier's RGBA debug colors are uploaded as a 4-component vertex
+  color attribute, which both renderers read. See [Debug](/api/debug).
+- **`<Attractor>` debug helper** (`@react-three/rapier-addons`) draws with `MeshBasicMaterial` and three's
+  `VertexNormalsHelper`, which `WebGPURenderer` supports, so it works on both renderers.
+- Materials you use for your own meshes must be WebGPU-compatible (node materials or the built-in ones). Custom
+  `ShaderMaterial` / `onBeforeCompile` code is WebGL-only.
 
-> [!WARNING]
-> **TODO:** confirm the WebGPU story for `<Debug>` and `Attractor` debug helpers once the demo has been verified on both renderers.
+> [!NOTE]
+> Some helpers from other libraries still read `state.gl`, which react-three-fiber v10 leaves `null` on WebGPU roots
+> (use `state.renderer`). That is unrelated to this library, but you may hit it in the same migration.
 
 ## 3. Rapier 0.21
 
@@ -68,46 +78,129 @@ but anything that draws, such as the debug renderer, must work on both backends.
 
 The Rapier wasm roughly doubled (about 1.6 MB to 3.1 MB) because the soft-body solver is now part of it.
 
-### New in Rapier 0.21
-
-Soft bodies and per-axis spherical-joint motors are available through Rapier's own API. React components for them are planned
-(see below).
-
 See the [TypeScript binding changelog](https://github.com/dimforge/rapier/blob/master/bindings/typescript/CHANGELOG.md)
 and the [engine changelog](https://github.com/dimforge/rapier/blob/master/CHANGELOG.md).
 
 ## 4. Update loop and stepping
 
-> [!WARNING]
-> **TODO:** the stepping rework is not finished. What is planned:
->
-> - Physics steps in a fixed-step phase of the react-three-fiber v10 scheduler (`@pmndrs/scheduler`), with an overstep alpha for interpolation.
-> - **`updatePriority` no longer takes over rendering.** In 2.x, setting a positive priority makes react-three-fiber stop rendering automatically;
->   the new loop will not do that.
-> - `timeStep`, `updateLoop`, `interpolate` and `paused` semantics, `maxSubSteps`, and the `FrameStepper`.
-> - `useBeforePhysicsStep` and `useAfterPhysicsStep` callback signatures.
-> - Parent-space syncing every frame, so rotating a physics ancestor works (issue #36).
->
-> Fill this section in when the API lands.
+Physics now runs on the react-three-fiber v10 scheduler. The full description is in
+[Update loop and stepping](/advanced/update-loop); this is what changes for 2.x code.
+
+**Where physics runs.** With the default `updateLoop="follow"`, `<Physics>` registers three scheduler jobs per world:
+
+- a **step job** in the world's own fixed-timestep phase, `rapier:fixed:<n>`, right after r3f's `physics` phase. It runs
+  once per whole `timeStep` of banked frame time, so zero, one or several times per frame;
+- a **sync job** in a per-frame `rapier` phase, just before `update`, which writes interpolated transforms to your meshes;
+- a **late check** in a `rapier:late` phase, just before `render`, which re-applies them if an ancestor of a body moved
+  during `update`.
+
+The phase order is `start → input → physics → rapier:fixed:… → rapier → update → rapier:late → render → finish`, so a
+`useFrame` in the default `update` phase always sees meshes that were already synced this frame. The built-in `physics`
+phase timestep is never changed: to run code in lockstep with Rapier, use `useBeforePhysicsStep` /
+`useAfterPhysicsStep`, not the `physics` phase.
+
+**`updatePriority` changed meaning (breaking).** It used to be passed to `useFrame` as a numeric priority, and a value
+above 0 took over react-three-fiber's render loop. It is now only the order of this world's jobs within their phases
+(higher runs first, matching r3f v10's `{ priority }`). React-three-fiber keeps rendering in all cases. If you relied on
+`updatePriority` to render manually, register your own `useFrame(cb, { phase: "render" })`.
+
+**New `maxSubSteps` (default 5).** This is the most fixed steps one frame may run. Time beyond that is dropped, so a
+stalled tab no longer makes physics fast-forward (#697). Raise it if you use a small `timeStep` (e.g. 1/240) and must not
+lose simulation time at low frame rates.
+
+**Step hooks receive `dt`.**
+
+```tsx
+useBeforePhysicsStep((world, dt) => {
+  // dt === timeStep for fixed steps, or the clamped frame delta for "vary"
+});
+```
+
+Existing `(world) => …` callbacks keep working. Prefer `dt` over `world.timestep`, which is only updated when the step
+runs.
+
+**Events are per substep.** Collision, intersection and contact-force events are now dispatched after every physics step
+instead of once per frame. Handlers may run several times in one frame. They also run before the frame's mesh sync: in a
+payload, the `rigidBodyObject` / `colliderObject` transforms are the previous frame's rendered (interpolated) pose. For
+the simulated pose at that step, read `payload.target.rigidBody.translation()` / `.rotation()`.
+
+**Pausing.** `paused` banks no time, so resuming does not jump ahead. `useRapier().step(dt)` still steps manually while
+paused, and it updates meshes immediately. Interpolation restarts from the current pose after a manual step, a
+pause/resume, an `interpolate` or `timeStep` change, or `setWorld()`, so visuals never lerp backwards.
+
+**Teleports.** Teleport with `setTranslation` inside `useBeforePhysicsStep` to avoid any interpolation smear. A teleport
+made elsewhere (an event handler, a regular `useFrame`) is interpolated from the previous step's pose for at most one step.
+
+**Demand frameloop.** `<Canvas frameloop="demand">` works with the default `"follow"` loop. Physics invalidates the canvas
+every frame while any dynamic or kinematic body is awake, and stops when everything sleeps, so `updateLoop="independent"`
+is no longer needed for this. Physics only notices bodies on a frame: when you wake or move a body outside a frame while
+the canvas is idle (e.g. `applyImpulse` in a DOM click handler), call `invalidate()` once, as in 2.x.
+
+**Moving parents (#36).** A `<RigidBody>`'s visual is written into its parent's current space every frame. Moving,
+rotating or re-parenting an ancestor after mount (`PresentationControls`, drei `<Float>`, a group animated in `useFrame`)
+no longer desyncs visuals from bodies, even when the ancestor moves during `update`. Ancestors do not drag bodies along;
+the simulation still decides where they are. Nested `<RigidBody>`s are synced parent-first, so they no longer lag the body
+that carries them.
+
+**Changing `timeStep` at runtime** works and retimes only that world's phase, so several worlds with different
+`timeStep`s can share a canvas. Each change drops the fraction of a step already banked, so avoid animating `timeStep`
+every frame (e.g. for slow motion). Prefer scaling forces or gravity, or use `paused` plus manual `step(dt)`.
+
+**`timeStep="vary"`** steps once per frame with the frame delta clamped to 0.5s, without interpolation, as before.
+
+**`updateLoop="independent"`** keeps its own `requestAnimationFrame` loop, now with the same accumulator, `maxSubSteps`
+and interpolation rules. Its first frame no longer reports a large catch-up delta.
+
+**Debug lines.** `<Physics debug>` draws the latest simulated step. With interpolation, the lines can lead the rendered
+meshes by up to one step. The debug renderer now reuses one geometry and disposes it on unmount instead of allocating one
+per frame and leaking on toggle (#666).
+
+**World teardown.** The Rapier world is freed after the unmount commit, so cleanups of children (bodies, colliders,
+joints) run against a live world, and StrictMode remounts are safe.
+
+**Older fiber builds.** If your `@react-three/fiber` ships a scheduler without fixed phases (`@pmndrs/scheduler` < 0.3,
+e.g. `10.0.0-alpha.5`), `<Physics>` falls back to its own accumulator in a per-frame job. The behavior is the same,
+including `maxSubSteps`, `paused` and interpolation.
 
 ## 5. Package exports
 
-The package now ships an `exports` map. Import from `@react-three/rapier` only; deep imports such as
-`@react-three/rapier/dist/...` or `@react-three/rapier/src/...` no longer resolve. Optional features live on named entry points
-(for example `@react-three/rapier/soft-bodies`, see below). Ensure your bundler and TypeScript use a resolution mode that understands
-`exports` (`moduleResolution: "bundler"`, `"node16"` or `"nodenext"`).
+The packages are built with rollup instead of preconstruct and ship an `exports` map with ESM (`.mjs`) and CommonJS
+(`.cjs`) builds and matching type declarations. Import from `@react-three/rapier` only; deep imports such as
+`@react-three/rapier/dist/...` or `@react-three/rapier/src/...` no longer resolve. Optional features live on named entry
+points: soft bodies are on `@react-three/rapier/soft-bodies`. Ensure your bundler and TypeScript use a resolution mode that
+understands `exports` (`moduleResolution: "bundler"`, `"node16"` or `"nodenext"`); a `typesVersions` fallback covers
+`"node"` / node10 resolution.
 
 ## 6. Dependencies
 
-- **`three-stdlib` is removed.** The library uses `three/addons` for the helpers it needed. If you relied on `three-stdlib` being installed
-  transitively, add it to your own dependencies. This also removes the `Could not resolve "fs"` problem that
-  `opentype.js` caused for some bundlers.
+- **`three-stdlib` is removed.** The library uses `three/examples/jsm` (`three/addons`) for the helpers it needed. If you
+  relied on `three-stdlib` being installed transitively, add it to your own dependencies. This also removes the
+  `Could not resolve "fs"` problem that `opentype.js` caused for some bundlers.
 - The minimum React is 19.0 and three is 0.185.
 
-## 7. New features
+## 7. Bug fixes with visible behavior changes
 
-> [!WARNING]
-> **TODO:** document these when their APIs are final.
->
-> - Character controller: `useCharacterController` and `<CharacterController>`.
-> - Soft bodies: `<SoftBody>` on the separate entry point `@react-three/rapier/soft-bodies`.
+- **Refs are cleared on destroy (#780).** Forwarded refs of `<RigidBody>`, colliders and `<InstancedRigidBodies>`
+  instances are set to `null` when the Rapier object is destroyed, instead of pointing at freed objects. Guard ref access
+  in cleanups and async code (`ref.current?.…`).
+- **Instanced frustum culling (#683).** `<InstancedRigidBodies>` disables frustum culling on its instanced mesh by default,
+  since its bounds go stale as bodies move. Pass `frustumCulled` to re-enable it.
+- **Collider mass props are reactive (#711).** `mass`, `density` and `massProperties` on colliders now update after mount.
+- **Trimesh and hull colliders (#781, #627)** read interleaved, normalized and quantized position attributes correctly,
+  and throw a descriptive error when a collider cannot be built.
+- **Heightfields (#564, #730).** Args are scaled per axis and no longer mutated (scale used to compound on remount).
+  `heights` must have `(rows + 1) * (cols + 1)` values; a mismatch warns in development.
+- **Enum re-exports (#703).** `ActiveCollisionTypes`, `ActiveEvents`, `ActiveHooks` and `QueryFilterFlags` are exported
+  from `@react-three/rapier`.
+- **No `key` spread warning (#691)** from `<InstancedRigidBodies>` on React 19.
+
+## 8. New features
+
+- **Character controller.** `useCharacterController` and `<CharacterController>` wrap Rapier's kinematic character
+  controller: walls, slopes, stairs and ground snapping, applied once per fixed step with the step's `dt`. See
+  [Character controller](/api/character-controller).
+- **Soft bodies.** `<SoftBody>` and `useSoftBody` build cloth, ropes and volumetric bodies from a mesh or line, with
+  pinning, attachments to rigid bodies and tearing. They live on `@react-three/rapier/soft-bodies`. See
+  [Soft bodies](/api/soft-bodies).
+- **`maxSubSteps`** on `<Physics>`, and `dt` in step callbacks (see [Update loop and stepping](/advanced/update-loop)).
+- Per-axis spherical-joint motors are available through Rapier's own API (`useRapier()`).

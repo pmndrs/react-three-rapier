@@ -37,6 +37,22 @@ only for the bodies or scenes that need it. Use `ccd` on small, fast bodies rath
 - Avoid running heavy code in `onCollisionEnter` and `onContactForce`, which fire often.
 - Do not create many `<Physics>` worlds.
 
-> [!WARNING]
-> **TODO (3.0):** document fixed-step catch-up limits (`maxSubSteps`) and per-frame invalidation once the new stepping
-> API lands.
+## Fixed-step catch-up
+
+When a frame takes longer than one `timeStep`, `<Physics>` runs several steps in that frame to catch up. `maxSubSteps`
+(default `5`) caps how many, and drops any time beyond `maxSubSteps * timeStep`. This keeps a slow device or a stalled
+tab from spending ever more time on physics (a "spiral of death"), at the cost of the simulation running slower than
+real time when frames are very long.
+
+- The cost of a frame is roughly `steps × step cost`. A smaller `timeStep` means more steps per frame, so raise
+  `maxSubSteps` with it only if you must not lose simulation time (for example `timeStep={1 / 240}` with
+  `maxSubSteps={12}`).
+- Code in `useBeforePhysicsStep` / `useAfterPhysicsStep` and collision handlers runs once per step, so it is multiplied by
+  the same factor. Keep it light.
+
+## On-demand rendering
+
+With `<Canvas frameloop="demand">`, the default `updateLoop="follow"` calls `invalidate()` once per frame while any
+dynamic or kinematic body is awake, and stops when everything sleeps. Fixed bodies never keep the canvas awake. Combined
+with sleeping this lets a settled scene stop rendering entirely. See
+[on-demand rendering](/advanced/update-loop#on-demand-rendering).

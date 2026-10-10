@@ -13,7 +13,7 @@ The snapshot can be used to construct a new world. In `r3/rapier`, you need to r
 > Snapshot formats are version-dependent. Store the Rapier version alongside persisted snapshot data and check compatibility before restoring after an upgrade.
 
 ```tsx
-import { useRapier } from '@react-three/rapier';
+import { useRapier } from "@react-three/rapier";
 
 const SnapshottingComponent = () => {
   const { world, setWorld, rapier } = useRapier();
@@ -21,23 +21,25 @@ const SnapshottingComponent = () => {
 
   // Store the snapshot
   const takeSnapshot = () => {
-    const snapshot = world.takeSnapshot()
-    worldSnapshot.current = snapshot
-  }
+    const snapshot = world.takeSnapshot();
+    worldSnapshot.current = snapshot;
+  };
 
   // Create a new World from the snapshot, and replace the current one
   const restoreSnapshot = () => {
-    setWorld(rapier.World.restoreSnapshot(worldSnapshot.current))
-  }
+    setWorld(rapier.World.restoreSnapshot(worldSnapshot.current));
+  };
 
-  return <>
-    <RigidBody>...</RigidBody>
-    <RigidBody>...</RigidBody>
-    <RigidBody>...</RigidBody>
-    <RigidBody>...</RigidBody>
-    <RigidBody>...</RigidBody>
-  </>
-}
+  return (
+    <>
+      <RigidBody>...</RigidBody>
+      <RigidBody>...</RigidBody>
+      <RigidBody>...</RigidBody>
+      <RigidBody>...</RigidBody>
+      <RigidBody>...</RigidBody>
+    </>
+  );
+};
 ```
 
 > [!WARNING]

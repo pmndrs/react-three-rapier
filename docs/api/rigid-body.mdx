@@ -4,7 +4,7 @@ description: The RigidBody component, body types, forces and continuous collisio
 nav: 4
 ---
 
-The `<RigidBody />` component is used to add a `mesh` into the physics world. You use it by wrapping one or more `meshes` and setting desired props. By default, this will automatically generate `Colliders` based on the shape of the wrapped `meshes` (see [Automatic colliders](#automatic-colliders)).
+The `<RigidBody />` component is used to add a `mesh` into the physics world. You use it by wrapping one or more `meshes` and setting desired props. By default, this will automatically generate `Colliders` based on the shape of the wrapped `meshes` (see [Automatic colliders](/api/colliders#automatic-colliders)).
 
 🧩 See [RigidBodyProps docs](https://pmndrs.github.io/react-three-rapier/interfaces/RigidBodyProps.html) for available props.
 
@@ -23,7 +23,7 @@ const RigidBodyMesh = () => (
 
 Kinematic bodies are not moved by contacts: they push dynamic bodies and nothing pushes them back. A kinematic body
 will not stop at a fixed collider, even with `activeCollisionTypes={ActiveCollisionTypes.ALL}`, which only enables
-*events* for that pair. See the [FAQ](/advanced/faq#kinematic-body-passes-through-fixed-colliders).
+_events_ for that pair. See the [FAQ](/advanced/faq#kinematic-body-passes-through-fixed-colliders).
 
 Move a kinematic body with `setNextKinematicTranslation({ x, y, z })` and `setNextKinematicRotation({ x, y, z, w })`,
 passing objects, not arrays.
@@ -79,9 +79,10 @@ const Scene = () => (
 );
 ```
 
-> [!WARNING]
-> The parent transform is read when the body is created. Rotating or moving a *physics ancestor* after mount
-> (for example drei `PresentationControls`) is not followed. See the [FAQ](/advanced/faq#rotating-a-parent-of-a-rigidbody-after-mount).
+> [!NOTE]
+> The rendered pose is written in the parent's current space every frame, so moving or rotating a parent after mount
+> (for example drei `PresentationControls`) keeps the visual on the body. Parents do not drag the body along, though.
+> See the [FAQ](/advanced/faq#rotating-a-parent-of-a-rigidbody-after-mount).
 
 > [!NOTE]
 > It is best to create RigidBodies where the center of gravity is at the center of the object, otherwise you might
@@ -92,8 +93,9 @@ const Scene = () => (
 `<RigidBody>` and every collider accept `onCollisionEnter`, `onCollisionExit`, `onIntersectionEnter`,
 `onIntersectionExit`, `onContactForce`, `onSleep` and `onWake`. See [Collision events](/advanced/collision-events).
 
-> [!WARNING]
-> **TODO (3.0 character controller):** `useCharacterController` and `<CharacterController>` are being built on
-> Rapier's kinematic character controller. The API is not final and is not documented here yet.
+## Character controller
+
+For player characters, `<CharacterController>` wraps a `kinematicPosition` `<RigidBody>` with Rapier's kinematic
+character controller (walls, slopes, stairs, ground snapping). See [Character controller](/api/character-controller).
 
 🧩 See [RigidBodyProps](https://pmndrs.github.io/react-three-rapier/interfaces/RigidBodyProps.html) for all props.

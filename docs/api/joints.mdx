@@ -115,7 +115,7 @@ The revolute joint prevents any relative movement between two rigid-bodies, exce
 const JointedThing = () => {
   const bodyA = useRef<RapierRigidBody>(null);
   const bodyB = useRef<RapierRigidBody>(null);
-  
+
   const joint = useRevoluteJoint(bodyA, bodyB, [
     // Position of the joint in bodyA's local space
     [0, 0, 0],
@@ -252,7 +252,13 @@ const JointedThing = () => {
 
 ### Joints example
 
-<a href="https://codesandbox.io/s/react-three-rapier-joints-mhhbd4"><img src="https://github.com/pmndrs/react-three-rapier/raw/main/packages/react-three-rapier/misc/example-joints.jpg" width="240" alt="example-joints.jpg" /></a>
+<a href="https://codesandbox.io/s/react-three-rapier-joints-mhhbd4">
+  <img
+    src="https://github.com/pmndrs/react-three-rapier/raw/main/packages/react-three-rapier/misc/example-joints.jpg"
+    width="240"
+    alt="example-joints.jpg"
+  />
+</a>
 
 > [!NOTE]
 > Joints are created once when the hook mounts. Changing the arguments afterwards is ignored, and the JS bindings

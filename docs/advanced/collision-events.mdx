@@ -75,6 +75,14 @@ A `CollisionTarget` is an object containing references to objects involved in a 
 - `collider`: `Rapier.Collider`
 - `colliderObject`: `Three.Object3D`
 
+### When events fire
+
+Collision, intersection and contact-force events are dispatched after every physics step, not once per frame. With a
+fixed `timeStep`, a frame can run several steps, so a handler may run several times in one frame (or not at all). Events
+also run before the frame's mesh sync, so the `rigidBodyObject` / `colliderObject` transforms in a payload are the
+previous frame's rendered (interpolated) pose. For the simulated pose at that step, read
+`payload.target.rigidBody.translation()` / `.rotation()`. See [Update loop](/advanced/update-loop).
+
 ### Contact manifolds in Rapier 0.21
 
 The `manifold` is a Rapier `TempContactManifold`. It is only valid during the callback, so copy out what you need.

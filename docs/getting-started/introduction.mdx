@@ -17,8 +17,8 @@ npm install @react-three/rapier
 ```
 
 ```tsx
-import { Canvas } from '@react-three/fiber';
-import { Physics, RigidBody, CuboidCollider } from '@react-three/rapier';
+import { Canvas } from "@react-three/fiber";
+import { Physics, RigidBody, CuboidCollider } from "@react-three/rapier";
 
 export default function App() {
   return (
@@ -40,11 +40,10 @@ export default function App() {
 }
 ```
 
-> [!WARNING]
-> **Version 3.0 is in development.** It is a breaking release that targets react-three-fiber v10 (including the
+> [!NOTE]
+> **Version 3.0 is in alpha.** It is a breaking release that targets react-three-fiber v10 (including the
 > WebGPU renderer), Rapier.js 0.21 and three 0.185+. If you are upgrading, read
-> [Migrating from 2.x to 3.0](/advanced/migration). Parts of this site carry **TODO** notes where an API
-> (the update loop, the character controller, soft bodies) is still being designed.
+> [Migrating from 2.x to 3.0](/advanced/migration).
 
 ## What you get
 
@@ -53,6 +52,8 @@ export default function App() {
 - Joints as hooks ([Joints](/api/joints)).
 - Collision, intersection and contact-force events, collision groups and physics hooks ([Advanced](/advanced/collision-events)).
 - Direct access to the Rapier `world` for queries such as raycasts ([Hooks](/api/hooks)).
+- Physics stepped at a fixed rate on the react-three-fiber v10 scheduler, with interpolation ([Update loop](/advanced/update-loop)).
+- A kinematic [character controller](/api/character-controller) and [soft bodies](/api/soft-bodies) (cloth, ropes, jelly).
 - A debug renderer ([Debug](/api/debug)) and an [Attractor](/api/attractors) addon.
 
 ## Where to go next

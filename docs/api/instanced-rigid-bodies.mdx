@@ -106,4 +106,10 @@ const Scene = () => {
 > Three.js cannot grow an `InstancedMesh` past the count it was allocated with. To add instances at runtime,
 > allocate a maximum (`args={[geometry, material, MAX_COUNT]}`) and set `count` to the number of live instances.
 
+## Frustum culling
+
+Three.js culls an `InstancedMesh` with bounds computed once, which go stale as the bodies move, so instances could
+vanish at the edge of the screen (#683). `<InstancedRigidBodies>` therefore sets `frustumCulled={false}` on its instanced
+mesh by default. Pass `frustumCulled` to re-enable culling when the instances stay within their initial bounds.
+
 See also [Performance](/advanced/performance).

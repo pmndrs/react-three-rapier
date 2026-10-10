@@ -6,7 +6,7 @@ nav: 29
 
 ## CSP refuses to compile WebAssembly
 
-*(Issue #699)* With a strict `Content-Security-Policy` you get an error mentioning `unsafe-eval` or WebAssembly compilation.
+_(Issue #699)_ With a strict `Content-Security-Policy` you get an error mentioning `unsafe-eval` or WebAssembly compilation.
 You do not need `'unsafe-eval'`. WebAssembly is gated by the narrower `'wasm-unsafe-eval'` source, which does not allow
 JavaScript `eval`:
 
@@ -18,19 +18,19 @@ It is supported by Chrome 95+, Firefox 102+ and Safari 16+. Switching to a non-c
 
 ## Could not resolve "fs"
 
-*(Issue #698)* This error comes from `opentype.js`, which is used by drei's `Text3D`, when your bundler targets a worker
+_(Issue #698)_ This error comes from `opentype.js`, which is used by drei's `Text3D`, when your bundler targets a worker
 or server runtime (for example Shopify Hydrogen). It is not caused by Rapier. Alias `fs` to `false` / mark it external for
 that target, exclude `Text3D` from server bundles, or avoid `Text3D`. 3.0 removes `three-stdlib` from this library's dependencies.
 
 ## Heightfield collider errors or lets bodies fall through
 
-*(Issues #730, #564)* A `HeightfieldCollider` with `args={[w, h, heights, scale]}` needs `heights.length === (w + 1) * (h + 1)`,
+_(Issues #730, #564)_ A `HeightfieldCollider` with `args={[w, h, heights, scale]}` needs `heights.length === (w + 1) * (h + 1)`,
 because `w` and `h` count cells and heights are per vertex. The values are column-major. Also use a positive `scale`: a negative
 `scale.z` makes bodies fall through. To mirror a heightfield, rotate its body by 180 degrees around Y.
 
 ## How do I get the penetration depth of a collision?
 
-*(Issue #768)* The `manifold` in `onCollisionEnter` is a Rapier `TempContactManifold`. Read `manifold.contactDist(i)` or
+_(Issue #768)_ The `manifold` in `onCollisionEnter` is a Rapier `TempContactManifold`. Read `manifold.contactDist(i)` or
 `manifold.solverContactDist(i)` for each of `manifold.numContacts()` contacts; negative values mean penetration. The manifold is
 temporary, so read it inside the callback and copy values out. The depth is for the first contact, so for resting contacts use
 [`onContactForce`](/advanced/contact-forces).
@@ -47,7 +47,7 @@ temporary, so read it inside the callback and copy values out. The depth is for 
 
 ## How do I raycast?
 
-*(Issue #714)* There is no `raycaster`. Use `useRapier()` and call queries on the world:
+_(Issue #714)_ There is no `raycaster`. Use `useRapier()` and call queries on the world:
 
 ```tsx
 const { world, rapier } = useRapier();
@@ -60,12 +60,12 @@ To know whether a body is on the floor, cast a short ray down, or use a sensor c
 
 ## setNextKinematicTranslation does nothing
 
-*(Issue #726)* Rapier's setters take objects, not arrays: `body.setNextKinematicTranslation({ x: 0, y: 1, z: 0 })`.
+_(Issue #726)_ Rapier's setters take objects, not arrays: `body.setNextKinematicTranslation({ x: 0, y: 1, z: 0 })`.
 Passing `[0, 1, 0]` silently does nothing. Call it every frame (for example in `useFrame`) on a `kinematicPosition` body.
 
 ## Using drei `Html` inside a RigidBody
 
-*(Issue #645)* `<RigidBody>` does not re-center its children. If the label looks centered, it comes from the `center` prop of `Html`, or from
+_(Issue #645)_ `<RigidBody>` does not re-center its children. If the label looks centered, it comes from the `center` prop of `Html`, or from
 centered geometry. Give the `Html` an explicit position relative to the body, or wrap it in a positioned group:
 
 ```tsx
@@ -79,38 +79,38 @@ centered geometry. Give the `Html` an explicit position relative to the body, or
 
 ## Hull or trimesh collider pivots around the wrong point
 
-*(Issue #267)* The collider is built from the geometry as it is, in the object's local space. If the geometry is not centered on its
+_(Issue #267)_ The collider is built from the geometry as it is, in the object's local space. If the geometry is not centered on its
 origin (common for models from glTF files, URDF links or hamburgers), the center of mass is off-center and the body spins around an
 unexpected point or looks "heavy" on one side. Re-center the geometry (`geometry.center()`, or fix it in your modeling tool), or
 wrap the mesh in a group with the opposite offset, so that the origin matches the intended pivot.
 
 ## Rotating a parent of a RigidBody after mount
 
-*(Issue #36)* Bodies read the world transform of their parents when they are created. If you later rotate or move a physics ancestor
-(for example drei `PresentationControls`, which rotates its children rather than the camera), the bodies do not follow, and the
-rendered pose is computed against a stale transform. Rotate the camera instead (`OrbitControls`, `CameraControls`), or keep
-physics objects outside the transformed group.
+_(Issue #36)_ Since 3.0 this works. A `<RigidBody>`'s visual is written in its parent's **current** space every frame, so
+moving, rotating or re-parenting an ancestor after mount (drei `PresentationControls` or `<Float>`, a group animated in
+`useFrame`) keeps the visual on the simulated body. If the ancestor moves during `update`, after the physics sync, a late
+pass right before `render` re-applies the transforms. Nested bodies are synced parent-first.
 
-> [!WARNING]
-> **TODO (3.0):** syncing parent transforms every frame is planned as part of the update loop rework.
+Note that ancestors do not _drag_ bodies: the simulation still decides where a body is in the world. To move bodies with a
+group, move the bodies themselves (for example kinematic bodies with `setNextKinematicTranslation`). In 2.x the parent
+transform was only read at creation; if you are still on 2.x, rotate the camera instead or keep physics objects outside
+the transformed group. See [Update loop: moving parents](/advanced/update-loop#moving-parents).
 
 ## React Native
 
-*(Issue #383)* React Native is not supported. Rapier is WebAssembly, which the Hermes engine does not provide. Polyfills work only for
+_(Issue #383)_ React Native is not supported. Rapier is WebAssembly, which the Hermes engine does not provide. Polyfills work only for
 tiny scenes and are unsupported. Look at `callstack/react-native-rapier` for native bindings.
 
 ## Kinematic body passes through fixed colliders
 
-*(Issue #694)* A kinematic body is never pushed out of other colliders by contacts. `activeCollisionTypes={ActiveCollisionTypes.ALL}` only
-makes kinematic-vs-fixed pairs *report events*; it does not resolve penetration. For a player character use Rapier's kinematic
-character controller (`world.createCharacterController()` with `computeColliderMovement`) or a dynamic body driven by velocity.
-
-> [!WARNING]
-> **TODO (3.0):** `useCharacterController` / `<CharacterController>` will wrap this. Not documented yet.
+_(Issue #694)_ A kinematic body is never pushed out of other colliders by contacts. `activeCollisionTypes={ActiveCollisionTypes.ALL}` only
+makes kinematic-vs-fixed pairs _report events_; it does not resolve penetration. For a player character use the
+[character controller](/api/character-controller) (`<CharacterController>` or `useCharacterController`), which resolves the
+movement against walls, slopes and stairs before applying it, or a dynamic body driven by velocity.
 
 ## Vehicle wheels react to sensors
 
-*(Issue #693)* Rapier's raycast vehicle controller casts rays that hit sensors by default. Pass a filter flag to `updateVehicle`:
+_(Issue #693)_ Rapier's raycast vehicle controller casts rays that hit sensors by default. Pass a filter flag to `updateVehicle`:
 
 ```tsx
 const { rapier } = useRapier();

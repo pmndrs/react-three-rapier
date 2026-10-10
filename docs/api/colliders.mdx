@@ -95,7 +95,7 @@ const Scene = () => (<>
 
 ### Heightfields
 
-`HeightfieldCollider` takes `args={[widthSegments, heightSegments, heights, scale]}`. The segment counts are *cells*,
+`HeightfieldCollider` takes `args={[widthSegments, heightSegments, heights, scale]}`. The segment counts are _cells_,
 and `heights` must hold one value per vertex: `(widthSegments + 1) * (heightSegments + 1)` values. Rapier lays heights
 out column-major. Use a positive `scale`; negative scales are not supported (mirror with a rotation of the body instead).
 
@@ -112,8 +112,20 @@ inside a `<RigidBody>` next to other colliders. See the compound example above.
 
 ### Collider examples
 
-<a href="https://codesandbox.io/s/react-three-rapier-auto-colliders-b4coz1"><img src="https://github.com/pmndrs/react-three-rapier/raw/main/packages/react-three-rapier/misc/example-auto-colliders.jpg" width="240" alt="example-auto-colliders.jpg" /></a>
-<a href="https://codesandbox.io/s/react-three-rapier-compound-colliders-ol5ybn"><img src="https://github.com/pmndrs/react-three-rapier/raw/main/packages/react-three-rapier/misc/example-compound-shapes.jpg" width="240" alt="example-compound-shapes.jpg" /></a>
+<a href="https://codesandbox.io/s/react-three-rapier-auto-colliders-b4coz1">
+  <img
+    src="https://github.com/pmndrs/react-three-rapier/raw/main/packages/react-three-rapier/misc/example-auto-colliders.jpg"
+    width="240"
+    alt="example-auto-colliders.jpg"
+  />
+</a>
+<a href="https://codesandbox.io/s/react-three-rapier-compound-colliders-ol5ybn">
+  <img
+    src="https://github.com/pmndrs/react-three-rapier/raw/main/packages/react-three-rapier/misc/example-compound-shapes.jpg"
+    width="240"
+    alt="example-compound-shapes.jpg"
+  />
+</a>
 
 🧩 See [ColliderProps](https://pmndrs.github.io/react-three-rapier/interfaces/ColliderProps.html) and
 [MeshColliderProps](https://pmndrs.github.io/react-three-rapier/interfaces/MeshColliderProps.html) for all props.

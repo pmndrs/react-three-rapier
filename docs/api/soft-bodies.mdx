@@ -1,0 +1,182 @@
+---
+title: Soft bodies
+description: Cloth, ropes and volumetric (jelly) bodies with SoftBody and useSoftBody.
+nav: 12
+---
+
+Rapier 0.21 simulates deformable bodies. `@react-three/rapier` turns the geometry of a mesh (or line) into one and keeps
+the geometry in sync with the simulation. Soft bodies collide with the colliders and rigid bodies of the same
+`<Physics>` world, can be pinned in place, can be attached to rigid bodies, and can tear.
+
+The API lives on its own entry point, so the extra code is only bundled when you use it:
+
+```tsx
+import { SoftBody, useSoftBody } from "@react-three/rapier/soft-bodies";
+```
+
+## `<SoftBody>`
+
+Wrap exactly one `<mesh>` (cloth, volume) or `<line>` / `<points>` (rope) inside `<Physics>`:
+
+```tsx
+import { Physics } from "@react-three/rapier";
+import { SoftBody } from "@react-three/rapier/soft-bodies";
+import { DoubleSide } from "three";
+
+const Flag = () => (
+  <Physics>
+    <SoftBody
+      type="cloth"
+      stiffness={14}
+      damping={0.4}
+      pinned={(p) => p.x < -1.49}
+    >
+      <mesh position={[0, 3, 0]}>
+        <planeGeometry args={[3, 1.8, 30, 18]} />
+        <meshStandardMaterial side={DoubleSide} />
+      </mesh>
+    </SoftBody>
+  </Physics>
+);
+```
+
+### Types
+
+| `type`              | built from                                                                                     | use with                                                                  |
+| ------------------- | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| `"cloth"` (default) | The welded vertices are particles, connected along the triangle edges.                         | Open surfaces: planes, curtains, flags.                                   |
+| `"rope"`            | The geometry's vertices, in order, are the particles of a chain.                               | A `<line>` or `<points>` whose positions list the rope from start to end. |
+| `"volume"`          | The closed surface is filled with tetrahedra, and the rendered vertices are skinned onto them. | Closed shapes: jelly cubes, spheres.                                      |
+
+### How the geometry is used
+
+- The geometry is replaced by a copy that is welded on **position only**, so vertices split for UV seams or hard
+  normals become one particle. The original render data (UVs, hard normals) is kept until a cloth tears.
+- The child's transform sets the initial pose of the body and is baked into the geometry. From then on the object's own
+  transform is the identity, and its geometry holds positions in the **parent's** local space.
+- The geometry is written once per rendered frame, after the rigid bodies, and interpolated between the last two
+  physics steps with the same alpha. Cloth attached to an interpolated rigid body therefore stays on it. Normals and
+  bounds are recomputed when the positions change.
+
+### Props
+
+Creation props are read once, when the body is created, like `<RigidBody>`'s. Changing them afterwards has no effect;
+remount with a `key` to rebuild the body.
+
+| prop                              | description                                                                                                       |
+| --------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `type`                            | `"cloth"`, `"rope"` or `"volume"`. Default `"cloth"`.                                                             |
+| `stiffness`                       | Natural frequency (Hz) of the springs. Higher is stiffer.                                                         |
+| `damping`                         | Damping ratio of the springs: `0` oscillates forever, `1` is critically damped.                                   |
+| `material`                        | A Rapier `SoftBodyMaterial` (or a function returning one), for full control. Overrides `stiffness` and `damping`. |
+| `mass`                            | Total mass, spread over the particles.                                                                            |
+| `pinned`                          | Particles that never move: particle indices, or `(restPosition, index) => boolean`.                               |
+| `attachments`                     | `[{ particles, body }]`: particles anchored to a rigid body (a Rapier body or a `<RigidBody>` ref).               |
+| `cellSize`                        | `volume` only: edge length of the tetrahedral cells. Defaults to a fifth of the largest dimension.                |
+| `cellModel`                       | `volume` only: the constitutive model of the cells.                                                               |
+| `solver`                          | The Rapier solver used to hold the body together.                                                                 |
+| `volumePreservation`              | Resist changes of volume (`volume` bodies).                                                                       |
+| `selfContacts`                    | Collide with itself.                                                                                              |
+| `particleRadius`                  | Thickness of the particles, which keeps cloth off surfaces.                                                       |
+| `gravityScale`                    | Multiplier on world gravity. Default `1`.                                                                         |
+| `linearDamping`                   | Velocity lost to drag.                                                                                            |
+| `additionalSolverIterations`      | Extra solver iterations, for a more rigid body.                                                                   |
+| `canSleep`                        | Whether the body may fall asleep. Default `true`.                                                                 |
+| `collisions`                      | Collide with rigid bodies and colliders. Default `true`.                                                          |
+| `friction`, `restitution`         | Contact response against colliders.                                                                               |
+| `collisionGroups`, `solverGroups` | Rapier group bitmasks for the body's colliders.                                                                   |
+| `configure`                       | `(desc) => desc \| void`. Receives the `SoftBodyDesc` right before creation, for Rapier settings without a prop.  |
+| `onTear`                          | Called when the body tears, with `{ softBody, pieces, tornEdges, tornCells }`.                                    |
+| `ref`                             | Receives the `SoftBodyState` once the body exists.                                                                |
+
+#### Selecting particles
+
+`pinned` and the `particles` of an attachment take either explicit indices or a predicate. The predicate is called for
+every particle with its rest position in the **mesh's local space** (its geometry before the soft body was created) and
+its index. For `cloth` and `rope`, indices are vertex indices of the welded geometry. For `volume` they index internal
+simulation particles, so prefer a predicate.
+
+```tsx
+// Pin the top edge of a 1x1 plane
+<SoftBody type="cloth" pinned={(p) => p.y > 0.49}>
+  ...
+</SoftBody>
+```
+
+#### Attachments
+
+Attached particles follow a rigid body. A ref must already be populated when the soft body is created, so declare the
+`<RigidBody>` before the `<SoftBody>`:
+
+```tsx
+const ball = useRef<RapierRigidBody>(null);
+
+<>
+  <RigidBody ref={ball} colliders="ball" position={[0, -2, 0]}>
+    <Sphere args={[0.3]} />
+  </RigidBody>
+  <SoftBody
+    type="rope"
+    pinned={[0]}
+    attachments={[{ particles: [23], body: ball }]}
+  >
+    <line>
+      <primitive object={ropeGeometry} attach="geometry" />
+      <lineBasicMaterial />
+    </line>
+  </SoftBody>
+</>;
+```
+
+### The `SoftBodyState` ref
+
+| member                | description                                                                                                             |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `body`                | The Rapier soft body created from the geometry. Use it for forces, e.g. `body.addForce(...)` in `useBeforePhysicsStep`. |
+| `bodies`              | `body` and every piece it tore into. All are removed on unmount.                                                        |
+| `object`              | The object whose geometry is driven by the simulation.                                                                  |
+| `type`                | The soft body type.                                                                                                     |
+| `cut(blade)`          | Cuts along a blade (a triangle of three world-space points). Returns `false` if nothing was cut.                        |
+| `tear(edges, cells?)` | Tears the given edges (and cells) of the main body at once.                                                             |
+
+## Tearing
+
+Set `material.tearStrain` or a tear force on the material, or call `cut()` / `tear()`, to tear a body. Tear events are
+handled after every physics substep: for `cloth` and `rope` the rendered triangles that cross a tear are removed and the
+torn seam gets vertices of its own, and `onTear` is called. After the first tear a cloth's vertices are split per
+particle, so seams of the original geometry (UV / hard-edge duplicates) are lost, and torn pieces render the latest step
+without interpolation.
+
+## `useSoftBody`
+
+The hook behind `<SoftBody>`, for when you already hold a ref to a `<mesh>`, `<line>` or `<points>`. It takes the same
+options and returns a ref to the `SoftBodyState`, populated once the body exists:
+
+```tsx
+const mesh = useRef<Mesh>(null);
+const soft = useSoftBody(mesh, { type: "cloth", pinned: (p) => p.y > 0.99 });
+
+return (
+  <mesh ref={mesh}>
+    <planeGeometry args={[2, 2, 16, 16]} />
+  </mesh>
+);
+```
+
+## Helpers
+
+`weldGeometry(geometry)` returns a copy of a geometry welded on position only, and `weld` / `applyWeldMap` expose the
+underlying mapping, if you want to prepare geometry yourself.
+
+## Known limitations
+
+- Soft bodies do not emit collision events (enter / exit) yet.
+- Tears re-topologize the rendered geometry for `cloth` and `rope` only. When a `volume` body tears, the rendered skin
+  only follows the main piece; pieces that split off are simulated but not rendered.
+- `cut()` on a triangle-mesh cloth may not disconnect pieces (bend edges keep them together). `tear()` with explicit edges
+  works.
+- Props are not applied after mount (see [Props](#props)).
+- The visuals of a soft body follow its parent's transform at sync time. Unlike rigid bodies, a parent that moves later in
+  the same frame (after the `rapier` phase) is picked up on the next frame.
+
+See the `soft-bodies` demos (cloth, rope, jelly) for complete scenes.
