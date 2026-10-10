@@ -46,10 +46,7 @@ export { InstancedRigidBodies } from "./components/InstancedRigidBodies";
 export * from "./components/AnyCollider";
 
 export * from "./hooks/joints";
-export {
-  useCharacterController,
-  getStepDt
-} from "./hooks/use-character-controller";
+export { useCharacterController } from "./hooks/use-character-controller";
 export {
   useRapier,
   useBeforePhysicsStep,

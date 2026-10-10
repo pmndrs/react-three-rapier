@@ -4,7 +4,6 @@ import {
   CapsuleCollider,
   CharacterController,
   CharacterControllerRef,
-  getStepDt,
   RapierRigidBody,
   RigidBody,
   useBeforePhysicsStep
@@ -119,11 +118,9 @@ const Player = () => {
   }, []);
 
   // Runs once per fixed physics step, so the motion is framerate independent.
-  useBeforePhysicsStep((world) => {
+  useBeforePhysicsStep((_world, dt) => {
     const character = ref.current;
     if (!character) return;
-    // getStepDt prefers the fixed-step dt argument when the stepping loop passes it.
-    const dt = getStepDt(world);
     const k = keys.current;
 
     const x =

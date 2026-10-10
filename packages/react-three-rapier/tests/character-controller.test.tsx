@@ -1,5 +1,6 @@
 import React, { StrictMode, useEffect, useRef } from "react";
 import ReactThreeTestRenderer from "@react-three/test-renderer";
+import { getScheduler } from "@react-three/fiber";
 import { describe, expect, it, vi } from "vitest";
 import {
   CapsuleCollider,
@@ -420,7 +421,61 @@ describe("character controller", () => {
     warn.mockRestore();
   });
 
-  // Needs the stepping rewrite (feat/v10-scheduler-stepping): before-step
-  // callbacks receive the substep dt instead of a stale world.timestep.
-  it.todo("is framerate independent with timeStep='vary'");
+  it("is framerate independent with timeStep='vary'", async () => {
+    const scheduler = getScheduler();
+    // One second of frames: steady 30 fps, steady 144 fps, and a jittery
+    // 30/120 fps mix. Each frame runs one vary step with that frame's delta,
+    // so a stale dt (e.g. the previous step's world.timestep) would drift.
+    const runs = [
+      Array<number>(30).fill(1 / 30),
+      Array<number>(144).fill(1 / 144),
+      Array.from({ length: 48 }, (_, i) => (i % 2 ? 1 / 120 : 1 / 30))
+    ];
+    const dists: number[] = [];
+    for (const deltas of runs) {
+      const chars: CharacterControllerRef[] = [];
+      const steps: number[] = [];
+      const Recorder = () => {
+        useBeforePhysicsStep((_world, dt) => {
+          steps.push(dt);
+        });
+        return null;
+      };
+      let ctx: RapierContext | undefined;
+      let renderer!: Harness["renderer"];
+      await ReactThreeTestRenderer.act(async () => {
+        renderer = await ReactThreeTestRenderer.create(
+          <Physics timeStep="vary">
+            <Floor />
+            <Character index={0} chars={chars} />
+            <Recorder />
+            <Grab onReady={(c) => (ctx = c)} />
+          </Physics>
+        );
+      });
+      while (!ctx || !chars[0]) await new Promise((r) => setTimeout(r, 10));
+
+      // Horizontal only: with a downward push, Rapier's ground snapping
+      // loses a little distance per step, which is not what we test here.
+      chars[0].setVelocity({ x: 3, y: 0, z: 0 });
+      const start = pos(chars[0]).x;
+      let time = 0;
+      scheduler.resetTiming();
+      scheduler.step(time);
+      steps.length = 0;
+      for (const delta of deltas) {
+        time += delta * 1000;
+        scheduler.step(time);
+      }
+      expect(steps.length).toBe(deltas.length);
+      steps.forEach((dt, i) => expect(dt).toBeCloseTo(deltas[i], 6));
+      dists.push(pos(chars[0]).x - start);
+
+      await ReactThreeTestRenderer.act(async () => {
+        await renderer.unmount();
+      });
+    }
+    // 1 second at 3 units/s, whatever the frame rate
+    for (const d of dists) expect(d).toBeCloseTo(3, 2);
+  });
 });

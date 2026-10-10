@@ -4,8 +4,7 @@ import {
   InteractionGroups,
   KinematicCharacterController,
   QueryFilterFlags,
-  RigidBody,
-  World
+  RigidBody
 } from "@dimforge/rapier3d-compat";
 import { useEffect, useMemo, useRef } from "react";
 import { Vector3Object } from "../types";
@@ -114,15 +113,6 @@ export interface CharacterControllerApi {
 }
 
 /**
- * Returns the fixed-step dt for a before-step callback.
- * Uses the `dt` argument when the stepping loop provides it, and falls back to `world.timestep`.
- * Switching to the 2nd callback argument later only requires changing the call site.
- * Pass the callback's `dt` argument once the stepping loop provides it.
- */
-export const getStepDt = (world: World, dt?: number): number =>
-  dt ?? world.timestep;
-
-/**
  * Creates and owns a Rapier `KinematicCharacterController`.
  *
  * The controller is created on mount and freed on unmount (StrictMode safe),
@@ -138,8 +128,7 @@ export const getStepDt = (world: World, dt?: number): number =>
  *   const vy = useRef(0);
  *   const cc = useCharacterController({ autostep: { maxHeight: 0.3, minWidth: 0.2 } });
  *
- *   useBeforePhysicsStep((world) => {
- *     const dt = world.timestep;
+ *   useBeforePhysicsStep((_world, dt) => {
  *     vy.current -= 9.81 * dt;
  *     const { grounded } = cc.move(body.current!, { x: 0, y: vy.current * dt, z: 0 });
  *     if (grounded) vy.current = 0;

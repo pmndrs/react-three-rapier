@@ -88,7 +88,7 @@ const Vehicle = () => {
     };
   }, [world]);
 
-  useBeforePhysicsStep((world) => {
+  useBeforePhysicsStep((_world, dt) => {
     const vehicle = controller.current;
     if (!vehicle) return;
 
@@ -109,7 +109,7 @@ const Vehicle = () => {
     // EXCLUDE_SENSORS: wheel rays ignore sensor colliders. Without it the green trigger zone
     // below would be treated as ground (#693).
     vehicle.updateVehicle(
-      world.timestep,
+      dt,
       rapier.QueryFilterFlags.EXCLUDE_SENSORS
     );
   });

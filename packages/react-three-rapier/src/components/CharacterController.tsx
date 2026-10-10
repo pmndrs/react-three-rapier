@@ -3,14 +3,12 @@ import {
   Collider,
   InteractionGroups,
   KinematicCharacterController,
-  QueryFilterFlags,
-  World
+  QueryFilterFlags
 } from "@dimforge/rapier3d-compat";
 import React, { Ref, useImperativeHandle, useMemo, useRef } from "react";
 import { useBeforePhysicsStep } from "../hooks/hooks";
 import {
   CharacterControllerOptions,
-  getStepDt,
   useCharacterController
 } from "../hooks/use-character-controller";
 import { RapierRigidBody, Vector3Object } from "../types";
@@ -97,8 +95,7 @@ export interface CharacterControllerProps
  *   const vy = useRef(0);
  *   const input = useInput(); // your own input, returns { x, z, jump }
  *
- *   useBeforePhysicsStep((world) => {
- *     const dt = world.timestep;
+ *   useBeforePhysicsStep((_world, dt) => {
  *     const c = ref.current!;
  *     vy.current = c.grounded && !input.jump ? 0 : vy.current - 9.81 * dt;
  *     if (c.grounded && input.jump) vy.current = 6;
@@ -199,14 +196,13 @@ export const CharacterController = (props: CharacterControllerProps) => {
     [cc, state]
   );
 
-  useBeforePhysicsStep((world: World, dt?: number) => {
+  useBeforePhysicsStep((_world, dt) => {
     const body = bodyRef.current;
     if (!body) return;
-    const step = getStepDt(world, dt);
-    const { velocity, pending, desired } = state;
-    desired.x = velocity.x * step + pending.x;
-    desired.y = velocity.y * step + pending.y;
-    desired.z = velocity.z * step + pending.z;
+        const { velocity, pending, desired } = state;
+    desired.x = velocity.x * dt + pending.x;
+    desired.y = velocity.y * dt + pending.y;
+    desired.z = velocity.z * dt + pending.z;
     pending.x = pending.y = pending.z = 0;
 
     const p = latest.current;
