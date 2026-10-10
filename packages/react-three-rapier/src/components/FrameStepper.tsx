@@ -1,14 +1,17 @@
 import { getScheduler, useFrame } from "@react-three/fiber";
-import React, { memo, useMemo, useRef } from "react";
+import React, { memo, useLayoutEffect, useMemo, useRef, useState } from "react";
 import {
   AccumulatorState,
+  FixedStepScheduler,
   MAX_VARIABLE_STEP,
   RAPIER_PHASE,
   StepperScheduler,
   accumulatorAlpha,
+  acquireFixedPhase,
   advanceAccumulator,
-  ensureFixedPhase,
+  ensureLatePhase,
   ensureRapierPhase,
+  releaseFixedPhase,
   supportsFixedPhases,
   useRaf
 } from "../utils/utils-physics";
@@ -36,6 +39,8 @@ interface FrameStepperProps {
   stepWorld: (dt: number) => void;
   /** Write body poses into their Object3Ds, interpolated by `alpha` */
   syncMeshes: (alpha: number) => void;
+  /** Re-express synced poses if an ancestor moved after the sync */
+  lateSync: () => void;
 }
 
 /** @internal */
@@ -50,27 +55,44 @@ export const resolveSteppingMode = (
 };
 
 /**
- * Steps once per fixed substep inside a dedicated fixed scheduler phase, then
- * syncs meshes once per frame using the phase's overstep as the alpha.
+ * Steps once per fixed substep inside this world's own fixed scheduler phase,
+ * then syncs meshes once per frame using the phase's overstep as the alpha.
  */
-const FixedPhaseStepper = ({
-  timeStep,
-  maxSubSteps,
+const FixedPhaseStepper = (props: FrameStepperProps & { timeStep: number }) => {
+  const { timeStep, maxSubSteps } = props;
+  const scheduler = getScheduler() as unknown as FixedStepScheduler;
+  const [phase, setPhase] = useState<string | null>(null);
+
+  // Own a phase while mounted (released for reuse on unmount). Acquired in an
+  // effect so StrictMode's double mount releases and re-acquires the same one.
+  useLayoutEffect(() => {
+    const name = acquireFixedPhase(scheduler, timeStep, maxSubSteps);
+    setPhase(name);
+    return () => releaseFixedPhase(scheduler, name);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- retimed below
+  }, [scheduler]);
+
+  // Retime our own phase in place; this never touches other worlds' phases.
+  useLayoutEffect(() => {
+    if (phase) {
+      scheduler.setPhaseTimestep(phase, timeStep, { maxSubsteps: maxSubSteps });
+    }
+  }, [scheduler, phase, timeStep, maxSubSteps]);
+
+  return phase ? (
+    <FixedPhaseJobs {...props} phase={phase} scheduler={scheduler} />
+  ) : null;
+};
+
+const FixedPhaseJobs = ({
+  phase,
+  scheduler,
   paused,
   interpolate,
   updatePriority = 0,
   stepWorld,
   syncMeshes
-}: FrameStepperProps & { timeStep: number }) => {
-  const scheduler = getScheduler() as unknown as StepperScheduler &
-    Required<Pick<StepperScheduler, "getOverstep">>;
-
-  // Phases must exist before useFrame's layout effect registers into them.
-  const phase = useMemo(
-    () => ensureFixedPhase(scheduler, timeStep, maxSubSteps),
-    [scheduler, timeStep, maxSubSteps]
-  );
-
+}: FrameStepperProps & { phase: string; scheduler: FixedStepScheduler }) => {
   useFrame(
     (_, dt) => {
       stepWorld(dt);
@@ -169,7 +191,20 @@ const RafStepper = (props: FrameStepperProps) => {
   return null;
 };
 
-const FrameStepper = (props: FrameStepperProps) => {
+/**
+ * Right before render: re-express synced poses if an ancestor moved after the
+ * sync (e.g. in a regular `useFrame`). Nearly free when nothing moved.
+ */
+const LateSync = ({ lateSync }: Pick<FrameStepperProps, "lateSync">) => {
+  const scheduler = getScheduler() as unknown as StepperScheduler;
+  const phase = useMemo(() => ensureLatePhase(scheduler), [scheduler]);
+
+  useFrame(lateSync, { phase });
+
+  return null;
+};
+
+const Stepper = (props: FrameStepperProps) => {
   const mode = resolveSteppingMode(props.type, props.timeStep, getScheduler());
 
   switch (mode) {
@@ -183,5 +218,12 @@ const FrameStepper = (props: FrameStepperProps) => {
       return <FrameJobStepper {...props} />;
   }
 };
+
+const FrameStepper = (props: FrameStepperProps) => (
+  <>
+    <Stepper {...props} />
+    <LateSync lateSync={props.lateSync} />
+  </>
+);
 
 export default memo(FrameStepper);

@@ -57,8 +57,9 @@ export const Debug = memo(() => {
 
   useEffect(() => () => geometry.dispose(), [geometry]);
 
-  // `update` runs after the `rapier` phase, so the lines are drawn from the
-  // same step the meshes were just synced to.
+  // Runs in `update`, after this frame's steps. The lines show the latest
+  // simulated step, so with interpolation they lead the rendered meshes by up
+  // to one step ((1 - alpha) * timeStep).
   useFrame(
     () => {
       const { vertices, colors } = world.debugRender();

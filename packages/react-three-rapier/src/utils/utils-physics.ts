@@ -19,6 +19,11 @@ export interface StepperScheduler {
   hasPhase(name: string): boolean;
   getOverstep?: (phase?: string, rootId?: string) => number;
   getPhaseTimestep?: (name: string) => number | undefined;
+  setPhaseTimestep?: (
+    name: string,
+    timestep: number | undefined,
+    options?: { maxSubsteps?: number }
+  ) => void;
 }
 
 /**
@@ -28,6 +33,13 @@ export interface StepperScheduler {
  * @internal
  */
 export const RAPIER_PHASE = "rapier";
+
+/**
+ * Per-frame phase right before `render`. Hosts the late sync pass that
+ * re-expresses synced poses when an ancestor moved during `update`.
+ * @internal
+ */
+export const RAPIER_LATE_PHASE = "rapier:late";
 
 /** Upper bound for a single variable step, in seconds. @internal */
 export const MAX_VARIABLE_STEP = 0.5;
@@ -46,13 +58,22 @@ const TIMESTEP_EPSILON = 1e-9;
  */
 export const supportsFixedPhases = (
   scheduler: Partial<StepperScheduler> | null | undefined
-): scheduler is StepperScheduler &
-  Required<Pick<StepperScheduler, "getOverstep" | "getPhaseTimestep">> =>
+): scheduler is FixedStepScheduler =>
   !!scheduler &&
   typeof scheduler.addPhase === "function" &&
   typeof scheduler.hasPhase === "function" &&
   typeof scheduler.getOverstep === "function" &&
-  typeof scheduler.getPhaseTimestep === "function";
+  typeof scheduler.getPhaseTimestep === "function" &&
+  typeof scheduler.setPhaseTimestep === "function";
+
+/** @internal */
+export type FixedStepScheduler = StepperScheduler &
+  Required<
+    Pick<
+      StepperScheduler,
+      "getOverstep" | "getPhaseTimestep" | "setPhaseTimestep"
+    >
+  >;
 
 /** @internal */
 export const sanitizeMaxSubSteps = (maxSubSteps: number | undefined) =>
@@ -68,31 +89,50 @@ export const ensureRapierPhase = (scheduler: StepperScheduler) => {
   return RAPIER_PHASE;
 };
 
-/**
- * Name of the fixed phase for one (timeStep, maxSubSteps) pair.
- * @internal
- */
-export const getFixedPhaseName = (timeStep: number, maxSubSteps: number) =>
-  `rapier:fixed:${timeStep}:${maxSubSteps}`;
+/** @internal */
+export const ensureLatePhase = (scheduler: StepperScheduler) => {
+  if (!scheduler.hasPhase(RAPIER_LATE_PHASE)) {
+    scheduler.addPhase(RAPIER_LATE_PHASE, { before: "render" });
+  }
+  return RAPIER_LATE_PHASE;
+};
+
+const FIXED_PHASE_PREFIX = "rapier:fixed:";
+
+// Fixed phases currently owned by a mounted world. Kept on the scheduler
+// singleton itself so duplicate copies of this module (or HMR) share it.
+const IN_USE = Symbol.for("@react-three/rapier/fixed-phases-in-use");
+const phasesInUse = (scheduler: StepperScheduler): Set<string> =>
+  ((scheduler as any)[IN_USE] ??= new Set<string>());
 
 /**
- * Ensures a dedicated fixed-timestep phase exists for this (timeStep, maxSubSteps)
- * pair and returns its name.
+ * Gives a world its own fixed-timestep phase, `rapier:fixed:<n>`, reusing a
+ * phase released by an unmounted world when possible.
  *
- * Phase timesteps are global to the scheduler singleton, so we never retime the
- * shared `physics` phase (other libraries and user code rely on its 1/60).
- * Worlds that share a timestep share a phase; every root keeps its own clock
- * for it.
+ * Why one phase per world: phase timesteps are global to the scheduler
+ * singleton, so retiming r3f's shared `physics` phase would change it for
+ * every other user and rule out worlds with different timesteps. A phase per
+ * world can be retimed in place (`setPhaseTimestep`) when `timeStep` or
+ * `maxSubSteps` change. The scheduler has no `removePhase`, hence the reuse:
+ * the number of phases is bounded by the most worlds ever mounted at once.
  * @internal
  */
-export const ensureFixedPhase = (
-  scheduler: StepperScheduler,
+export const acquireFixedPhase = (
+  scheduler: FixedStepScheduler,
   timeStep: number,
   maxSubSteps: number
 ) => {
   ensureRapierPhase(scheduler);
-  const name = getFixedPhaseName(timeStep, maxSubSteps);
-  if (!scheduler.hasPhase(name)) {
+  const inUse = phasesInUse(scheduler);
+
+  let index = 0;
+  while (inUse.has(FIXED_PHASE_PREFIX + index)) index++;
+  const name = FIXED_PHASE_PREFIX + index;
+  inUse.add(name);
+
+  if (scheduler.hasPhase(name)) {
+    scheduler.setPhaseTimestep(name, timeStep, { maxSubsteps: maxSubSteps });
+  } else {
     scheduler.addPhase(name, {
       before: RAPIER_PHASE,
       timestep: timeStep,
@@ -100,6 +140,14 @@ export const ensureFixedPhase = (
     });
   }
   return name;
+};
+
+/** @internal */
+export const releaseFixedPhase = (
+  scheduler: StepperScheduler,
+  name: string
+) => {
+  phasesInUse(scheduler).delete(name);
 };
 
 /** @internal */

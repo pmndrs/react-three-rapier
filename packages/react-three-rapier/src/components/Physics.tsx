@@ -39,7 +39,9 @@ import {
   vector3ToRapierVector
 } from "../utils/utils";
 import {
+  anyParentSpaceMoved,
   beginParentSpacePass,
+  ParentSpace,
   refreshParentInverse
 } from "../utils/utils-rigidbody";
 import { sanitizeMaxSubSteps } from "../utils/utils-physics";
@@ -75,13 +77,71 @@ export interface RigidBodyState {
    */
   previousPose?: { position: Vector3; rotation: Quaternion; valid: boolean };
   /**
-   * Version of the parent space `invertedWorldMatrix` was last refreshed from.
+   * World-space pose last written to the object (after interpolation), reused
+   * when only the parent space changes later in the frame.
+   * @internal
+   */
+  renderedPose?: { position: Vector3; rotation: Quaternion };
+  /**
+   * The parent space `invertedWorldMatrix` was last refreshed from.
+   * @internal
+   */
+  parentSpace?: ParentSpace;
+  /**
+   * Version of that parent space.
    * @internal
    */
   parentSpaceVersion?: number;
 }
 
 export type RigidBodyStateMap = Map<RigidBody["handle"], RigidBodyState>;
+
+const sceneDepth = (object: Object3D) => {
+  let depth = 0;
+  for (let o = object.parent; o; o = o.parent) depth++;
+  return depth;
+};
+
+/**
+ * The rigid body state map, iterable parent-first. The order is rebuilt (a
+ * stable sort by scene depth) only when bodies register or unregister, so a
+ * nested <RigidBody> is always synced after the body that carries it.
+ * @internal
+ */
+export class RigidBodyStateRegistry extends Map<
+  RigidBody["handle"],
+  RigidBodyState
+> {
+  private orderedEntries: [RigidBody["handle"], RigidBodyState][] = [];
+  private orderDirty = false;
+
+  set(handle: RigidBody["handle"], state: RigidBodyState) {
+    this.orderDirty = true;
+    return super.set(handle, state);
+  }
+
+  delete(handle: RigidBody["handle"]) {
+    this.orderDirty = true;
+    return super.delete(handle);
+  }
+
+  clear() {
+    this.orderDirty = true;
+    super.clear();
+  }
+
+  /** Entries ordered parent-first (by scene depth at registration time). */
+  ordered() {
+    if (this.orderDirty) {
+      this.orderDirty = false;
+      this.orderedEntries = Array.from(this.entries())
+        .map((entry) => ({ entry, depth: sceneDepth(entry[1].object) }))
+        .sort((a, b) => a.depth - b.depth)
+        .map(({ entry }) => entry);
+    }
+    return this.orderedEntries;
+  }
+}
 
 /**
  * Called once per physics step.
@@ -512,7 +572,7 @@ export const Physics: FC<PhysicsProps> = (props) => {
   const rapier = suspend(importRapier, ["@react-thee/rapier", importRapier]);
   const { invalidate } = useThree();
 
-  const rigidBodyStates = useConst<RigidBodyStateMap>(() => new Map());
+  const rigidBodyStates = useConst(() => new RigidBodyStateRegistry());
   const colliderStates = useConst<ColliderStateMap>(() => new Map());
   const rigidBodyEvents = useConst<EventMap>(() => new Map());
   const colliderEvents = useConst<EventMap>(() => new Map());
@@ -580,6 +640,7 @@ export const Physics: FC<PhysicsProps> = (props) => {
         if (alive.current) return;
         worldProxy.free();
         resetWorldProxy();
+        eventQueue.free();
       });
     };
   }, []);
@@ -787,8 +848,13 @@ export const Physics: FC<PhysicsProps> = (props) => {
     if (!alive.current) return;
     const world = worldProxy;
 
+    beforeStepCallbacks.forEach((callback) => {
+      callback.current(world, dt);
+    });
+
     // Snapshot the pose each body is about to leave, so a frame that runs
-    // several substeps interpolates across the last one only.
+    // several substeps interpolates across the last one only. Taken after the
+    // before-step callbacks, so a teleport made there is not interpolated.
     if (config.current.interpolate && config.current.timeStep !== "vary") {
       rigidBodyStates.forEach((state, handle) => {
         const rigidBody = world.getRigidBody(handle);
@@ -807,10 +873,6 @@ export const Physics: FC<PhysicsProps> = (props) => {
       });
     }
 
-    beforeStepCallbacks.forEach((callback) => {
-      callback.current(world, dt);
-    });
-
     world.timestep = dt;
 
     const hasHooks =
@@ -825,78 +887,156 @@ export const Physics: FC<PhysicsProps> = (props) => {
     drainEvents(world);
   });
 
+  const writePose = (
+    state: RigidBodyState,
+    position: Vector3,
+    rotation: Quaternion
+  ) => {
+    _matrix4
+      .compose(position, rotation, state.scale)
+      .premultiply(state.invertedWorldMatrix);
+
+    if (state.meshType === "instancedMesh") {
+      state.setMatrix(_matrix4);
+    } else {
+      _matrix4.decompose(
+        state.object.position,
+        state.object.quaternion,
+        _scale
+      );
+    }
+  };
+
+  const rememberPose = (
+    state: RigidBodyState,
+    position: Vector3,
+    rotation: Quaternion
+  ) => {
+    const pose = (state.renderedPose ??= {
+      position: new Vector3(),
+      rotation: new Quaternion()
+    });
+    pose.position.copy(position);
+    pose.rotation.copy(rotation);
+    return pose;
+  };
+
+  // Parent spaces read by the last sync, checked again right before render.
+  const syncedSpaces = useConst<ParentSpace[]>(() => []);
+
   /**
    * Write body poses into their Object3Ds / instances, once per rendered frame.
    *
-   * Poses are written in the CURRENT parent space (the parent's inverse world
-   * matrix is recomputed every frame, not captured at spawn), interpolated by
-   * `alpha` between the previous and the latest step. Also dispatches
-   * sleep/wake events and invalidates the canvas once if any body is awake, so
-   * `frameloop="demand"` keeps ticking while things move.
+   * Bodies are visited parent-first. Poses are written in the CURRENT parent
+   * space (the parent's inverse world matrix is recomputed every frame, not
+   * captured at spawn), interpolated by `alpha` between the previous and the
+   * latest step. Also dispatches sleep/wake events and invalidates the canvas
+   * once if any body is awake, so `frameloop="demand"` keeps ticking while
+   * things move.
    */
-  const syncMeshes = useConst(() => {
-    return (alpha: number) => {
-      if (!alive.current) return;
-      const world = worldProxy;
-      beginParentSpacePass();
+  const syncMeshes = useConst(() => (alpha: number) => {
+    if (!alive.current) return;
+    const world = worldProxy;
+    beginParentSpacePass();
+    syncedSpaces.length = 0;
 
-      let anyAwake = false;
+    let anyAwake = false;
 
-      rigidBodyStates.forEach((state, handle) => {
+    const entries = rigidBodyStates.ordered();
+    for (let i = 0; i < entries.length; i++) {
+      const [handle, state] = entries[i];
+      const rigidBody = world.getRigidBody(handle);
+      if (!rigidBody) continue;
+
+      const sleeping = rigidBody.isSleeping();
+      const events = rigidBodyEvents.get(handle);
+      if (sleeping && !state.isSleeping) events?.onSleep?.();
+      if (!sleeping && state.isSleeping) events?.onWake?.();
+      state.isSleeping = sleeping;
+
+      if (!state.setMatrix || !state.object.parent) continue;
+
+      const parentMoved = refreshParentInverse(state, syncedSpaces);
+
+      // A sleeping body doesn't move, but its parent might have.
+      if (sleeping && !parentMoved && state.renderedPose) continue;
+      // Fixed bodies are still synced (they can be teleported), but never
+      // keep a demand frameloop awake.
+      if (!sleeping && !rigidBody.isFixed()) anyAwake = true;
+
+      const t = rigidBody.translation();
+      const r = rigidBody.rotation();
+      _syncPosition.set(t.x, t.y, t.z);
+      _syncRotation.set(r.x, r.y, r.z, r.w);
+
+      const previous = state.previousPose;
+      if (!sleeping && previous?.valid && alpha < 1) {
+        // Interpolating in world space, then mapping into parent space once,
+        // equals mapping both poses and interpolating (affine parent).
+        _syncPosition.lerpVectors(previous.position, _syncPosition, alpha);
+        _syncRotationPrev.copy(previous.rotation).slerp(_syncRotation, alpha);
+        _syncRotation.copy(_syncRotationPrev);
+      }
+
+      const pose = rememberPose(state, _syncPosition, _syncRotation);
+      writePose(state, pose.position, pose.rotation);
+    }
+
+    if (anyAwake) invalidate();
+  });
+
+  /**
+   * Late pass, right before render: if an ancestor moved after the sync (e.g.
+   * animated in a regular `useFrame`), re-express the already synced world
+   * poses in the new parent spaces. Costs one matrix compare per distinct
+   * parent when nothing moved.
+   */
+  const lateSync = useConst(() => () => {
+    if (!alive.current || syncedSpaces.length === 0) return;
+    if (!anyParentSpaceMoved(syncedSpaces)) return;
+
+    const world = worldProxy;
+    beginParentSpacePass();
+    syncedSpaces.length = 0;
+
+    const entries = rigidBodyStates.ordered();
+    for (let i = 0; i < entries.length; i++) {
+      const [handle, state] = entries[i];
+      if (!state.setMatrix || !state.object.parent) continue;
+      if (!refreshParentInverse(state, syncedSpaces)) continue;
+
+      let pose = state.renderedPose;
+      if (!pose) {
         const rigidBody = world.getRigidBody(handle);
-        if (!rigidBody) return;
-
-        const sleeping = rigidBody.isSleeping();
-        const events = rigidBodyEvents.get(handle);
-        if (sleeping && !state.isSleeping) events?.onSleep?.();
-        if (!sleeping && state.isSleeping) events?.onWake?.();
-        state.isSleeping = sleeping;
-
-        if (!state.setMatrix || !state.object.parent) return;
-
-        const parentMoved = refreshParentInverse(state);
-
-        // A sleeping body doesn't move, but its parent might have.
-        if (sleeping && !parentMoved) return;
-        // Fixed bodies are still synced (they can be teleported), but never
-        // keep a demand frameloop awake.
-        if (!sleeping && !rigidBody.isFixed()) anyAwake = true;
-
+        if (!rigidBody) continue;
         const t = rigidBody.translation();
         const r = rigidBody.rotation();
         _syncPosition.set(t.x, t.y, t.z);
         _syncRotation.set(r.x, r.y, r.z, r.w);
-
-        const previous = state.previousPose;
-        if (previous?.valid && alpha < 1) {
-          // Interpolating in world space, then mapping into parent space once,
-          // equals mapping both poses and interpolating (affine parent).
-          _syncPosition.lerpVectors(previous.position, _syncPosition, alpha);
-          _syncRotationPrev.copy(previous.rotation).slerp(_syncRotation, alpha);
-          _syncRotation.copy(_syncRotationPrev);
-        }
-
-        _matrix4
-          .compose(_syncPosition, _syncRotation, state.scale)
-          .premultiply(state.invertedWorldMatrix);
-
-        if (state.meshType === "instancedMesh") {
-          state.setMatrix(_matrix4);
-        } else {
-          _matrix4.decompose(
-            state.object.position,
-            state.object.quaternion,
-            _scale
-          );
-        }
-      });
-
-      if (anyAwake) invalidate();
-    };
+        pose = rememberPose(state, _syncPosition, _syncRotation);
+      }
+      writePose(state, pose.position, pose.rotation);
+    }
   });
+
+  /**
+   * Forget the previous-step poses, so the next frames render the current
+   * pose until a new step gives something to interpolate from. Used whenever
+   * the pose may have jumped outside a regular step.
+   */
+  const resetInterpolation = useConst(() => () => {
+    rigidBodyStates.forEach((state) => {
+      if (state.previousPose) state.previousPose.valid = false;
+    });
+  });
+
+  useEffect(() => {
+    resetInterpolation();
+  }, [paused, interpolate, timeStep]);
 
   const step = useCallback((dt: number) => {
     stepWorld(dt);
+    resetInterpolation();
     syncMeshes(1);
   }, []);
 
@@ -906,6 +1046,7 @@ export const Physics: FC<PhysicsProps> = (props) => {
       world: worldProxy,
       setWorld: (world: World) => {
         setWorldProxy(world);
+        resetInterpolation();
       },
       physicsOptions: {
         colliders,
@@ -938,6 +1079,7 @@ export const Physics: FC<PhysicsProps> = (props) => {
         updatePriority={updatePriority}
         stepWorld={stepWorld}
         syncMeshes={syncMeshes}
+        lateSync={lateSync}
       />
       {debug && <Debug />}
       {children}
