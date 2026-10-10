@@ -5,26 +5,25 @@
   "repository": "https://github.com/pmndrs/react-three-rapier",
   "author": "Hugo Wiledal <hugo.wiledal@gmail.com>",
   "license": "MIT",
-  "prettier": {
-    "trailingComma": "none",
-    "tabWidth": 2,
-    "useTabs": false,
-    "semi": true,
-    "singleQuote": false,
-    "arrowParens": "always"
-  },
   "devDependencies": {
     "@arethetypeswrong/cli": "0.18.5",
     "@changesets/cli": "2.27.1",
     "@commitlint/cli": "17.1.2",
     "@commitlint/config-conventional": "17.1.0",
+    "@eslint/js": "9.39.5",
     "@rollup/plugin-node-resolve": "16.0.3",
     "@testing-library/dom": "10.4.2",
     "@testing-library/react": "16.3.3",
     "@vitest/ui": "5.0.3",
     "esbuild": "0.28.2",
+    "eslint": "9.39.5",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-plugin-jsx-a11y": "6.10.2",
+    "eslint-plugin-react": "7.37.5",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "globals": "17.13.0",
     "jsdom": "30.1.2",
-    "prettier": "2.7.1",
+    "prettier": "3.9.9",
     "publint": "0.3.25",
     "rollup": "4.64.3",
     "rollup-plugin-dts": "6.5.1",
@@ -33,6 +32,7 @@
     "simple-git-hooks": "2.8.0",
     "typedoc": "0.23.24",
     "typescript": "5.9.3",
+    "typescript-eslint": "8.71.1",
     "vite": "8.3.4",
     "vitest": "5.0.3",
     "vitest-canvas-mock": "1.2.0"
@@ -43,6 +43,9 @@
     "test": "yarn typecheck && vitest run",
     "test:ui": "vitest --ui",
     "check:packages": "yarn workspaces foreach -A --no-private run check:package",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "ci": "yarn typecheck && yarn build && yarn check:packages && vitest run",
     "demo": "yarn workspace demo dev",
     "demo:build": "yarn workspace demo build",
@@ -53,7 +56,7 @@
   },
   "simple-git-hooks": {
     "commit-msg": "npx --no -- commitlint --edit ${1}",
-    "pre-commit": "yarn prettier packages/ demo/ --check; yarn ci"
+    "pre-commit": "yarn typecheck"
   },
   "workspaces": [
     "packages/*",
