@@ -36,6 +36,7 @@ import { Kinematics } from "./examples/kinematics/KinematicsExample";
 import { LockedTransformsExample } from "./examples/locked-transforms/LockedTransformsExample";
 import { ManualStepExample } from "./examples/manual-step/ManualStepExamples";
 import { MeshColliderTest } from "./examples/mesh-collider-test/MeshColliderExample";
+import { CharacterControllerExample } from "./examples/character-controller/CharacterControllerExample";
 import { OneWayPlatform } from "./examples/one-way-platform/OneWayPlatform";
 import { PerformanceExample } from "./examples/performance/PeformanceExample";
 import Shapes from "./examples/plinko/ShapesExample";
@@ -109,7 +110,8 @@ const routes: Record<string, ReactNode> = {
   "rope-joint": <RopeJointExample />,
   "active-collision-types": <ActiveCollisionTypesExample />,
   "contact-skin": <ContactSkinExample />,
-  "one-way-platform": <OneWayPlatform />
+  "one-way-platform": <OneWayPlatform />,
+  "character-controller": <CharacterControllerExample />
 };
 
 export const App = () => {

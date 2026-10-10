@@ -26,13 +26,30 @@ export type {
 } from "./components/Physics";
 export type { MeshColliderProps } from "./components/MeshCollider";
 
+export type {
+  CharacterControllerProps,
+  CharacterControllerRef
+} from "./components/CharacterController";
+export type {
+  CharacterControllerOptions,
+  CharacterControllerApi,
+  CharacterAutostepOptions,
+  CharacterMoveOptions,
+  CharacterMoveResult
+} from "./hooks/use-character-controller";
+
 export { Physics } from "./components/Physics";
+export { CharacterController } from "./components/CharacterController";
 export { RigidBody } from "./components/RigidBody";
 export { MeshCollider } from "./components/MeshCollider";
 export { InstancedRigidBodies } from "./components/InstancedRigidBodies";
 export * from "./components/AnyCollider";
 
 export * from "./hooks/joints";
+export {
+  useCharacterController,
+  getStepDt
+} from "./hooks/use-character-controller";
 export {
   useRapier,
   useBeforePhysicsStep,
