@@ -1,0 +1,261 @@
+---
+title: Joints
+description: Fixed, spherical, revolute, prismatic, rope and spring joints as hooks.
+nav: 7
+---
+
+Joints can be made between two `RigidBodies` to provide a way to restrict a motion of a body in relation to another.
+
+> Read more about joints in Rapier: https://rapier.rs/docs/user_guides/javascript/joints
+
+Joints are available in `r3/rapier` as hooks.
+
+There are 6 different joint types available:
+
+- Fixed (two bodies are fixed together)
+- Spherical (two bodies are connected by a ball and socket, for things like arms or chains)
+- Revolute (two bodies are connected by a hinge, for things like doors or wheels)
+- Prismatic (two bodies are connected by a sliding joint, for things like pistons or sliders)
+- Rope (limits the max distance between two bodies)
+- Spring (applies a force proportional to the distance between two bodies)
+
+Each joint hook returns a RefObject containing the raw reference to the joint instance.
+
+```tsx
+const WheelJoint = ({ bodyA, bodyB }) => {
+  const joint = useRevoluteJoint(bodyA, bodyB, [
+    [0, 0, 0],
+    [0, 0, 0],
+    [0, 0, 0]
+  ]);
+
+  useFrame(() => {
+    if (joint.current) {
+      joint.current.configureMotorVelocity(10, 2);
+    }
+  }, []);
+
+  return null;
+};
+```
+
+### Fixed Joint
+
+A fixed joint ensures that two rigid-bodies don't move relative to each other. Fixed joints are characterized by one local frame (represented by an isometry) on each rigid-body. The fixed-joint makes these frames coincide in world-space.
+
+🧩 See [FixedJoint docs](https://pmndrs.github.io/react-three-rapier/functions/useFixedJoint.html) for available options.
+
+```tsx
+const JointedThing = () => {
+  const bodyA = useRef<RapierRigidBody>(null);
+  const bodyB = useRef<RapierRigidBody>(null);
+
+  const joint = useFixedJoint(bodyA, bodyB, [
+    // Position of the joint in bodyA's local space
+    [0, 0, 0],
+    // Orientation of the joint in bodyA's local space
+    [0, 0, 0, 1],
+    // Position of the joint in bodyB's local space
+    [0, 0, 0],
+    // Orientation of the joint in bodyB's local space
+    [0, 0, 0, 1]
+  ]);
+
+  return (
+    <group>
+      <RigidBody ref={bodyA}>
+        <mesh />
+      </RigidBody>
+      <RigidBody ref={bodyB}>
+        <mesh />
+      </RigidBody>
+    </group>
+  );
+};
+```
+
+### Spherical Joint
+
+The spherical joint ensures that two points on the local-spaces of two rigid-bodies always coincide (it prevents any relative translational motion at this points).
+
+🧩 See [SphericalJoint docs](https://pmndrs.github.io/react-three-rapier/functions/useSphericalJoint.html) for available options.
+
+```tsx
+const JointedThing = () => {
+  const bodyA = useRef<RapierRigidBody>(null);
+  const bodyB = useRef<RapierRigidBody>(null);
+
+  const joint = useSphericalJoint(bodyA, bodyB, [
+    // Position of the joint in bodyA's local space
+    [0, 0, 0],
+    // Position of the joint in bodyB's local space
+    [0, 0, 0]
+  ]);
+
+  return (
+    <group>
+      <RigidBody ref={bodyA}>
+        <mesh />
+      </RigidBody>
+      <RigidBody ref={bodyB}>
+        <mesh />
+      </RigidBody>
+    </group>
+  );
+};
+```
+
+### Revolute Joint
+
+The revolute joint prevents any relative movement between two rigid-bodies, except for relative rotations along one axis. This is typically used to simulate wheels, fans, etc.
+
+🧩 See [RevoluteJoint docs](https://pmndrs.github.io/react-three-rapier/functions/useRevoluteJoint.html) for available options.
+
+```tsx
+const JointedThing = () => {
+  const bodyA = useRef<RapierRigidBody>(null);
+  const bodyB = useRef<RapierRigidBody>(null);
+  
+  const joint = useRevoluteJoint(bodyA, bodyB, [
+    // Position of the joint in bodyA's local space
+    [0, 0, 0],
+    // Position of the joint in bodyB's local space
+    [0, 0, 0],
+    // Axis of the joint, expressed in the local-space of
+    // the rigid-bodies it is attached to. Cannot be [0,0,0].
+    [0, 1, 0]
+  ]);
+
+  return (
+    <group>
+      <RigidBody ref={bodyA}>
+        <mesh />
+      </RigidBody>
+      <RigidBody ref={bodyB}>
+        <mesh />
+      </RigidBody>
+    </group>
+  );
+};
+```
+
+### Prismatic Joint
+
+The prismatic joint prevents any relative movement between two rigid-bodies, except for relative translations along one axis.
+
+🧩 See [PrismaticJoint docs](https://pmndrs.github.io/react-three-rapier/functions/usePrismaticJoint.html) for available options.
+
+```tsx
+const JointedThing = () => {
+  const bodyA = useRef<RapierRigidBody>(null);
+  const bodyB = useRef<RapierRigidBody>(null);
+
+  const joint = usePrismaticJoint(bodyA, bodyB, [
+    // Position of the joint in bodyA's local space
+    [0, 0, 0],
+    // Position of the joint in bodyB's local space
+    [0, 0, 0],
+    // Axis of the joint, expressed in the local-space of
+    // the rigid-bodies it is attached to. Cannot be [0,0,0].
+    [0, 1, 0]
+  ]);
+
+  return (
+    <group>
+      <RigidBody ref={bodyA}>
+        <mesh />
+      </RigidBody>
+      <RigidBody ref={bodyB}>
+        <mesh />
+      </RigidBody>
+    </group>
+  );
+};
+```
+
+### Rope Joint
+
+The rope joint limits the max distance between two bodies.
+
+🧩 See [RopeJoint docs](https://pmndrs.github.io/react-three-rapier/functions/useRopeJoint.html) for available options.
+
+```tsx
+const JointedThing = () => {
+  const bodyA = useRef<RapierRigidBody>(null);
+  const bodyB = useRef<RapierRigidBody>(null);
+
+  const joint = useRopeJoint(bodyA, bodyB, [
+    // Position of the joint in bodyA's local space
+    [0, 0, 0],
+    // Position of the joint in bodyB's local space
+    [0, 0, 0],
+    // The max distance between the two bodies / length of the rope
+    1
+  ]);
+
+  return (
+    <group>
+      <RigidBody ref={bodyA}>
+        <mesh />
+      </RigidBody>
+      <RigidBody ref={bodyB}>
+        <mesh />
+      </RigidBody>
+    </group>
+  );
+};
+```
+
+### Spring Joint
+
+The spring joint applies a force proportional to the distance between two bodies.
+
+🧩 See [SpringJoint docs](https://pmndrs.github.io/react-three-rapier/functions/useSpringJoint.html) for available options.
+
+```tsx
+const JointedThing = () => {
+  const bodyA = useRef<RapierRigidBody>(null);
+  const bodyB = useRef<RapierRigidBody>(null);
+
+  const mass = 1;
+  const springRestLength = 0;
+  const stiffness = 1.0e3;
+  const criticalDamping = 2.0 * Math.sqrt(stiffness * mass);
+  const dampingRatio = props.jointNum / (props.total / 2);
+  const damping = dampingRatio * criticalDamping;
+
+  const joint = useSpringJoint(bodyA, bodyB, [
+    // Position of the joint in bodyA's local space
+    [0, 0, 0],
+    // Position of the joint in bodyB's local space
+    [0, 0, 0],
+    // Spring rest length
+    springRestLength,
+    // Spring stiffness
+    stiffness,
+    // Spring damping
+    damping
+  ]);
+
+  return (
+    <group>
+      <RigidBody ref={bodyA}>
+        <mesh />
+      </RigidBody>
+      <RigidBody ref={bodyB}>
+        <mesh />
+      </RigidBody>
+    </group>
+  );
+};
+```
+
+### Joints example
+
+<a href="https://codesandbox.io/s/react-three-rapier-joints-mhhbd4"><img src="https://github.com/pmndrs/react-three-rapier/raw/main/packages/react-three-rapier/misc/example-joints.jpg" width="240" alt="example-joints.jpg" /></a>
+
+> [!NOTE]
+> Joints are created once when the hook mounts. Changing the arguments afterwards is ignored, and the JS bindings
+> do not expose enabling or disabling a joint. To toggle one, mount and unmount a wrapper component, or disable one of
+> the bodies with `setEnabled(false)`. Rapier 0.21 added per-axis motors on spherical joints (`configureMotor*` with
+> `JointAxis`), available through the joint ref.

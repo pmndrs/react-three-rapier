@@ -1,0 +1,59 @@
+---
+title: Update loop and stepping
+description: Fixed time steps, manual stepping and on-demand rendering.
+nav: 25
+---
+
+> [!WARNING]
+> **TODO (3.0):** The update loop is being reworked for 3.0 on top of the react-three-fiber v10 scheduler
+> (`@pmndrs/scheduler`) and its fixed-step physics phase. The props and behavior described here
+> (`timeStep`, `interpolate`, `updateLoop`, `updatePriority`, `paused`, `step` and the frame stepper)
+> are the 2.x ones, are still present on `next`, and are likely to change. This section will be rewritten
+> once the new stepping API lands. See [Migrating from 2.x to 3.0](/advanced/migration).
+
+## Configuring time step size
+
+By default, `<Physics>` will simulate the physics world at a fixed rate of 60 frames per second. This can be changed by setting the `timeStep` prop on `<Physics>`:
+
+```tsx
+<Physics timeStep={1 / 30}>{/* ... */}</Physics>
+```
+
+The `timeStep` prop may also be set to `"vary"`, which will cause the simulation's time step to adjust to every frame's frame delta:
+
+```tsx
+<Physics timeStep="vary">{/* ... */}</Physics>
+```
+
+> [!NOTE]
+> This is useful for games that run at variable frame rates, but may cause instability in the simulation. It also prevents the physics simulation from being fully deterministic. Please use with care!
+
+## Manual stepping
+
+You can manually step the physics simulation by calling the `step` method from the `useRapier` hook.
+
+```tsx
+const { step } = useRapier();
+
+step(1 / 60);
+```
+
+## On-demand rendering
+
+By default `@react-three/rapier` will update the physics simulation when a frame renders. This is fine for most cases, but if you want to only render the scene when things have changed, you need to run the physics simulation independently from the render loop.
+
+- See https://docs.pmnd.rs/react-three-fiber/advanced/scaling-performance#on-demand-rendering, for info on on-demand rendering in `@react-tree/fiber`.
+
+Setting `<Physics updateLoop="independent" />` will make the physics simulation run in it's own `requestAnimationFrame` loop, and call `invalidate` on the canvas only when there are active (moving) bodies.
+
+```tsx
+<Canvas frameloop="demand">
+  <Physics updateLoop="independent">...</Physics>
+</Canvas>
+```
+
+> [!WARNING]
+> **TODO (3.0):** with the react-three-fiber v10 scheduler, `updateLoop="independent"`, `updatePriority`, the
+> `FrameStepper` and the `step` function are expected to change. `updatePriority` will no longer take over rendering.
+> Document the final shape of the fixed-step physics phase, `maxSubSteps`, the `paused`/manual-step semantics and
+> the signature of `useBeforePhysicsStep` / `useAfterPhysicsStep` here.

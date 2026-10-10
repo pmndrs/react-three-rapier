@@ -50,6 +50,8 @@
     "release": "yarn build && changeset publish",
     "test": "tsc && vitest run",
     "test:ui": "vitest --ui",
+    "docs": "curl -sL https://raw.githubusercontent.com/pmndrs/docs/refs/heads/main/preview.sh | MDX=docs ICON=🤺 LOGO=https://github.com/pmndrs/react-three-rapier/raw/main/packages/react-three-rapier/misc/hero.svg NEXT_PUBLIC_LIBNAME='React Three Rapier' NEXT_PUBLIC_LIBNAME_SHORT='r3/rapier' GITHUB=https://github.com/pmndrs/react-three-rapier sh",
+    "docs:site:build": "npx -y @pmndrs/docs@4 build docs docs/out --format website --libname \"React Three Rapier\" --libname-short \"r3/rapier\" --home-redirect \"/getting-started/introduction\" --icon \"🤺\" --logo \"https://github.com/pmndrs/react-three-rapier/raw/main/packages/react-three-rapier/misc/hero.svg\" --github \"https://github.com/pmndrs/react-three-rapier\" --discord \"https://discord.gg/ZZjjNvJ\"",
     "docs:build": "typedoc --out ./packages/react-three-rapier/docs ./packages/react-three-rapier/src/index.ts --excludeInternal",
     "canary:enter": "changeset pre enter canary",
     "canary:exit": "changeset pre exit"

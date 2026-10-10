@@ -1,0 +1,51 @@
+---
+title: Contact force events
+description: onContactForce payloads and what changed in Rapier 0.21.
+nav: 22
+---
+
+Contact force events are triggered on `<RigidBody>` and any collider components when two objects collider.
+
+```tsx
+<RigidBody
+  colliders="ball"
+  onContactForce={(payload) => {
+    console.log(`The total force generated was: ${payload.totalForce}`);
+  }}
+>
+  <Sphere>
+    <meshPhysicalMaterial color={"grey"} />
+  </Sphere>
+</RigidBody>
+```
+
+The payload for the contact force event contains the following properties:
+
+- `target`  
+  `CollisionTarget` of the object firing the event
+- `other`  
+  `CollisionTarget` of the other object involved in the event
+- `totalForce`  
+  The sum of all the forces between the two colliders
+- `totalForceMagnitude`  
+  The sum of the magnitudes of each force between the two colliders
+- `maxForceDirection`  
+  The world-space (unit) direction of the force with strongest magnitude
+- `maxForceMagnitude`  
+  The magnitude of the largest force at a contact point of this contact pair
+
+More information about each property can be found in the rapier [TempContactForceEvent API documentation](https://rapier.rs/javascript3d/classes/TempContactForceEvent.html).
+
+You can also add the `onContactForce` event to any collider.
+
+```tsx
+<CapsuleCollider
+  onContactForce={(payload) => {
+    /* ... */
+  }}
+/>
+```
+
+> [!NOTE]
+> Rapier 0.21 reports smaller contact impulses than 0.19 (roughly by a factor of `1 / (iterations + 1)`), because the
+> solver now works in substeps. Thresholds you tuned against 2.x may need to be lowered.

@@ -1,0 +1,60 @@
+---
+title: Installation
+description: Installing @react-three/rapier and its peer dependencies, bundler notes and CSP requirements.
+nav: 1
+---
+
+```bash
+npm install three @react-three/fiber @react-three/rapier
+```
+
+`@dimforge/rapier3d-compat` is installed for you as a dependency. Import Rapier types and enums from it, or from
+`@react-three/rapier`, never from deep paths.
+
+## Peer dependencies
+
+| package | 3.0 | 2.x |
+| --- | --- | --- |
+| `@react-three/fiber` | `>=10.0.0-0` | `^9` |
+| `react` / `react-dom` | `>=19.0 <19.3` (follows react-three-fiber 10) | `^19` |
+| `three` | `>=0.185` | |
+
+If you are on react-three-fiber v8 and React 18, use `@react-three/rapier` v1.
+
+> [!NOTE]
+> The 3.0 ranges are the planned ones and may change before the stable release.
+
+## Suspense
+
+`<Physics>` loads the Rapier WebAssembly module lazily, so it **must** be inside a `<Suspense>` boundary.
+
+```tsx
+<Canvas>
+  <Suspense fallback={null}>
+    <Physics>{/* ... */}</Physics>
+  </Suspense>
+</Canvas>
+```
+
+## Bundle size
+
+Rapier 0.21 roughly doubled the size of the inlined WebAssembly (about 1.6 MB to 3.1 MB). The module is loaded
+with a dynamic `import()` when `<Physics>` first mounts, so it does not block your initial JavaScript, but account for
+it in your loading strategy.
+
+## Content Security Policy
+
+WebAssembly compilation is gated by CSP. If your site sends a `Content-Security-Policy` header with a `script-src`
+directive, add `'wasm-unsafe-eval'`. This allows WebAssembly without allowing JavaScript `eval`. See the
+[FAQ](/advanced/faq#csp-refuses-to-compile-webassembly).
+
+## Bundlers
+
+Use the public `@dimforge/rapier3d-compat` entry point when you import Rapier yourself. Since Rapier 0.20 its files
+live in `dist/` behind an `exports` map, so deep imports such as `@dimforge/rapier3d-compat/math` and hard-coded CDN
+file URLs no longer work. Make sure only one copy of `@dimforge/rapier3d-compat` is installed; a duplicate or
+mismatched copy shows up as `raweventqueue_new of undefined`.
+
+## React Native
+
+React Native is not supported, since Rapier needs WebAssembly. See the [FAQ](/advanced/faq#react-native).
