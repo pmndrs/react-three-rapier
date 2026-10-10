@@ -6,6 +6,39 @@
 version: 2
 updates:
   - package-ecosystem: "npm"
-    directory: "/packages/react-three-rapier"
+    directory: "/" # yarn workspaces are discovered from the root
     schedule:
       interval: "weekly"
+    groups:
+      minor-and-patch:
+        applies-to: version-updates
+        update-types:
+          - "minor"
+          - "patch"
+    ignore:
+      # three, react/react-dom and @react-three/* track r3f v10 / drei v11 prereleases;
+      # major bumps are deliberate, hand-verified upgrades.
+      - dependency-name: "three"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@types/three"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react-dom"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@types/react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@types/react-dom"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@react-three/*"
+        update-types: ["version-update:semver-major"]
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      github-actions:
+        update-types:
+          - "minor"
+          - "patch"

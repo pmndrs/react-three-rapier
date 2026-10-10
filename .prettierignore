@@ -1,3 +1,10 @@
-dist
-docs
+**/dist
+**/node_modules
+**/coverage
+**/docs/out
+packages/react-three-rapier/docs
+.yarn
+yarn.lock
+.changeset/**/*.md
+CHANGELOG.md
 readme.md

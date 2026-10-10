@@ -1,67 +1,70 @@
 {
   "name": "react-three-rapier",
   "version": "0.1.0",
-  "main": "index.js",
+  "private": true,
   "repository": "https://github.com/pmndrs/react-three-rapier",
   "author": "Hugo Wiledal <hugo.wiledal@gmail.com>",
   "license": "MIT",
-  "preconstruct": {
-    "packages": [
-      "packages/*"
-    ]
-  },
-  "prettier": {
-    "trailingComma": "none",
-    "tabWidth": 2,
-    "useTabs": false,
-    "semi": true,
-    "singleQuote": false,
-    "arrowParens": "always"
-  },
-  "dependencies": {
-    "@babel/core": "7.17.10",
-    "@babel/preset-env": "7.17.10",
-    "@babel/preset-react": "7.16.7",
-    "@babel/preset-typescript": "7.16.7",
-    "@changesets/cli": "2.27.1",
+  "devDependencies": {
+    "@arethetypeswrong/cli": "0.18.5",
+    "@changesets/cli": "3.0.3",
     "@commitlint/cli": "17.1.2",
     "@commitlint/config-conventional": "17.1.0",
-    "@manypkg/cli": "0.19.1",
-    "@preconstruct/cli": "2.8.8",
-    "@testing-library/dom": "10.4.0",
-    "@testing-library/react": "16.2.0",
-    "@vitejs/plugin-react": "4.3.4",
-    "@vitest/ui": "3.0.4",
-    "jsdom": "24.0.0",
-    "prettier": "2.7.1",
+    "@eslint/js": "9.39.5",
+    "@rollup/plugin-node-resolve": "16.0.3",
+    "@testing-library/dom": "10.4.2",
+    "@testing-library/react": "16.3.3",
+    "@vitest/ui": "5.0.3",
+    "esbuild": "0.28.2",
+    "eslint": "9.39.5",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-plugin-jsx-a11y": "6.10.2",
+    "eslint-plugin-react": "7.37.5",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "globals": "17.13.0",
+    "jsdom": "30.1.2",
+    "prettier": "3.9.9",
+    "publint": "0.3.25",
+    "rollup": "4.64.3",
+    "rollup-plugin-dts": "6.5.1",
+    "rollup-plugin-esbuild": "6.2.1",
+    "rollup-plugin-filesize": "10.0.0",
     "simple-git-hooks": "2.8.0",
     "typedoc": "0.23.24",
-    "typescript": "5.7.3",
-    "vitest": "3.0.4",
-    "vitest-canvas-mock": "0.3.3"
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.71.1",
+    "vite": "8.3.4",
+    "vitest": "5.0.3",
+    "vitest-canvas-mock": "1.2.0"
   },
   "scripts": {
-    "ci": "preconstruct validate && manypkg check && yarn test",
-    "postinstall": "preconstruct dev",
-    "build": "preconstruct build",
-    "dev": "preconstruct dev",
-    "watch": "preconstruct watch",
-    "demo": "cd demo && yarn dev",
-    "release": "yarn build && changeset publish",
-    "test": "tsc && vitest run",
+    "build": "yarn workspaces foreach -A -t --no-private run build",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "yarn typecheck && vitest run",
     "test:ui": "vitest --ui",
+    "check:packages": "yarn workspaces foreach -A --no-private run check:package",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "ci": "yarn typecheck && yarn build && yarn check:packages && vitest run",
+    "demo": "yarn workspace demo dev",
+    "demo:build": "yarn workspace demo build",
     "docs:build": "typedoc --out ./packages/react-three-rapier/docs ./packages/react-three-rapier/src/index.ts --excludeInternal",
-    "canary:enter": "changeset pre enter canary",
-    "canary:exit": "changeset pre exit"
+    "changeset:version": "changeset version && yarn install --mode update-lockfile",
+    "changeset:publish": "yarn build && yarn test && changeset publish",
+    "prerelease:enter": "changeset pre enter alpha",
+    "prerelease:exit": "changeset pre exit"
   },
   "simple-git-hooks": {
     "commit-msg": "npx --no -- commitlint --edit ${1}",
-    "pre-commit": "yarn prettier packages/ demo/ --check; yarn ci"
+    "pre-commit": "yarn typecheck"
   },
-  "private": true,
   "workspaces": [
     "packages/*",
     "demo"
   ],
-  "packageManager": "yarn@1.22.21+sha1.1959a18351b811cdeedbd484a8f86c3cc3bbaf72"
+  "engines": {
+    "node": ">=22"
+  },
+  "packageManager": "yarn@4.18.1"
 }

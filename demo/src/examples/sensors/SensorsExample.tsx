@@ -1,4 +1,5 @@
-import { Box, Sphere, Text } from "@react-three/drei";
+// <Html> instead of troika <Text>: Text is WebGL-only (ShaderMaterial)
+import { Box, Html, Sphere } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import {
   CuboidCollider,
@@ -49,7 +50,13 @@ const Goal = (props: RigidBodyProps) => {
         castShadow
       />
 
-      {intersecting && <Text fontSize={2}>Goal</Text>}
+      {intersecting && (
+        <Html center>
+          <div style={{ fontSize: 48, fontWeight: "bold", userSelect: "none" }}>
+            Goal
+          </div>
+        </Html>
+      )}
 
       <CuboidCollider
         position={[0, 0, 1]}

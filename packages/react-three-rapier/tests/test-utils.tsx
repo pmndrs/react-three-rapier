@@ -43,17 +43,21 @@ export const TestCollider = ({
   return <CuboidCollider ref={ref} {...rest} />;
 };
 
-export const createCollider = (props: CuboidColliderProps) =>
-  new Promise<Collider>(
-    async (resolve) =>
-      await ReactThreeTestRenderer.act(async () => {
-        await ReactThreeTestRenderer.create(
-          <Physics>
-            <TestCollider {...props} ready={resolve} />
-          </Physics>
-        );
-      })
+// These helpers await `create` before handing back the instance. Resolving on the `ready`
+// callback alone leaves `create`'s act() scope open while the test (or the next test) starts
+// its own act(), and overlapping act scopes don't flush reliably on r3f v10.
+export const createCollider = async (props: CuboidColliderProps) => {
+  let resolveCollider!: (collider: Collider) => void;
+  const ready = new Promise<Collider>((resolve) => (resolveCollider = resolve));
+
+  await ReactThreeTestRenderer.create(
+    <Physics>
+      <TestCollider {...props} ready={resolveCollider} />
+    </Physics>
   );
+
+  return ready;
+};
 
 export const TestRigidBody = ({
   ready,
@@ -72,17 +76,20 @@ export const TestRigidBody = ({
   );
 };
 
-export const createRigidBody = (props: RigidBodyProps) =>
-  new Promise<RapierRigidBody>(
-    async (resolve) =>
-      await ReactThreeTestRenderer.act(async () => {
-        await ReactThreeTestRenderer.create(
-          <Physics>
-            <TestRigidBody {...props} ready={resolve} />
-          </Physics>
-        );
-      })
+export const createRigidBody = async (props: RigidBodyProps) => {
+  let resolveRigidBody!: (rigidBody: RapierRigidBody) => void;
+  const ready = new Promise<RapierRigidBody>(
+    (resolve) => (resolveRigidBody = resolve)
   );
+
+  await ReactThreeTestRenderer.create(
+    <Physics>
+      <TestRigidBody {...props} ready={resolveRigidBody} />
+    </Physics>
+  );
+
+  return ready;
+};
 
 const Mounter = ({
   ready
@@ -99,16 +106,19 @@ const Mounter = ({
 };
 
 export const awaitReady = async (children: ReactNode) => {
-  const step = await new Promise<(num: number) => void>(async (resolve) => {
-    await ReactThreeTestRenderer.create(
-      <Physics paused>
-        {children}
-        <Mounter ready={resolve} />
-      </Physics>
-    );
-  });
+  let resolveStep!: (step: (num: number) => void) => void;
+  const ready = new Promise<(num: number) => void>(
+    (resolve) => (resolveStep = resolve)
+  );
 
-  return step;
+  await ReactThreeTestRenderer.create(
+    <Physics paused>
+      {children}
+      <Mounter ready={resolveStep} />
+    </Physics>
+  );
+
+  return ready;
 };
 
 export const RapierContextCatcher = ({

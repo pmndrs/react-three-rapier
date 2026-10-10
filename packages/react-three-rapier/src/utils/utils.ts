@@ -32,7 +32,7 @@ export const rapierQuaternionToQuaternion = ({
 
 export const vector3ToRapierVector = (v: Vector3Like) => {
   if (Array.isArray(v)) {
-    return new RapierVector3(v[0], v[1], v[2]);
+    return new RapierVector3(v[0], v[1], v[2] as number);
   } else if (typeof v === "number") {
     return new RapierVector3(v, v, v);
   } else {
@@ -45,7 +45,13 @@ export const quaternionToRapierQuaternion = (v: QuaternionLike) => {
   if (Array.isArray(v)) {
     return new RapierQuaternion(v[0], v[1], v[2], v[3]);
   } else {
-    return new RapierQuaternion(v.x, v.y, v.z, v.w);
+    const threeQuaternion = v as Quaternion;
+    return new RapierQuaternion(
+      threeQuaternion.x,
+      threeQuaternion.y,
+      threeQuaternion.z,
+      threeQuaternion.w
+    );
   }
 };
 
