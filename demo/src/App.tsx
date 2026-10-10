@@ -1,7 +1,6 @@
-import { Box, Environment, OrbitControls } from "@react-three/drei";
+import { Box, Environment, OrbitControls, Stats } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { Physics, RigidBody } from "@react-three/rapier";
-import { Perf } from "r3f-perf";
 import {
   JSX,
   ReactNode,
@@ -45,7 +44,7 @@ import { SnapshotExample } from "./examples/snapshot/SnapshotExample";
 import { SpringExample } from "./examples/spring/SpringExample";
 import { StutteringExample } from "./examples/stuttering/StutteringExample";
 import { Transforms } from "./examples/transforms/TransformsExample";
-import { OrbitControls as OrbitControlsImpl } from "three-stdlib";
+import type { OrbitControls as OrbitControlsImpl } from "three/addons/controls/OrbitControls.js";
 import { useResetOrbitControls } from "./hooks/use-reset-orbit-controls";
 
 type DemoContext = {
@@ -148,7 +147,7 @@ export const App = () => {
         }}
       />
       <Suspense fallback="Loading...">
-        <Canvas shadows dpr={1}>
+        <Canvas gl={{ shadows: true }} dpr={1}>
           <StrictMode>
             <Physics
               paused={paused}
@@ -188,7 +187,8 @@ export const App = () => {
 
               <Floor />
 
-              {perf && <Perf />}
+              {/* r3f-perf does not support r3f v10 yet; drei <Stats> stands in */}
+              {perf && <Stats />}
             </Physics>
           </StrictMode>
         </Canvas>

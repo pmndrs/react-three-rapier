@@ -29,31 +29,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
 
-      - name: Setup Node.js environment
-        uses: actions/setup-node@v3.6.0
-        with:
-          node-version: 22.x
-          
-      - name: Enable corepack  
-        run: corepack enable
-
-      - name: Install Node Dependencies
-        run: yarn --immutable
+      - uses: ./.github/actions/setup
 
       - name: Run typedoc
         run: yarn docs:build
 
       - name: Setup Pages
-        uses: actions/configure-pages@v2
+        uses: actions/configure-pages@v6
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           # Upload docs folder
           path: "./packages/react-three-rapier/docs"
 
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
