@@ -42,6 +42,20 @@ describe("getColliderArgsFromGeometry", () => {
     expect(Array.from(args[1] as Uint32Array)).toEqual([0, 1, 2, 0, 2, 3]);
   });
 
+  it("trimesh: merges vertices of non-indexed geometry (#698)", () => {
+    const g = new BufferGeometry();
+    g.setAttribute(
+      "position",
+      new BufferAttribute(
+        new Float32Array([...positions.slice(0, 9), ...positions.slice(0, 9)]),
+        3
+      )
+    );
+    const { args } = getColliderArgsFromGeometry(g, "trimesh");
+    expect((args[0] as Float32Array).length).toBe(9);
+    expect(Array.from(args[1] as Uint32Array)).toEqual([0, 1, 2, 0, 1, 2]);
+  });
+
   it("hull: handles normalized quantized attributes (#627)", () => {
     const g = new BufferGeometry();
     g.setAttribute(

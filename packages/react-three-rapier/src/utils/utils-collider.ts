@@ -15,7 +15,7 @@ import {
   Object3D,
   Vector3
 } from "three";
-import { mergeVertices } from "three-stdlib";
+import { mergeVertices } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { ColliderProps, RigidBodyProps } from "..";
 import {
   ColliderState,

@@ -7,7 +7,7 @@ import { ThreeElements } from "@react-three/fiber";
 import { RigidBody } from "@react-three/rapier";
 import { useRef } from "react";
 import { Group, Mesh, MeshPhysicalMaterial, MeshStandardMaterial } from "three";
-import type { GLTF } from "three-stdlib";
+import type { GLTF } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { useDemo } from "../../App";
 import { useResetOrbitControls } from "../../hooks/use-reset-orbit-controls";
 
