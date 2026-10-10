@@ -6,7 +6,7 @@ import {
   InterleavedBufferAttribute,
   Vector3
 } from "three";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
   createColliderFromOptions,
   scaleColliderArgs,
@@ -98,5 +98,41 @@ describe("scaleColliderArgs", () => {
 
     const second = scaleColliderArgs("heightfield", args, scale);
     expect(second[3]).toEqual({ x: 20, y: 300, z: 4000 });
+  });
+});
+
+describe("heightfield args validation (#730)", () => {
+  const make = async (heights: number[]) => {
+    await RAPIER.init();
+    const world = new RAPIER.World({ x: 0, y: 0, z: 0 });
+    createColliderFromOptions(
+      {
+        shape: "heightfield",
+        args: [1, 1, heights, { x: 1, y: 1, z: 1 }]
+      } as any,
+      world,
+      new Vector3(1, 1, 1)
+    );
+  };
+
+  it("warns when heights length is not (rows+1)*(cols+1)", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    try {
+      // rapier may also panic on the invalid heights, which we wrap in an error
+      await make([0, 0, 0]).catch(() => {});
+      expect(warn).toHaveBeenCalledWith(expect.stringContaining("(rows + 1)"));
+    } finally {
+      warn.mockRestore();
+    }
+  });
+
+  it("does not warn for a correct heights length", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    try {
+      await make([0, 0, 0, 0]);
+      expect(warn).not.toHaveBeenCalled();
+    } finally {
+      warn.mockRestore();
+    }
   });
 });

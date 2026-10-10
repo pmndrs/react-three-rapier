@@ -41,10 +41,23 @@ export type CuboidArgs = [
 export type BallArgs = [radius: number];
 export type CapsuleArgs = [halfHeight: number, radius: number];
 export type ConvexHullArgs = [vertices: ArrayLike<number>];
+/**
+ * Arguments for a heightfield collider: `[rows, cols, heights, scale]`.
+ *
+ * `rows` and `cols` are the number of *cells* along each axis, not the number
+ * of height samples. The `heights` array therefore must contain
+ * `(rows + 1) * (cols + 1)` values, stored in column-major order
+ * (`heights[col * (rows + 1) + row]`). A different length will produce a
+ * wrong or misaligned collider (a dev-mode warning is logged).
+ *
+ * `scale` is the total size of the heightfield along each axis.
+ *
+ * @see https://rapier.rs/docs/user_guides/javascript/colliders#heightfield
+ */
 export type HeightfieldArgs = [
-  width: number,
-  height: number,
-  heights: number[],
+  rows: number,
+  cols: number,
+  heights: ArrayLike<number>,
   scale: { x: number; y: number; z: number }
 ];
 export type TrimeshArgs = [

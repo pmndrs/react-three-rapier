@@ -29,7 +29,11 @@ import {
   _scale,
   _vector3
 } from "./shared-objects";
-import { ColliderShape, RigidBodyAutoCollider } from "../types";
+import {
+  ColliderShape,
+  HeightfieldArgs,
+  RigidBodyAutoCollider
+} from "../types";
 import { scaleVertices, vectorToTuple } from "./utils";
 
 export const scaleColliderArgs = (
@@ -87,6 +91,20 @@ export const createColliderFromOptions = (
   scale: Vector3,
   getRigidBody?: () => RigidBody
 ) => {
+  if (
+    options.shape === "heightfield" &&
+    typeof process !== "undefined" &&
+    process.env.NODE_ENV !== "production"
+  ) {
+    const [rows, cols, heights] = options.args as HeightfieldArgs;
+    const expected = (rows + 1) * (cols + 1);
+    if (heights?.length !== expected) {
+      console.warn(
+        `@react-three/rapier: heightfield collider expects \`heights\` to have (rows + 1) * (cols + 1) = ${expected} values, but got ${heights?.length}.`
+      );
+    }
+  }
+
   const scaledArgs = scaleColliderArgs(options.shape!, options.args, scale);
   // @ts-ignore
   const desc = ColliderDesc[options.shape!](...scaledArgs);
