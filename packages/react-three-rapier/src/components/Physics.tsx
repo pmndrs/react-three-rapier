@@ -6,6 +6,7 @@ import {
   PhysicsHooks,
   RigidBody,
   RigidBodyHandle,
+  SoftBodyTearEvent,
   SolverFlags,
   World
 } from "@dimforge/rapier3d-compat";
@@ -64,6 +65,12 @@ export interface RigidBodyState {
 export type RigidBodyStateMap = Map<RigidBody["handle"], RigidBodyState>;
 
 export type WorldStepCallback = (world: World) => void;
+
+/**
+ * Called for every soft body tear event drained after a world step. The
+ * event is only valid for the duration of the call.
+ */
+export type SoftBodyTearCallback = (event: SoftBodyTearEvent) => void;
 
 export type WorldStepCallbackSet = Set<{ current: WorldStepCallback }>;
 
@@ -145,6 +152,12 @@ export interface RapierContext {
    * @internal
    */
   afterStepCallbacks: WorldStepCallbackSet;
+
+  /**
+   * Triggered for every soft body tear event produced by the world step
+   * @internal
+   */
+  softBodyTearCallbacks: Set<SoftBodyTearCallback>;
 
   /**
    * Hooks to filter contact pairs
@@ -483,6 +496,9 @@ export const Physics: FC<PhysicsProps> = (props) => {
   }));
   const beforeStepCallbacks = useConst<WorldStepCallbackSet>(() => new Set());
   const afterStepCallbacks = useConst<WorldStepCallbackSet>(() => new Set());
+  const softBodyTearCallbacks = useConst<Set<SoftBodyTearCallback>>(
+    () => new Set()
+  );
 
   /**
    * Initiate the world
@@ -836,6 +852,10 @@ export const Physics: FC<PhysicsProps> = (props) => {
         });
       });
 
+      eventQueue.drainSoftBodyTearEvents((event) => {
+        softBodyTearCallbacks.forEach((callback) => callback(event));
+      });
+
       world.forEachActiveRigidBody(() => {
         invalidate();
       });
@@ -860,6 +880,7 @@ export const Physics: FC<PhysicsProps> = (props) => {
       colliderEvents,
       beforeStepCallbacks,
       afterStepCallbacks,
+      softBodyTearCallbacks,
       isPaused: paused,
       isDebug: debug,
       step,
