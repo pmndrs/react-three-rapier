@@ -34,6 +34,7 @@ const Grab = ({ onReady }: { onReady: (ctx: RapierContext) => void }) => {
 const Character = ({
   index,
   chars,
+  children,
   ...props
 }: { index: number; chars: CharacterControllerRef[] } & Record<
   string,
@@ -46,6 +47,7 @@ const Character = ({
   return (
     <CharacterController ref={ref} position={[0, 0.81, 0]} {...props}>
       <CapsuleCollider args={[0.5, 0.3]} />
+      {children}
     </CharacterController>
   );
 };
@@ -90,7 +92,7 @@ const run = async (h: Harness, seconds: number, dt = 1 / 60) => {
   });
 };
 
-const pos = (c: CharacterControllerRef) => c.rigidBody.translation();
+const pos = (c: CharacterControllerRef) => c.rigidBody!.translation();
 
 describe("character controller", () => {
   it("creates and removes the controller on mount/unmount", async () => {
@@ -277,7 +279,7 @@ describe("character controller", () => {
     expect(dists[1]).toBeGreaterThan(2.9);
   });
 
-  it("move(delta) applies a one-off displacement", async () => {
+  it("translate(delta) applies a one-off displacement", async () => {
     const h = await setup((chars) => (
       <>
         <Floor />
@@ -285,7 +287,7 @@ describe("character controller", () => {
       </>
     ));
     const c = h.chars[0];
-    c.move({ x: 1, y: 0, z: 0 });
+    c.translate({ x: 1, y: 0, z: 0 });
     await run(h, 0.5);
     expect(pos(c).x).toBeCloseTo(1, 1);
   });
@@ -335,4 +337,90 @@ describe("character controller", () => {
     expect(second).toBe(first);
     expect(body.translation().x).toBeGreaterThan(0.1);
   });
+
+  it("reverts options to Rapier defaults when they become undefined", async () => {
+    let controller: any;
+    const Probe = ({ opts }: { opts: CharacterControllerOptions }) => {
+      const cc = useCharacterController(opts);
+      useEffect(() => {
+        controller = cc.controller;
+      });
+      return null;
+    };
+    let renderer!: Awaited<ReturnType<typeof ReactThreeTestRenderer.create>>;
+    await ReactThreeTestRenderer.act(async () => {
+      renderer = await ReactThreeTestRenderer.create(
+        <Physics paused>
+          <Probe opts={{ slide: false, maxSlopeClimbAngle: 0.1 }} />
+        </Physics>
+      );
+    });
+    const defaultSlope = Math.PI / 4;
+    expect(controller.maxSlopeClimbAngle()).toBeCloseTo(0.1);
+    await ReactThreeTestRenderer.act(async () => {
+      await renderer.update(
+        <Physics paused>
+          <Probe
+            opts={{
+              autostep: { maxHeight: 0.4, minWidth: 0.1 },
+              snapToGround: 0.3
+            }}
+          />
+        </Physics>
+      );
+    });
+    expect(controller.autostepEnabled()).toBe(true);
+    expect(controller.snapToGroundEnabled()).toBe(true);
+    expect(controller.slideEnabled()).toBe(true);
+    expect(controller.maxSlopeClimbAngle()).toBeCloseTo(defaultSlope);
+    await ReactThreeTestRenderer.act(async () => {
+      await renderer.update(
+        <Physics paused>
+          <Probe opts={{}} />
+        </Physics>
+      );
+    });
+    expect(controller.autostepEnabled()).toBe(false);
+    expect(controller.snapToGroundEnabled()).toBe(false);
+  });
+
+  it("creates only the explicit collider for mesh children", async () => {
+    const h = await setup((chars) => (
+      <Character index={0} chars={chars}>
+        <mesh>
+          <boxGeometry />
+        </mesh>
+      </Character>
+    ));
+    expect(h.chars[0].rigidBody!.numColliders()).toBe(1);
+  });
+
+  it("move() after unmount is a no-op that does not leak a controller", async () => {
+    let api: any;
+    let body!: RapierRigidBody;
+    const Player = () => {
+      const ref = useRef<RapierRigidBody>(null);
+      api = useCharacterController();
+      useEffect(() => {
+        body = ref.current!;
+      }, []);
+      return (
+        <RigidBody ref={ref} type="kinematicPosition">
+          <CapsuleCollider args={[0.5, 0.3]} />
+        </RigidBody>
+      );
+    };
+    const h = await setup(() => <Player />);
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    await ReactThreeTestRenderer.act(async () => {
+      await h.renderer.unmount();
+    });
+    expect(() => api.move(body, { x: 1, y: 0, z: 0 })).not.toThrow();
+    expect(h.ctx.world.characterControllers.size).toBe(0);
+    warn.mockRestore();
+  });
+
+  // Needs the stepping rewrite (feat/v10-scheduler-stepping): before-step
+  // callbacks receive the substep dt instead of a stale world.timestep.
+  it.todo("is framerate independent with timeStep='vary'");
 });

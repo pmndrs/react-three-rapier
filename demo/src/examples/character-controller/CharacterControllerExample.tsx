@@ -4,6 +4,7 @@ import {
   CapsuleCollider,
   CharacterController,
   CharacterControllerRef,
+  getStepDt,
   RapierRigidBody,
   RigidBody,
   useBeforePhysicsStep
@@ -121,7 +122,8 @@ const Player = () => {
   useBeforePhysicsStep((world) => {
     const character = ref.current;
     if (!character) return;
-    const dt = world.timestep;
+    // getStepDt prefers the fixed-step dt argument when the stepping loop passes it.
+    const dt = getStepDt(world);
     const k = keys.current;
 
     const x =

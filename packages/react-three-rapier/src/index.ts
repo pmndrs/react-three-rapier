@@ -35,8 +35,7 @@ export type {
   CharacterControllerApi,
   CharacterAutostepOptions,
   CharacterMoveOptions,
-  CharacterMoveResult,
-  CharacterVector3
+  CharacterMoveResult
 } from "./hooks/use-character-controller";
 
 export { Physics } from "./components/Physics";
@@ -47,7 +46,10 @@ export { InstancedRigidBodies } from "./components/InstancedRigidBodies";
 export * from "./components/AnyCollider";
 
 export * from "./hooks/joints";
-export { useCharacterController } from "./hooks/use-character-controller";
+export {
+  useCharacterController,
+  getStepDt
+} from "./hooks/use-character-controller";
 export {
   useRapier,
   useBeforePhysicsStep,

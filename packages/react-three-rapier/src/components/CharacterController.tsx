@@ -10,11 +10,10 @@ import React, { Ref, useImperativeHandle, useMemo, useRef } from "react";
 import { useBeforePhysicsStep } from "../hooks/hooks";
 import {
   CharacterControllerOptions,
-  CharacterVector3,
   getStepDt,
   useCharacterController
 } from "../hooks/use-character-controller";
-import { RapierRigidBody } from "../types";
+import { RapierRigidBody, Vector3Object } from "../types";
 import { RigidBody, RigidBodyProps } from "./RigidBody";
 
 /**
@@ -25,7 +24,7 @@ export interface CharacterControllerRef {
   /** The underlying Rapier `KinematicCharacterController`. */
   readonly controller: KinematicCharacterController;
   /** The kinematic rigid body of the character. */
-  readonly rigidBody: RapierRigidBody;
+  readonly rigidBody: RapierRigidBody | null;
   /** Whether the character was standing on the ground during the last step. */
   readonly grounded: boolean;
   /**
@@ -33,13 +32,13 @@ export interface CharacterControllerRef {
    * It is converted to a translation with the fixed step dt on every physics step,
    * so the resulting motion is framerate independent.
    */
-  setVelocity(velocity: CharacterVector3): void;
+  setVelocity(velocity: Vector3Object): void;
   /**
    * Queues a one-off displacement (world units) applied on the next physics step
    * on top of the velocity, e.g. for knockback or teleport-like pushes.
    * Multiple calls before the step accumulate.
    */
-  move(delta: CharacterVector3): void;
+  translate(delta: Vector3Object): void;
 }
 
 /**
@@ -78,7 +77,16 @@ export interface CharacterControllerProps
  * non-sensor collider is used to compute the movement.
  *
  * The desired motion is applied once per fixed physics step with the fixed
- * `dt`, so it is framerate independent. Gravity and jumping stay in userland:
+ * `dt`, so it is framerate independent.
+ *
+ * Callback ordering: the component registers its step callback in its own
+ * effect, which runs before callbacks registered by a parent component. Values
+ * you set with `setVelocity` / `translate` from your own `useBeforePhysicsStep`
+ * are therefore applied on the next step (one fixed step of latency), and
+ * `grounded` reflects the previous step.
+ *
+ * Defaults to `colliders={false}`: add explicit colliders as children
+ * (pass `colliders` to override). Gravity and jumping stay in userland:
  * integrate your own vertical velocity in `useBeforePhysicsStep` and call
  * `setVelocity`.
  *
@@ -133,6 +141,7 @@ export const CharacterController = (props: CharacterControllerProps) => {
     applyImpulsesToDynamicBodies,
     characterMass,
     normalNudgeFactor,
+    colliders = false,
     ...rigidBodyProps
   } = props;
 
@@ -171,7 +180,7 @@ export const CharacterController = (props: CharacterControllerProps) => {
         return cc.controller;
       },
       get rigidBody() {
-        return bodyRef.current!;
+        return bodyRef.current;
       },
       get grounded() {
         return state.grounded;
@@ -181,7 +190,7 @@ export const CharacterController = (props: CharacterControllerProps) => {
         state.velocity.y = v.y;
         state.velocity.z = v.z;
       },
-      move(d) {
+      translate(d) {
         state.pending.x += d.x;
         state.pending.y += d.y;
         state.pending.z += d.z;
@@ -222,7 +231,12 @@ export const CharacterController = (props: CharacterControllerProps) => {
   });
 
   return (
-    <RigidBody {...rigidBodyProps} ref={bodyRef} type="kinematicPosition">
+    <RigidBody
+      colliders={colliders}
+      {...rigidBodyProps}
+      ref={bodyRef}
+      type="kinematicPosition"
+    >
       {children}
     </RigidBody>
   );

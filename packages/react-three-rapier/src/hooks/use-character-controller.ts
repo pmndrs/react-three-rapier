@@ -7,19 +7,10 @@ import {
   RigidBody,
   World
 } from "@dimforge/rapier3d-compat";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
+import { Vector3Object } from "../types";
 import { useRapier } from "./hooks";
 import { useImperativeInstance } from "./use-imperative-instance";
-
-/**
- * A plain `{ x, y, z }` vector.
- * @category Character Controller
- */
-export interface CharacterVector3 {
-  x: number;
-  y: number;
-  z: number;
-}
 
 /**
  * Autostep (stair climbing) configuration.
@@ -37,7 +28,8 @@ export interface CharacterAutostepOptions {
 /**
  * Configuration of the Rapier `KinematicCharacterController`.
  * Every option is applied reactively: changing a value updates the live controller.
- * Options left `undefined` keep Rapier's defaults.
+ * Options left `undefined` (or reset to `undefined`) revert to Rapier's defaults;
+ * `autostep` and `snapToGround` default to disabled.
  * @category Character Controller
  */
 export interface CharacterControllerOptions {
@@ -47,7 +39,7 @@ export interface CharacterControllerOptions {
    */
   offset?: number;
   /** The "up" direction of the character. @default [0, 1, 0] */
-  up?: [number, number, number] | CharacterVector3;
+  up?: [number, number, number] | Vector3Object;
   /** Whether the character slides along obstacles. @default true */
   slide?: boolean;
   /** Maximum angle (radians) of a slope the character can climb. */
@@ -95,7 +87,7 @@ export interface CharacterMoveOptions {
  */
 export interface CharacterMoveResult {
   /** The translation that was applied to the body (after collision resolution). */
-  movement: CharacterVector3;
+  movement: Vector3Object;
   /** Whether the character is standing on the ground. */
   grounded: boolean;
   /** Collisions that happened while computing the movement (pooled objects). */
@@ -116,7 +108,7 @@ export interface CharacterControllerApi {
    */
   move(
     rigidBody: RigidBody,
-    desiredTranslation: CharacterVector3,
+    desiredTranslation: Vector3Object,
     options?: CharacterMoveOptions
   ): CharacterMoveResult;
 }
@@ -125,7 +117,7 @@ export interface CharacterControllerApi {
  * Returns the fixed-step dt for a before-step callback.
  * Uses the `dt` argument when the stepping loop provides it, and falls back to `world.timestep`.
  * Switching to the 2nd callback argument later only requires changing the call site.
- * @internal
+ * Pass the callback's `dt` argument once the stepping loop provides it.
  */
 export const getStepDt = (world: World, dt?: number): number =>
   dt ?? world.timestep;
@@ -184,46 +176,76 @@ export const useCharacterController = (
   const upY = up ? (Array.isArray(up) ? up[1] : up.y) : undefined;
   const upZ = up ? (Array.isArray(up) ? up[2] : up.z) : undefined;
 
-  const autostepSet = autostep !== undefined;
   const autostepHeight = autostep ? autostep.maxHeight : undefined;
   const autostepWidth = autostep ? autostep.minWidth : undefined;
   const autostepDynamic = autostep
     ? !!autostep.includeDynamicBodies
     : undefined;
 
+  // Rapier's own defaults, captured from the freshly created controller.
+  const defaults = useRef<{
+    offset: number;
+    up: Vector3Object;
+    slide: boolean;
+    maxSlope: number;
+    minSlide: number;
+    impulses: boolean;
+    mass: number | null;
+    nudge: number;
+  }>(null!);
+  // Set once the controller has been freed (guards move() after unmount).
+  const destroyed = useRef(false);
+
   const getController = useImperativeInstance(
-    () => world.createCharacterController(offset ?? 0.01),
+    () => {
+      const c = world.createCharacterController(offset ?? 0.01);
+      defaults.current = {
+        offset: c.offset(),
+        up: { x: c.up().x, y: c.up().y, z: c.up().z },
+        slide: c.slideEnabled(),
+        maxSlope: c.maxSlopeClimbAngle(),
+        minSlide: c.minSlopeSlideAngle(),
+        impulses: c.applyImpulsesToDynamicBodies(),
+        mass: c.characterMass(),
+        nudge: c.normalNudgeFactor()
+      };
+      return c;
+    },
     (controller) => {
+      destroyed.current = true;
       world.removeCharacterController(controller);
     },
     [world]
   );
 
+  // The hook is (re)mounted: allow use again (StrictMode re-runs effects).
+  useEffect(() => {
+    destroyed.current = false;
+    return () => {
+      destroyed.current = true;
+    };
+  }, []);
+
   useEffect(() => {
     const c = getController();
-    if (offset !== undefined) c.setOffset(offset);
-    if (upX !== undefined) c.setUp({ x: upX, y: upY!, z: upZ! });
-    if (slide !== undefined) c.setSlideEnabled(slide);
-    if (maxSlopeClimbAngle !== undefined)
-      c.setMaxSlopeClimbAngle(maxSlopeClimbAngle);
-    if (minSlopeSlideAngle !== undefined)
-      c.setMinSlopeSlideAngle(minSlopeSlideAngle);
-    if (autostepSet) {
-      if (autostepHeight !== undefined) {
-        c.enableAutostep(autostepHeight, autostepWidth!, autostepDynamic!);
-      } else {
-        c.disableAutostep();
-      }
+    const d = defaults.current;
+    c.setOffset(offset ?? d.offset);
+    c.setUp(upX !== undefined ? { x: upX, y: upY!, z: upZ! } : d.up);
+    c.setSlideEnabled(slide ?? d.slide);
+    c.setMaxSlopeClimbAngle(maxSlopeClimbAngle ?? d.maxSlope);
+    c.setMinSlopeSlideAngle(minSlopeSlideAngle ?? d.minSlide);
+    if (autostepHeight !== undefined) {
+      c.enableAutostep(autostepHeight, autostepWidth!, autostepDynamic!);
+    } else {
+      c.disableAutostep();
     }
-    if (snapToGround !== undefined) {
-      if (snapToGround === false) c.disableSnapToGround();
-      else c.enableSnapToGround(snapToGround);
-    }
-    if (applyImpulsesToDynamicBodies !== undefined)
-      c.setApplyImpulsesToDynamicBodies(applyImpulsesToDynamicBodies);
-    if (characterMass !== undefined) c.setCharacterMass(characterMass);
-    if (normalNudgeFactor !== undefined)
-      c.setNormalNudgeFactor(normalNudgeFactor);
+    if (typeof snapToGround === "number") c.enableSnapToGround(snapToGround);
+    else c.disableSnapToGround();
+    c.setApplyImpulsesToDynamicBodies(
+      applyImpulsesToDynamicBodies ?? d.impulses
+    );
+    c.setCharacterMass((characterMass ?? d.mass) as number);
+    c.setNormalNudgeFactor(normalNudgeFactor ?? d.nudge);
   }, [
     getController,
     offset,
@@ -233,7 +255,6 @@ export const useCharacterController = (
     slide,
     maxSlopeClimbAngle,
     minSlopeSlideAngle,
-    autostepSet,
     autostepHeight,
     autostepWidth,
     autostepDynamic,
@@ -252,8 +273,8 @@ export const useCharacterController = (
       return userPredicate ? userPredicate(collider) : true;
     };
 
-    const movement: CharacterVector3 = { x: 0, y: 0, z: 0 };
-    const target: CharacterVector3 = { x: 0, y: 0, z: 0 };
+    const movement: Vector3Object = { x: 0, y: 0, z: 0 };
+    const target: Vector3Object = { x: 0, y: 0, z: 0 };
     const collisions: CharacterCollision[] = [];
     const pool: CharacterCollision[] = [];
     const result: CharacterMoveResult = {
@@ -267,6 +288,15 @@ export const useCharacterController = (
         return getController();
       },
       move(rigidBody, desired, opts) {
+        if (destroyed.current) {
+          if (process.env.NODE_ENV !== "production") {
+            console.warn(
+              "react-three-rapier: character controller move() called after the controller was destroyed; ignoring."
+            );
+          }
+          result.movement.x = result.movement.y = result.movement.z = 0;
+          return result;
+        }
         const controller = getController();
 
         let collider = opts?.collider;
@@ -321,5 +351,5 @@ export const useCharacterController = (
         return result;
       }
     };
-  }, [getController]);
+  }, [getController, destroyed]);
 };
