@@ -16,7 +16,6 @@
     "@react-three/rapier-addons": "workspace:*",
     "@types/three": "0.186.0",
     "leva": "0.10.0",
-    "r3f-perf": "7.2.3",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "react-router-dom": "7.1.3",
