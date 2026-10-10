@@ -2,6 +2,7 @@ import ReactThreeTestRenderer from "@react-three/test-renderer";
 import React, { StrictMode } from "react";
 import { describe, expect, it } from "vitest";
 import { Physics, RapierContext, RapierRigidBody, RigidBody } from "../src";
+import { SoftBodyMaterial } from "@dimforge/rapier3d-compat";
 import { SoftBody, SoftBodyState, weldGeometry } from "../src/soft-bodies";
 import { BufferGeometry, Mesh, SphereGeometry, Vector3 } from "three";
 import { pause, UseRapierMounter } from "./test-utils";
@@ -154,6 +155,57 @@ describe("soft bodies", () => {
     }
     // ...and the local ones are not (the parent is offset by 10 on x)
     expect(Math.abs(p.getX(0))).toBeLessThan(2);
+  });
+
+  describe.each([1, 3])(
+    "material driven tears (%i substeps per frame)",
+    (n) => {
+      it("never exposes NaN vertices or bounds", async () => {
+        const ref = React.createRef<SoftBodyState>();
+        let tears = 0;
+        const { context } = await setup(
+          <SoftBody
+            type="cloth"
+            ref={ref}
+            pinned={(p) => p.y > 0.49}
+            material={() => {
+              const material = SoftBodyMaterial.uniform(8, 0.4);
+              material.tearStrain = 0.0005;
+              return material;
+            }}
+            onTear={() => tears++}
+          >
+            {clothMesh}
+          </SoftBody>
+        );
+        const mesh = ref.current!.object as Mesh;
+        for (let frame = 0; frame < 90; frame++) {
+          context.step(n / 60);
+          const p = positions(mesh);
+          expect(p.every((v) => Number.isFinite(v))).toBe(true);
+          expect(mesh.geometry.boundingSphere!.radius).not.toBeNaN();
+        }
+        expect(tears).toBeGreaterThan(0);
+      });
+    }
+  );
+
+  it("keeps the original UVs and hard normals of the render mesh", async () => {
+    const ref = React.createRef<SoftBodyState>();
+    const { context } = await setup(
+      <SoftBody type="volume" ref={ref} cellSize={0.4}>
+        <mesh position={[0, 2, 0]}>
+          <boxGeometry args={[1, 1, 1]} />
+          <meshBasicMaterial />
+        </mesh>
+      </SoftBody>
+    );
+    const geometry = ref.current!.object.geometry;
+    // unwelded: 24 render vertices, each face keeps its own uv
+    expect(geometry.attributes.position.count).toBe(24);
+    expect(geometry.attributes.uv.count).toBe(24);
+    stepFor(context, 0.2);
+    expect(geometry.attributes.position.count).toBe(24);
   });
 
   it("welds vertices on position only (UV seams)", () => {

@@ -14,7 +14,7 @@ import {
   Object3D,
   Vector3
 } from "three";
-import { weldGeometry } from "./geometry";
+import { applyWeldMap, weld } from "./geometry";
 import type {
   SoftBodyOptions,
   SoftBodyParticleSelector,
@@ -48,7 +48,7 @@ export class SoftBodyState {
    * `body` and every piece it tore into. Pieces are removed with the state.
    */
   readonly bodies: RawSoftBody[];
-  /** Number of vertices of the (welded) rendered geometry. */
+  /** Number of vertices of the rendered geometry. */
   vertexCount: number;
 
   private readonly world: World;
@@ -60,6 +60,15 @@ export class SoftBodyState {
   private owners: RawSoftBody[] = [];
   private ownerParticles: Uint32Array = new Uint32Array(0);
   private torn = false;
+  private warnedVolume = false;
+  // Render vertex -> particle, while the render geometry is the original one
+  // (UVs and hard normals intact). Null once a cloth tore, see handleTear.
+  private weldMap: Uint32Array | null = null;
+  private weldedCount = 0;
+  private knownVersions = new Map<RawSoftBody, number>();
+  // Particle buffers of the last two steps, for interpolation
+  private prev: Float32Array | null = null;
+  private curr: Float32Array | null = null;
   private readonly onTear?: SoftBodyOptions["onTear"];
 
   constructor(
@@ -82,18 +91,30 @@ export class SoftBodyState {
     const toWorld = object.matrixWorld.clone();
     const toLocal = toWorld.clone().invert();
 
-    // Always simulate (and render) from our own welded copy of the geometry,
-    // so the rendered vertex order matches the simulated one.
-    const geometry =
-      type === "rope"
-        ? ropeGeometry(object.geometry)
-        : weldGeometry(object.geometry);
-    const position = geometry.attributes.position as BufferAttribute;
-    const count = position.count;
+    // The simulation runs on a position-welded copy of the geometry, while
+    // the rendered geometry is the original one, skinned through the weld map:
+    // UVs and hard edges survive.
+    let localPositions: Float32Array;
+    let weldIndex: Uint32Array | null = null;
+    let renderGeometry: BufferGeometry;
+    if (type === "rope") {
+      renderGeometry = ropeGeometry(object.geometry);
+      localPositions = new Float32Array(
+        renderGeometry.attributes.position.array
+      );
+    } else {
+      const welded = weld(object.geometry);
+      localPositions = welded.positions;
+      weldIndex = welded.index;
+      this.weldMap = welded.map;
+      renderGeometry = renderCopy(object.geometry);
+    }
+    const count = localPositions.length / 3;
+    this.weldedCount = count;
 
     const worldPositions = new Float32Array(count * 3);
     for (let i = 0; i < count; i++) {
-      _vector.fromBufferAttribute(position, i).applyMatrix4(toWorld);
+      _vector.fromArray(localPositions, i * 3).applyMatrix4(toWorld);
       worldPositions[i * 3] = _vector.x;
       worldPositions[i * 3 + 1] = _vector.y;
       worldPositions[i * 3 + 2] = _vector.z;
@@ -101,11 +122,10 @@ export class SoftBodyState {
 
     let desc: SoftBodyDesc | null;
     if (type === "volume") {
-      const index = geometry.index!;
       const cellSize = options.cellSize ?? defaultCellSize(worldPositions);
       desc = SoftBodyDesc.volumetric(
         worldPositions,
-        new Uint32Array(index.array),
+        weldIndex!,
         cellSize,
         true
       );
@@ -114,10 +134,7 @@ export class SoftBodyState {
       for (let i = 0; i < count - 1; i++) edges.push(i, i + 1);
       desc = new SoftBodyDesc(worldPositions).setEdges(edges).setWire(edges);
     } else {
-      desc = SoftBodyDesc.trimesh(
-        worldPositions,
-        new Uint32Array(geometry.index!.array)
-      );
+      desc = SoftBodyDesc.trimesh(worldPositions, weldIndex!);
     }
 
     if (!desc) {
@@ -132,8 +149,16 @@ export class SoftBodyState {
     const resolve = (selector: SoftBodyParticleSelector | undefined) =>
       resolveSelector(selector, particleRest, toLocal);
 
-    if (options.material) desc.setMaterial(options.material);
-    else if (options.stiffness !== undefined || options.damping !== undefined) {
+    if (options.material) {
+      desc.setMaterial(
+        typeof options.material === "function"
+          ? options.material()
+          : options.material
+      );
+    } else if (
+      options.stiffness !== undefined ||
+      options.damping !== undefined
+    ) {
       const material = SoftBodyMaterial.uniform(
         options.stiffness ?? 10,
         options.damping ?? 0.5
@@ -188,12 +213,10 @@ export class SoftBodyState {
     const body = world.createSoftBody(desc);
     this.body = body;
     this.bodies = [body];
-    this.vertexCount = count;
+    this.vertexCount = renderGeometry.attributes.position.count;
+    this.knownVersions.set(body, body.topologyVersion());
 
-    if (type !== "volume") {
-      this.owners = new Array(count).fill(body);
-      this.ownerParticles = new Uint32Array(count).map((_, i) => i);
-    }
+    if (type === "rope") this.resetOwners(body, count);
 
     // Attachments to rigid bodies
     for (const attachment of options.attachments ?? []) {
@@ -213,7 +236,7 @@ export class SoftBodyState {
     // geometry holds parent-space positions, so the object's own transform is
     // the identity.
     const previous = object.geometry;
-    object.geometry = geometry;
+    object.geometry = renderGeometry;
     previous.dispose();
     object.position.set(0, 0, 0);
     object.quaternion.set(0, 0, 0, 1);
@@ -228,9 +251,14 @@ export class SoftBodyState {
    * of the object's parent, then updates normals and bounds. Called after
    * every physics step; you rarely need to call it yourself.
    */
-  sync() {
+  sync(alpha = 1) {
     if (this.disposed) return;
-    if (this.synced && !this.torn && this.body.isSleeping()) return;
+    // A tear changes the particle layout; wait until handleTear has remapped.
+    for (const body of this.bodies) {
+      if (this.knownVersions.get(body) !== body.topologyVersion()) return;
+    }
+    if (this.synced && !this.torn && alpha >= 1 && this.body.isSleeping())
+      return;
 
     const { object } = this;
     const geometry = object.geometry;
@@ -248,16 +276,20 @@ export class SoftBodyState {
     }
     const identity = _inverse.equals(_matrix.identity());
 
-    let source: Float32Array;
-    if (this.type === "volume") {
-      source = this.body.meshVertices(0);
-      this.write(array, source, null, identity);
-    } else if (!this.torn) {
-      source = this.body.particlePositions();
-      this.write(array, source, null, identity);
-    } else {
+    if (this.torn) {
       const cache = new Map<RawSoftBody, Float32Array>();
-      this.write(array, null, cache, identity);
+      this.write(array, null, null, 1, cache, identity);
+    } else {
+      const source =
+        this.type === "volume"
+          ? this.body.meshVertices(0)
+          : this.body.particlePositions();
+      if (alpha >= 1) {
+        this.prev = this.curr;
+        this.curr = source;
+      }
+      const prev = this.prev?.length === source.length ? this.prev : null;
+      this.write(array, source, prev, alpha, null, identity);
     }
 
     position.needsUpdate = true;
@@ -267,18 +299,32 @@ export class SoftBodyState {
     this.synced = true;
   }
 
+  private resetOwners(body: RawSoftBody, count: number) {
+    this.owners = new Array(count).fill(body);
+    this.ownerParticles = new Uint32Array(count).map((_, i) => i);
+  }
+
   private write(
     target: Float32Array,
     source: Float32Array | null,
+    prev: Float32Array | null,
+    alpha: number,
     cache: Map<RawSoftBody, Float32Array> | null,
     identity: boolean
   ) {
+    const weldMap = this.weldMap;
     for (let i = 0; i < this.vertexCount; i++) {
       let x: number, y: number, z: number;
       if (source) {
-        x = source[i * 3];
-        y = source[i * 3 + 1];
-        z = source[i * 3 + 2];
+        const p = weldMap ? weldMap[i] : i;
+        x = source[p * 3];
+        y = source[p * 3 + 1];
+        z = source[p * 3 + 2];
+        if (prev && alpha < 1) {
+          x = prev[p * 3] + (x - prev[p * 3]) * alpha;
+          y = prev[p * 3 + 1] + (y - prev[p * 3 + 1]) * alpha;
+          z = prev[p * 3 + 2] + (z - prev[p * 3 + 2]) * alpha;
+        }
       } else {
         const owner = this.owners[i];
         let positions = cache!.get(owner);
@@ -290,6 +336,10 @@ export class SoftBodyState {
         x = positions[p * 3];
         y = positions[p * 3 + 1];
         z = positions[p * 3 + 2];
+      }
+      // Never write garbage: keep the last good position
+      if (!(Number.isFinite(x) && Number.isFinite(y) && Number.isFinite(z))) {
+        continue;
       }
 
       if (identity) {
@@ -356,8 +406,31 @@ export class SoftBodyState {
       }
     }
 
+    if (this.type === "volume" && !this.warnedVolume) {
+      this.warnedVolume = true;
+      console.warn(
+        "react-three-rapier: a volume SoftBody tore. The rendered skin only follows the main piece; pieces that split off are simulated but not rendered."
+      );
+    }
+
     if (this.type !== "volume") {
       this.torn = true;
+
+      // Once a cloth tears, vertices are split per particle so each side of
+      // the tear can follow its own piece. This drops the original seams
+      // (UV/hard-edge duplicates) of the render geometry.
+      if (this.weldMap) {
+        const previous = this.object.geometry;
+        this.object.geometry = applyWeldMap(
+          previous,
+          this.weldMap,
+          this.weldedCount
+        );
+        previous.dispose();
+        this.weldMap = null;
+        this.vertexCount = this.weldedCount;
+        this.resetOwners(this.body, this.weldedCount);
+      }
 
       // Particles the engine split off to open the tear need a rendered
       // vertex of their own (cloth), or they would stay welded.
@@ -392,7 +465,13 @@ export class SoftBodyState {
       if (this.type === "cloth") this.rebuildClothIndex();
     }
 
+    for (const body of this.bodies) {
+      this.knownVersions.set(body, body.topologyVersion());
+    }
+    this.prev = this.curr = null;
     this.synced = false;
+    // Show the new layout right away (sync was skipped while it was stale)
+    this.sync();
     this.onTear?.({
       softBody: torn,
       pieces,
@@ -485,6 +564,19 @@ export class SoftBodyState {
     this.object.geometry.dispose();
   }
 }
+
+/** A copy of the render geometry with its own dynamic float positions. */
+const renderCopy = (source: BufferGeometry) => {
+  const geometry = source.clone();
+  const position = source.attributes.position as BufferAttribute;
+  const copy = new BufferAttribute(new Float32Array(position.count * 3), 3);
+  for (let i = 0; i < position.count; i++) {
+    copy.setXYZ(i, position.getX(i), position.getY(i), position.getZ(i));
+  }
+  copy.setUsage(35048 /* DynamicDrawUsage */);
+  geometry.setAttribute("position", copy);
+  return geometry;
+};
 
 /** A rope keeps its vertex order: no welding, and no index is needed. */
 const ropeGeometry = (source: BufferGeometry) => {

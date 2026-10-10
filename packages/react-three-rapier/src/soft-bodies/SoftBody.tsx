@@ -9,6 +9,7 @@ import React, {
   useRef
 } from "react";
 import type { Object3D } from "three";
+import { useRapier } from "../hooks/hooks";
 import { SoftBodyState } from "./soft-body-state";
 import type { SoftBodyOptions } from "./types";
 import { useSoftBody } from "./use-soft-body";
@@ -60,13 +61,14 @@ export const SoftBody = (props: SoftBodyProps) => {
 
   const meshRef = useRef<Object3D | null>(null);
   const state = useSoftBody(meshRef, options);
+  const { world } = useRapier();
 
   // Expose the state through the ref. The state is created in an effect of
   // useSoftBody, which runs before this one.
   useEffect(() => {
     setRef(ref, state.current);
     return () => setRef(ref, null);
-  }, [ref, state]);
+  }, [ref, state, world]);
 
   const onlyChild = Children.only(children);
   if (!isValidElement(onlyChild)) {

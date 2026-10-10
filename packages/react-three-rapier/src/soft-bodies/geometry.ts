@@ -1,78 +1,112 @@
 import { BufferAttribute, BufferGeometry } from "three";
-import { mergeVertices } from "three-stdlib";
 
 /**
- * Returns a copy of `geometry` welded so that vertices sharing a position
- * become a single vertex.
- *
- * Welds on **position only**. three's `mergeVertices(geometry)` only merges
- * vertices whose *every* attribute matches, but UV-mapped closed shapes (a
- * `SphereGeometry`, for one) duplicate vertices along the UV seam and at the
- * poles that share a position and differ in `uv`/`normal`. Left unwelded those
- * would become separate, unconnected particles and the seam would tear open as
- * soon as the body deforms.
- *
- * The other attributes (`uv`, `color`, ...) are rebuilt around the deduplicated
- * vertex set, taking each value from whichever original vertex welded first
- * into a slot. The returned geometry is always indexed, and its vertex order is
- * the order of the simulated particles (for `cloth` and `rope`).
+ * The result of welding a geometry on position only.
+ * @category Soft Bodies
+ */
+export interface WeldResult {
+  /** Flattened positions of the unique vertices, in first-seen order. */
+  positions: Float32Array;
+  /** Triangle indices into `positions`. */
+  index: Uint32Array;
+  /** For every original vertex, the index of its welded vertex. */
+  map: Uint32Array;
+}
+
+/**
+ * Welds the vertices of `geometry` that share a position (to 1e-4), looking
+ * at **position only**. UV-mapped or hard-edged shapes duplicate vertices
+ * along seams, with equal positions but different `uv`/`normal`; those must be
+ * one particle of the simulation or the seam would tear open.
  *
  * @category Soft Bodies
  */
-export const weldGeometry = (geometry: BufferGeometry): BufferGeometry => {
+export const weld = (geometry: BufferGeometry): WeldResult => {
   const position = geometry.attributes.position as BufferAttribute | undefined;
   if (!position) {
     throw new Error(
       "react-three-rapier: SoftBody geometry must have a position attribute."
     );
   }
-
-  const positionOnly = new BufferGeometry();
-  positionOnly.setAttribute("position", position);
-  if (geometry.index) positionOnly.setIndex(geometry.index);
-
-  const merged = mergeVertices(positionOnly);
-  const mergedIndex = merged.index!;
-  const weldedCount = merged.attributes.position.count;
-  const sourceIndex = geometry.index;
-
-  // The first original vertex that landed in each welded slot is the source of
-  // that slot's non-position attributes.
-  const firstSource = new Int32Array(weldedCount).fill(-1);
-  for (let c = 0; c < mergedIndex.count; c++) {
-    const welded = mergedIndex.getX(c);
-    if (firstSource[welded] === -1) {
-      firstSource[welded] = sourceIndex ? sourceIndex.getX(c) : c;
+  const map = new Uint32Array(position.count);
+  const unique: number[] = [];
+  const seen = new Map<string, number>();
+  for (let i = 0; i < position.count; i++) {
+    const x = position.getX(i);
+    const y = position.getY(i);
+    const z = position.getZ(i);
+    const key = `${Math.round(x * 1e4)},${Math.round(y * 1e4)},${Math.round(
+      z * 1e4
+    )}`;
+    let welded = seen.get(key);
+    if (welded === undefined) {
+      welded = unique.length / 3;
+      seen.set(key, welded);
+      unique.push(x, y, z);
     }
+    map[i] = welded;
+  }
+
+  const source = geometry.index;
+  const count = source ? source.count : position.count;
+  const index = new Uint32Array(count);
+  for (let i = 0; i < count; i++) {
+    index[i] = map[source ? source.getX(i) : i];
+  }
+  return { positions: new Float32Array(unique), index, map };
+};
+
+/**
+ * Builds an indexed geometry with one vertex per welded vertex, using a weld
+ * map from {@link weld}. Other attributes (`uv`, `color`, ...) are taken from
+ * the first original vertex that welded into each slot.
+ *
+ * @category Soft Bodies
+ */
+export const applyWeldMap = (
+  geometry: BufferGeometry,
+  map: Uint32Array,
+  weldedCount: number
+): BufferGeometry => {
+  const firstSource = new Int32Array(weldedCount).fill(-1);
+  for (let i = 0; i < map.length; i++) {
+    if (firstSource[map[i]] === -1) firstSource[map[i]] = i;
   }
 
   const result = new BufferGeometry();
-  result.setIndex(mergedIndex);
+  const source = geometry.index;
+  const index = new Uint32Array(source ? source.count : map.length);
+  for (let i = 0; i < index.length; i++) {
+    index[i] = map[source ? source.getX(i) : i];
+  }
+  result.setIndex(new BufferAttribute(index, 1));
 
-  // Always give the simulation its own, dynamic, float position buffer
-  const weldedPosition = new BufferAttribute(
-    new Float32Array(merged.attributes.position.array),
-    3
-  );
-  weldedPosition.setUsage(35048 /* DynamicDrawUsage */);
-  result.setAttribute("position", weldedPosition);
-
+  const getters = ["getX", "getY", "getZ", "getW"] as const;
   for (const name of Object.keys(geometry.attributes)) {
-    if (name === "position") continue;
     const attribute = geometry.attributes[name] as BufferAttribute;
     const { itemSize } = attribute;
     const array = new (attribute.array.constructor as new (
       length: number
     ) => typeof attribute.array)(weldedCount * itemSize);
-    const rebuilt = new BufferAttribute(array, itemSize, attribute.normalized);
     for (let v = 0; v < weldedCount; v++) {
-      const source = firstSource[v];
       for (let k = 0; k < itemSize; k++) {
-        array[v * itemSize + k] = attribute.array[source * itemSize + k];
+        array[v * itemSize + k] = attribute[getters[k]](firstSource[v]);
       }
     }
-    result.setAttribute(name, rebuilt);
+    const welded = new BufferAttribute(array, itemSize, attribute.normalized);
+    if (name === "position") welded.setUsage(35048 /* DynamicDrawUsage */);
+    result.setAttribute(name, welded);
   }
-
   return result;
+};
+
+/**
+ * Returns a copy of `geometry` welded on position only (see {@link weld}),
+ * always indexed.
+ *
+ * @category Soft Bodies
+ */
+export const weldGeometry = (geometry: BufferGeometry): BufferGeometry => {
+  const { positions, map } = weld(geometry);
+  return applyWeldMap(geometry, map, positions.length / 3);
 };

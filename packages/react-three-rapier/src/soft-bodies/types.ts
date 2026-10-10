@@ -68,9 +68,15 @@ export interface SoftBodyTearPayload {
   softBody: RawSoftBody;
   /** The pieces that disconnected and became soft bodies of their own. */
   pieces: RawSoftBody[];
-  /** Indices of the edges that tore. */
+  /**
+   * The edges that tore, as flattened particle index pairs (as in Rapier's
+   * `SoftBodyTearEvent.tornEdges()`), not edge indices.
+   */
   tornEdges: number[];
-  /** Indices of the cells that tore (empty for `cloth` and `rope`). */
+  /**
+   * The cells that tore, as flattened particle indices (empty for `cloth` and
+   * `rope`), as in Rapier's `SoftBodyTearEvent.tornCells()`.
+   */
   tornCells: number[];
 }
 
@@ -95,8 +101,13 @@ export interface SoftBodyOptions {
    * damped. Leave undefined for Rapier's default.
    */
   damping?: number;
-  /** Full material control; overrides `stiffness` and `damping`. */
-  material?: SoftBodyMaterial;
+  /**
+   * Full material control; overrides `stiffness` and `damping`. Rapier
+   * materials need the wasm to be initialised: pass a function
+   * (`material={() => new SoftBodyMaterial()}`) when defining it at module
+   * scope or before `<Physics>` has loaded.
+   */
+  material?: SoftBodyMaterial | (() => SoftBodyMaterial);
 
   /** Total mass of the body, spread over its particles. */
   mass?: number;
@@ -154,7 +165,10 @@ export interface SoftBodyOptions {
    * Called when the body tears (requires `material.tearStrain` or
    * `tearForce`, or a manual `softBody.tearEdge()`). For `cloth` and `rope`
    * the rendered triangles that cross a tear are removed so the tear is
-   * visible.
+   * visible. After the first tear a cloth's vertices are split per particle,
+   * so seams of the original geometry (UV/hard-edge duplicates) are lost.
+   *
+   * Volume bodies also report tears, but only the main piece is rendered.
    */
   onTear?: (payload: SoftBodyTearPayload) => void;
 }
