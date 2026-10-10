@@ -23,7 +23,7 @@ describe("forwarded refs", () => {
         </RigidBody>
       </Physics>
     );
-    await pause(50);
+    await pause(300);
 
     expect(bodyRef.current).toBeTruthy();
     expect(colliderRef.current).toBeTruthy();
@@ -50,7 +50,7 @@ describe("forwarded refs", () => {
         </RigidBody>
       </Physics>
     );
-    await pause(50);
+    await pause(300);
     await ReactThreeTestRenderer.act(async () => {
       await renderer.unmount();
     });
@@ -72,7 +72,7 @@ describe("forwarded refs", () => {
         </Physics>
       </StrictMode>
     );
-    await pause(50);
+    await pause(300);
 
     expect(bodyRef.current).toBeTruthy();
     // must not be a freed body
@@ -97,7 +97,7 @@ describe("forwarded refs", () => {
       </Physics>
     );
     const renderer = await ReactThreeTestRenderer.create(tree(3));
-    await pause(50);
+    await pause(300);
     expect(ref.current!.filter(Boolean).length).toBe(3);
 
     await ReactThreeTestRenderer.act(async () => {

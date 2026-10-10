@@ -17,7 +17,7 @@ describe("RigidBody type changes (#314)", () => {
     );
 
     const renderer = await ReactThreeTestRenderer.create(tree("dynamic"));
-    await pause(50);
+    await pause(300);
     expect(ref.current!.bodyType()).toBe(RigidBodyType.Dynamic);
 
     await ReactThreeTestRenderer.act(async () => {

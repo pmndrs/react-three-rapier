@@ -11,7 +11,7 @@ const setup = async (
   const renderer = await ReactThreeTestRenderer.create(
     <Physics paused>{render(initial)}</Physics>
   );
-  await pause(50);
+  await pause(300);
   return renderer;
 };
 

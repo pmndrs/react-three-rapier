@@ -107,8 +107,9 @@ export const InstancedRigidBodies = memo(
       >
         <object3D ref={instanceWrapperRef}>{children}</object3D>
 
-        {instances?.map((instance, index) => (
+        {instances?.map(({ key, ...instance }, index) => (
           <RigidBody
+            key={key ?? index}
             {...rigidBodyProps}
             {...instance}
             ref={(body) => {
