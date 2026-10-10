@@ -18,8 +18,7 @@ const nextCapacity = (count: number) => {
  */
 const ensureCapacity = (geometry: BufferGeometry, vertexCount: number) => {
   const position = geometry.getAttribute("position") as
-    | BufferAttribute
-    | undefined;
+    BufferAttribute | undefined;
   if (position && position.count >= vertexCount) return;
 
   const capacity = nextCapacity(vertexCount);

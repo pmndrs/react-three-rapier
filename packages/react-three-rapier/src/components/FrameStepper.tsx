@@ -23,10 +23,7 @@ import { PhysicsProps } from "./Physics";
  * @internal
  */
 export type SteppingMode =
-  | "fixed-phase"
-  | "accumulator"
-  | "vary"
-  | "independent";
+  "fixed-phase" | "accumulator" | "vary" | "independent";
 
 interface FrameStepperProps {
   type: NonNullable<PhysicsProps["updateLoop"]>;
@@ -117,6 +114,20 @@ const createFrameAdvancer = (
   };
 };
 
+/** Accumulator state, reset whenever the timestep changes (banked time would
+ * otherwise be reinterpreted in the new step length). */
+const useAccumulator = (timeStep: FrameStepperProps["timeStep"]) => {
+  const state = useRef<AccumulatorState & { timeStep: typeof timeStep }>({
+    accumulator: 0,
+    timeStep
+  });
+  if (state.current.timeStep !== timeStep) {
+    state.current.timeStep = timeStep;
+    state.current.accumulator = 0;
+  }
+  return state.current;
+};
+
 /**
  * Fallback without scheduler fixed-step support, and `timeStep="vary"`:
  * one per-frame job that steps and then syncs.
@@ -124,18 +135,13 @@ const createFrameAdvancer = (
 const FrameJobStepper = (props: FrameStepperProps) => {
   const { updatePriority = 0, syncMeshes, timeStep } = props;
   const scheduler = getScheduler() as unknown as StepperScheduler;
-  const accumulator = useRef<AccumulatorState>({ accumulator: 0 });
+  const accumulator = useAccumulator(timeStep);
 
   useMemo(() => {
     ensureRapierPhase(scheduler);
   }, [scheduler]);
 
-  // A timestep change would otherwise reinterpret banked time.
-  useMemo(() => {
-    accumulator.current.accumulator = 0;
-  }, [timeStep]);
-
-  const advance = createFrameAdvancer(accumulator.current, props);
+  const advance = createFrameAdvancer(accumulator, props);
 
   useFrame(
     (_, dt) => {
@@ -152,13 +158,9 @@ const FrameJobStepper = (props: FrameStepperProps) => {
  */
 const RafStepper = (props: FrameStepperProps) => {
   const { syncMeshes, timeStep } = props;
-  const accumulator = useRef<AccumulatorState>({ accumulator: 0 });
+  const accumulator = useAccumulator(timeStep);
 
-  useMemo(() => {
-    accumulator.current.accumulator = 0;
-  }, [timeStep]);
-
-  const advance = createFrameAdvancer(accumulator.current, props);
+  const advance = createFrameAdvancer(accumulator, props);
 
   useRaf((dt) => {
     syncMeshes(advance(dt));
