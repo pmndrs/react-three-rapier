@@ -5,6 +5,6 @@
 packages/react-three-rapier/docs
 .yarn
 yarn.lock
-.changeset/*.md
+.changeset/**/*.md
 CHANGELOG.md
 readme.md

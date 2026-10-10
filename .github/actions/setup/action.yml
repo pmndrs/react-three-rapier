@@ -1,0 +1,26 @@
+name: Setup
+description: Enable Corepack (Yarn 4), set up Node.js with the Yarn cache and install dependencies
+
+inputs:
+  node-version:
+    description: Node.js version
+    default: 22.x
+
+runs:
+  using: composite
+  steps:
+    # Corepack must be enabled before setup-node so its Yarn cache step finds Yarn 4
+    # (the `packageManager` field), not the runner's global Yarn 1.
+    - name: Enable Corepack
+      shell: bash
+      run: corepack enable
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v7
+      with:
+        node-version: ${{ inputs.node-version }}
+        cache: yarn
+
+    - name: Install dependencies
+      shell: bash
+      run: yarn install --immutable

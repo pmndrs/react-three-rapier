@@ -7,7 +7,7 @@
   "license": "MIT",
   "devDependencies": {
     "@arethetypeswrong/cli": "0.18.5",
-    "@changesets/cli": "2.27.1",
+    "@changesets/cli": "3.0.3",
     "@commitlint/cli": "17.1.2",
     "@commitlint/config-conventional": "17.1.0",
     "@eslint/js": "9.39.5",
@@ -49,10 +49,11 @@
     "ci": "yarn typecheck && yarn build && yarn check:packages && vitest run",
     "demo": "yarn workspace demo dev",
     "demo:build": "yarn workspace demo build",
-    "release": "yarn build && changeset publish",
     "docs:build": "typedoc --out ./packages/react-three-rapier/docs ./packages/react-three-rapier/src/index.ts --excludeInternal",
-    "canary:enter": "changeset pre enter canary",
-    "canary:exit": "changeset pre exit"
+    "changeset:version": "changeset version && yarn install --mode update-lockfile",
+    "changeset:publish": "yarn build && yarn test && changeset publish",
+    "prerelease:enter": "changeset pre enter alpha",
+    "prerelease:exit": "changeset pre exit"
   },
   "simple-git-hooks": {
     "commit-msg": "npx --no -- commitlint --edit ${1}",
