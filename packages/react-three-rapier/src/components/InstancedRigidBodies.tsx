@@ -23,6 +23,13 @@ export interface InstancedRigidBodiesProps extends Omit<RigidBodyProps, "ref"> {
   colliderNodes?: ReactNode[];
   children: ReactNode;
   ref?: React.Ref<(RapierRigidBody | null)[] | null>;
+  /**
+   * Whether the child InstancedMesh is frustum culled. Physics moves the
+   * instances away from where three computed the mesh's bounding sphere, so
+   * culling is disabled by default to keep instances from vanishing (#683).
+   * @defaultValue false
+   */
+  frustumCulled?: boolean;
 }
 
 export const InstancedRigidBodies = memo(
@@ -36,6 +43,7 @@ export const InstancedRigidBodies = memo(
       children,
       instances,
       colliderNodes = [],
+      frustumCulled = false,
 
       // wrapper object props
       position,
@@ -67,19 +75,23 @@ export const InstancedRigidBodies = memo(
 
       if (instancedMesh) {
         instancedMesh.instanceMatrix.setUsage(DynamicDrawUsage);
-
-        // Three computes an InstancedMesh's bounding sphere once, from the
-        // initial instance matrices. Physics then moves the instances around,
-        // so the cached bounds go stale and the whole mesh gets culled when the
-        // camera moves (#683). Recomputing the sphere every step is O(instances)
-        // per frame, so we opt out of frustum culling instead.
-        instancedMesh.frustumCulled = false;
       } else {
         console.warn(
           "InstancedRigidBodies expects exactly one child, which must be an InstancedMesh"
         );
       }
     }, []);
+
+    useEffect(() => {
+      const instancedMesh = getInstancedMesh();
+
+      // Three computes an InstancedMesh's bounding sphere once, from the
+      // initial instance matrices. Physics then moves the instances around,
+      // so the cached bounds go stale and the whole mesh gets culled when the
+      // camera moves (#683). Recomputing the sphere every step is O(instances)
+      // per frame, so we opt out of frustum culling by default instead.
+      if (instancedMesh) instancedMesh.frustumCulled = frustumCulled;
+    }, [frustumCulled]);
 
     // Update the RigidBodyStates whenever the instances change
     const applyInstancedState = (state: RigidBodyState, index: number) => {

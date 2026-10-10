@@ -42,4 +42,20 @@ describe("InstancedRigidBodies", () => {
     expect(meshes).toHaveLength(1);
     expect(meshes[0].instance.frustumCulled).toBe(false);
   });
+
+  it("lets users opt back in to frustum culling", async () => {
+    const renderer = await ReactThreeTestRenderer.create(
+      <Physics paused>
+        <InstancedRigidBodies instances={[{ key: "a" }]} frustumCulled>
+          <instancedMesh args={[undefined, undefined, 1]} />
+        </InstancedRigidBodies>
+      </Physics>
+    );
+    await pause(300);
+
+    const meshes = renderer.scene.findAll(
+      (node) => "isInstancedMesh" in node.instance
+    );
+    expect(meshes[0].instance.frustumCulled).toBe(true);
+  });
 });
