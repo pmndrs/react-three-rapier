@@ -11,20 +11,25 @@ const setup = async (
   children: React.ReactNode,
   { strict = false }: { strict?: boolean } = {}
 ) => {
-  let renderer!: Awaited<ReturnType<typeof ReactThreeTestRenderer.create>>;
-  const context = await new Promise<RapierContext>(async (resolve) => {
-    const tree = (
-      <Physics paused>
-        <UseRapierMounter ready={resolve} />
-        {children}
-      </Physics>
-    );
-    await ReactThreeTestRenderer.act(async () => {
-      renderer = await ReactThreeTestRenderer.create(
-        strict ? <StrictMode>{tree}</StrictMode> : tree
-      );
-    });
+  // Await `create` itself (not just the mount callback): racing them leaves
+  // act() scopes overlapping, which doesn't flush reliably on r3f v10.
+  let resolveContext!: (context: RapierContext) => void;
+  const ready = new Promise<RapierContext>((resolve) => {
+    resolveContext = resolve;
   });
+  const tree = (
+    <Physics paused>
+      <UseRapierMounter ready={resolveContext} />
+      {children}
+    </Physics>
+  );
+  let renderer!: Awaited<ReturnType<typeof ReactThreeTestRenderer.create>>;
+  await ReactThreeTestRenderer.act(async () => {
+    renderer = await ReactThreeTestRenderer.create(
+      strict ? <StrictMode>{tree}</StrictMode> : tree
+    );
+  });
+  const context = await ready;
   // let the effects of the children settle
   await ReactThreeTestRenderer.act(async () => {
     await pause(20);
