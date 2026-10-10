@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main, next]
+  push:
+    branches: [main, next]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  typecheck:
+    name: Typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      - name: Typecheck packages and tests
+        run: yarn typecheck
+      - name: Typecheck demo
+        run: yarn workspace demo typecheck
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      # vitest resolves the workspace packages from src, so no build is needed first
+      - name: Test
+        run: yarn vitest run
+
+  build:
+    name: Build & check packages
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      - name: Build
+        run: yarn build
+      - name: publint + arethetypeswrong
+        run: yarn check:packages
+
+  demo:
+    name: Build demo
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      - name: Build demo
+        run: yarn demo:build
+
+  lint:
+    name: Lint & format
+    runs-on: ubuntu-latest
+    # Non-blocking until the codebase is reformatted / lint-fixed at the end of the 3.0
+    # integration (see DEVELOPMENT.md). Remove `continue-on-error` then.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      - name: Lint
+        run: yarn lint
+      - name: Format
+        if: ${{ !cancelled() }}
+        run: yarn format:check

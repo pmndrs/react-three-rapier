@@ -108,23 +108,25 @@ describe("physics", () => {
       const beforeStepCallback = vi.fn();
       const frameCallback = vi.fn();
 
-      let renderer: Awaited<ReturnType<typeof ReactThreeTestRenderer.create>>;
+      let onReady!: (value: unknown) => void;
+      const ready = new Promise((resolve) => (onReady = resolve));
 
-      await new Promise(async (resolve) => {
-        renderer = await ReactThreeTestRenderer.create(
-          <Physics>
-            <RigidBody colliders="cuboid" restitution={2}>
-              <CuboidCollider args={[1, 1, 1]} />
-            </RigidBody>
+      // `create` resolves after the tree has mounted, so await it directly rather than
+      // racing it against `onReady` (with r3f v10 `onReady` fires before `create` resolves).
+      const renderer = await ReactThreeTestRenderer.create(
+        <Physics>
+          <RigidBody colliders="cuboid" restitution={2}>
+            <CuboidCollider args={[1, 1, 1]} />
+          </RigidBody>
 
-            <BeforeStepper
-              onBeforePhysicsStep={beforeStepCallback}
-              onFrame={frameCallback}
-              onReady={resolve}
-            />
-          </Physics>
-        );
-      });
+          <BeforeStepper
+            onBeforePhysicsStep={beforeStepCallback}
+            onFrame={frameCallback}
+            onReady={onReady}
+          />
+        </Physics>
+      );
+      await ready;
 
       await ReactThreeTestRenderer.act(async () => {});
 
@@ -135,15 +137,17 @@ describe("physics", () => {
         await renderer.advanceFrames(1, 1 / 60);
       });
 
+      // r3f v10's test renderer primes the scheduler with a zero-delta frame before the
+      // requested frames, so useFrame runs n + 1 times while physics steps n times.
       expect(beforeStepCallback).toBeCalledTimes(1);
-      expect(frameCallback).toBeCalledTimes(1);
+      expect(frameCallback).toBeCalledTimes(2);
 
       await ReactThreeTestRenderer.act(async () => {
         await renderer.advanceFrames(1, 1 / 60);
       });
 
       expect(beforeStepCallback).toBeCalledTimes(2);
-      expect(frameCallback).toBeCalledTimes(2);
+      expect(frameCallback).toBeCalledTimes(4);
     });
 
     it("updates when using the 'independent' strategy", async () => {
@@ -166,7 +170,7 @@ describe("physics", () => {
         );
       });
 
-      await pause(50);
+      await pause(150);
 
       expect(beforeStepCallback).toHaveBeenCalled();
       expect(frameCallback).toHaveBeenCalled();
@@ -174,7 +178,7 @@ describe("physics", () => {
       beforeStepCallback.mockClear();
       frameCallback.mockClear();
 
-      await pause(50);
+      await pause(150);
 
       expect(beforeStepCallback).toHaveBeenCalled();
       expect(frameCallback).toHaveBeenCalled();
@@ -182,7 +186,7 @@ describe("physics", () => {
       beforeStepCallback.mockClear();
       frameCallback.mockClear();
 
-      await pause(50);
+      await pause(150);
 
       expect(beforeStepCallback).toHaveBeenCalled();
       expect(frameCallback).toHaveBeenCalled();

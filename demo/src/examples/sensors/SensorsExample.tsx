@@ -1,4 +1,6 @@
-import { Box, Sphere, Text } from "@react-three/drei";
+import { Box, Sphere } from "@react-three/drei";
+// drei 11 only ships the troika-based <Text> from its WebGL-only `legacy` entry
+import { Text } from "@react-three/drei/legacy";
 import { useFrame } from "@react-three/fiber";
 import {
   CuboidCollider,

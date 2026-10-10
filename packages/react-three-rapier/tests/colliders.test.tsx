@@ -329,14 +329,18 @@ describe("colliders", () => {
         );
       };
 
-      const { world, step, setShowCollider, setShowRigidBody } =
-        await new Promise<TestSceneResult>((resolve) => {
-          ReactThreeTestRenderer.create(
-            <Physics paused>
-              <TestScene onMount={resolve} />
-            </Physics>
-          );
-        });
+      let onMount!: (result: TestSceneResult) => void;
+      const mounted = new Promise<TestSceneResult>(
+        (resolve) => (onMount = resolve)
+      );
+
+      await ReactThreeTestRenderer.create(
+        <Physics paused>
+          <TestScene onMount={onMount} />
+        </Physics>
+      );
+
+      const { world, step, setShowCollider, setShowRigidBody } = await mounted;
 
       expect(world.colliders.len()).to.equal(0);
 
