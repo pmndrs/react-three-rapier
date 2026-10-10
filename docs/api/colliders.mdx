@@ -1,0 +1,131 @@
+---
+title: Colliders
+description: Automatic colliders, collider components, compound shapes and MeshCollider.
+nav: 5
+---
+
+## Automatic colliders
+
+RigidBodies generate automatic colliders by default for all meshes that it contains. You can control the default collider by setting the `colliders` prop on a `<RigidBody />`, or change it globally by setting `colliders` on `<Physics />`. Setting `colliders={false}` disables auto-generation.
+
+Supported values:
+
+- `"cuboid"`, creates a CuboidCollider based on the bounding box of the mesh
+- `"ball"`, creates a SphereCollider based on the bounding sphere of the mesh
+- `"trimesh"`, creates a TrimeshCollider based on the mesh's geometry
+- `"hull"`, creates a ConvexHullCollider based on the mesh's geometry
+- `false`, disables auto-generation
+
+Generate ConvexHull colliders for all meshes in a RigidBody by default:
+
+```tsx
+const Scene = () => (
+  <Physics colliders="hull">
+    <RigidBody>
+      <Box />
+    </RigidBody>
+    <RigidBody position={[0, 10, 0]}>
+      <Sphere />
+    </RigidBody>
+  </Physics>
+);
+```
+
+Turn off automatic collider generation globally, but apply auto generation locally:
+
+```tsx
+const Scene = () => (
+  <Physics colliders={false}>
+    {/* Use an automatic CuboidCollider for all meshes inside this RigidBody */}
+    <RigidBody colliders="cuboid">
+      <Box />
+    </RigidBody>
+
+    {/* Use an automatic BallCollider for all meshes inside this RigidBody */}
+    <RigidBody position={[0, 10, 0]} colliders="ball">
+      <Sphere />
+    </RigidBody>
+  </Physics>
+);
+```
+
+If part of your meshes are invisible and you want to include them in the collider creation, use the `includeInvisible` flag.
+
+```tsx
+<RigidBody colliders="hull" includeInvisible>
+  <object3D>
+    <Suzanne visible={false} />
+  </object3D>
+</RigidBody>
+```
+
+## Collider components
+
+You can also create `Colliders` by hand and add them to a `RigidBody` to create compound colliders. This is useful for creating more complex shapes, for creating simplified shapes for performance reasons, or for detecting collisions on specific parts of a mesh.
+
+🧩 See [ColliderProps docs](https://pmndrs.github.io/react-three-rapier/interfaces/ColliderProps.html) for available props.
+
+```tsx
+const Scene = () => (<>
+  {/* Make a compound shape with two custom BallColliders */}
+  <RigidBody position={[0, 10, 0]}>
+    <Sphere />
+    <BallCollider args={[0.5]} />
+    <BallCollider args={[0.5]} position={[1, 0, 0]} />
+  </RigidBody>
+
+  {/* Make a compound shape with two custom BallColliders, an automatic BallCollider,
+      Two automatic MeshColliders, based on two different shape types */}
+  <RigidBody position={[0, 10, 0]} colliders='ball'>
+    <MeshCollider type="trimesh">
+      <mesh ... />
+    </MeshCollider>
+
+    <MeshCollider type="hull">
+      <mesh ... />
+    </MeshCollider>
+
+    <Sphere />
+
+    <BallCollider args={[0.5]} />
+    <BallCollider args={[0.5]} position={[1, 0, 0]} />
+  </RigidBody>
+<>)
+```
+
+### Heightfields
+
+`HeightfieldCollider` takes `args={[widthSegments, heightSegments, heights, scale]}`. The segment counts are _cells_,
+and `heights` must hold one value per vertex: `(widthSegments + 1) * (heightSegments + 1)` values. Rapier lays heights
+out column-major. Use a positive `scale`; negative scales are not supported (mirror with a rotation of the body instead).
+
+### Hull and trimesh pivots
+
+Hull and trimesh colliders are built from the geometry exactly as it is. If the geometry is not centered on the
+object's origin, the collider and the body's center of mass are off-center, and the body appears to rotate around a
+different pivot. See the [FAQ](/advanced/faq#hull-or-trimesh-collider-pivots-around-the-wrong-point).
+
+## MeshCollider
+
+`<MeshCollider type="hull" | "trimesh" | "cuboid" | "ball">` generates colliders from the meshes it wraps and can sit
+inside a `<RigidBody>` next to other colliders. See the compound example above.
+
+### Collider examples
+
+<a href="https://codesandbox.io/s/react-three-rapier-auto-colliders-b4coz1">
+  <img
+    src="https://github.com/pmndrs/react-three-rapier/raw/main/packages/react-three-rapier/misc/example-auto-colliders.jpg"
+    width="240"
+    alt="example-auto-colliders.jpg"
+  />
+</a>
+<a href="https://codesandbox.io/s/react-three-rapier-compound-colliders-ol5ybn">
+  <img
+    src="https://github.com/pmndrs/react-three-rapier/raw/main/packages/react-three-rapier/misc/example-compound-shapes.jpg"
+    width="240"
+    alt="example-compound-shapes.jpg"
+  />
+</a>
+
+🧩 See [ColliderProps](https://pmndrs.github.io/react-three-rapier/interfaces/ColliderProps.html) and
+[MeshColliderProps](https://pmndrs.github.io/react-three-rapier/interfaces/MeshColliderProps.html) for all props.

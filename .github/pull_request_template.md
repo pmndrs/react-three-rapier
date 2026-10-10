@@ -1,7 +1,9 @@
 ## Description
+
 <!-- A summary of the changes. Add a video or screenshot if it makes sense! -->
 
 ### Type of change
+
 <!-- Remove unrelated items -->
 
 - 🐛 Bug fix
@@ -9,6 +11,7 @@
 - 📦 Other (tests, refactoring, docs, etc.)
 
 ### Checklist:
+
 <!-- Check all that apply, remove any that don't -->
 
 - [ ] 🔍 I have performed a self-review of my code

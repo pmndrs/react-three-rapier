@@ -1,0 +1,166 @@
+---
+title: Update loop and stepping
+description: Fixed time steps on the react-three-fiber v10 scheduler, interpolation, manual stepping and on-demand rendering.
+nav: 25
+---
+
+`<Physics>` runs on the react-three-fiber v10 scheduler (`@pmndrs/scheduler`). By default it simulates at a fixed rate
+of 60 steps per second, independent of the frame rate, and interpolates the rendered transforms between the last two
+steps so motion looks smooth at any refresh rate.
+
+## Where physics runs
+
+With the default `updateLoop="follow"`, every `<Physics>` world registers three scheduler jobs:
+
+- A **step job** in the world's own fixed-timestep phase, `rapier:fixed:<n>`. It runs right after r3f's built-in
+  `physics` phase, once per whole `timeStep` of banked frame time, so zero, one or several times per frame.
+- A **sync job** in the per-frame `rapier` phase, just before `update`. It writes the interpolated transforms of all
+  bodies into their meshes, once per frame.
+- A **late check** in the `rapier:late` phase, just before `render`. It re-applies those transforms if an ancestor of
+  a body moved during `update` (see [moving parents](#moving-parents)).
+
+The resulting phase order is:
+
+```
+start → input → physics → rapier:fixed:… → rapier → update → rapier:late → render → finish
+```
+
+A `useFrame` in the default `update` phase therefore always sees meshes that were already synced this frame.
+
+Each world owns its fixed phase, and the built-in `physics` phase timestep is never changed. Other libraries and your
+own `useFrame(cb, { phase: "physics" })` code keep their 1/60, and several `<Physics>` worlds with different
+`timeStep`s can run in one canvas. To run code in lockstep with Rapier, use
+[`useBeforePhysicsStep` / `useAfterPhysicsStep`](#running-code-every-step), not the `physics` phase.
+
+## Configuring time step size
+
+`timeStep` sets the length of one fixed step, in seconds (default `1/60`):
+
+```tsx
+<Physics timeStep={1 / 30}>{/* ... */}</Physics>
+```
+
+The `timeStep` prop may also be set to `"vary"`, which steps once per frame with that frame's delta (clamped to 0.5s).
+There is no interpolation in this mode:
+
+```tsx
+<Physics timeStep="vary">{/* ... */}</Physics>
+```
+
+> [!NOTE]
+> `"vary"` is useful when you need exactly one step per frame, but it may cause instability in the simulation and it
+> is not deterministic. Please use with care!
+
+Changing `timeStep` at runtime works and retimes only that world's phase. Each change drops the fraction of a step that
+was already banked, so do not animate `timeStep` every frame (for example for slow motion). Prefer scaling forces or
+gravity, or use `paused` with [manual stepping](#manual-stepping).
+
+## Catch-up limit: `maxSubSteps`
+
+When a frame takes longer than one `timeStep`, several fixed steps run in that frame to catch up. `maxSubSteps`
+(default `5`) caps how many. Simulation time beyond `maxSubSteps * timeStep` is dropped rather than queued, so a stalled
+tab, a debugger pause or a heavy frame does not make physics fast-forward or spiral.
+
+```tsx
+// Small steps need a higher cap to keep real-time speed at low frame rates
+<Physics timeStep={1 / 240} maxSubSteps={12}>
+  {/* ... */}
+</Physics>
+```
+
+Raise it if you use a small `timeStep` and must not lose simulation time at low frame rates. It is ignored with
+`timeStep="vary"`.
+
+## Interpolation
+
+With `interpolate` (default `true`), the sync job renders each body between the pose before and the pose after the
+latest step, using how far the frame is into the next step (the phase's overstep) as the blend factor. Rendered
+transforms therefore lag the simulation by less than one step. `interpolate={false}` renders the latest simulated pose.
+
+Interpolation restarts from the current pose after a manual `step()`, after `setWorld()`, and when `paused`,
+`interpolate` or `timeStep` change, so visuals never lerp backwards.
+
+### Teleports
+
+Teleport a body with `setTranslation` (or `setRotation`) inside `useBeforePhysicsStep`. The pose before the step is
+recorded after the before-step callbacks, so the jump is not interpolated. A teleport made elsewhere (an event handler,
+a regular `useFrame`) is interpolated from the previous step's pose for at most one step.
+
+## Running code every step
+
+`useBeforePhysicsStep` and `useAfterPhysicsStep` run once per fixed step, inside the step job, and receive the world and
+the length of that step:
+
+```tsx
+useBeforePhysicsStep((world, dt) => {
+  // dt === timeStep for fixed steps, or the clamped frame delta with timeStep="vary"
+});
+```
+
+Use `dt` rather than the frame delta to keep logic framerate independent. Callbacks that only take `(world)` keep
+working. Collision, intersection and contact-force events are also dispatched after every step, so a handler may run
+several times in one frame. See [Collision events](/advanced/collision-events).
+
+## Pausing
+
+`paused` disables the step job. No time is banked while paused, so resuming does not jump ahead. Meshes keep syncing
+(showing the latest simulated pose), and manual stepping still works.
+
+## Manual stepping
+
+You can manually step the physics simulation by calling the `step` method from the `useRapier` hook. It runs one step of
+`dt` seconds (with the step callbacks and events) and syncs the meshes immediately, also while `paused`.
+
+```tsx
+const { step } = useRapier();
+
+step(1 / 60);
+```
+
+## `updatePriority`
+
+`updatePriority` orders this world's jobs within their phases. Higher runs first, like r3f v10's `{ priority }`
+option. It no longer takes over rendering: r3f keeps rendering in all cases.
+
+> [!NOTE]
+> In 2.x, a positive `updatePriority` was passed to `useFrame` and made react-three-fiber stop rendering automatically.
+> If you relied on that to render manually, register your own `useFrame(cb, { phase: "render" })`.
+
+## On-demand rendering
+
+`<Canvas frameloop="demand">` works with the default `updateLoop="follow"`. While any dynamic or kinematic body is awake,
+the sync job calls `invalidate()` once per frame, so the canvas keeps rendering. When everything sleeps it stops.
+Fixed bodies never keep the canvas awake.
+
+- See https://docs.pmnd.rs/react-three-fiber/advanced/scaling-performance#on-demand-rendering, for info on on-demand
+  rendering in `@react-three/fiber`.
+
+```tsx
+<Canvas frameloop="demand">
+  <Physics>...</Physics>
+</Canvas>
+```
+
+Physics only notices bodies on a frame. If you wake or move a body outside a frame while the canvas is idle (for example
+`applyImpulse` in a DOM click handler), call `invalidate()` once.
+
+## Independent loop
+
+`<Physics updateLoop="independent" />` steps physics in its own `requestAnimationFrame` loop instead of the
+react-three-fiber scheduler. It uses the same fixed-step accumulator, `maxSubSteps`, `paused` and interpolation rules,
+and invalidates the canvas while bodies are awake. Since `"follow"` supports `frameloop="demand"` itself, you only need
+this to decouple physics from the canvas' frame loop.
+
+## Moving parents
+
+A `<RigidBody>`'s visual is written in its parent's current space every frame. Moving, rotating or re-parenting an
+ancestor after mount (drei `PresentationControls` or `<Float>`, a group animated in `useFrame`) keeps the visual on the
+simulated body, even when the ancestor moves during `update`, after the sync, because the `rapier:late` check catches
+it. Ancestors do not drag the bodies along: the simulation still decides where bodies are. Nested `<RigidBody>`s are
+synced parent-first, so an inner body never lags the body that carries it.
+
+## Older react-three-fiber builds
+
+If your `@react-three/fiber` ships a scheduler without fixed phases (`@pmndrs/scheduler` < 0.3, for example
+`10.0.0-alpha.5`), `<Physics>` falls back to its own accumulator in a per-frame job in the `rapier` phase. Behavior is
+the same, including `maxSubSteps`, `paused` and interpolation.

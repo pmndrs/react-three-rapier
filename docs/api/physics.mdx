@@ -1,0 +1,60 @@
+---
+title: Physics
+description: The Physics world component and its props.
+nav: 3
+---
+
+The `<Physics />` component is the root component of your physics world. It is responsible for creating the physics world and managing the simulation. It relies on lazily initiating `Rapier` and needs to be wrapped in `<Suspense />`.
+
+🧩 See [PhysicsProps docs](https://pmndrs.github.io/react-three-rapier/interfaces/PhysicsProps.html) for available props.
+
+```tsx
+const Scene = () => {
+  return (
+    <Canvas>
+      <Suspense>
+        <Physics gravity={[0, 1, 0]} interpolate={false} colliders={false}>
+          ...
+        </Physics>
+      </Suspense>
+    </Canvas>
+  );
+};
+```
+
+## Props
+
+| prop                       | default         | description                                                                                                                                        |
+| -------------------------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `gravity`                  | `[0, -9.81, 0]` | World gravity vector.                                                                                                                              |
+| `colliders`                | `"cuboid"`      | Default [automatic collider](/api/colliders#automatic-colliders) for all meshes in rigid bodies. `false` disables generation.                      |
+| `debug`                    | `false`         | Render all colliders. See [Debug](/api/debug).                                                                                                     |
+| `paused`                   | `false`         | Pause the simulation. No time is banked while paused; `step()` from `useRapier()` still works.                                                     |
+| `timeStep`                 | `1/60`          | Fixed time step in seconds, or `"vary"` to step once per frame with the frame delta (clamped to 0.5s). See [update loop](/advanced/update-loop).   |
+| `maxSubSteps`              | `5`             | Most fixed steps one frame may run. Surplus time is dropped, so slow frames cannot spiral. Ignored with `"vary"`.                                  |
+| `interpolate`              | `true`          | Interpolate rendered transforms between the last two fixed steps. No effect when `timeStep` is `"vary"`.                                           |
+| `updateLoop`               | `"follow"`      | `"follow"` steps on the react-three-fiber v10 scheduler (a fixed-step phase per world), `"independent"` runs its own `requestAnimationFrame` loop. |
+| `updatePriority`           | `0`             | Order of this world's jobs within their scheduler phases (higher runs first). Does not take over rendering.                                        |
+| `numSolverIterations`      | `4`             | Constraint solver iterations. Higher is more rigid and more expensive.                                                                             |
+| `numInternalPgsIterations` | `1`             | Internal PGS iterations per solver iteration. Improves stability cheaply.                                                                          |
+| `allowedLinearError`       | `0.001`         | Penetration the engine will not attempt to correct.                                                                                                |
+| `predictionDistance`       | `0.002`         | Maximal distance separating two objects that generates predictive contacts.                                                                        |
+| `maxCcdSubsteps`           | `1`             | Maximum CCD substeps. `0` disables all continuous collision detection, see [CCD](/api/rigid-body#continuous-collision-detection).                  |
+| `contactNaturalFrequency`  | `30`            | Controls how stiffly contacts are corrected.                                                                                                       |
+| `lengthUnit`               | `1`             | Approximate size of most dynamic objects, used to scale length-based tolerances.                                                                   |
+| `minIslandSize`            |                 | **Removed in Rapier 0.20.** Deprecated and ignored.                                                                                                |
+
+> [!NOTE]
+> `<Physics>` keeps `allowedLinearError={0.001}` and `predictionDistance={0.002}` from earlier versions. Rapier 0.21's
+> native defaults are `0.005` and `0.02`, which reduce tunneling. Set them explicitly to adopt them.
+
+## Stepping
+
+With the default `updateLoop="follow"`, each `<Physics>` world steps in its own fixed-timestep phase of the
+react-three-fiber v10 scheduler (`rapier:fixed:<n>`, right after r3f's `physics` phase), syncs interpolated transforms
+into your meshes once per frame in a `rapier` phase before `update`, and re-applies them in a `rapier:late` phase before
+`render` if an ancestor moved. Use [`useBeforePhysicsStep` / `useAfterPhysicsStep`](/api/hooks)
+to run code every step. See [Update loop and stepping](/advanced/update-loop) for the details, including
+`frameloop="demand"`, teleports and moving parents.
+
+For the generated reference see the [TypeDoc API docs](https://pmndrs.github.io/react-three-rapier/interfaces/PhysicsProps.html).

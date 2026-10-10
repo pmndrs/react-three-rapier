@@ -15,10 +15,9 @@ import { Mesh } from "three";
 import { useResetOrbitControls } from "../../hooks/use-reset-orbit-controls";
 
 export const useSuzanne = () => {
-  // @ts-ignore
   return useGLTF(
     new URL("../../models/susanne.glb", import.meta.url).toString()
-  ) as {
+  ) as unknown as {
     nodes: {
       Suzanne: Mesh;
     };
@@ -26,10 +25,9 @@ export const useSuzanne = () => {
 };
 
 const useOffsetTorus = () => {
-  // @ts-ignore
   return useGLTF(
     new URL("../../models/offset-torus.glb", import.meta.url).toString()
-  ) as {
+  ) as unknown as {
     nodes: {
       Torus: Mesh;
     };

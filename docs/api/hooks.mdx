@@ -1,0 +1,111 @@
+---
+title: Hooks
+description: useRapier, step callbacks, physics hooks, joints and queries.
+nav: 10
+---
+
+## useRapier
+
+Gives you access to the `world`, direct access to the `rapier` module, and more. It throws if used outside `<Physics>`.
+🧩 See [RapierContext docs](https://pmndrs.github.io/react-three-rapier/interfaces/RapierContext.html).
+
+```tsx
+import { useRapier } from "@react-three/rapier";
+
+const { world, rapier } = useRapier();
+```
+
+### Raycasting and queries
+
+Queries live on the world; there is no separate raycaster.
+
+```tsx
+const { world, rapier } = useRapier();
+
+const castDown = (origin: { x: number; y: number; z: number }) => {
+  const ray = new rapier.Ray(origin, { x: 0, y: -1, z: 0 });
+  const maxToi = 10;
+  const solid = true;
+  const hit = world.castRay(ray, maxToi, solid);
+  if (hit) {
+    const point = ray.pointAt(hit.timeOfImpact);
+    // hit.collider is the Rapier collider that was hit
+  }
+};
+```
+
+`world.castRayAndGetNormal`, `world.intersectionsWithRay`, `world.projectPoint` and shape casts work the same way.
+
+## useBeforePhysicsStep / useAfterPhysicsStep
+
+Run code right before or right after every physics step. The callback receives the `world` and `dt`, the length of
+that step in seconds: the fixed `timeStep`, or the clamped frame delta with `timeStep="vary"`.
+
+- `useBeforePhysicsStep(callback)`
+  🧩 See [docs](https://pmndrs.github.io/react-three-rapier/functions/useBeforePhysicsStep.html).
+- `useAfterPhysicsStep(callback)`
+  🧩 See [docs](https://pmndrs.github.io/react-three-rapier/functions/useAfterPhysicsStep.html).
+
+```tsx
+import { useBeforePhysicsStep, useAfterPhysicsStep } from "@react-three/rapier";
+
+const Thruster = ({ body }: { body: RefObject<RapierRigidBody> }) => {
+  useBeforePhysicsStep((world, dt) => {
+    // Runs once per fixed step, so this is framerate independent
+    body.current?.applyImpulse({ x: 0, y: 12 * dt, z: 0 }, true);
+  });
+
+  useAfterPhysicsStep((world) => {
+    // Read the simulated state of this step
+  });
+
+  return null;
+};
+```
+
+With a fixed `timeStep` the callbacks run zero, one or several times per frame, inside the world's fixed-step
+scheduler phase, before the meshes are synced. Use `dt`, not the frame delta. Callbacks that only take `(world)` keep
+working. The callback can change between renders without re-registering. Teleports (`setTranslation`) made in
+`useBeforePhysicsStep` are not interpolated. See [Update loop](/advanced/update-loop).
+
+## useFilterContactPair / useFilterIntersectionPair
+
+Collision filtering for one-way platforms and similar. See [Physics hooks](/advanced/physics-hooks).
+
+## Joint hooks
+
+`useFixedJoint`, `useSphericalJoint`, `useRevoluteJoint`, `usePrismaticJoint`, `useRopeJoint`, `useSpringJoint`.
+See [Joints](/api/joints).
+
+## useCharacterController
+
+Creates and owns a Rapier `KinematicCharacterController` and returns a stable `{ controller, move }` api. Call `move`
+once per physics step from `useBeforePhysicsStep` with a translation already scaled by `dt`:
+
+```tsx
+const cc = useCharacterController({
+  autostep: { maxHeight: 0.3, minWidth: 0.2 },
+  snapToGround: 0.2
+});
+
+useBeforePhysicsStep((_world, dt) => {
+  const { grounded } = cc.move(body.current!, {
+    x: 4 * dt,
+    y: -9.81 * dt,
+    z: 0
+  });
+});
+```
+
+`<CharacterController>` wraps the hook in a kinematic `<RigidBody>`. See [Character controller](/api/character-controller).
+
+## Soft bodies
+
+`<SoftBody>` and `useSoftBody` (cloth, ropes and volumetric "jelly" bodies) live on a separate entry point, so the extra
+code is only bundled when you use them:
+
+```tsx
+import { SoftBody, useSoftBody } from "@react-three/rapier/soft-bodies";
+```
+
+See [Soft bodies](/api/soft-bodies).

@@ -28,7 +28,7 @@ import { createCollider } from "./test-utils";
 describe("colliders", () => {
   describe("mutable collider options", () => {
     it(`should have sensor property correctly assigned`, async () => {
-      for (let value of [true, false, undefined]) {
+      for (const value of [true, false, undefined]) {
         const spy = vi.spyOn(Collider.prototype, "setSensor");
 
         try {
@@ -60,7 +60,7 @@ describe("colliders", () => {
       ];
 
       it(`should have collisionGroups property correctly assigned`, async () => {
-        for (let value of interactionGroupsValues) {
+        for (const value of interactionGroupsValues) {
           const spy = vi.spyOn(Collider.prototype, "setCollisionGroups");
           try {
             const collider = await createCollider({
@@ -79,7 +79,7 @@ describe("colliders", () => {
       });
 
       it(`should have solverGroups property correctly assigned`, async () => {
-        for (let value of interactionGroupsValues) {
+        for (const value of interactionGroupsValues) {
           const spy = vi.spyOn(Collider.prototype, "setSolverGroups");
           try {
             const collider = await createCollider({
@@ -99,7 +99,7 @@ describe("colliders", () => {
     });
 
     it(`should have friction property correctly assigned`, async () => {
-      for (let value of [1, 2, 5]) {
+      for (const value of [1, 2, 5]) {
         const spy = vi.spyOn(Collider.prototype, "setFriction");
         try {
           const collider = await createCollider({
@@ -117,7 +117,7 @@ describe("colliders", () => {
       }
     });
     it(`should have frictionCombineRule property correctly assigned`, async () => {
-      for (let value of [
+      for (const value of [
         CoefficientCombineRule.Max,
         CoefficientCombineRule.Min,
         CoefficientCombineRule.Multiply,
@@ -141,7 +141,7 @@ describe("colliders", () => {
       }
     });
     it(`should have restitutionCombineRule property correctly assigned`, async () => {
-      for (let value of [
+      for (const value of [
         CoefficientCombineRule.Max,
         CoefficientCombineRule.Min,
         CoefficientCombineRule.Multiply,
@@ -164,7 +164,7 @@ describe("colliders", () => {
       }
     });
     it(`should have restitution property correctly assigned`, async () => {
-      for (let value of [1, 2, 5]) {
+      for (const value of [1, 2, 5]) {
         const spy = vi.spyOn(Collider.prototype, "setRestitution");
         try {
           const collider = await createCollider({
@@ -203,7 +203,7 @@ describe("colliders", () => {
     describe("should have mass property correctly assigned", async () => {
       const densityAtMass1 = 0.02083333395421505;
 
-      for (let value of [1, 2, 5, undefined]) {
+      for (const value of [1, 2, 5, undefined]) {
         it(`should work with value ${value}`, async () => {
           const collider = await createCollider({
             args: [1, 2, 3],
@@ -329,14 +329,18 @@ describe("colliders", () => {
         );
       };
 
-      const { world, step, setShowCollider, setShowRigidBody } =
-        await new Promise<TestSceneResult>((resolve) => {
-          ReactThreeTestRenderer.create(
-            <Physics paused>
-              <TestScene onMount={resolve} />
-            </Physics>
-          );
-        });
+      let onMount!: (result: TestSceneResult) => void;
+      const mounted = new Promise<TestSceneResult>(
+        (resolve) => (onMount = resolve)
+      );
+
+      await ReactThreeTestRenderer.create(
+        <Physics paused>
+          <TestScene onMount={onMount} />
+        </Physics>
+      );
+
+      const { world, step, setShowCollider, setShowRigidBody } = await mounted;
 
       expect(world.colliders.len()).to.equal(0);
 

@@ -1,0 +1,48 @@
+---
+title: Debug
+description: Rendering collider outlines with the debug option.
+nav: 8
+---
+
+Set the `debug` prop on `<Physics />` to see live representations of all colliders in a scene, using the live debug buffer from the physics engine.
+
+```tsx
+import { Box, Sphere } from "@react-three/drei";
+import { RigidBody } from "@react-three/rapier";
+
+const Scene = () => {
+  return (
+    <Physics debug>
+      <RigidBody>
+        <Box />
+      </RigidBody>
+      <RigidBody>
+        <Sphere />
+      </RigidBody>
+    </Physics>
+  );
+};
+```
+
+## How it works
+
+`<Physics debug>` mounts a `<Debug>` component that draws Rapier's debug lines (`world.debugRender()`) with a
+`lineSegments` and a `lineBasicMaterial` using vertex colors.
+
+- It keeps **one** `BufferGeometry` for its whole lifetime. Every frame the position and color attributes are rewritten in
+  place, only the used range is uploaded, and the draw range is set to the current vertex count. The attributes grow in
+  powers of two when Rapier returns more lines, disposing the outgrown GPU buffers. The geometry is disposed when debug is
+  turned off or `<Physics>` unmounts, so toggling `debug` does not leak memory.
+- The lines are updated in the `update` phase, after this frame's physics steps, so they show the latest simulated step.
+  With [interpolation](/advanced/update-loop#interpolation) on, they can lead the rendered meshes by up to one step.
+  Use `interpolate={false}` if you need them to line up exactly.
+
+## WebGPU
+
+The debug renderer works with both `WebGLRenderer` and react-three-fiber v10's `WebGPURenderer`. Rapier's colors are RGBA
+and are uploaded as a 4-component color attribute: WebGL reads it through `vertexAlphas`, and three's WebGPU node
+materials read vertex colors as `vec4`, so no conversion is needed.
+
+> [!NOTE]
+> Debug rendering calls `world.debugRender()` every frame, which copies every collider outline out of wasm. Leave it off
+> in production.

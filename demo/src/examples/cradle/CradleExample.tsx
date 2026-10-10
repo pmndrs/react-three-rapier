@@ -1,11 +1,10 @@
 import { Cylinder, Sphere } from "@react-three/drei";
 import {
   BallCollider,
-  CylinderCollider,
   RapierRigidBody,
   RigidBody,
   RigidBodyOptions,
-  useSphericalJoint
+  useRevoluteJoint
 } from "@react-three/rapier";
 import { useRef } from "react";
 import { Demo } from "../../App";
@@ -15,30 +14,31 @@ const Rod = (props: RigidBodyOptions) => {
   const anchor = useRef<RapierRigidBody>(null!);
   const rod = useRef<RapierRigidBody>(null!);
 
-  useSphericalJoint(anchor, rod, [
+  useRevoluteJoint(anchor, rod, [
     [0, 0, 0],
-    [0, 0, 0]
+    [0, 0, 0],
+    [0, 0, 1] // swing in the XY plane
   ]);
 
   return (
     <group>
-      <RigidBody ref={anchor} {...props} />
+      {/* a fixed anchor: no collider, and it never moves */}
+      <RigidBody ref={anchor} {...props} type="fixed" />
 
       <RigidBody ref={rod} {...props} colliders={false}>
         <Cylinder
-          scale={[0.05, 2, 0.05]}
-          position={[0, -1, 0]}
+          scale={[0.15, 6, 0.15]}
+          position={[0, -3, 0]}
           receiveShadow
           castShadow
         >
           <meshStandardMaterial color={"black"} />
         </Cylinder>
-        <Sphere scale={0.2} position={[0, -2, 0]} receiveShadow castShadow>
+        <Sphere scale={0.6} position={[0, -6, 0]} receiveShadow castShadow>
           <meshStandardMaterial metalness={1} roughness={0.3} />
         </Sphere>
 
-        <CylinderCollider args={[1, 0.05]} position={[0, -1, 0]} />
-        <BallCollider args={[0.2]} position={[0, -2, 0]} restitution={1.2} />
+        <BallCollider args={[0.6]} position={[0, -6, 0]} restitution={1} />
       </RigidBody>
     </group>
   );
@@ -48,12 +48,14 @@ export const CradleExample: Demo = () => {
   useResetOrbitControls();
 
   return (
-    <group rotation={[1, 0, 0]} scale={3}>
+    // No group rotation/scale: body poses come from world matrices, so a tilted parent would
+    // make the rods hang (and swing) in a tilted plane. Scale the rod geometry instead.
+    <group position={[-2.4, 3, 0]}>
       <Rod position={[0, 0, 0]} />
-      <Rod position={[0.5, 0, 0]} />
-      <Rod position={[1, 0, 0]} />
-      <Rod position={[1.5, 0, 0]} />
-      <Rod position={[2, 0, 0]} rotation={[0.0, 0, 2]} />
+      <Rod position={[1.2, 0, 0]} />
+      <Rod position={[2.4, 0, 0]} />
+      <Rod position={[3.6, 0, 0]} />
+      <Rod position={[4.8, 0, 0]} rotation={[0, 0, 0.9]} />
     </group>
   );
 };

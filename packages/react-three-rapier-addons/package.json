@@ -1,28 +1,68 @@
 {
   "name": "@react-three/rapier-addons",
   "version": "5.0.0",
-  "main": "dist/react-three-rapier-addons.cjs.js",
-  "module": "dist/react-three-rapier-addons.esm.js",
+  "description": "Addons for @react-three/rapier",
+  "keywords": [
+    "physics",
+    "rapier",
+    "react-three-fiber",
+    "react",
+    "three"
+  ],
   "license": "MIT",
-  "sideEffects": false,
-  "peerDependencies": {
-    "@react-three/fiber": "*",
-    "@react-three/rapier": "^2.0.0",
-    "react": "^19",
-    "three": "*"
+  "homepage": "https://github.com/pmndrs/react-three-rapier",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pmndrs/react-three-rapier.git",
+    "directory": "packages/react-three-rapier-addons"
   },
-  "dependencies": {
-    "three-stdlib": "^2.35.12"
+  "bugs": {
+    "url": "https://github.com/pmndrs/react-three-rapier/issues"
+  },
+  "type": "commonjs",
+  "engines": {
+    "node": ">=22"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      },
+      "default": "./dist/index.mjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "sideEffects": false,
+  "files": [
+    "dist/index.*",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json && rollup --config rollup.config.mjs",
+    "check:package": "publint --strict && attw --pack ."
+  },
+  "peerDependencies": {
+    "@react-three/fiber": ">=10.0.0-0",
+    "@react-three/rapier": "^3.0.0-0",
+    "react": ">=19.0 <19.3",
+    "three": ">=0.185.0"
   },
   "devDependencies": {
-    "@react-three/drei": "10.0.1",
-    "@react-three/fiber": "9.0.4",
-    "@react-three/rapier": "2.2.0",
-    "@types/react": "19.0.8",
-    "@types/react-dom": "19.0.3",
-    "react": "19.0.0",
-    "react-dom": "19.0.0",
-    "three": "0.172.0"
-  },
-  "repository": "https://github.com/pmndrs/react-three-rapier/tree/master/packages/react-three-rapier-addons"
+    "@react-three/fiber": "10.0.0-canary.a056612",
+    "@react-three/rapier": "workspace:*",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.7",
+    "@types/three": "0.186.0",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "three": "0.186.1"
+  }
 }

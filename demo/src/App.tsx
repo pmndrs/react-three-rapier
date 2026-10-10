@@ -1,67 +1,50 @@
-import { Box, Environment, OrbitControls } from "@react-three/drei";
-import { Canvas } from "@react-three/fiber";
+import { Box, Environment, OrbitControls, Stats } from "@react-three/drei";
+import { Canvas, useStore } from "@react-three/fiber";
 import { Physics, RigidBody } from "@react-three/rapier";
-import { Perf } from "r3f-perf";
 import {
-  JSX,
   ReactNode,
   StrictMode,
   Suspense,
-  createContext,
-  useContext,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
   useRef,
   useState
 } from "react";
-import { NavLink, NavLinkProps, Route, Routes } from "react-router-dom";
-import { ActiveCollisionTypesExample } from "./examples/active-collision-types/ActiveCollisionTypesExample";
-import { AllCollidersExample } from "./examples/all-colliders/AllCollidersExample";
-import { AllShapesExample } from "./examples/all-shapes/AllShapesExample";
-import { ApiUsage } from "./examples/api-usage/ApiUsageExample";
-import { AttractorExample } from "./examples/attractors/AttractorsExample";
-import { Car } from "./examples/car/CarExample";
-import { Cluster } from "./examples/cluster/ClusterExample";
-import { Colliders } from "./examples/colliders/CollidersExample";
-import { CollisionEventsExample } from "./examples/collision-events/CollisionEventsExample";
-import { ComponentsExample } from "./examples/components/ComponentsExample";
-import { ContactForceEventsExample } from "./examples/contact-force-events/ContactForceEventsExample";
-import { ContactSkinExample } from "./examples/contact-skin/ContactSkinExample";
-import { CradleExample } from "./examples/cradle/CradleExample";
-import { Damping } from "./examples/damping/DampingExample";
-import { DynamicTypeChangeExample } from "./examples/dynamic-type-change/DynamicTypeChangeExample";
-import { ImmutablePropsExample } from "./examples/immutable-props/ImmutablePropsExample";
-import { InstancedMeshes } from "./examples/instanced-meshes/InstancedMeshesExample";
-import { InstancedMeshesCompound } from "./examples/instances-meshes-compound/InstancedMeshesCompoundExample";
-import { Joints } from "./examples/joints/JointsExample";
-import { Kinematics } from "./examples/kinematics/KinematicsExample";
-import { LockedTransformsExample } from "./examples/locked-transforms/LockedTransformsExample";
-import { ManualStepExample } from "./examples/manual-step/ManualStepExamples";
-import { MeshColliderTest } from "./examples/mesh-collider-test/MeshColliderExample";
-import { OneWayPlatform } from "./examples/one-way-platform/OneWayPlatform";
-import { PerformanceExample } from "./examples/performance/PeformanceExample";
-import Shapes from "./examples/plinko/ShapesExample";
-import { RopeJointExample } from "./examples/rope-joint/RopeJointExample";
-import { SensorsExample } from "./examples/sensors/SensorsExample";
-import { SnapshotExample } from "./examples/snapshot/SnapshotExample";
-import { SpringExample } from "./examples/spring/SpringExample";
-import { StutteringExample } from "./examples/stuttering/StutteringExample";
-import { Transforms } from "./examples/transforms/TransformsExample";
-import { OrbitControls as OrbitControlsImpl } from "three-stdlib";
+import {
+  Navigate,
+  NavLink,
+  NavLinkProps,
+  Route,
+  Routes,
+  useLocation
+} from "react-router-dom";
+import { demoContext } from "./demo-context";
+import { DEFAULT_EXAMPLE, ExampleMeta, examples } from "./examples";
+import { getRenderer, hasWebGPU, switchRenderer } from "./renderer";
+import type { OrbitControls as OrbitControlsImpl } from "three/addons/controls/OrbitControls.js";
 import { useResetOrbitControls } from "./hooks/use-reset-orbit-controls";
 
-type DemoContext = {
-  setDebug: (f: boolean) => void;
-  setPaused: (f: boolean) => void;
-  setCameraEnabled: (f: boolean) => void;
-  orbitControlRef: React.RefObject<OrbitControlsImpl>;
+// Kept here so examples can keep importing them from "../../App"
+export { useDemo } from "./demo-context";
+export type { Demo, DemoContext } from "./demo-context";
+
+/**
+ * r3f v10 leaves `state.gl` null on WebGPU roots (it is the legacy WebGL alias of
+ * `state.renderer`), but drei 11 alpha still reads `gl.domElement` (<Html>) and
+ * `gl.initTexture` (useTexture). Point it at the WebGPU renderer so those keep working.
+ * Remove once drei uses `state.renderer`.
+ */
+const GlShim = ({ children }: { children: ReactNode }) => {
+  const store = useStore();
+  const [ready, setReady] = useState(false);
+  useLayoutEffect(() => {
+    const { gl, renderer } = store.getState();
+    if (!gl && renderer) store.setState({ gl: renderer } as never);
+    setReady(true);
+  }, [store]);
+  return ready ? <>{children}</> : null;
 };
-
-const demoContext = createContext<Partial<DemoContext>>({});
-
-export const useDemo = () => useContext(demoContext);
-
-export interface Demo {
-  (props: { children?: ReactNode }): JSX.Element;
-}
 
 const Floor = () => {
   return (
@@ -78,41 +61,6 @@ const Floor = () => {
   );
 };
 
-const routes: Record<string, ReactNode> = {
-  "": <Shapes />,
-  joints: <Joints />,
-  components: <ComponentsExample />,
-  cradle: <CradleExample />,
-  transforms: <Transforms />,
-  cluster: <Cluster />,
-  "all-shapes": <AllShapesExample />,
-  attractors: <AttractorExample />,
-  car: <Car />,
-  "api-usage": <ApiUsage />,
-  kinematics: <Kinematics />,
-  "mesh-collider-test": <MeshColliderTest />,
-  colliders: <Colliders />,
-  "instanced-meshes": <InstancedMeshes />,
-  damping: <Damping />,
-  "instanced-meshes-compound": <InstancedMeshesCompound />,
-  "all-colliders": <AllCollidersExample />,
-  "collision-events": <CollisionEventsExample />,
-  "contact-force-events": <ContactForceEventsExample />,
-  sensors: <SensorsExample />,
-  "manual-step": <ManualStepExample />,
-  "locked-transforms": <LockedTransformsExample />,
-  performance: <PerformanceExample />,
-  "dynamic-type-changes": <DynamicTypeChangeExample />,
-  stuttering: <StutteringExample />,
-  "immutable-props": <ImmutablePropsExample />,
-  snapshot: <SnapshotExample />,
-  spring: <SpringExample />,
-  "rope-joint": <RopeJointExample />,
-  "active-collision-types": <ActiveCollisionTypesExample />,
-  "contact-skin": <ContactSkinExample />,
-  "one-way-platform": <OneWayPlatform />
-};
-
 export const App = () => {
   const [debug, setDebug] = useState<boolean>(false);
   const [perf, setPerf] = useState<boolean>(false);
@@ -121,6 +69,19 @@ export const App = () => {
   const [physicsKey, setPhysicsKey] = useState<number>(0);
   const [cameraEnabled, setCameraEnabled] = useState<boolean>(true);
   const orbitControlRef = useRef<OrbitControlsImpl>(null!);
+  const renderer = useMemo(getRenderer, []);
+  const { pathname } = useLocation();
+  const [meta, setMeta] = useState<ExampleMeta>({});
+
+  const current = examples.find((e) => "/" + e.path === pathname);
+  useEffect(() => {
+    let live = true;
+    setMeta({});
+    current?.loadMeta().then((m) => live && setMeta(m));
+    return () => {
+      live = false;
+    };
+  }, [current]);
 
   useResetOrbitControls();
 
@@ -148,51 +109,95 @@ export const App = () => {
         }}
       />
       <Suspense fallback="Loading...">
-        <Canvas shadows dpr={1}>
+        <Canvas
+          // the root entry picks WebGPU when given the `renderer` prop and WebGL for `gl`.
+          // Switching renderer reloads the page, so these props never change on a live canvas.
+          key={renderer}
+          {...(renderer === "webgpu"
+            ? { renderer: { shadows: true } }
+            : { gl: { shadows: true } })}
+          dpr={1}
+        >
           <StrictMode>
-            <Physics
-              paused={paused}
-              key={physicsKey}
-              interpolate={interpolate}
-              debug={debug}
-              timeStep={1 / 60}
-            >
-              <directionalLight
-                castShadow
-                position={[10, 10, 10]}
-                shadow-camera-bottom={-40}
-                shadow-camera-top={40}
-                shadow-camera-left={-40}
-                shadow-camera-right={40}
-                shadow-mapSize-width={1024}
-                shadow-bias={-0.0001}
-              />
-              <Environment preset="apartment" />
-
-              <OrbitControls ref={orbitControlRef} enabled={cameraEnabled} />
-
-              <demoContext.Provider
-                value={{
-                  setDebug,
-                  setPaused,
-                  setCameraEnabled,
-                  orbitControlRef
-                }}
+            <GlShim>
+              <Physics
+                paused={paused}
+                key={physicsKey}
+                interpolate={interpolate}
+                debug={debug}
+                timeStep={1 / 60}
               >
-                <Routes>
-                  {Object.keys(routes).map((key, index, array) => (
-                    <Route path={key} key={key} element={routes[key]} />
-                  ))}
-                </Routes>
-              </demoContext.Provider>
+                <directionalLight
+                  castShadow
+                  position={[10, 10, 10]}
+                  shadow-camera-bottom={-40}
+                  shadow-camera-top={40}
+                  shadow-camera-left={-40}
+                  shadow-camera-right={40}
+                  shadow-mapSize-width={1024}
+                  shadow-bias={-0.0001}
+                />
+                <Environment preset="apartment" />
 
-              <Floor />
+                <OrbitControls ref={orbitControlRef} enabled={cameraEnabled} />
 
-              {perf && <Perf />}
-            </Physics>
+                <demoContext.Provider
+                  value={{
+                    setDebug,
+                    setPaused,
+                    setCameraEnabled,
+                    orbitControlRef,
+                    renderer
+                  }}
+                >
+                  <Suspense fallback={null}>
+                    <Routes>
+                      <Route
+                        path="/"
+                        element={<Navigate to={DEFAULT_EXAMPLE} replace />}
+                      />
+                      {examples.map(({ path, Component }) => (
+                        <Route path={path} key={path} element={<Component />} />
+                      ))}
+                    </Routes>
+                  </Suspense>
+                </demoContext.Provider>
+
+                <Floor />
+
+                {/* r3f-perf does not support r3f v10 yet; drei <Stats> stands in */}
+                {perf && <Stats />}
+              </Physics>
+            </GlShim>
           </StrictMode>
         </Canvas>
       </Suspense>
+
+      {(meta.title ||
+        meta.description ||
+        (meta.webglOnly && renderer === "webgpu")) && (
+        <div
+          style={{
+            position: "absolute",
+            top: 8,
+            left: 270,
+            maxWidth: 480,
+            padding: "6px 10px",
+            background: "#fffd",
+            borderRadius: 4,
+            fontSize: 13
+          }}
+        >
+          {meta.title && <strong>{meta.title}</strong>}
+          {meta.description && <div>{meta.description}</div>}
+          {meta.webglOnly && renderer === "webgpu" && (
+            <div style={{ color: "#b00" }}>
+              WebGL only: this example does not support the WebGPU renderer.
+              Switch to WebGL to see it working.
+            </div>
+          )}
+        </div>
+      )}
 
       <div
         style={{
@@ -215,6 +220,20 @@ export const App = () => {
         >
           r3/rapier demos
         </h1>
+
+        <div>
+          <ToggleButton
+            label="WebGPU"
+            value={renderer === "webgpu"}
+            disabled={!hasWebGPU()}
+            onClick={() => switchRenderer("webgpu")}
+          />
+          <ToggleButton
+            label="WebGL"
+            value={renderer === "webgl"}
+            onClick={() => switchRenderer("webgl")}
+          />
+        </div>
 
         <div>
           <ToggleButton
@@ -244,9 +263,9 @@ export const App = () => {
           />
         </div>
 
-        {Object.keys(routes).map((key) => (
-          <Link key={key} to={key} end>
-            {key.replace(/-/g, " ") || "Plinko"}
+        {examples.map(({ path, title }) => (
+          <Link key={path} to={path} end>
+            {title}
           </Link>
         ))}
       </div>
@@ -276,13 +295,17 @@ const Link = (props: NavLinkProps) => {
 const ToggleButton = ({
   label,
   value,
+  disabled,
   onClick
 }: {
   label: string;
   value: boolean;
+  disabled?: boolean;
   onClick(): void;
 }) => (
   <button
+    disabled={disabled}
+    title={disabled ? "WebGPU is not available in this browser" : undefined}
     style={{
       background: value ? "red" : "transparent",
       border: "2px solid red",

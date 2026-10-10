@@ -59,6 +59,8 @@ heightFieldGeometry.rotateX(-Math.PI / 2);
 heightFieldGeometry.rotateY(-Math.PI / 2);
 heightFieldGeometry.computeVertexNormals();
 
+let explosionId = 0;
+
 const Explosion = ({ position }: { position: [number, number, number] }) => {
   return (
     <Sphere position={position} scale={0.5}>
@@ -92,7 +94,10 @@ const Collisioner = (
       if (contact) {
         setExplosions((curr: ReactNode[]) => [
           ...curr,
-          <Explosion position={[contact.x, contact.y, contact.z]} />
+          <Explosion
+            key={explosionId++}
+            position={[contact.x, contact.y, contact.z]}
+          />
         ]);
       }
     },

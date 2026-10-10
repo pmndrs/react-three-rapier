@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
+    "target": "ES2022",
     "useDefineForClassFields": true,
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "allowJs": false,
@@ -10,10 +10,20 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "module": "ESNext",
-    "moduleResolution": "Node",
+    "moduleResolution": "Bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx"
-  }
+    "jsx": "react-jsx",
+    // Typecheck and test against the workspace sources rather than built `dist/` output (mirrors
+    // the aliases in vitest.config.mts). Subpath entries map to `src/<name>/index.ts`.
+    "paths": {
+      "@react-three/rapier": ["./packages/react-three-rapier/src/index.ts"],
+      "@react-three/rapier/*": ["./packages/react-three-rapier/src/*"],
+      "@react-three/rapier-addons": [
+        "./packages/react-three-rapier-addons/src/index.ts"
+      ]
+    }
+  },
+  "include": ["packages/*/src", "packages/*/tests", "vitest.config.mts"]
 }

@@ -1,34 +1,44 @@
 name: Release
 
+# `main` publishes stable releases. `next` is the 3.0 integration branch and is in changesets
+# pre mode (.changeset/pre.json, `yarn prerelease:enter`), so the same flow there opens a
+# "Version Packages (alpha)" PR into `next` (the action appends the pre tag) and publishes `x.y.z-alpha.n` under the `alpha`
+# dist-tag, leaving `latest` untouched. Run `yarn prerelease:exit` before merging `next` into
+# `main`.
 on:
   push:
     branches:
       - main
+      - next
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
   release:
     name: Release
+    if: github.repository_owner == 'pmndrs'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # changesets pushes the version branch
+      pull-requests: write # ...and opens the "Version Packages" PR
+      id-token: write # npm provenance / trusted publishing (OIDC)
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
 
-      - name: Setup Node.js 22.x
-        uses: actions/setup-node@v3
-        with:
-          node-version: 22
-
-      - name: Install Dependencies
-        run: yarn --immutable
+      - uses: ./.github/actions/setup
 
       - name: Create Release Pull Request or Publish to npm
         id: changesets
         uses: changesets/action@v1
         with:
-          publish: yarn release
+          version: yarn changeset:version
+          publish: yarn changeset:publish
           commit: "chore(changeset): release packages"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # This is a Yarn 4 workspace, so changesets publishes with `yarn npm publish`, which
+          # reads YARN_NPM_AUTH_TOKEN rather than NPM_TOKEN. NPM_TOKEN is kept because
+          # changesets/action uses it to write the .npmrc it checks registry state with.
+          YARN_NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

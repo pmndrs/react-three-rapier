@@ -1,4 +1,4 @@
-import { Box, Html, Sphere, Torus, useCamera } from "@react-three/drei";
+import { Box, Html, Sphere, Torus } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
 import { RigidBody, RapierRigidBody, vec3 } from "@react-three/rapier";
 import { useControls } from "leva";
@@ -23,7 +23,9 @@ export const StutteringExample: Demo = () => {
       pos.y += 15;
       pos.z += 15;
       camera.position.lerp(pos, 0.04);
-      camera.lookAt(bodyModel.current?.getWorldPosition(vec3())!);
+      if (bodyModel.current) {
+        camera.lookAt(bodyModel.current.getWorldPosition(vec3()));
+      }
     }
   });
 

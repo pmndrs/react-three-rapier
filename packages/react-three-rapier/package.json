@@ -1,33 +1,90 @@
 {
   "name": "@react-three/rapier",
   "version": "2.2.0",
-  "source": "src/index.ts",
-  "main": "dist/react-three-rapier.cjs.js",
-  "module": "dist/react-three-rapier.esm.js",
-  "types": "dist/react-three-rapier.cjs.d.ts",
-  "files": [
-    "dist"
+  "description": "Rapier physics in React",
+  "keywords": [
+    "physics",
+    "rapier",
+    "react-three-fiber",
+    "react",
+    "three"
   ],
-  "devDependencies": {
-    "@react-three/drei": "10.0.1",
-    "@react-three/fiber": "9.0.4",
-    "@react-three/test-renderer": "9.0.1",
-    "@types/react": "19.0.8",
-    "@types/react-dom": "19.0.3",
-    "@types/three": "0.172.0",
-    "react": "19.0.0",
-    "react-dom": "19.0.0",
-    "three": "0.172.0"
+  "license": "MIT",
+  "homepage": "https://github.com/pmndrs/react-three-rapier",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pmndrs/react-three-rapier.git",
+    "directory": "packages/react-three-rapier"
+  },
+  "bugs": {
+    "url": "https://github.com/pmndrs/react-three-rapier/issues"
+  },
+  "type": "commonjs",
+  "engines": {
+    "node": ">=22"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      },
+      "default": "./dist/index.mjs"
+    },
+    "./soft-bodies": {
+      "import": {
+        "types": "./dist/soft-bodies.d.mts",
+        "default": "./dist/soft-bodies.mjs"
+      },
+      "require": {
+        "types": "./dist/soft-bodies.d.cts",
+        "default": "./dist/soft-bodies.cjs"
+      },
+      "default": "./dist/soft-bodies.mjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "typesVersions": {
+    "*": {
+      "soft-bodies": [
+        "./dist/soft-bodies.d.ts"
+      ]
+    }
+  },
+  "sideEffects": false,
+  "files": [
+    "dist/index.*",
+    "dist/soft-bodies.*",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json && rollup --config rollup.config.mjs",
+    "check:package": "publint --strict && attw --pack ."
   },
   "peerDependencies": {
-    "@react-three/fiber": "^9.0.4",
-    "react": "^19",
-    "three": ">=0.159.0"
+    "@react-three/fiber": ">=10.0.0-0",
+    "react": ">=19.0 <19.3",
+    "three": ">=0.185.0"
   },
   "dependencies": {
     "@dimforge/rapier3d-compat": "0.21.0",
-    "suspend-react": "^0.1.3",
-    "three-stdlib": "^2.35.12"
+    "suspend-react": "^0.1.3"
   },
-  "repository": "https://github.com/pmndrs/react-three-rapier/tree/master/packages/react-three-rapier"
+  "devDependencies": {
+    "@react-three/fiber": "10.0.0-canary.a056612",
+    "@react-three/test-renderer": "10.0.0-canary.a056612",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.7",
+    "@types/three": "0.186.0",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "three": "0.186.1"
+  }
 }

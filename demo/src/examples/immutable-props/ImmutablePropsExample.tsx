@@ -20,8 +20,8 @@ export const ImmutablePropsExample: Demo = () => {
   });
 
   useFrame(() => {
-    let rot = performance.now() / 1000;
-    rb.current!.setRotation(
+    const rot = performance.now() / 1000;
+    rb.current?.setRotation(
       quat().setFromEuler(euler({ x: 0, y: rot, z: 0 })),
       true
     );

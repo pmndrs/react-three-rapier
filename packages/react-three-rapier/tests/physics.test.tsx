@@ -25,31 +25,28 @@ describe("physics", () => {
   describe("useRapier exposed things", () => {
     it("exposes a manual step function", async () => {
       const rigidBody = React.createRef<RapierRigidBody>();
-      const rapierContext = await new Promise<RapierContext>(
-        async (resolve, reject) => {
-          try {
-            await ReactThreeTestRenderer.create(
-              <Physics paused>
-                <UseRapierMounter ready={resolve} />
+      let resolveContext!: (context: RapierContext) => void;
+      const ready = new Promise<RapierContext>((resolve) => {
+        resolveContext = resolve;
+      });
+      await ReactThreeTestRenderer.create(
+        <Physics paused>
+          <UseRapierMounter ready={resolveContext} />
 
-                <RigidBody
-                  colliders="cuboid"
-                  restitution={2}
-                  ref={rigidBody}
-                  linearVelocity={[20, 20, 20]}
-                >
-                  <mesh>
-                    <boxGeometry />
-                    <meshStandardMaterial />
-                  </mesh>
-                </RigidBody>
-              </Physics>
-            );
-          } catch (e) {
-            reject(e);
-          }
-        }
+          <RigidBody
+            colliders="cuboid"
+            restitution={2}
+            ref={rigidBody}
+            linearVelocity={[20, 20, 20]}
+          >
+            <mesh>
+              <boxGeometry />
+              <meshStandardMaterial />
+            </mesh>
+          </RigidBody>
+        </Physics>
       );
+      const rapierContext = await ready;
 
       const translation1 = vec3(rigidBody.current?.translation()).toArray();
       expect(translation1).to.deep.eq([0, 0, 0]);
@@ -108,23 +105,25 @@ describe("physics", () => {
       const beforeStepCallback = vi.fn();
       const frameCallback = vi.fn();
 
-      let renderer: Awaited<ReturnType<typeof ReactThreeTestRenderer.create>>;
+      let onReady!: (value: unknown) => void;
+      const ready = new Promise((resolve) => (onReady = resolve));
 
-      await new Promise(async (resolve) => {
-        renderer = await ReactThreeTestRenderer.create(
-          <Physics>
-            <RigidBody colliders="cuboid" restitution={2}>
-              <CuboidCollider args={[1, 1, 1]} />
-            </RigidBody>
+      // `create` resolves after the tree has mounted, so await it directly rather than
+      // racing it against `onReady` (with r3f v10 `onReady` fires before `create` resolves).
+      const renderer = await ReactThreeTestRenderer.create(
+        <Physics>
+          <RigidBody colliders="cuboid" restitution={2}>
+            <CuboidCollider args={[1, 1, 1]} />
+          </RigidBody>
 
-            <BeforeStepper
-              onBeforePhysicsStep={beforeStepCallback}
-              onFrame={frameCallback}
-              onReady={resolve}
-            />
-          </Physics>
-        );
-      });
+          <BeforeStepper
+            onBeforePhysicsStep={beforeStepCallback}
+            onFrame={frameCallback}
+            onReady={onReady}
+          />
+        </Physics>
+      );
+      await ready;
 
       await ReactThreeTestRenderer.act(async () => {});
 
@@ -135,38 +134,43 @@ describe("physics", () => {
         await renderer.advanceFrames(1, 1 / 60);
       });
 
+      // r3f v10's test renderer primes the scheduler with a zero-delta frame before the
+      // requested frames, so useFrame runs n + 1 times while physics steps n times.
       expect(beforeStepCallback).toBeCalledTimes(1);
-      expect(frameCallback).toBeCalledTimes(1);
+      expect(frameCallback).toBeCalledTimes(2);
 
       await ReactThreeTestRenderer.act(async () => {
         await renderer.advanceFrames(1, 1 / 60);
       });
 
       expect(beforeStepCallback).toBeCalledTimes(2);
-      expect(frameCallback).toBeCalledTimes(2);
+      expect(frameCallback).toBeCalledTimes(4);
     });
 
     it("updates when using the 'independent' strategy", async () => {
       const beforeStepCallback = vi.fn();
       const frameCallback = vi.fn();
 
-      await new Promise(async (resolve) => {
-        await ReactThreeTestRenderer.create(
-          <Physics updateLoop="independent">
-            <RigidBody colliders="cuboid" restitution={2}>
-              <CuboidCollider args={[1, 1, 1]} />
-            </RigidBody>
-            <BeforeStepper
-              onBeforePhysicsStep={beforeStepCallback}
-              onFrame={frameCallback}
-              onReady={resolve}
-            />
-          </Physics>,
-          { frameloop: "demand" }
-        );
+      let onReady!: () => void;
+      const ready = new Promise<void>((resolve) => {
+        onReady = resolve;
       });
+      await ReactThreeTestRenderer.create(
+        <Physics updateLoop="independent">
+          <RigidBody colliders="cuboid" restitution={2}>
+            <CuboidCollider args={[1, 1, 1]} />
+          </RigidBody>
+          <BeforeStepper
+            onBeforePhysicsStep={beforeStepCallback}
+            onFrame={frameCallback}
+            onReady={onReady}
+          />
+        </Physics>,
+        { frameloop: "demand" }
+      );
+      await ready;
 
-      await pause(50);
+      await pause(150);
 
       expect(beforeStepCallback).toHaveBeenCalled();
       expect(frameCallback).toHaveBeenCalled();
@@ -174,7 +178,7 @@ describe("physics", () => {
       beforeStepCallback.mockClear();
       frameCallback.mockClear();
 
-      await pause(50);
+      await pause(150);
 
       expect(beforeStepCallback).toHaveBeenCalled();
       expect(frameCallback).toHaveBeenCalled();
@@ -182,7 +186,7 @@ describe("physics", () => {
       beforeStepCallback.mockClear();
       frameCallback.mockClear();
 
-      await pause(50);
+      await pause(150);
 
       expect(beforeStepCallback).toHaveBeenCalled();
       expect(frameCallback).toHaveBeenCalled();

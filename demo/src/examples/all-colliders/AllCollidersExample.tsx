@@ -16,7 +16,7 @@ import {
   RoundCylinderCollider
 } from "@react-three/rapier";
 import { useSuzanne } from "../all-shapes/AllShapesExample";
-import { RoundedBoxGeometry } from "three-stdlib";
+import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
 import { PlaneGeometry } from "three";
 import { useEffect, useRef } from "react";
 import { useResetOrbitControls } from "../../hooks/use-reset-orbit-controls";

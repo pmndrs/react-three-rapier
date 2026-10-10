@@ -39,7 +39,20 @@ export const useRapier = (): RapierContext => {
 };
 
 /**
- * Registers a callback to be called before the physics step
+ * Registers a callback to be called before every physics step.
+ *
+ * With a fixed `timeStep` this runs once per fixed substep (zero or more times
+ * per rendered frame), so it is the place for per-step logic such as forces,
+ * character controllers and vehicles. The callback receives the world and the
+ * step's `dt` in seconds.
+ *
+ * @example
+ * ```tsx
+ * useBeforePhysicsStep((world, dt) => {
+ *   body.current?.applyImpulse({ x: 0, y: thrust * dt, z: 0 }, true);
+ * });
+ * ```
+ *
  * @category Hooks
  */
 export const useBeforePhysicsStep = (callback: WorldStepCallback) => {
@@ -57,7 +70,8 @@ export const useBeforePhysicsStep = (callback: WorldStepCallback) => {
 };
 
 /**
- * Registers a callback to be called after the physics step
+ * Registers a callback to be called after every physics step, with the world
+ * and the step's `dt` in seconds. Runs once per fixed substep.
  * @category Hooks
  */
 export const useAfterPhysicsStep = (callback: WorldStepCallback) => {

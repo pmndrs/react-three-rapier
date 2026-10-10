@@ -6,10 +6,8 @@ import {
   RigidBodyOptions,
   useSpringJoint
 } from "@react-three/rapier";
-import { forwardRef, useMemo, useRef } from "react";
+import { RefObject, forwardRef, useMemo, useRef } from "react";
 import { Demo } from "../../App";
-import { useForwardedRef } from "@react-three/rapier/src/hooks/use-forwarded-ref";
-import { vectorArrayToVector3 } from "@react-three/rapier/src/utils/utils";
 import { useResetOrbitControls } from "../../hooks/use-reset-orbit-controls";
 import { Vector3 } from "three";
 
@@ -36,7 +34,8 @@ const BoxRigidBody = ({ color, ...props }: BoxRigidBodyProps) => {
 
 const BallSpring = forwardRef<RapierRigidBody, BallSpringProps>(
   (props, floorRef) => {
-    const floor = useForwardedRef(floorRef);
+    // the parent always passes a ref object; don't deep-import library internals
+    const floor = floorRef as RefObject<RapierRigidBody>;
     const ball = useRef<RapierRigidBody>(null!);
 
     const stiffness = 1.0e3;
@@ -83,7 +82,7 @@ export const SpringExample: Demo = () => {
 
   const vectorArr = useMemo(() => {
     return Array.from({ length: 30 }).map((_, i) => {
-      return vectorArrayToVector3([-20 + 1.5 * (i + 1), 7.5, -30]);
+      return new Vector3(-20 + 1.5 * (i + 1), 7.5, -30);
     });
   }, []);
 
