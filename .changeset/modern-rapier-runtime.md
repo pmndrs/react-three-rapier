@@ -1,15 +1,16 @@
 ---
-"@react-three/rapier": minor
+"@react-three/rapier": major
 ---
 
-Upgrade `@dimforge/rapier3d-compat` from 0.19.2 to 0.21.0 and update the development and CI runtime to Node.js 24.
+Upgrade `@dimforge/rapier3d-compat` from 0.19.2 to 0.21.0.
 
 ### Migration notes
 
 - `minIslandSize` is deprecated and ignored because Rapier removed this setting.
 - Fast dynamic bodies now use CCD against fixed colliders automatically. The `ccd` prop enables additional sweeps against kinematic and dynamic bodies; `ccd={false}` no longer disables all CCD. Use `<Physics maxCcdSubsteps={0}>` to disable CCD entirely.
 - `additionalSolverIterations` now adds whole solver substeps for the constraint-connected bodies, rather than only extra iterations.
-- Sleeping, restitution, contact forces, and velocity limits changed upstream. Existing scenes may need retuning, and numerical trajectories can differ.
+- Sleeping, restitution, contact forces, and velocity limits changed upstream. Existing scenes may need retuning, and numerical trajectories can differ. In particular, bodies fall asleep sooner (linear sleep threshold 0.4 → 0.05, time-until-sleep 2.0s → 0.5s), velocities are capped (400 u/s linear, ~45°/step angular), and contact impulses / contact-force events are smaller.
+- The Rapier wasm roughly doubled in size (≈1.6 MB → ≈3.1 MB), which increases bundle size.
 - `<Physics>` retains its existing `allowedLinearError={0.001}` and `predictionDistance={0.002}` defaults. Rapier's new native defaults are `0.005` and `0.02`, respectively; set these props explicitly to adopt them.
 - Collision-event manifolds expose `friction()` and `restitution()` instead of `solverContactFriction(index)` and `solverContactRestitution(index)`. `solverContactPoint(index)` now returns the world-space midpoint of the two per-body surface points. Read manifold data inside the event callback, since manifolds are temporary.
 - Use the public `@dimforge/rapier3d-compat` entry point for imports. Package files moved into `dist/`, so old deep imports and pinned CDN file URLs must be updated.
