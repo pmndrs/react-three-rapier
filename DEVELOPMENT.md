@@ -40,6 +40,26 @@ Tests, the root typecheck and the demo all resolve `@react-three/rapier` and
 tsconfig `paths`), so none of them needs a build first, and the demo hot-reloads library
 changes.
 
+## Demo app and examples
+
+The demo runs on **WebGPU by default** when the browser has `navigator.gpu`, otherwise WebGL.
+Use the WebGPU / WebGL buttons in the sidebar, or `?renderer=webgl|webgpu` in the URL (the
+choice is also remembered in localStorage). Switching reloads the page. Examples must work on
+both renderers; if one genuinely cannot (custom `ShaderMaterial`, `onBeforeCompile`, troika
+`<Text>`, postprocessing...) mark it `webglOnly` (below) and the demo shows a notice on WebGPU.
+
+**Adding an example needs no edits to `App.tsx`.** Routes are discovered with `import.meta.glob`
+(`demo/src/examples.ts`) and loaded lazily:
+
+- Create `demo/src/examples/<folder>/index.ts(x)` whose **default export** is the example
+  component. The route is `/<folder>` and the sidebar label is the humanised folder name.
+- Optionally export `meta` from the same module: `{ title?, description?, webglOnly? }`
+  (`export { default, meta } from "./MyExample"`). It is shown in a header while the example is open.
+- A folder **without** an `index` still registers: every `*Example*.tsx` file in it becomes a
+  route (`/<folder>` for a single file, `/<folder>/<file-name-kebab>` for several), using the
+  default export or the first exported capitalised function as the component.
+- Examples can use `useDemo()` and `Demo` from `../../App` (re-exported from `demo/src/demo-context.ts`).
+
 ## Build
 
 Each package's `yarn build` runs `tsc -p tsconfig.build.json` (typecheck + per-file
