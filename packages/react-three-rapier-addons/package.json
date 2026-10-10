@@ -1,10 +1,54 @@
 {
   "name": "@react-three/rapier-addons",
   "version": "5.0.0",
-  "main": "dist/react-three-rapier-addons.cjs.js",
-  "module": "dist/react-three-rapier-addons.esm.js",
+  "description": "Addons for @react-three/rapier",
+  "keywords": [
+    "physics",
+    "rapier",
+    "react-three-fiber",
+    "react",
+    "three"
+  ],
   "license": "MIT",
+  "homepage": "https://github.com/pmndrs/react-three-rapier",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pmndrs/react-three-rapier.git",
+    "directory": "packages/react-three-rapier-addons"
+  },
+  "bugs": {
+    "url": "https://github.com/pmndrs/react-three-rapier/issues"
+  },
+  "type": "commonjs",
+  "engines": {
+    "node": ">=22"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      },
+      "default": "./dist/index.mjs"
+    },
+    "./package.json": "./package.json"
+  },
   "sideEffects": false,
+  "files": [
+    "dist/index.*",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json && rollup --config rollup.config.mjs",
+    "check:package": "publint --strict && attw --pack ."
+  },
   "peerDependencies": {
     "@react-three/fiber": ">=10.0.0-0",
     "@react-three/rapier": "^3.0.0-0",
@@ -23,6 +67,5 @@
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "three": "0.186.1"
-  },
-  "repository": "https://github.com/pmndrs/react-three-rapier/tree/master/packages/react-three-rapier-addons"
+  }
 }
