@@ -15,7 +15,13 @@ import { Object3D } from "three";
 import { ColliderProps } from ".";
 import { RigidBodyState } from "./components/Physics";
 
-export { CoefficientCombineRule as CoefficientCombineRule } from "@dimforge/rapier3d-compat";
+export {
+  CoefficientCombineRule,
+  ActiveCollisionTypes,
+  ActiveEvents,
+  ActiveHooks,
+  QueryFilterFlags
+} from "@dimforge/rapier3d-compat";
 export { RapierCollider, RapierRigidBody };
 
 export type RefGetter<T> = RefObject<() => T | undefined>;
