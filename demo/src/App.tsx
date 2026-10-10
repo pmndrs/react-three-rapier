@@ -43,6 +43,9 @@ import Shapes from "./examples/plinko/ShapesExample";
 import { RopeJointExample } from "./examples/rope-joint/RopeJointExample";
 import { SensorsExample } from "./examples/sensors/SensorsExample";
 import { SnapshotExample } from "./examples/snapshot/SnapshotExample";
+import { ClothExample } from "./examples/soft-bodies/ClothExample";
+import { JellyExample } from "./examples/soft-bodies/JellyExample";
+import { RopeExample } from "./examples/soft-bodies/RopeExample";
 import { SpringExample } from "./examples/spring/SpringExample";
 import { StutteringExample } from "./examples/stuttering/StutteringExample";
 import { Transforms } from "./examples/transforms/TransformsExample";
@@ -111,7 +114,10 @@ const routes: Record<string, ReactNode> = {
   "active-collision-types": <ActiveCollisionTypesExample />,
   "contact-skin": <ContactSkinExample />,
   "one-way-platform": <OneWayPlatform />,
-  "character-controller": <CharacterControllerExample />
+  "character-controller": <CharacterControllerExample />,
+  "soft-cloth": <ClothExample />,
+  "soft-rope": <RopeExample />,
+  "soft-jelly": <JellyExample />
 };
 
 export const App = () => {
