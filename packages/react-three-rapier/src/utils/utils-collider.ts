@@ -102,7 +102,7 @@ export const createColliderFromOptions = (
   }
 
   const scaledArgs = scaleColliderArgs(options.shape!, options.args, scale);
-  // @ts-ignore
+  // @ts-expect-error each shape takes its own args tuple; the args were built for options.shape
   const desc = ColliderDesc[options.shape!](...scaledArgs);
 
   const failure = (cause?: unknown) =>
@@ -281,7 +281,7 @@ export const setColliderOptions = (
         const option = options[key];
         mutableColliderOptions[key]!(
           collider,
-          // @ts-ignore Option does not want to fit into the function, but it will
+          // @ts-expect-error Option does not want to fit into the function, but it will
           option,
           options
         );

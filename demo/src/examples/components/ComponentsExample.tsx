@@ -11,7 +11,6 @@ type GroupProps = ThreeElements["group"];
 
 const Map = () => {
   const { nodes } = useGLTF(
-    // @ts-ignore
     new URL("../../models/map.glb", import.meta.url).toString()
   ) as unknown as { nodes: { map: Mesh } };
 

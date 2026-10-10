@@ -64,9 +64,13 @@ export const InstancedMeshesCompound: Demo = () => {
           scale: [0.5 + Math.random(), 0.5 + Math.random(), 0.5 + Math.random()]
         }))}
         colliderNodes={[
-          <BallCollider args={[1]} />,
-          <BallCollider args={[0.5]} position={[1, 0.3, -0.25]} />,
-          <CuboidCollider args={[0.5, 0.2, 0.5]} position={[-1, 0.3, -0.25]} />
+          <BallCollider key="center" args={[1]} />,
+          <BallCollider key="right" args={[0.5]} position={[1, 0.3, -0.25]} />,
+          <CuboidCollider
+            key="left"
+            args={[0.5, 0.2, 0.5]}
+            position={[-1, 0.3, -0.25]}
+          />
         ]}
       >
         <instancedMesh

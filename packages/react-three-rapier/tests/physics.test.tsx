@@ -25,31 +25,28 @@ describe("physics", () => {
   describe("useRapier exposed things", () => {
     it("exposes a manual step function", async () => {
       const rigidBody = React.createRef<RapierRigidBody>();
-      const rapierContext = await new Promise<RapierContext>(
-        async (resolve, reject) => {
-          try {
-            await ReactThreeTestRenderer.create(
-              <Physics paused>
-                <UseRapierMounter ready={resolve} />
+      let resolveContext!: (context: RapierContext) => void;
+      const ready = new Promise<RapierContext>((resolve) => {
+        resolveContext = resolve;
+      });
+      await ReactThreeTestRenderer.create(
+        <Physics paused>
+          <UseRapierMounter ready={resolveContext} />
 
-                <RigidBody
-                  colliders="cuboid"
-                  restitution={2}
-                  ref={rigidBody}
-                  linearVelocity={[20, 20, 20]}
-                >
-                  <mesh>
-                    <boxGeometry />
-                    <meshStandardMaterial />
-                  </mesh>
-                </RigidBody>
-              </Physics>
-            );
-          } catch (e) {
-            reject(e);
-          }
-        }
+          <RigidBody
+            colliders="cuboid"
+            restitution={2}
+            ref={rigidBody}
+            linearVelocity={[20, 20, 20]}
+          >
+            <mesh>
+              <boxGeometry />
+              <meshStandardMaterial />
+            </mesh>
+          </RigidBody>
+        </Physics>
       );
+      const rapierContext = await ready;
 
       const translation1 = vec3(rigidBody.current?.translation()).toArray();
       expect(translation1).to.deep.eq([0, 0, 0]);
@@ -154,21 +151,24 @@ describe("physics", () => {
       const beforeStepCallback = vi.fn();
       const frameCallback = vi.fn();
 
-      await new Promise(async (resolve) => {
-        await ReactThreeTestRenderer.create(
-          <Physics updateLoop="independent">
-            <RigidBody colliders="cuboid" restitution={2}>
-              <CuboidCollider args={[1, 1, 1]} />
-            </RigidBody>
-            <BeforeStepper
-              onBeforePhysicsStep={beforeStepCallback}
-              onFrame={frameCallback}
-              onReady={resolve}
-            />
-          </Physics>,
-          { frameloop: "demand" }
-        );
+      let onReady!: () => void;
+      const ready = new Promise<void>((resolve) => {
+        onReady = resolve;
       });
+      await ReactThreeTestRenderer.create(
+        <Physics updateLoop="independent">
+          <RigidBody colliders="cuboid" restitution={2}>
+            <CuboidCollider args={[1, 1, 1]} />
+          </RigidBody>
+          <BeforeStepper
+            onBeforePhysicsStep={beforeStepCallback}
+            onFrame={frameCallback}
+            onReady={onReady}
+          />
+        </Physics>,
+        { frameloop: "demand" }
+      );
+      await ready;
 
       await pause(150);
 
