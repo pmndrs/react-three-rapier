@@ -9,6 +9,7 @@ import {
 import { describe, expect, it } from "vitest";
 import {
   createColliderFromOptions,
+  scaleColliderArgs,
   getColliderArgsFromGeometry
 } from "../src/utils/utils-collider";
 
@@ -68,5 +69,20 @@ describe("createColliderFromOptions", () => {
         new Vector3(1, 1, 1)
       )
     ).toThrow(/convex hull/i);
+  });
+});
+
+describe("scaleColliderArgs", () => {
+  it("scales heightfield x/y/z independently without mutating the args (#564)", () => {
+    const heightfieldScale = { x: 2, y: 3, z: 4 };
+    const args = [1, 1, [0, 0, 0, 0], heightfieldScale];
+    const scale = new Vector3(10, 100, 1000);
+
+    const first = scaleColliderArgs("heightfield", args, scale);
+    expect(first[3]).toEqual({ x: 20, y: 300, z: 4000 });
+    expect(heightfieldScale).toEqual({ x: 2, y: 3, z: 4 });
+
+    const second = scaleColliderArgs("heightfield", args, scale);
+    expect(second[3]).toEqual({ x: 20, y: 300, z: 4000 });
   });
 });

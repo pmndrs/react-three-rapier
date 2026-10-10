@@ -41,10 +41,9 @@ export const scaleColliderArgs = (
 
   // Heightfield uses a vector
   if (shape === "heightfield") {
+    // Don't mutate the user's args object, or scale compounds on every remount
     const s = newArgs[3] as { x: number; y: number; z: number };
-    s.x *= scale.x;
-    s.x *= scale.y;
-    s.x *= scale.z;
+    newArgs[3] = { x: s.x * scale.x, y: s.y * scale.y, z: s.z * scale.z };
 
     return newArgs;
   }
