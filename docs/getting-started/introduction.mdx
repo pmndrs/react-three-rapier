@@ -1,0 +1,65 @@
+---
+title: Introduction
+description: Rapier physics in React, a react-three-fiber wrapper around the Rapier WebAssembly physics engine.
+nav: 0
+---
+
+<Intro>
+  `@react-three/rapier` (or `r3/rapier`) is a wrapper around the [Rapier](https://rapier.rs/docs/user_guides/javascript)
+  WASM-based physics engine, designed to slot seamlessly into a
+  [react-three-fiber](https://github.com/pmndrs/react-three-fiber) pipeline. Wrap a mesh in `<RigidBody>` and it falls.
+</Intro>
+
+The goal of this library is to provide a fast physics engine with minimal friction and a small, straightforward API.
+
+```bash
+npm install @react-three/rapier
+```
+
+```tsx
+import { Canvas } from '@react-three/fiber';
+import { Physics, RigidBody, CuboidCollider } from '@react-three/rapier';
+
+export default function App() {
+  return (
+    <Canvas>
+      <Suspense>
+        <Physics debug>
+          <RigidBody colliders="hull" restitution={2}>
+            <mesh>
+              <torusGeometry />
+              <meshStandardMaterial />
+            </mesh>
+          </RigidBody>
+
+          <CuboidCollider position={[0, -2, 0]} args={[20, 0.5, 20]} />
+        </Physics>
+      </Suspense>
+    </Canvas>
+  );
+}
+```
+
+> [!WARNING]
+> **Version 3.0 is in development.** It is a breaking release that targets react-three-fiber v10 (including the
+> WebGPU renderer), Rapier.js 0.21 and three 0.185+. If you are upgrading, read
+> [Migrating from 2.x to 3.0](/advanced/migration). Parts of this site carry **TODO** notes where an API
+> (the update loop, the character controller, soft bodies) is still being designed.
+
+## What you get
+
+- Automatic colliders generated from your meshes, or hand-placed colliders for compound shapes ([RigidBody](/api/rigid-body), [Colliders](/api/colliders)).
+- Instanced meshes with one body per instance ([InstancedRigidBodies](/api/instanced-rigid-bodies)).
+- Joints as hooks ([Joints](/api/joints)).
+- Collision, intersection and contact-force events, collision groups and physics hooks ([Advanced](/advanced/collision-events)).
+- Direct access to the Rapier `world` for queries such as raycasts ([Hooks](/api/hooks)).
+- A debug renderer ([Debug](/api/debug)) and an [Attractor](/api/attractors) addon.
+
+## Where to go next
+
+- [Installation](/getting-started/installation)
+- [Basic usage](/getting-started/basic-usage)
+- [Frequently asked questions](/advanced/faq)
+
+For contributions, please read the [contribution guide](https://github.com/pmndrs/react-three-rapier/blob/main/packages/react-three-rapier/CONTRIBUTING.md).
+Questions are welcome on [Discord](https://discord.gg/ZZjjNvJ) and in [GitHub issues](https://github.com/pmndrs/react-three-rapier/issues).
