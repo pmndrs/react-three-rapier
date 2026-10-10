@@ -6,7 +6,15 @@ import {
   World
 } from "@dimforge/rapier3d-compat";
 import { useEffect, useMemo } from "react";
-import { BufferGeometry, Euler, Mesh, Object3D, Vector3 } from "three";
+import {
+  BufferAttribute,
+  BufferGeometry,
+  Euler,
+  InterleavedBufferAttribute,
+  Mesh,
+  Object3D,
+  Vector3
+} from "three";
 import { mergeVertices } from "three-stdlib";
 import { ColliderProps, RigidBodyProps } from "..";
 import {
@@ -52,6 +60,28 @@ export const scaleColliderArgs = (
   return newArgs.map((arg, index) => scaleArray[index] * (arg as number));
 };
 
+/**
+ * Copy a position attribute into a tightly packed Float32Array of xyz triples.
+ * Using `getX/getY/getZ` handles InterleavedBufferAttribute, offsets, and
+ * normalized/quantized (e.g. Draco/meshopt) attributes, which `attribute.array` does not.
+ */
+export const getPositionArray = (
+  attribute: BufferAttribute | InterleavedBufferAttribute
+): Float32Array => {
+  const out = new Float32Array(attribute.count * 3);
+  for (let i = 0; i < attribute.count; i++) {
+    out[i * 3] = attribute.getX(i);
+    out[i * 3 + 1] = attribute.getY(i);
+    out[i * 3 + 2] = attribute.getZ(i);
+  }
+  return out;
+};
+
+export const getIndexArray = (index: BufferAttribute): Uint32Array =>
+  index.array instanceof Uint32Array
+    ? index.array
+    : Uint32Array.from(index.array as ArrayLike<number>);
+
 export const createColliderFromOptions = (
   options: ColliderProps,
   world: World,
@@ -62,7 +92,26 @@ export const createColliderFromOptions = (
   // @ts-ignore
   const desc = ColliderDesc[options.shape!](...scaledArgs);
 
-  return world.createCollider(desc!, getRigidBody?.());
+  const failure = (cause?: unknown) =>
+    new Error(
+      `@react-three/rapier: Could not create a "${options.shape}" collider from the given args. ` +
+        (options.shape === "convexHull"
+          ? "Rapier failed to compute a convex hull: the points are probably degenerate (coplanar, collinear, duplicated, or contain NaN)."
+          : "Check that the args are valid for this shape."),
+      { cause }
+    );
+
+  if (!desc) {
+    throw failure();
+  }
+
+  const rigidBody = getRigidBody?.();
+
+  try {
+    return world.createCollider(desc, rigidBody);
+  } catch (e) {
+    throw failure(e);
+  }
 };
 
 type ImmutableColliderOptions = (keyof ColliderProps)[];
@@ -365,8 +414,10 @@ export const getColliderArgsFromGeometry = (
 
         return {
           args: [
-            clonedGeometry.attributes.position.array as Float32Array,
-            clonedGeometry.index?.array as Uint32Array
+            getPositionArray(clonedGeometry.attributes.position),
+            clonedGeometry.index
+              ? getIndexArray(clonedGeometry.index)
+              : undefined
           ],
           offset: new Vector3()
         };
@@ -375,10 +426,8 @@ export const getColliderArgsFromGeometry = (
 
     case "hull":
       {
-        const g = geometry.clone();
-
         return {
-          args: [g.attributes.position.array as Float32Array],
+          args: [getPositionArray(geometry.attributes.position)],
           offset: new Vector3()
         };
       }
