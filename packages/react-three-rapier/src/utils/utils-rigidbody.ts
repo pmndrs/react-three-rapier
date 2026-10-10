@@ -65,6 +65,68 @@ export const createRigidBodyState = ({
   };
 };
 
+interface ParentSpace {
+  /** Sync pass this entry was last read in */
+  pass: number;
+  /** Bumped whenever the parent's world matrix changes */
+  version: number;
+  inverse: Matrix4;
+  world: Matrix4;
+}
+
+// Parent inverse world matrices, re-read once per sync pass and shared by all
+// bodies with the same parent. Keyed weakly so removed parents are collected.
+const parentSpaces = new WeakMap<Object3D, ParentSpace>();
+let currentPass = 0;
+
+/**
+ * Starts a new sync pass: parent world matrices are re-read once per pass.
+ * @internal
+ */
+export const beginParentSpacePass = () => {
+  currentPass++;
+};
+
+/**
+ * Refreshes `state.invertedWorldMatrix` from the object's CURRENT parent world
+ * matrix (#36: it used to be captured once at spawn, so moving or rotating an
+ * ancestor afterwards desynced every visual from its body).
+ *
+ * @returns whether the parent space changed since this body was last synced
+ * @internal
+ */
+export const refreshParentInverse = (state: RigidBodyState) => {
+  const parent = state.object.parent;
+  if (!parent) return false;
+
+  let space = parentSpaces.get(parent);
+  if (!space) {
+    parent.updateWorldMatrix(true, false);
+    space = {
+      pass: currentPass,
+      version: 0,
+      world: parent.matrixWorld.clone(),
+      inverse: parent.matrixWorld.clone().invert()
+    };
+    parentSpaces.set(parent, space);
+  } else if (space.pass !== currentPass) {
+    space.pass = currentPass;
+    parent.updateWorldMatrix(true, false);
+    if (!space.world.equals(parent.matrixWorld)) {
+      space.world.copy(parent.matrixWorld);
+      space.inverse.copy(parent.matrixWorld).invert();
+      space.version++;
+    }
+  }
+
+  const moved = state.parentSpaceVersion !== space.version;
+  if (moved) {
+    state.invertedWorldMatrix.copy(space.inverse);
+    state.parentSpaceVersion = space.version;
+  }
+  return moved;
+};
+
 type ImmutableRigidBodyOptions = (keyof RigidBodyProps)[];
 
 export const immutableRigidBodyOptions: ImmutableRigidBodyOptions = [

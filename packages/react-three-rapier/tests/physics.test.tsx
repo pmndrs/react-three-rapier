@@ -170,7 +170,7 @@ describe("physics", () => {
         );
       });
 
-      await pause(50);
+      await pause(150);
 
       expect(beforeStepCallback).toHaveBeenCalled();
       expect(frameCallback).toHaveBeenCalled();
@@ -178,7 +178,7 @@ describe("physics", () => {
       beforeStepCallback.mockClear();
       frameCallback.mockClear();
 
-      await pause(50);
+      await pause(150);
 
       expect(beforeStepCallback).toHaveBeenCalled();
       expect(frameCallback).toHaveBeenCalled();
@@ -186,7 +186,7 @@ describe("physics", () => {
       beforeStepCallback.mockClear();
       frameCallback.mockClear();
 
-      await pause(50);
+      await pause(150);
 
       expect(beforeStepCallback).toHaveBeenCalled();
       expect(frameCallback).toHaveBeenCalled();
