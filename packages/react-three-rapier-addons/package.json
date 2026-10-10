@@ -6,23 +6,23 @@
   "license": "MIT",
   "sideEffects": false,
   "peerDependencies": {
-    "@react-three/fiber": "*",
-    "@react-three/rapier": "^2.0.0",
-    "react": "^19",
-    "three": "*"
+    "@react-three/fiber": ">=10.0.0-0",
+    "@react-three/rapier": "^3.0.0-0",
+    "react": ">=19.0 <19.3",
+    "three": ">=0.185.0"
   },
   "dependencies": {
-    "three-stdlib": "^2.35.12"
+    "three-stdlib": "^2.36.1"
   },
   "devDependencies": {
-    "@react-three/drei": "10.0.1",
-    "@react-three/fiber": "9.0.4",
+    "@react-three/fiber": "10.0.0-canary.a056612",
     "@react-three/rapier": "workspace:*",
-    "@types/react": "19.0.8",
-    "@types/react-dom": "19.0.3",
-    "react": "19.0.0",
-    "react-dom": "19.0.0",
-    "three": "0.172.0"
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.7",
+    "@types/three": "0.186.0",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "three": "0.186.1"
   },
   "repository": "https://github.com/pmndrs/react-three-rapier/tree/master/packages/react-three-rapier-addons"
 }

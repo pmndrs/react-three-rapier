@@ -10,23 +10,23 @@
   },
   "dependencies": {
     "@react-three/csg": "3.3.0",
-    "@react-three/drei": "10.0.1",
-    "@react-three/fiber": "9.0.4",
+    "@react-three/drei": "11.0.0-alpha.7",
+    "@react-three/fiber": "10.0.0-canary.a056612",
     "@react-three/rapier": "workspace:*",
     "@react-three/rapier-addons": "workspace:*",
-    "@types/three": "0.172.0",
+    "@types/three": "0.186.0",
     "leva": "0.10.0",
     "r3f-perf": "7.2.3",
-    "react": "19.0.0",
-    "react-dom": "19.0.0",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
     "react-router-dom": "7.1.3",
-    "three": "0.172.0"
+    "three": "0.186.1"
   },
   "devDependencies": {
-    "@types/react": "19.0.8",
-    "@types/react-dom": "19.0.3",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.7",
     "@vitejs/plugin-react": "4.3.4",
-    "typescript": "5.7.3",
+    "typescript": "5.9.3",
     "vite": "6.0.11"
   },
   "repository": "https://github.com/pmndrs/react-three-rapier/tree/master/demo"

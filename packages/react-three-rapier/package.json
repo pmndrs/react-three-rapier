@@ -9,25 +9,24 @@
     "dist"
   ],
   "devDependencies": {
-    "@react-three/drei": "10.0.1",
-    "@react-three/fiber": "9.0.4",
-    "@react-three/test-renderer": "9.0.1",
-    "@types/react": "19.0.8",
-    "@types/react-dom": "19.0.3",
-    "@types/three": "0.172.0",
-    "react": "19.0.0",
-    "react-dom": "19.0.0",
-    "three": "0.172.0"
+    "@react-three/fiber": "10.0.0-canary.a056612",
+    "@react-three/test-renderer": "10.0.0-canary.a056612",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.7",
+    "@types/three": "0.186.0",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "three": "0.186.1"
   },
   "peerDependencies": {
-    "@react-three/fiber": "^9.0.4",
-    "react": "^19",
-    "three": ">=0.159.0"
+    "@react-three/fiber": ">=10.0.0-0",
+    "react": ">=19.0 <19.3",
+    "three": ">=0.185.0"
   },
   "dependencies": {
     "@dimforge/rapier3d-compat": "0.21.0",
     "suspend-react": "^0.1.3",
-    "three-stdlib": "^2.35.12"
+    "three-stdlib": "^2.36.1"
   },
   "repository": "https://github.com/pmndrs/react-three-rapier/tree/master/packages/react-three-rapier"
 }
