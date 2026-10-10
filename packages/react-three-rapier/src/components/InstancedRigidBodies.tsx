@@ -67,6 +67,13 @@ export const InstancedRigidBodies = memo(
 
       if (instancedMesh) {
         instancedMesh.instanceMatrix.setUsage(DynamicDrawUsage);
+
+        // Three computes an InstancedMesh's bounding sphere once, from the
+        // initial instance matrices. Physics then moves the instances around,
+        // so the cached bounds go stale and the whole mesh gets culled when the
+        // camera moves (#683). Recomputing the sphere every step is O(instances)
+        // per frame, so we opt out of frustum culling instead.
+        instancedMesh.frustumCulled = false;
       } else {
         console.warn(
           "InstancedRigidBodies expects exactly one child, which must be an InstancedMesh"

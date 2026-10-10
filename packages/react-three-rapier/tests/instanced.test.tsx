@@ -25,4 +25,21 @@ describe("InstancedRigidBodies", () => {
     );
     expect(keyWarnings).toHaveLength(0);
   });
+
+  it("disables frustum culling on the instanced mesh, since bounds go stale (#683)", async () => {
+    const renderer = await ReactThreeTestRenderer.create(
+      <Physics paused>
+        <InstancedRigidBodies instances={[{ key: "a" }]}>
+          <instancedMesh args={[undefined, undefined, 1]} />
+        </InstancedRigidBodies>
+      </Physics>
+    );
+    await pause(300);
+
+    const meshes = renderer.scene.findAll(
+      (node) => "isInstancedMesh" in node.instance
+    );
+    expect(meshes).toHaveLength(1);
+    expect(meshes[0].instance.frustumCulled).toBe(false);
+  });
 });
