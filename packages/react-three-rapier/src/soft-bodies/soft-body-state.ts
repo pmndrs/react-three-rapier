@@ -66,7 +66,9 @@ export class SoftBodyState {
     world: World,
     object: Renderable,
     options: SoftBodyOptions,
-    resolveBody: (body: unknown) => import("@dimforge/rapier3d-compat").RigidBody | null | undefined
+    resolveBody: (
+      body: unknown
+    ) => import("@dimforge/rapier3d-compat").RigidBody | null | undefined
   ) {
     const type = options.type ?? "cloth";
     this.world = world;
@@ -83,7 +85,9 @@ export class SoftBodyState {
     // Always simulate (and render) from our own welded copy of the geometry,
     // so the rendered vertex order matches the simulated one.
     const geometry =
-      type === "rope" ? ropeGeometry(object.geometry) : weldGeometry(object.geometry);
+      type === "rope"
+        ? ropeGeometry(object.geometry)
+        : weldGeometry(object.geometry);
     const position = geometry.attributes.position as BufferAttribute;
     const count = position.count;
 
@@ -98,8 +102,7 @@ export class SoftBodyState {
     let desc: SoftBodyDesc | null;
     if (type === "volume") {
       const index = geometry.index!;
-      const cellSize =
-        options.cellSize ?? defaultCellSize(worldPositions);
+      const cellSize = options.cellSize ?? defaultCellSize(worldPositions);
       desc = SoftBodyDesc.volumetric(
         worldPositions,
         new Uint32Array(index.array),
@@ -164,7 +167,8 @@ export class SoftBodyState {
     ) {
       // Only the settings of the template are used, its shape is replaced.
       const template = ColliderDesc.ball(0.01);
-      if (options.friction !== undefined) template.setFriction(options.friction);
+      if (options.friction !== undefined)
+        template.setFriction(options.friction);
       if (options.restitution !== undefined)
         template.setRestitution(options.restitution);
       if (options.collisionGroups !== undefined)
@@ -394,7 +398,7 @@ export class SoftBodyState {
       pieces,
       tornEdges: Array.from(event.tornEdges()),
       tornCells: Array.from(event.tornCells())
-    } satisfies SoftBodyTearPayload);
+    } as SoftBodyTearPayload);
   }
 
   /** Duplicates the given rendered vertices, owned by new particles. */
@@ -409,10 +413,9 @@ export class SoftBodyState {
     for (const name of Object.keys(geometry.attributes)) {
       const attribute = geometry.attributes[name] as BufferAttribute;
       const { itemSize } = attribute;
-      const array = new (attribute.array
-        .constructor as new (length: number) => typeof attribute.array)(
-        total * itemSize
-      );
+      const array = new (attribute.array.constructor as new (
+        length: number
+      ) => typeof attribute.array)(total * itemSize);
       array.set(attribute.array);
       sources.forEach((source, i) => {
         for (let k = 0; k < itemSize; k++) {
