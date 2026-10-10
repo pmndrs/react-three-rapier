@@ -1,7 +1,7 @@
 {
   "name": "react-three-rapier",
   "version": "0.1.0",
-  "main": "index.js",
+  "private": true,
   "repository": "https://github.com/pmndrs/react-three-rapier",
   "author": "Hugo Wiledal <hugo.wiledal@gmail.com>",
   "license": "MIT",
@@ -18,7 +18,7 @@
     "singleQuote": false,
     "arrowParens": "always"
   },
-  "dependencies": {
+  "devDependencies": {
     "@babel/core": "7.17.10",
     "@babel/preset-env": "7.17.10",
     "@babel/preset-react": "7.16.7",
@@ -26,7 +26,6 @@
     "@changesets/cli": "2.27.1",
     "@commitlint/cli": "17.1.2",
     "@commitlint/config-conventional": "17.1.0",
-    "@manypkg/cli": "0.19.1",
     "@preconstruct/cli": "2.8.8",
     "@testing-library/dom": "10.4.0",
     "@testing-library/react": "16.2.0",
@@ -41,12 +40,12 @@
     "vitest-canvas-mock": "0.3.3"
   },
   "scripts": {
-    "ci": "preconstruct validate && manypkg check && yarn test",
+    "ci": "preconstruct validate && yarn test",
     "postinstall": "preconstruct dev",
     "build": "preconstruct build",
     "dev": "preconstruct dev",
     "watch": "preconstruct watch",
-    "demo": "cd demo && yarn dev",
+    "demo": "yarn workspace demo dev",
     "release": "yarn build && changeset publish",
     "test": "tsc && vitest run",
     "test:ui": "vitest --ui",
@@ -58,10 +57,12 @@
     "commit-msg": "npx --no -- commitlint --edit ${1}",
     "pre-commit": "yarn prettier packages/ demo/ --check; yarn ci"
   },
-  "private": true,
   "workspaces": [
     "packages/*",
     "demo"
   ],
-  "packageManager": "yarn@1.22.21+sha1.1959a18351b811cdeedbd484a8f86c3cc3bbaf72"
+  "engines": {
+    "node": ">=22"
+  },
+  "packageManager": "yarn@4.18.1"
 }
