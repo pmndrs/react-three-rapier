@@ -65,6 +65,98 @@ export const createRigidBodyState = ({
   };
 };
 
+/**
+ * A parent Object3D's world space, as last read by a sync pass.
+ * @internal
+ */
+export interface ParentSpace {
+  object: Object3D;
+  /** Sync pass this entry was last read in */
+  pass: number;
+  /** Bumped whenever the parent's world matrix changes */
+  version: number;
+  inverse: Matrix4;
+  world: Matrix4;
+}
+
+// Parent inverse world matrices, re-read once per sync pass and shared by all
+// bodies with the same parent. Keyed weakly so removed parents are collected.
+const parentSpaces = new WeakMap<Object3D, ParentSpace>();
+let currentPass = 0;
+
+/**
+ * Starts a new sync pass: parent world matrices are re-read once per pass.
+ * @internal
+ */
+export const beginParentSpacePass = () => {
+  currentPass++;
+};
+
+/**
+ * Refreshes `state.invertedWorldMatrix` from the object's CURRENT parent world
+ * matrix (#36: it used to be captured once at spawn, so moving or rotating an
+ * ancestor afterwards desynced every visual from its body).
+ *
+ * @param collect receives each parent space the first time it is read in this
+ * pass, so a later pass can cheaply check whether any of them moved
+ * @returns whether the parent space changed (or the body was re-parented)
+ * since this body was last synced
+ * @internal
+ */
+export const refreshParentInverse = (
+  state: RigidBodyState,
+  collect?: ParentSpace[]
+) => {
+  const parent = state.object.parent;
+  if (!parent) return false;
+
+  let space = parentSpaces.get(parent);
+  if (!space) {
+    parent.updateWorldMatrix(true, false);
+    space = {
+      object: parent,
+      pass: currentPass,
+      version: 0,
+      world: parent.matrixWorld.clone(),
+      inverse: parent.matrixWorld.clone().invert()
+    };
+    parentSpaces.set(parent, space);
+    collect?.push(space);
+  } else if (space.pass !== currentPass) {
+    space.pass = currentPass;
+    parent.updateWorldMatrix(true, false);
+    if (!space.world.equals(parent.matrixWorld)) {
+      space.world.copy(parent.matrixWorld);
+      space.inverse.copy(parent.matrixWorld).invert();
+      space.version++;
+    }
+    collect?.push(space);
+  }
+
+  const moved =
+    state.parentSpace !== space || state.parentSpaceVersion !== space.version;
+  if (moved) {
+    state.invertedWorldMatrix.copy(space.inverse);
+    state.parentSpace = space;
+    state.parentSpaceVersion = space.version;
+  }
+  return moved;
+};
+
+/**
+ * Whether any of these parents' world matrices changed since they were read.
+ * Costs one `updateWorldMatrix` and one matrix compare per distinct parent.
+ * @internal
+ */
+export const anyParentSpaceMoved = (spaces: ParentSpace[]) => {
+  for (let i = 0; i < spaces.length; i++) {
+    const { object, world } = spaces[i];
+    object.updateWorldMatrix(true, false);
+    if (!world.equals(object.matrixWorld)) return true;
+  }
+  return false;
+};
+
 type ImmutableRigidBodyOptions = (keyof RigidBodyProps)[];
 
 export const immutableRigidBodyOptions: ImmutableRigidBodyOptions = [
