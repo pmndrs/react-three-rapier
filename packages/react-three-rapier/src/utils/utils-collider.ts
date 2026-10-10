@@ -91,11 +91,7 @@ export const createColliderFromOptions = (
   scale: Vector3,
   getRigidBody?: () => RigidBody
 ) => {
-  if (
-    options.shape === "heightfield" &&
-    typeof process !== "undefined" &&
-    process.env.NODE_ENV !== "production"
-  ) {
+  if (options.shape === "heightfield") {
     const [rows, cols, heights] = options.args as HeightfieldArgs;
     const expected = (rows + 1) * (cols + 1);
     if (heights?.length !== expected) {

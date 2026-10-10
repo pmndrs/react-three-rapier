@@ -12,6 +12,6 @@ Bug fixes for 3.0:
 - Re-export `ActiveCollisionTypes`, `ActiveEvents`, `ActiveHooks` and `QueryFilterFlags` from the package index (#703)
 - Add a regression test for changing the `RigidBody` `type` after mount (#314)
 - `InstancedRigidBodies` no longer spreads `key` into JSX, which warned on React 19 (#691)
-- `InstancedRigidBodies` disables frustum culling on its instanced mesh, since cached bounds go stale as bodies move (#683)
+- `InstancedRigidBodies` disables frustum culling on its instanced mesh by default, since cached bounds go stale as bodies move; pass `frustumCulled` to re-enable it (#683)
 - Replace `three-stdlib` with `three/examples/jsm` imports and remove the dependency (#698)
 - Document `HeightfieldArgs` (`heights` must have `(rows + 1) * (cols + 1)` values) and warn in development when the length mismatches (#730)

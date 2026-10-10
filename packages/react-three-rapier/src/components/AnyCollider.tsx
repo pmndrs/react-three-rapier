@@ -53,6 +53,9 @@ export const AnyCollider = memo((props: ColliderProps) => {
   const { world, colliderEvents, colliderStates } = useRapier();
   const rigidBodyContext = useRigidBodyContext();
   const colliderRef = useForwardedRef(props.ref);
+  // Destroy closures can outlive a render; always use the latest ref
+  const latestRef = useRef(props.ref);
+  latestRef.current = props.ref;
   const objectRef = useRef<Object3D>(null);
 
   // We spread the props out here to make sure that the ref is updated when the props change.
@@ -72,8 +75,8 @@ export const AnyCollider = memo((props: ColliderProps) => {
         rigidBodyContext?.getRigidBody
       );
 
-      if (typeof props.ref == "function") {
-        props.ref(collider);
+      if (typeof latestRef.current == "function") {
+        latestRef.current(collider);
       }
       colliderRef.current = collider;
 
@@ -85,10 +88,11 @@ export const AnyCollider = memo((props: ColliderProps) => {
       }
 
       // Don't leave the consumer holding a reference to a freed rapier object
-      if (typeof props.ref === "function") {
-        props.ref(null);
-      } else if (props.ref && props.ref.current === collider) {
-        props.ref.current = null;
+      const currentRef = latestRef.current;
+      if (typeof currentRef === "function") {
+        currentRef(null);
+      } else if (currentRef && currentRef.current === collider) {
+        currentRef.current = null;
       }
       if (colliderRef.current === collider) {
         (colliderRef as MutableRefObject<Collider | null>).current = null;

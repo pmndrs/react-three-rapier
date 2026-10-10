@@ -82,16 +82,19 @@ export const InstancedRigidBodies = memo(
       }
     }, []);
 
+    // Three computes an InstancedMesh's bounding sphere once, from the
+    // initial instance matrices. Physics then moves the instances around,
+    // so the cached bounds go stale and the whole mesh gets culled when the
+    // camera moves (#683). Recomputing the sphere every step is O(instances)
+    // per frame, so we opt out of frustum culling by default instead.
+    // Runs after every render so that a re-created InstancedMesh (e.g. when the
+    // instance count changes) is also covered; it is cheap and idempotent.
     useEffect(() => {
       const instancedMesh = getInstancedMesh();
-
-      // Three computes an InstancedMesh's bounding sphere once, from the
-      // initial instance matrices. Physics then moves the instances around,
-      // so the cached bounds go stale and the whole mesh gets culled when the
-      // camera moves (#683). Recomputing the sphere every step is O(instances)
-      // per frame, so we opt out of frustum culling by default instead.
-      if (instancedMesh) instancedMesh.frustumCulled = frustumCulled;
-    }, [frustumCulled]);
+      if (instancedMesh && instancedMesh.frustumCulled !== frustumCulled) {
+        instancedMesh.frustumCulled = frustumCulled;
+      }
+    });
 
     // Update the RigidBodyStates whenever the instances change
     const applyInstancedState = (state: RigidBodyState, index: number) => {
