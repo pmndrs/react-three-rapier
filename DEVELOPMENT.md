@@ -75,11 +75,11 @@ node10 resolution. A new subpath needs the same four things. Subpath entries mus
 
 ## Linting and formatting
 
-ESLint 9 (flat config) and Prettier 3 are configured but the codebase has **not** been
-reformatted or lint-fixed yet; that happens once at the end of the 3.0 integration to avoid
-conflicts with in-flight work. Until then the CI lint job is non-blocking. Format the files you
-touch with `yarn prettier --write <paths>`, and never run `eslint --fix` or `yarn format` across
-files you did not otherwise change.
+ESLint 9 (flat config) and Prettier 3 are configured, the codebase is formatted, and it has no
+lint errors. CI runs `yarn lint` and `yarn format:check` as a blocking job, so run `yarn format`
+before pushing. Lint warnings (unused variables, hook dependencies) don't fail the build, but
+avoid adding new ones. The one-off Prettier 3 reformat is listed in `.git-blame-ignore-revs`
+(GitHub skips it automatically; set `blame.ignoreRevsFile` to skip it locally).
 
 ## Releases
 

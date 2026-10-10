@@ -58,9 +58,6 @@ jobs:
   lint:
     name: Lint & format
     runs-on: ubuntu-latest
-    # Non-blocking until the codebase is reformatted / lint-fixed at the end of the 3.0
-    # integration (see DEVELOPMENT.md). Remove `continue-on-error` then.
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
